@@ -113,9 +113,34 @@ export default function ScoringScreen() {
   };
 
   const handleTargetPress = (event: any) => {
-    const { locationX, locationY } = event.nativeEvent;
-    const x = locationX / TARGET_SIZE;
-    const y = locationY / TARGET_SIZE;
+    // Get touch/click position relative to the target container
+    let x, y;
+    
+    if (event.nativeEvent.locationX !== undefined) {
+      // Native (iOS/Android)
+      x = event.nativeEvent.locationX / TARGET_SIZE;
+      y = event.nativeEvent.locationY / TARGET_SIZE;
+    } else if (event.nativeEvent.offsetX !== undefined) {
+      // Web
+      x = event.nativeEvent.offsetX / TARGET_SIZE;
+      y = event.nativeEvent.offsetY / TARGET_SIZE;
+    } else {
+      // Fallback - use pageX/pageY and calculate offset
+      const target = event.currentTarget || event.target;
+      const rect = target.getBoundingClientRect?.();
+      if (rect) {
+        x = (event.nativeEvent.pageX - rect.left) / TARGET_SIZE;
+        y = (event.nativeEvent.pageY - rect.top) / TARGET_SIZE;
+      } else {
+        // Last resort - use center
+        x = 0.5;
+        y = 0.5;
+      }
+    }
+
+    // Clamp values
+    x = Math.max(0, Math.min(1, x));
+    y = Math.max(0, Math.min(1, y));
 
     const ring = calculateRingFromPosition(x, y);
 
