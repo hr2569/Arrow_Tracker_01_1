@@ -402,7 +402,7 @@ export default function ScoringScreen() {
         </View>
 
         {/* Toggle Overlay */}
-        <TouchableOpacity
+        <Pressable
           style={styles.toggleOverlay}
           onPress={() => setShowTargetOverlay(!showTargetOverlay)}
         >
@@ -417,7 +417,7 @@ export default function ScoringScreen() {
         </TouchableOpacity>
 
         {/* Re-detect Button */}
-        <TouchableOpacity
+        <Pressable
           style={styles.redetectButton}
           onPress={detectArrows}
           disabled={isDetecting}
@@ -428,7 +428,7 @@ export default function ScoringScreen() {
 
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
+          <Pressable
             style={styles.secondaryButton}
             onPress={() => router.back()}
           >
@@ -436,7 +436,7 @@ export default function ScoringScreen() {
             <Text style={styles.secondaryButtonText}>Back</Text>
           </Pressable>
 
-          <TouchableOpacity
+          <Pressable
             style={styles.primaryButton}
             onPress={handleFinishRound}
           >
