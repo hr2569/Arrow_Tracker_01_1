@@ -298,6 +298,9 @@ async def create_session(request: CreateSessionRequest):
 async def get_sessions():
     """Get all scoring sessions"""
     sessions = await db.sessions.find().sort("created_at", -1).to_list(100)
+    # Remove MongoDB _id from response
+    for session in sessions:
+        session.pop('_id', None)
     return sessions
 
 @api_router.get("/sessions/{session_id}")
