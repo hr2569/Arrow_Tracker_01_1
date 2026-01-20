@@ -52,6 +52,8 @@ export default function ScoringScreen() {
   const [selectedArrow, setSelectedArrow] = useState<string | null>(null);
   const [showTargetOverlay, setShowTargetOverlay] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [targetLayout, setTargetLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+  const targetRef = useRef<View>(null);
 
   // Get center and radius from targetData or use defaults
   const centerX = targetData?.center?.x ?? 0.5;
