@@ -395,13 +395,14 @@ async def update_round(session_id: str, round_id: str, request: UpdateRoundReque
     
     # Recalculate total
     session['total_score'] = sum(r['total_score'] for r in session['rounds'])
-    session['updated_at'] = datetime.utcnow()
+    session['updated_at'] = datetime.utcnow().isoformat()
     
     await db.sessions.update_one(
         {"id": session_id},
         {"$set": session}
     )
     
+    session.pop('_id', None)
     return session
 
 @api_router.delete("/sessions/{session_id}")
