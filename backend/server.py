@@ -286,7 +286,12 @@ async def create_session(request: CreateSessionRequest):
         name=request.name or f"Session {datetime.utcnow().strftime('%Y-%m-%d %H:%M')}"
     )
     session_dict = session.dict()
+    # Convert datetime to ISO string for JSON serialization
+    session_dict['created_at'] = session_dict['created_at'].isoformat()
+    session_dict['updated_at'] = session_dict['updated_at'].isoformat()
     await db.sessions.insert_one(session_dict)
+    # Remove MongoDB _id from response
+    session_dict.pop('_id', None)
     return session_dict
 
 @api_router.get("/sessions")
