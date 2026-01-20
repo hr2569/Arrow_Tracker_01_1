@@ -95,27 +95,39 @@ async def analyze_target_corners(image_base64: str) -> dict:
         chat = LlmChat(
             api_key=api_key,
             session_id=f"target-analysis-{uuid.uuid4()}",
-            system_message="""You are an expert archery target analyzer. You analyze images of archery targets and detect the four corners of the target face.
-            
-Your task is to identify the bounding corners of the circular target. Return the corners as normalized coordinates (0-1) where (0,0) is top-left and (1,1) is bottom-right of the image.
+            system_message="""You are an expert archery target analyzer. You analyze images of archery targets to detect the WHITE TARGET PAPER boundaries and the colored ring structure.
 
-Respond ONLY in JSON format like this:
+Your task:
+1. Find the 4 corners of the WHITE TARGET PAPER (the square/rectangular paper the target is printed on)
+2. Find the CENTER of the colored target rings (yellow bullseye center)
+3. Calculate the RADIUS of the outermost ring relative to the paper size
+
+The target has colored rings from outside to inside:
+- White (rings 1-2) - outermost
+- Black (rings 3-4)
+- Blue (rings 5-6)
+- Red (rings 7-8)
+- Yellow/Gold (rings 9-10) - center/bullseye
+
+Return coordinates as normalized values (0-1) where (0,0) is top-left and (1,1) is bottom-right of the IMAGE.
+
+Respond ONLY in JSON format:
 {
   "detected": true,
-  "corners": [
+  "paper_corners": [
     {"x": 0.1, "y": 0.1, "position": "top-left"},
     {"x": 0.9, "y": 0.1, "position": "top-right"},
     {"x": 0.9, "y": 0.9, "position": "bottom-right"},
     {"x": 0.1, "y": 0.9, "position": "bottom-left"}
   ],
-  "center": {"x": 0.5, "y": 0.5},
-  "radius": 0.4,
+  "target_center": {"x": 0.5, "y": 0.5},
+  "target_radius": 0.35,
   "confidence": 0.95,
   "message": "Target detected successfully"
 }
 
-If no target is detected, respond:
-{"detected": false, "message": "No archery target found in image"}"""
+If no target paper is detected:
+{"detected": false, "message": "No archery target paper found in image"}"""
         ).with_model("openai", "gpt-4o")
         
         # Clean base64 string
@@ -126,7 +138,7 @@ If no target is detected, respond:
         image_content = ImageContent(image_base64=image_base64)
         
         user_message = UserMessage(
-            text="Analyze this archery target image. Detect the four corners of the target face (the bounding box around the circular target). Return the coordinates in JSON format.",
+            text="Analyze this archery target image. Find the 4 corners of the WHITE TARGET PAPER, the center of the bullseye (yellow area), and estimate the radius of the colored target rings relative to the image. Return coordinates in JSON format.",
             file_contents=[image_content]
         )
         
@@ -148,9 +160,9 @@ If no target is detected, respond:
             if result.get('detected', False):
                 return {
                     "success": True,
-                    "corners": result.get('corners', []),
-                    "center": result.get('center', {"x": 0.5, "y": 0.5}),
-                    "radius": result.get('radius', 0.4),
+                    "corners": result.get('paper_corners', []),
+                    "center": result.get('target_center', {"x": 0.5, "y": 0.5}),
+                    "radius": result.get('target_radius', 0.4),
                     "confidence": result.get('confidence', 0.8),
                     "message": result.get('message', 'Target detected')
                 }
