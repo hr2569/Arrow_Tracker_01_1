@@ -188,34 +188,37 @@ async def detect_arrows(image_base64: str, target_center: dict, target_radius: f
         chat = LlmChat(
             api_key=api_key,
             session_id=f"arrow-detection-{uuid.uuid4()}",
-            system_message="""You are an expert archery target scorer. You analyze images of archery targets with arrows and detect the position of each arrow hit.
+            system_message=f"""You are an expert archery target scorer. You analyze images of archery targets with arrows and detect the position of each arrow hit.
 
-The target has 10 scoring rings:
-- Ring 10 (innermost, gold/yellow): X (center dot)
-- Ring 9 (gold/yellow): Inner gold
-- Ring 8 (red): Inner red
-- Ring 7 (red): Outer red  
-- Ring 6 (blue): Inner blue
-- Ring 5 (blue): Outer blue
-- Ring 4 (black): Inner black
-- Ring 3 (black): Outer black
-- Ring 2 (white): Inner white
-- Ring 1 (white): Outer white
+The target has 10 scoring rings with these colors (from outside to inside):
+- Rings 1-2: White (outermost)
+- Rings 3-4: Black
+- Rings 5-6: Blue
+- Rings 7-8: Red
+- Rings 9-10: Yellow/Gold (center bullseye)
 
-For each arrow you detect, determine which ring it hit based on its position from the center.
+The target center is at approximately ({target_center.get('x', 0.5)}, {target_center.get('y', 0.5)}) in normalized coordinates.
+The target radius is approximately {target_radius} in normalized coordinates.
+
+For each ARROW (not old holes) you detect:
+1. Find its position as normalized coordinates (0-1) relative to the image
+2. Determine which colored ring zone it hit based on the colors above
+3. Assign the correct score (1-10)
+
+Look for arrows with fletching (feathers/vanes) - they look different from old holes in the target.
 
 Respond ONLY in JSON format:
-{
+{{
   "detected": true,
   "arrows": [
-    {"x": 0.52, "y": 0.48, "ring": 9, "confidence": 0.9},
-    {"x": 0.45, "y": 0.55, "ring": 7, "confidence": 0.85}
+    {{"x": 0.52, "y": 0.48, "ring": 9, "confidence": 0.9}},
+    {{"x": 0.45, "y": 0.55, "ring": 7, "confidence": 0.85}}
   ],
   "message": "Detected 2 arrows"
-}
+}}
 
-Coordinates are normalized (0-1) relative to the image. If no arrows found:
-{"detected": false, "arrows": [], "message": "No arrows detected"}"""
+If no arrows found:
+{{"detected": false, "arrows": [], "message": "No arrows detected"}}"""
         ).with_model("openai", "gpt-4o")
         
         # Clean base64 string
@@ -226,7 +229,7 @@ Coordinates are normalized (0-1) relative to the image. If no arrows found:
         image_content = ImageContent(image_base64=image_base64)
         
         user_message = UserMessage(
-            text=f"Analyze this archery target image and detect all arrow hits. The target center is approximately at ({target_center.get('x', 0.5)}, {target_center.get('y', 0.5)}) with radius {target_radius}. For each arrow, determine its position and which scoring ring (1-10) it hit.",
+            text=f"Analyze this archery target image and detect all ARROWS (not old holes). The target center is at ({target_center.get('x', 0.5)}, {target_center.get('y', 0.5)}) with radius {target_radius}. For each arrow, determine its position and which scoring ring (1-10) it hit based on the ring colors (White 1-2, Black 3-4, Blue 5-6, Red 7-8, Yellow 9-10).",
             file_contents=[image_content]
         )
         
