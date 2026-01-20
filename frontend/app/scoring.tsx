@@ -314,9 +314,9 @@ export default function ScoringScreen() {
                 ]}>
                   {arrow.ring}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
-          </TouchableOpacity>
+          </Pressable>
 
           {/* Loading Overlay */}
           {isDetecting && (
@@ -355,7 +355,7 @@ export default function ScoringScreen() {
               {arrows.some(a => !a.confirmed) && (
                 <TouchableOpacity onPress={confirmAllArrows}>
                   <Text style={styles.confirmAllText}>Confirm All</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
             </View>
             {arrows.map((arrow, index) => (
@@ -380,14 +380,14 @@ export default function ScoringScreen() {
                       onPress={() => confirmArrow(arrow.id)}
                     >
                       <Ionicons name="checkmark" size={18} color="#4CAF50" />
-                    </TouchableOpacity>
+                    </Pressable>
                   )}
                   <TouchableOpacity
                     style={styles.removeBtn}
                     onPress={() => removeArrow(arrow.id)}
                   >
                     <Ionicons name="trash" size={18} color="#ff6b6b" />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               </View>
             ))}
@@ -435,7 +435,7 @@ export default function ScoringScreen() {
           >
             <Ionicons name="arrow-back" size={20} color="#e94560" />
             <Text style={styles.secondaryButtonText}>Back</Text>
-          </TouchableOpacity>
+          </Pressable>
 
           <TouchableOpacity
             style={styles.primaryButton}
@@ -443,7 +443,7 @@ export default function ScoringScreen() {
           >
             <Text style={styles.primaryButtonText}>Finish Round</Text>
             <Ionicons name="checkmark-circle" size={20} color="#fff" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
