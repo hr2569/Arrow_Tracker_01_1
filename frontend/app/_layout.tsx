@@ -1,7 +1,16 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, LogBox } from 'react-native';
+
+// Suppress known warnings from dependencies
+LogBox.ignoreLogs([
+  'shadow*',
+  'props.pointerEvents',
+  '"shadow*" style props are deprecated',
+  'props.pointerEvents is deprecated',
+  'Unauthorized request from',
+]);
 
 export default function RootLayout() {
   return (
