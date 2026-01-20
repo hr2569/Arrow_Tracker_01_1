@@ -132,11 +132,18 @@ export default function AlignmentScreen() {
   };
 
   const calculateRadius = () => {
-    const center = calculateCenter();
-    const distances = corners.map(c => 
-      Math.sqrt(Math.pow(c.x - center.x, 2) + Math.pow(c.y - center.y, 2))
-    );
-    return Math.max(...distances);
+    // Calculate the width and height of the bounding box from corners
+    const minX = Math.min(...corners.map(c => c.x));
+    const maxX = Math.max(...corners.map(c => c.x));
+    const minY = Math.min(...corners.map(c => c.y));
+    const maxY = Math.max(...corners.map(c => c.y));
+    
+    const width = maxX - minX;
+    const height = maxY - minY;
+    
+    // The radius is half of the smaller dimension (to fit a circle)
+    // Multiply by 0.95 to account for margin on the target paper
+    return Math.min(width, height) / 2 * 0.95;
   };
 
   const handleConfirm = () => {
