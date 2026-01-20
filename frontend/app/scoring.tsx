@@ -218,23 +218,21 @@ export default function ScoringScreen() {
             )}
 
             {/* Target Rings Overlay */}
-            {showTargetOverlay && targetData && (
+            {showTargetOverlay && (
               <View 
                 style={[
                   styles.targetOverlay,
                   {
-                    left: (targetData.center?.x || 0.5) * TARGET_SIZE,
-                    top: (targetData.center?.y || 0.5) * TARGET_SIZE,
-                    transform: [
-                      { translateX: -TARGET_SIZE * (targetData.radius || 0.4) },
-                      { translateY: -TARGET_SIZE * (targetData.radius || 0.4) },
-                    ],
+                    width: TARGET_SIZE * (targetData?.radius || 0.4) * 2,
+                    height: TARGET_SIZE * (targetData?.radius || 0.4) * 2,
+                    left: (targetData?.center?.x || 0.5) * TARGET_SIZE - TARGET_SIZE * (targetData?.radius || 0.4),
+                    top: (targetData?.center?.y || 0.5) * TARGET_SIZE - TARGET_SIZE * (targetData?.radius || 0.4),
                   },
                 ]}
               >
                 {[...Array(10)].map((_, i) => {
-                  const ringRadius = TARGET_SIZE * (targetData.radius || 0.4) * 2;
-                  const ringSize = ringRadius * ((10 - i) / 10);
+                  const overlaySize = TARGET_SIZE * (targetData?.radius || 0.4) * 2;
+                  const ringSize = overlaySize * ((10 - i) / 10);
                   return (
                     <View
                       key={i}
