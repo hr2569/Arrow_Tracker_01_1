@@ -89,38 +89,41 @@ export default function AlignmentScreen() {
     }
   };
 
-  const handleCornerDrag = (index: number, dx: number, dy: number) => {
-    const newCorners = [...corners];
-    let newX = newCorners[index].x + dx / IMAGE_SIZE;
-    let newY = newCorners[index].y + dy / IMAGE_SIZE;
+  const handleCornerDrag = (index: number, gestureState: any) => {
+    const currentCorners = [...cornersRef.current];
+    let newX = startPosRef.current.x + gestureState.dx / IMAGE_SIZE;
+    let newY = startPosRef.current.y + gestureState.dy / IMAGE_SIZE;
     
     // Clamp values between 0 and 1
     newX = Math.max(0.05, Math.min(0.95, newX));
     newY = Math.max(0.05, Math.min(0.95, newY));
     
-    newCorners[index] = { ...newCorners[index], x: newX, y: newY };
-    setCorners(newCorners);
+    currentCorners[index] = { ...currentCorners[index], x: newX, y: newY };
+    setCorners(currentCorners);
   };
 
-  const createPanResponder = (index: number) => {
-    return PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        setActiveCorner(index);
-      },
-      onPanResponderMove: (_, gestureState) => {
-        handleCornerDrag(index, gestureState.dx, gestureState.dy);
-      },
-      onPanResponderRelease: () => {
-        setActiveCorner(null);
-      },
-    });
-  };
-
-  const [panResponders] = useState(() => 
-    corners.map((_, index) => createPanResponder(index))
-  );
+  const panResponders = useRef(
+    [0, 1, 2, 3].map((index) =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderGrant: () => {
+          setActiveCorner(index);
+          // Store the starting position
+          startPosRef.current = {
+            x: cornersRef.current[index].x,
+            y: cornersRef.current[index].y,
+          };
+        },
+        onPanResponderMove: (_, gestureState) => {
+          handleCornerDrag(index, gestureState);
+        },
+        onPanResponderRelease: () => {
+          setActiveCorner(null);
+        },
+      })
+    )
+  ).current;
 
   const calculateCenter = () => {
     const avgX = corners.reduce((sum, c) => sum + c.x, 0) / 4;
