@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -42,6 +42,15 @@ export default function AlignmentScreen() {
   const [activeCorner, setActiveCorner] = useState<number | null>(null);
   const [isManualMode, setIsManualMode] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  
+  // Use refs to track corner positions during drag
+  const cornersRef = useRef(corners);
+  const startPosRef = useRef({ x: 0, y: 0 });
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    cornersRef.current = corners;
+  }, [corners]);
 
   useEffect(() => {
     if (currentImage) {
