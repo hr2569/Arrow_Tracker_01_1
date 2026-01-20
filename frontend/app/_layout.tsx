@@ -1,48 +1,7 @@
-// Import warning suppression first
-import '../utils/suppressWarnings';
-
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet, LogBox, Platform } from 'react-native';
-
-// Suppress known warnings from dependencies
-LogBox.ignoreLogs([
-  'shadow*',
-  'props.pointerEvents',
-  '"shadow*" style props are deprecated',
-  'props.pointerEvents is deprecated',
-  'Unauthorized request from',
-]);
-
-// Suppress console warnings on web
-if (Platform.OS === 'web') {
-  const originalWarn = console.warn;
-  console.warn = (...args) => {
-    const message = args[0]?.toString() || '';
-    if (
-      message.includes('shadow') ||
-      message.includes('pointerEvents') ||
-      message.includes('Unauthorized request')
-    ) {
-      return;
-    }
-    originalWarn.apply(console, args);
-  };
-  
-  const originalError = console.error;
-  console.error = (...args) => {
-    const message = args[0]?.toString() || '';
-    if (
-      message.includes('shadow') ||
-      message.includes('pointerEvents') ||
-      message.includes('Unauthorized request')
-    ) {
-      return;
-    }
-    originalError.apply(console, args);
-  };
-}
+import { StyleSheet } from 'react-native';
 
 export default function RootLayout() {
   return (
