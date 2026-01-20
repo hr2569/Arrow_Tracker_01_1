@@ -167,20 +167,80 @@ If no target is detected, respond:
 async def detect_arrows(image_base64: str, target_center: dict, target_radius: float) -> dict:
     """Use AI to detect arrow positions in the target image"""
     try:
-        # For testing purposes, return mock data since the AI integration has API issues
-        # TODO: Fix the Emergent API integration
-        logger.info("Using mock arrow detection for testing")
+        from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
         
-        # Simulate successful arrow detection
-        return {
-            "success": True,
-            "arrows": [
-                {"x": 0.52, "y": 0.48, "ring": 9, "confidence": 0.9},
-                {"x": 0.45, "y": 0.55, "ring": 7, "confidence": 0.85},
-                {"x": 0.6, "y": 0.4, "ring": 6, "confidence": 0.8}
-            ],
-            "message": "Detected 3 arrows (MOCKED)"
-        }
+        api_key = os.environ.get('EMERGENT_LLM_KEY', '')
+        if not api_key:
+            return {"success": False, "message": "API key not configured"}
+        
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"arrow-detection-{uuid.uuid4()}",
+            system_message="""You are an expert archery target scorer. You analyze images of archery targets with arrows and detect the position of each arrow hit.
+
+The target has 10 scoring rings:
+- Ring 10 (innermost, gold/yellow): X (center dot)
+- Ring 9 (gold/yellow): Inner gold
+- Ring 8 (red): Inner red
+- Ring 7 (red): Outer red  
+- Ring 6 (blue): Inner blue
+- Ring 5 (blue): Outer blue
+- Ring 4 (black): Inner black
+- Ring 3 (black): Outer black
+- Ring 2 (white): Inner white
+- Ring 1 (white): Outer white
+
+For each arrow you detect, determine which ring it hit based on its position from the center.
+
+Respond ONLY in JSON format:
+{
+  "detected": true,
+  "arrows": [
+    {"x": 0.52, "y": 0.48, "ring": 9, "confidence": 0.9},
+    {"x": 0.45, "y": 0.55, "ring": 7, "confidence": 0.85}
+  ],
+  "message": "Detected 2 arrows"
+}
+
+Coordinates are normalized (0-1) relative to the image. If no arrows found:
+{"detected": false, "arrows": [], "message": "No arrows detected"}"""
+        ).with_model("openai", "gpt-4o")
+        
+        # Clean base64 string
+        if ',' in image_base64:
+            image_base64 = image_base64.split(',')[1]
+        
+        # Create image content - use file_contents parameter (not image_contents)
+        image_content = ImageContent(image_base64=image_base64)
+        
+        user_message = UserMessage(
+            text=f"Analyze this archery target image and detect all arrow hits. The target center is approximately at ({target_center.get('x', 0.5)}, {target_center.get('y', 0.5)}) with radius {target_radius}. For each arrow, determine its position and which scoring ring (1-10) it hit.",
+            file_contents=[image_content]
+        )
+        
+        response = await chat.send_message(user_message)
+        logger.info(f"Arrow detection response: {response}")
+        
+        # Parse JSON from response
+        try:
+            response_text = response.strip()
+            if response_text.startswith('```json'):
+                response_text = response_text[7:]
+            if response_text.startswith('```'):
+                response_text = response_text[3:]
+            if response_text.endswith('```'):
+                response_text = response_text[:-3]
+            
+            result = json.loads(response_text.strip())
+            
+            return {
+                "success": True,
+                "arrows": result.get('arrows', []),
+                "message": result.get('message', 'Analysis complete')
+            }
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON parse error: {e}")
+            return {"success": False, "arrows": [], "message": f"Failed to parse AI response: {str(e)}"}
             
     except Exception as e:
         logger.error(f"Arrow detection error: {e}")
