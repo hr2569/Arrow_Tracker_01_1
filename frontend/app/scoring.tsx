@@ -293,7 +293,7 @@ export default function ScoringScreen() {
 
             {/* Arrow Markers */}
             {arrows.map((arrow) => (
-              <TouchableOpacity
+              <Pressable
                 key={arrow.id}
                 style={[
                   styles.arrowMarker,
@@ -352,7 +352,7 @@ export default function ScoringScreen() {
             <View style={styles.listHeader}>
               <Text style={styles.listTitle}>Arrows</Text>
               {arrows.some(a => !a.confirmed) && (
-                <TouchableOpacity onPress={confirmAllArrows}>
+                <Pressable onPress={confirmAllArrows}>
                   <Text style={styles.confirmAllText}>Confirm All</Text>
                 </Pressable>
               )}
@@ -374,14 +374,14 @@ export default function ScoringScreen() {
                 </View>
                 <View style={styles.arrowActions}>
                   {!arrow.confirmed && (
-                    <TouchableOpacity
+                    <Pressable
                       style={styles.confirmBtn}
                       onPress={() => confirmArrow(arrow.id)}
                     >
                       <Ionicons name="checkmark" size={18} color="#4CAF50" />
                     </Pressable>
                   )}
-                  <TouchableOpacity
+                  <Pressable
                     style={styles.removeBtn}
                     onPress={() => removeArrow(arrow.id)}
                   >
