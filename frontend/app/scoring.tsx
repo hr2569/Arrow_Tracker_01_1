@@ -228,9 +228,12 @@ export default function ScoringScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Target Area */}
-        <View style={styles.targetContainer}>
-          <TouchableOpacity
-            activeOpacity={1}
+        <View 
+          ref={targetRef}
+          style={styles.targetContainer}
+          onLayout={handleTargetLayout}
+        >
+          <Pressable
             onPress={handleTargetPress}
             style={styles.targetTouchArea}
           >
