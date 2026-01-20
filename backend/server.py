@@ -309,6 +309,7 @@ async def get_session(session_id: str):
     session = await db.sessions.find_one({"id": session_id})
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
+    session.pop('_id', None)
     return session
 
 @api_router.post("/sessions/{session_id}/rounds")
