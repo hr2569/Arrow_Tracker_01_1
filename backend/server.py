@@ -343,15 +343,19 @@ async def add_round(session_id: str, request: AddRoundRequest):
     )
     
     # Update session
-    session['rounds'].append(new_round.dict())
+    new_round_dict = new_round.dict()
+    new_round_dict['created_at'] = new_round_dict['created_at'].isoformat()
+    
+    session['rounds'].append(new_round_dict)
     session['total_score'] = sum(r['total_score'] for r in session['rounds'])
-    session['updated_at'] = datetime.utcnow()
+    session['updated_at'] = datetime.utcnow().isoformat()
     
     await db.sessions.update_one(
         {"id": session_id},
         {"$set": session}
     )
     
+    session.pop('_id', None)
     return session
 
 @api_router.put("/sessions/{session_id}/rounds/{round_id}")
