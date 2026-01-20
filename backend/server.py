@@ -86,16 +86,25 @@ class UpdateRoundRequest(BaseModel):
 async def analyze_target_corners(image_base64: str) -> dict:
     """Use AI to detect target corners in the image"""
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+        import requests
         
         api_key = os.environ.get('EMERGENT_LLM_KEY', '')
         if not api_key:
             return {"success": False, "message": "API key not configured"}
         
-        chat = LlmChat(
-            api_key=api_key,
-            session_id=f"target-analysis-{uuid.uuid4()}",
-            system_message="""You are an expert archery target analyzer. You analyze images of archery targets and detect the four corners of the target face.
+        # Clean base64 string
+        if ',' in image_base64:
+            image_base64 = image_base64.split(',')[1]
+        
+        # Use OpenAI-compatible format for Emergent API
+        url = "https://api.emergent.sh/v1/chat/completions"
+        
+        payload = {
+            "model": "gpt-4o",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """You are an expert archery target analyzer. You analyze images of archery targets and detect the four corners of the target face.
             
 Your task is to identify the bounding corners of the circular target. Return the corners as normalized coordinates (0-1) where (0,0) is top-left and (1,1) is bottom-right of the image.
 
@@ -116,26 +125,42 @@ Respond ONLY in JSON format like this:
 
 If no target is detected, respond:
 {"detected": false, "message": "No archery target found in image"}"""
-        ).with_model("openai", "gpt-4o")
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Analyze this archery target image. Detect the four corners of the target face (the bounding box around the circular target). Return the coordinates in JSON format."},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/png;base64,{image_base64}"}
+                        }
+                    ]
+                }
+            ],
+            "max_tokens": 1000,
+            "temperature": 0.1
+        }
         
-        # Clean base64 string
-        if ',' in image_base64:
-            image_base64 = image_base64.split(',')[1]
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
         
-        image_content = ImageContent(image_base64=image_base64)
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
         
-        user_message = UserMessage(
-            text="Analyze this archery target image. Detect the four corners of the target face (the bounding box around the circular target). Return the coordinates in JSON format.",
-            image_contents=[image_content]
-        )
+        if response.status_code != 200:
+            logger.error(f"API request failed: {response.status_code} - {response.text}")
+            return {"success": False, "message": f"API request failed: {response.status_code}"}
         
-        response = await chat.send_message(user_message)
-        logger.info(f"Target analysis response: {response}")
+        response_data = response.json()
+        ai_response = response_data["choices"][0]["message"]["content"]
+        
+        logger.info(f"Target analysis response: {ai_response}")
         
         # Parse JSON from response
         try:
             # Try to extract JSON from response
-            response_text = response.strip()
+            response_text = ai_response.strip()
             if response_text.startswith('```json'):
                 response_text = response_text[7:]
             if response_text.startswith('```'):
@@ -157,7 +182,7 @@ If no target is detected, respond:
             else:
                 return {"success": False, "message": result.get('message', 'No target detected')}
         except json.JSONDecodeError as e:
-            logger.error(f"JSON parse error: {e}, response: {response}")
+            logger.error(f"JSON parse error: {e}, response: {ai_response}")
             return {"success": False, "message": f"Failed to parse AI response: {str(e)}"}
             
     except Exception as e:
