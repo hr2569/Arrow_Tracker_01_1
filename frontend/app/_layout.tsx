@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet, LogBox } from 'react-native';
+import { StyleSheet, LogBox, Platform } from 'react-native';
 
 // Suppress known warnings from dependencies
 LogBox.ignoreLogs([
@@ -11,6 +11,35 @@ LogBox.ignoreLogs([
   'props.pointerEvents is deprecated',
   'Unauthorized request from',
 ]);
+
+// Suppress console warnings on web
+if (Platform.OS === 'web') {
+  const originalWarn = console.warn;
+  console.warn = (...args) => {
+    const message = args[0]?.toString() || '';
+    if (
+      message.includes('shadow') ||
+      message.includes('pointerEvents') ||
+      message.includes('Unauthorized request')
+    ) {
+      return;
+    }
+    originalWarn.apply(console, args);
+  };
+  
+  const originalError = console.error;
+  console.error = (...args) => {
+    const message = args[0]?.toString() || '';
+    if (
+      message.includes('shadow') ||
+      message.includes('pointerEvents') ||
+      message.includes('Unauthorized request')
+    ) {
+      return;
+    }
+    originalError.apply(console, args);
+  };
+}
 
 export default function RootLayout() {
   return (
