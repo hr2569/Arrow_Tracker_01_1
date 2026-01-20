@@ -414,7 +414,7 @@ export default function ScoringScreen() {
           <Text style={styles.toggleText}>
             {showTargetOverlay ? 'Hide' : 'Show'} Ring Overlay
           </Text>
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Re-detect Button */}
         <Pressable
@@ -424,7 +424,7 @@ export default function ScoringScreen() {
         >
           <Ionicons name="scan" size={20} color="#e94560" />
           <Text style={styles.redetectText}>Re-detect Arrows</Text>
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
