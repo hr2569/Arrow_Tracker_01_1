@@ -116,46 +116,38 @@ export default function ScoringScreen() {
   };
 
   const handleTargetPress = (event: any) => {
-    // Get touch/click position relative to the target container
-    let x, y;
+    if (!targetLayout) return;
     
-    if (event.nativeEvent.locationX !== undefined) {
-      // Native (iOS/Android)
-      x = event.nativeEvent.locationX / TARGET_SIZE;
-      y = event.nativeEvent.locationY / TARGET_SIZE;
-    } else if (event.nativeEvent.offsetX !== undefined) {
-      // Web
-      x = event.nativeEvent.offsetX / TARGET_SIZE;
-      y = event.nativeEvent.offsetY / TARGET_SIZE;
-    } else {
-      // Fallback - use pageX/pageY and calculate offset
-      const target = event.currentTarget || event.target;
-      const rect = target.getBoundingClientRect?.();
-      if (rect) {
-        x = (event.nativeEvent.pageX - rect.left) / TARGET_SIZE;
-        y = (event.nativeEvent.pageY - rect.top) / TARGET_SIZE;
-      } else {
-        // Last resort - use center
-        x = 0.5;
-        y = 0.5;
-      }
-    }
+    // Use pageX/pageY and subtract the target's position
+    const pageX = event.nativeEvent.pageX;
+    const pageY = event.nativeEvent.pageY;
+    
+    const x = (pageX - targetLayout.x) / targetLayout.width;
+    const y = (pageY - targetLayout.y) / targetLayout.height;
 
     // Clamp values
-    x = Math.max(0, Math.min(1, x));
-    y = Math.max(0, Math.min(1, y));
+    const clampedX = Math.max(0, Math.min(1, x));
+    const clampedY = Math.max(0, Math.min(1, y));
 
-    const ring = calculateRingFromPosition(x, y);
+    const ring = calculateRingFromPosition(clampedX, clampedY);
 
     const newArrow: Arrow = {
       id: `arrow-${Date.now()}`,
-      x,
-      y,
+      x: clampedX,
+      y: clampedY,
       ring,
       confirmed: true,
     };
 
     setArrows([...arrows, newArrow]);
+  };
+
+  const handleTargetLayout = () => {
+    if (targetRef.current) {
+      targetRef.current.measureInWindow((x, y, width, height) => {
+        setTargetLayout({ x, y, width, height });
+      });
+    }
   };
 
   const handleArrowPress = (arrowId: string) => {
