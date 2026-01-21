@@ -106,12 +106,20 @@ export default function ScoringScreen() {
     const dx = x - centerX;
     const dy = y - centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const normalizedDistance = distance / radius;
     
-    if (normalizedDistance > 1) return 0; // Miss
+    // Use the radius, but if it's 0 or very small, use a default
+    const effectiveRadius = radius > 0.1 ? radius : 0.4;
+    const normalizedDistance = distance / effectiveRadius;
     
-    const ring = Math.max(1, Math.min(10, Math.ceil(10 - normalizedDistance * 9)));
-    return ring;
+    // If outside 1.2x the radius, it's a miss (allow some margin)
+    if (normalizedDistance > 1.2) return 0;
+    
+    // Calculate ring: 10 at center, 1 at edge
+    // Clamp normalizedDistance to max 1 for scoring
+    const clampedDistance = Math.min(normalizedDistance, 1);
+    const ring = Math.round(10 - clampedDistance * 9);
+    
+    return Math.max(1, Math.min(10, ring));
   };
 
   const handleTargetPress = (event: any) => {
