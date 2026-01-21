@@ -450,13 +450,22 @@ export default function AlignmentScreen() {
           <TouchableOpacity
             style={[
               styles.confirmButton,
-              (!analysisComplete || isAnalyzing) && styles.disabledButton,
+              (!analysisComplete || isAnalyzing || isCropping) && styles.disabledButton,
             ]}
             onPress={handleConfirm}
-            disabled={!analysisComplete || isAnalyzing}
+            disabled={!analysisComplete || isAnalyzing || isCropping}
           >
-            <Text style={styles.confirmButtonText}>Confirm Alignment</Text>
-            <Ionicons name="checkmark-circle" size={24} color="#fff" />
+            {isCropping ? (
+              <>
+                <ActivityIndicator color="#fff" size="small" />
+                <Text style={styles.confirmButtonText}>Cropping...</Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.confirmButtonText}>Crop & Continue</Text>
+                <Ionicons name="crop" size={24} color="#fff" />
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
