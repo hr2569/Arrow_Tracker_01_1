@@ -431,7 +431,9 @@ export default function ScoringScreen() {
         <View style={styles.instructions}>
           <Ionicons name="information-circle" size={20} color="#a0a0a0" />
           <Text style={styles.instructionText}>
-            Tap on the target to add arrows. Tap an arrow to select it.
+            {manualMode 
+              ? 'Tap on the target to place your arrows. Tap an arrow to select and edit.'
+              : 'Tap on the target to add arrows. Tap an arrow to select it.'}
           </Text>
         </View>
 
