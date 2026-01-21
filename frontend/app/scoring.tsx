@@ -52,15 +52,21 @@ export default function ScoringScreen() {
   const [isDetecting, setIsDetecting] = useState(false);
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrow, setSelectedArrow] = useState<string | null>(null);
-  const [showTargetOverlay, setShowTargetOverlay] = useState(!manualMode); // Hide overlay by default in manual mode
+  const [showTargetOverlay, setShowTargetOverlay] = useState(!manualMode);
   const [error, setError] = useState<string | null>(null);
   const [targetLayout, setTargetLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+  const [zoomIndex, setZoomIndex] = useState(0); // Index into ZOOM_LEVELS
   const targetRef = useRef<View>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // Current zoom level and target size
+  const zoomLevel = ZOOM_LEVELS[zoomIndex];
+  const TARGET_SIZE = BASE_TARGET_SIZE * zoomLevel;
 
   // Get center and radius from targetData or use defaults
   const centerX = targetData?.center?.x ?? 0.5;
   const centerY = targetData?.center?.y ?? 0.5;
-  const radius = targetData?.radius ?? 0.4;
+  const radius = targetData?.radius ?? 0.45;
 
   useEffect(() => {
     if (currentImage) {
