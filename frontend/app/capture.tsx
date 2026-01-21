@@ -59,6 +59,7 @@ export default function CaptureScreen() {
     if (!cameraRef.current) return;
 
     setIsLoading(true);
+    setManualMode(false); // Not manual mode when using camera
     try {
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.8,
