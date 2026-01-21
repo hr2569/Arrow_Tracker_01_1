@@ -12,6 +12,8 @@ from datetime import datetime
 import base64
 import json
 import asyncio
+import cv2
+import numpy as np
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
