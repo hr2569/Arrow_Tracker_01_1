@@ -688,6 +688,10 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
+  targetWrapper: {
+    alignItems: 'center',
+    width: '100%',
+  },
   targetScrollContent: {
     alignItems: 'center',
     justifyContent: 'center',
