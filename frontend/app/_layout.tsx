@@ -29,7 +29,7 @@ export default function RootLayout() {
         <Stack.Screen 
           name="capture" 
           options={{ 
-            title: 'Capture Target',
+            title: 'New Session',
             presentation: 'modal' 
           }} 
         />
