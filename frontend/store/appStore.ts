@@ -28,6 +28,10 @@ interface AppState {
   targetData: TargetData | null;
   setTargetData: (data: TargetData | null) => void;
 
+  // Manual mode flag - skips AI detection
+  manualMode: boolean;
+  setManualMode: (mode: boolean) => void;
+
   // Current round data
   currentRound: RoundData | null;
   setCurrentRound: (round: RoundData | null) => void;
@@ -48,6 +52,9 @@ export const useAppStore = create<AppState>((set) => ({
   targetData: null,
   setTargetData: (data) => set({ targetData: data }),
 
+  manualMode: false,
+  setManualMode: (mode) => set({ manualMode: mode }),
+
   currentRound: null,
   setCurrentRound: (round) => set({ currentRound: round }),
   clearCurrentRound: () => set({ currentRound: null }),
@@ -59,6 +66,7 @@ export const useAppStore = create<AppState>((set) => ({
     set({
       currentImage: null,
       targetData: null,
+      manualMode: false,
       currentRound: null,
       currentSession: null,
     }),
