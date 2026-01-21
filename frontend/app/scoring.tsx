@@ -540,6 +540,7 @@ export default function ScoringScreen() {
             <Ionicons name="checkmark-circle" size={20} color="#fff" />
           </Pressable>
         </View>
+        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
