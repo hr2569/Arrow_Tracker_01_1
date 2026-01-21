@@ -305,18 +305,16 @@ export default function ScoringScreen() {
 
       <ScrollView 
         ref={scrollViewRef}
-        contentContainerStyle={[
-          styles.scrollContent,
-          zoomLevel > 1 && { width: TARGET_SIZE + 40, height: TARGET_SIZE + 300 }
-        ]}
-        horizontal={false}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
-        showsHorizontalScrollIndicator={true}
-        directionalLockEnabled={false}
       >
+        {/* Horizontal scroll wrapper for zoomed target */}
         <ScrollView 
           horizontal={true}
-          contentContainerStyle={styles.innerScrollContent}
+          contentContainerStyle={[
+            styles.targetScrollContent,
+            { minWidth: zoomLevel > 1 ? TARGET_SIZE + 40 : '100%' }
+          ]}
           showsHorizontalScrollIndicator={zoomLevel > 1}
           nestedScrollEnabled={true}
         >
