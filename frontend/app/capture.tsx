@@ -95,6 +95,28 @@ export default function CaptureScreen() {
     setCameraMode(true);
   };
 
+  const startManualScoring = async () => {
+    setIsLoading(true);
+    try {
+      // Set manual mode and use the static target image
+      setManualMode(true);
+      // Set default target data for the clean target (centered, full size)
+      setTargetData({
+        corners: [],
+        center: { x: 0.5, y: 0.5 },
+        radius: 0.45, // Slightly less than 0.5 to account for image borders
+        confidence: 1.0,
+      });
+      setCurrentImage(STATIC_TARGET_URL);
+      router.push('/scoring');
+    } catch (error) {
+      console.error('Manual scoring error:', error);
+      Alert.alert('Error', 'Failed to start manual scoring');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (cameraMode) {
     return (
       <View style={styles.cameraContainer}>
