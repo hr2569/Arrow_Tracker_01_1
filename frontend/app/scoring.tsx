@@ -586,20 +586,22 @@ export default function ScoringScreen() {
           </Text>
         </View>
 
-        {/* Toggle Overlay */}
-        <Pressable
-          style={styles.toggleOverlay}
-          onPress={() => setShowTargetOverlay(!showTargetOverlay)}
-        >
-          <Ionicons
-            name={showTargetOverlay ? 'eye' : 'eye-off'}
-            size={20}
-            color="#e94560"
-          />
-          <Text style={styles.toggleText}>
-            {showTargetOverlay ? 'Hide' : 'Show'} Ring Overlay
-          </Text>
-        </Pressable>
+        {/* Toggle Overlay - Only show if NOT manual mode (manual mode always shows rings) */}
+        {!manualMode && (
+          <Pressable
+            style={styles.toggleOverlay}
+            onPress={() => setShowTargetOverlay(!showTargetOverlay)}
+          >
+            <Ionicons
+              name={showTargetOverlay ? 'eye' : 'eye-off'}
+              size={20}
+              color="#e94560"
+            />
+            <Text style={styles.toggleText}>
+              {showTargetOverlay ? 'Hide' : 'Show'} Ring Overlay
+            </Text>
+          </Pressable>
+        )}
 
         {/* Re-detect Button - Only show if not in manual mode */}
         {!manualMode && (
