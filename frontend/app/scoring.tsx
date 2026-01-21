@@ -308,26 +308,25 @@ export default function ScoringScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
       >
-        {/* Horizontal scroll wrapper for zoomed target */}
-        <ScrollView 
-          horizontal={true}
-          contentContainerStyle={[
-            styles.targetScrollContent,
-            { minWidth: zoomLevel > 1 ? TARGET_SIZE + 40 : '100%' }
-          ]}
-          showsHorizontalScrollIndicator={zoomLevel > 1}
-          nestedScrollEnabled={true}
-        >
-          {/* Target Area */}
-          <View 
-            ref={targetRef}
-            style={[styles.targetContainer, { width: TARGET_SIZE, height: TARGET_SIZE }]}
-            onLayout={handleTargetLayout}
+        {/* Target wrapper - centers the target and allows horizontal scroll when zoomed */}
+        <View style={styles.targetWrapper}>
+          <ScrollView 
+            horizontal={true}
+            contentContainerStyle={styles.targetScrollContent}
+            showsHorizontalScrollIndicator={zoomLevel > 1}
+            nestedScrollEnabled={true}
+            scrollEnabled={zoomLevel > 1}
           >
-            <Pressable
-              onPress={handleTargetPress}
-              style={[styles.targetTouchArea, { width: TARGET_SIZE, height: TARGET_SIZE }]}
+            {/* Target Area */}
+            <View 
+              ref={targetRef}
+              style={[styles.targetContainer, { width: TARGET_SIZE, height: TARGET_SIZE }]}
+              onLayout={handleTargetLayout}
             >
+              <Pressable
+                onPress={handleTargetPress}
+                style={[styles.targetTouchArea, { width: TARGET_SIZE, height: TARGET_SIZE }]}
+              >
               {/* Background Image - Only show if NOT manual mode */}
               {!manualMode && currentImage ? (
                 <Image
