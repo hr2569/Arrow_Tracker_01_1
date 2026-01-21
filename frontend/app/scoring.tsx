@@ -280,31 +280,63 @@ export default function ScoringScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Target Area */}
-        <View 
-          ref={targetRef}
-          style={styles.targetContainer}
-          onLayout={handleTargetLayout}
-        >
+      {/* Zoom Controls - Fixed at top */}
+      <View style={styles.zoomControlsContainer}>
+        <View style={styles.zoomControls}>
           <Pressable
-            onPress={handleTargetPress}
-            style={styles.targetTouchArea}
+            style={[styles.zoomButton, zoomIndex === 0 && styles.zoomButtonDisabled]}
+            onPress={zoomOut}
+            disabled={zoomIndex === 0}
           >
-            {/* Background Image */}
-            {currentImage ? (
-              <Image
-                source={{ uri: currentImage }}
-                style={styles.targetImage}
-                resizeMode="cover"
-                pointerEvents="none"
-              />
-            ) : (
-              <View style={styles.noImageContainer} pointerEvents="none">
-                <Ionicons name="image-outline" size={48} color="#666" />
-                <Text style={styles.noImageText}>No image loaded</Text>
-              </View>
-            )}
+            <Ionicons name="remove" size={24} color={zoomIndex === 0 ? '#666' : '#fff'} />
+          </Pressable>
+          <Text style={styles.zoomText}>{Math.round(zoomLevel * 100)}%</Text>
+          <Pressable
+            style={[styles.zoomButton, zoomIndex === ZOOM_LEVELS.length - 1 && styles.zoomButtonDisabled]}
+            onPress={zoomIn}
+            disabled={zoomIndex === ZOOM_LEVELS.length - 1}
+          >
+            <Ionicons name="add" size={24} color={zoomIndex === ZOOM_LEVELS.length - 1 ? '#666' : '#fff'} />
+          </Pressable>
+        </View>
+        <Text style={styles.zoomHint}>Pinch or use buttons to zoom</Text>
+      </View>
+
+      <ScrollView 
+        ref={scrollViewRef}
+        contentContainerStyle={styles.scrollContent}
+        horizontal={zoomLevel > 1}
+        showsHorizontalScrollIndicator={zoomLevel > 1}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.innerScrollContent}
+          showsVerticalScrollIndicator={true}
+          nestedScrollEnabled={true}
+        >
+          {/* Target Area */}
+          <View 
+            ref={targetRef}
+            style={[styles.targetContainer, { width: TARGET_SIZE, height: TARGET_SIZE }]}
+            onLayout={handleTargetLayout}
+          >
+            <Pressable
+              onPress={handleTargetPress}
+              style={[styles.targetTouchArea, { width: TARGET_SIZE, height: TARGET_SIZE }]}
+            >
+              {/* Background Image */}
+              {currentImage ? (
+                <Image
+                  source={{ uri: currentImage }}
+                  style={[styles.targetImage, { width: TARGET_SIZE, height: TARGET_SIZE }]}
+                  resizeMode="cover"
+                  pointerEvents="none"
+                />
+              ) : (
+                <View style={styles.noImageContainer} pointerEvents="none">
+                  <Ionicons name="image-outline" size={48} color="#666" />
+                  <Text style={styles.noImageText}>No image loaded</Text>
+                </View>
+              )}
 
             {/* Target Rings Overlay */}
             {showTargetOverlay && (
