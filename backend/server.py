@@ -336,6 +336,28 @@ async def analyze_target(request: ImageAnalysisRequest):
     result = await analyze_target_corners(request.image_base64)
     return result
 
+@api_router.post("/perspective-crop")
+async def perspective_crop_endpoint(request: PerspectiveCropRequest):
+    """Perform perspective crop on an image"""
+    try:
+        cropped_image = perspective_crop(
+            request.image_base64,
+            request.corners,
+            request.output_size
+        )
+        return {
+            "success": True,
+            "cropped_image": cropped_image,
+            "message": "Image cropped successfully"
+        }
+    except Exception as e:
+        logger.error(f"Perspective crop error: {e}")
+        return {
+            "success": False,
+            "cropped_image": None,
+            "message": str(e)
+        }
+
 @api_router.post("/detect-arrows")
 async def detect_arrows_endpoint(request: ImageAnalysisRequest):
     """Detect arrow positions in target image"""
