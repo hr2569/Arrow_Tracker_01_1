@@ -299,18 +299,24 @@ export default function ScoringScreen() {
             <Ionicons name="add" size={24} color={zoomIndex === ZOOM_LEVELS.length - 1 ? '#666' : '#fff'} />
           </Pressable>
         </View>
-        <Text style={styles.zoomHint}>Pinch or use buttons to zoom</Text>
+        <Text style={styles.zoomHint}>Use +/- to zoom for precise placement</Text>
       </View>
 
       <ScrollView 
         ref={scrollViewRef}
-        contentContainerStyle={styles.scrollContent}
-        horizontal={zoomLevel > 1}
-        showsHorizontalScrollIndicator={zoomLevel > 1}
+        contentContainerStyle={[
+          styles.scrollContent,
+          zoomLevel > 1 && { width: TARGET_SIZE + 40, height: TARGET_SIZE + 300 }
+        ]}
+        horizontal={false}
+        showsVerticalScrollIndicator={true}
+        showsHorizontalScrollIndicator={true}
+        directionalLockEnabled={false}
       >
         <ScrollView 
+          horizontal={true}
           contentContainerStyle={styles.innerScrollContent}
-          showsVerticalScrollIndicator={true}
+          showsHorizontalScrollIndicator={zoomLevel > 1}
           nestedScrollEnabled={true}
         >
           {/* Target Area */}
@@ -323,41 +329,147 @@ export default function ScoringScreen() {
               onPress={handleTargetPress}
               style={[styles.targetTouchArea, { width: TARGET_SIZE, height: TARGET_SIZE }]}
             >
-              {/* Background Image */}
-              {currentImage ? (
+              {/* Background Image - Only show if NOT manual mode */}
+              {!manualMode && currentImage ? (
                 <Image
                   source={{ uri: currentImage }}
                   style={[styles.targetImage, { width: TARGET_SIZE, height: TARGET_SIZE }]}
                   resizeMode="cover"
                   pointerEvents="none"
                 />
-              ) : (
-                <View style={styles.noImageContainer} pointerEvents="none">
-                  <Ionicons name="image-outline" size={48} color="#666" />
-                  <Text style={styles.noImageText}>No image loaded</Text>
-                </View>
-              )}
+              ) : null}
 
-            {/* Target Rings Overlay */}
-            {showTargetOverlay && (
-              <View 
-                pointerEvents="none"
-                style={[
-                  styles.targetOverlay,
-                  {
-                    width: overlaySize,
-                    height: overlaySize,
-                    left: overlayLeft,
-                    top: overlayTop,
-                  },
-                ]}
-              >
-                {[...Array(10)].map((_, i) => {
-                  const ringSize = overlaySize * ((10 - i) / 10);
-                  const ringColor = i < 2 ? 'rgba(200,200,200,0.6)' : 
-                                    i < 4 ? 'rgba(40,40,40,0.6)' : 
-                                    i < 6 ? 'rgba(65,105,225,0.6)' : 
-                                    i < 8 ? 'rgba(220,20,60,0.6)' : 
+              {/* Built-in Target Rings - Always show in manual mode, optional overlay otherwise */}
+              {(manualMode || showTargetOverlay) && (
+                <View 
+                  pointerEvents="none"
+                  style={[
+                    styles.targetOverlay,
+                    {
+                      width: TARGET_SIZE,
+                      height: TARGET_SIZE,
+                      left: 0,
+                      top: 0,
+                    },
+                  ]}
+                >
+                  {/* White/Cream background for the target */}
+                  {manualMode && (
+                    <View style={[styles.targetBackground, { width: TARGET_SIZE, height: TARGET_SIZE, borderRadius: TARGET_SIZE / 2 }]} />
+                  )}
+                  
+                  {/* Ring 1-2: White */}
+                  {[0, 1].map((i) => {
+                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
+                    return (
+                      <View
+                        key={`ring-${i}`}
+                        style={[
+                          styles.ring,
+                          {
+                            width: ringSize,
+                            height: ringSize,
+                            borderRadius: ringSize / 2,
+                            backgroundColor: manualMode ? '#f5f5f0' : 'transparent',
+                            borderColor: manualMode ? '#333' : 'rgba(200,200,200,0.6)',
+                            borderWidth: manualMode ? 1 : 2,
+                          },
+                        ]}
+                      />
+                    );
+                  })}
+                  
+                  {/* Ring 3-4: Black */}
+                  {[2, 3].map((i) => {
+                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
+                    return (
+                      <View
+                        key={`ring-${i}`}
+                        style={[
+                          styles.ring,
+                          {
+                            width: ringSize,
+                            height: ringSize,
+                            borderRadius: ringSize / 2,
+                            backgroundColor: manualMode ? '#2a2a2a' : 'transparent',
+                            borderColor: manualMode ? '#555' : 'rgba(40,40,40,0.6)',
+                            borderWidth: manualMode ? 1 : 2,
+                          },
+                        ]}
+                      />
+                    );
+                  })}
+                  
+                  {/* Ring 5-6: Blue */}
+                  {[4, 5].map((i) => {
+                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
+                    return (
+                      <View
+                        key={`ring-${i}`}
+                        style={[
+                          styles.ring,
+                          {
+                            width: ringSize,
+                            height: ringSize,
+                            borderRadius: ringSize / 2,
+                            backgroundColor: manualMode ? '#00a2e8' : 'transparent',
+                            borderColor: manualMode ? '#0077b3' : 'rgba(65,105,225,0.6)',
+                            borderWidth: manualMode ? 1 : 2,
+                          },
+                        ]}
+                      />
+                    );
+                  })}
+                  
+                  {/* Ring 7-8: Red */}
+                  {[6, 7].map((i) => {
+                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
+                    return (
+                      <View
+                        key={`ring-${i}`}
+                        style={[
+                          styles.ring,
+                          {
+                            width: ringSize,
+                            height: ringSize,
+                            borderRadius: ringSize / 2,
+                            backgroundColor: manualMode ? '#ed1c24' : 'transparent',
+                            borderColor: manualMode ? '#b31217' : 'rgba(220,20,60,0.6)',
+                            borderWidth: manualMode ? 1 : 2,
+                          },
+                        ]}
+                      />
+                    );
+                  })}
+                  
+                  {/* Ring 9-10: Gold/Yellow */}
+                  {[8, 9].map((i) => {
+                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
+                    return (
+                      <View
+                        key={`ring-${i}`}
+                        style={[
+                          styles.ring,
+                          {
+                            width: ringSize,
+                            height: ringSize,
+                            borderRadius: ringSize / 2,
+                            backgroundColor: manualMode ? '#fff200' : 'transparent',
+                            borderColor: manualMode ? '#ccaa00' : 'rgba(255,215,0,0.6)',
+                            borderWidth: manualMode ? 1 : 2,
+                          },
+                        ]}
+                      />
+                    );
+                  })}
+                  
+                  {/* Center X mark */}
+                  <View style={styles.centerMark}>
+                    <View style={styles.centerLine} />
+                    <View style={[styles.centerLine, styles.centerLineVertical]} />
+                  </View>
+                </View>
+              )} 
                                     'rgba(255,215,0,0.6)';
                   return (
                     <View
