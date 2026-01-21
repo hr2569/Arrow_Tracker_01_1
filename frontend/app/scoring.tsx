@@ -685,11 +685,16 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-  },
-  innerScrollContent: {
     padding: 20,
     paddingBottom: 40,
+  },
+  targetScrollContent: {
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contentBelowTarget: {
+    paddingHorizontal: 0,
+    paddingTop: 16,
   },
   targetContainer: {
     backgroundColor: '#1a1a2e',
