@@ -45,7 +45,7 @@ interface Arrow {
 
 export default function ScoringScreen() {
   const router = useRouter();
-  const { currentImage, targetData, setCurrentRound } = useAppStore();
+  const { currentImage, targetData, setCurrentRound, manualMode } = useAppStore();
   const [isDetecting, setIsDetecting] = useState(false);
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrow, setSelectedArrow] = useState<string | null>(null);
@@ -61,7 +61,10 @@ export default function ScoringScreen() {
 
   useEffect(() => {
     if (currentImage) {
-      detectArrows();
+      // Only auto-detect arrows if not in manual mode
+      if (!manualMode) {
+        detectArrows();
+      }
     } else {
       setError('No image available. Please go back and capture an image.');
     }
