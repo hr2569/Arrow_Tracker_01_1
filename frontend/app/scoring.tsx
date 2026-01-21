@@ -506,7 +506,8 @@ export default function ScoringScreen() {
             </View>
           )}
         </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
         
         {/* Content below target - outside horizontal scroll */}
         <View style={styles.contentBelowTarget}>
