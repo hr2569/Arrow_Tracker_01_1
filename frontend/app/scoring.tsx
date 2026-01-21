@@ -215,6 +215,19 @@ export default function ScoringScreen() {
     return arrows.reduce((sum, arrow) => sum + arrow.ring, 0);
   };
 
+  // Zoom controls
+  const zoomIn = () => {
+    if (zoomIndex < ZOOM_LEVELS.length - 1) {
+      setZoomIndex(zoomIndex + 1);
+    }
+  };
+
+  const zoomOut = () => {
+    if (zoomIndex > 0) {
+      setZoomIndex(zoomIndex - 1);
+    }
+  };
+
   const handleFinishRound = () => {
     if (arrows.length < 3) {
       Alert.alert(
