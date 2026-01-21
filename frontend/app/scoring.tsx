@@ -123,18 +123,34 @@ export default function ScoringScreen() {
   };
 
   const handleTargetPress = (event: any) => {
-    if (!targetLayout) return;
+    // Try multiple methods to get correct coordinates
+    let x, y;
     
-    // Use pageX/pageY and subtract the target's position
-    const pageX = event.nativeEvent.pageX;
-    const pageY = event.nativeEvent.pageY;
-    
-    const x = (pageX - targetLayout.x) / targetLayout.width;
-    const y = (pageY - targetLayout.y) / targetLayout.height;
+    // Method 1: Use offsetX/offsetY (works on web)
+    if (event.nativeEvent.offsetX !== undefined && event.nativeEvent.offsetY !== undefined) {
+      x = event.nativeEvent.offsetX / TARGET_SIZE;
+      y = event.nativeEvent.offsetY / TARGET_SIZE;
+    }
+    // Method 2: Use locationX/locationY (works on native)
+    else if (event.nativeEvent.locationX !== undefined && event.nativeEvent.locationY !== undefined) {
+      x = event.nativeEvent.locationX / TARGET_SIZE;
+      y = event.nativeEvent.locationY / TARGET_SIZE;
+    }
+    // Method 3: Fallback using pageX/pageY with layout
+    else if (targetLayout && event.nativeEvent.pageX !== undefined) {
+      x = (event.nativeEvent.pageX - targetLayout.x) / targetLayout.width;
+      y = (event.nativeEvent.pageY - targetLayout.y) / targetLayout.height;
+    }
+    else {
+      console.log('Could not determine click position');
+      return;
+    }
 
     // Clamp values
     const clampedX = Math.max(0, Math.min(1, x));
     const clampedY = Math.max(0, Math.min(1, y));
+
+    console.log('Arrow placed at:', clampedX, clampedY);
 
     const ring = calculateRingFromPosition(clampedX, clampedY);
 
@@ -146,13 +162,15 @@ export default function ScoringScreen() {
       confirmed: true,
     };
 
-    setArrows([...arrows, newArrow]);
+    setArrows(prev => [...prev, newArrow]);
   };
 
-  const handleTargetLayout = () => {
+  const handleTargetLayout = (event: any) => {
+    const { x, y, width, height } = event.nativeEvent.layout;
+    // Also measure in window for absolute positioning
     if (targetRef.current) {
-      targetRef.current.measureInWindow((x, y, width, height) => {
-        setTargetLayout({ x, y, width, height });
+      targetRef.current.measureInWindow((wx, wy, wwidth, wheight) => {
+        setTargetLayout({ x: wx, y: wy, width: wwidth || TARGET_SIZE, height: wheight || TARGET_SIZE });
       });
     }
   };
