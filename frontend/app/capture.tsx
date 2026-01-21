@@ -29,6 +29,7 @@ export default function CaptureScreen() {
 
   const pickImage = async () => {
     try {
+      setManualMode(false); // Not manual mode when using gallery
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
