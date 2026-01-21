@@ -101,13 +101,14 @@ export default function CaptureScreen() {
       // Set manual mode and use the static target image
       setManualMode(true);
       // Set default target data for the clean target (centered, full size)
+      // Radius matches the 0.95 factor used in ring rendering (0.95/2 = 0.475)
       setTargetData({
         corners: [],
         center: { x: 0.5, y: 0.5 },
-        radius: 0.45, // Slightly less than 0.5 to account for image borders
+        radius: 0.475,
         confidence: 1.0,
       });
-      setCurrentImage(STATIC_TARGET_URL);
+      setCurrentImage(null); // No image needed for manual mode
       router.push('/scoring');
     } catch (error) {
       console.error('Manual scoring error:', error);
