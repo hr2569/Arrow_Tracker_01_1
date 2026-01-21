@@ -16,8 +16,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../store/appStore';
 import axios from 'axios';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const TARGET_SIZE = SCREEN_WIDTH - 40;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.5);
+
+// Zoom levels
+const ZOOM_LEVELS = [1, 1.5, 2, 2.5];
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
