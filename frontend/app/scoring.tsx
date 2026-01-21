@@ -450,15 +450,17 @@ export default function ScoringScreen() {
           </Text>
         </Pressable>
 
-        {/* Re-detect Button */}
-        <Pressable
-          style={styles.redetectButton}
-          onPress={detectArrows}
-          disabled={isDetecting}
-        >
-          <Ionicons name="scan" size={20} color="#e94560" />
-          <Text style={styles.redetectText}>Re-detect Arrows</Text>
-        </Pressable>
+        {/* Re-detect Button - Only show if not in manual mode */}
+        {!manualMode && (
+          <Pressable
+            style={styles.redetectButton}
+            onPress={detectArrows}
+            disabled={isDetecting}
+          >
+            <Ionicons name="scan" size={20} color="#e94560" />
+            <Text style={styles.redetectText}>Re-detect Arrows</Text>
+          </Pressable>
+        )}
 
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
