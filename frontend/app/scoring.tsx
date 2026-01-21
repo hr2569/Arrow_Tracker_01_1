@@ -507,6 +507,10 @@ export default function ScoringScreen() {
             </View>
           )}
         </View>
+        </ScrollView>
+        
+        {/* Content below target - outside horizontal scroll */}
+        <View style={styles.contentBelowTarget}>
 
         {/* Error Message */}
         {error && (
