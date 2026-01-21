@@ -146,18 +146,61 @@ export default function AlignmentScreen() {
     return Math.min(width, height) / 2 * 0.95;
   };
 
-  const handleConfirm = () => {
-    const center = calculateCenter();
-    const radius = calculateRadius();
+  const [isCropping, setIsCropping] = useState(false);
+
+  const handleConfirm = async () => {
+    if (!currentImage) return;
     
-    setTargetData({
-      corners: corners,
-      center: center,
-      radius: radius,
-      confidence: isManualMode ? 0.7 : 0.9,
-    });
+    setIsCropping(true);
     
-    router.push('/scoring');
+    try {
+      // Call perspective crop API
+      const response = await axios.post(`${API_URL}/api/perspective-crop`, {
+        image_base64: currentImage,
+        corners: corners.map(c => ({ x: c.x, y: c.y })),
+        output_size: 800,
+      });
+      
+      if (response.data.success && response.data.cropped_image) {
+        // Update the current image with the cropped version
+        setCurrentImage(response.data.cropped_image);
+        
+        // Set target data - after crop, center is at 0.5, 0.5 and radius is 0.45
+        setTargetData({
+          corners: [
+            { x: 0, y: 0, position: 'top-left' },
+            { x: 1, y: 0, position: 'top-right' },
+            { x: 1, y: 1, position: 'bottom-right' },
+            { x: 0, y: 1, position: 'bottom-left' },
+          ],
+          center: { x: 0.5, y: 0.5 },
+          radius: 0.45,
+          confidence: 0.9,
+        });
+        
+        router.push('/scoring');
+      } else {
+        Alert.alert('Error', response.data.message || 'Failed to crop image');
+      }
+    } catch (err: any) {
+      console.error('Crop error:', err);
+      Alert.alert('Error', 'Failed to crop image. Proceeding with original.');
+      
+      // Fallback - use original image with calculated center/radius
+      const center = calculateCenter();
+      const radius = calculateRadius();
+      
+      setTargetData({
+        corners: corners,
+        center: center,
+        radius: radius,
+        confidence: isManualMode ? 0.7 : 0.9,
+      });
+      
+      router.push('/scoring');
+    } finally {
+      setIsCropping(false);
+    }
   };
 
   const handleRetake = () => {
