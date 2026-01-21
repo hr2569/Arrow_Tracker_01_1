@@ -49,7 +49,7 @@ export default function ScoringScreen() {
   const [isDetecting, setIsDetecting] = useState(false);
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrow, setSelectedArrow] = useState<string | null>(null);
-  const [showTargetOverlay, setShowTargetOverlay] = useState(true);
+  const [showTargetOverlay, setShowTargetOverlay] = useState(!manualMode); // Hide overlay by default in manual mode
   const [error, setError] = useState<string | null>(null);
   const [targetLayout, setTargetLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const targetRef = useRef<View>(null);
