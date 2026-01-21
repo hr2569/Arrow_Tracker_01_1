@@ -469,28 +469,7 @@ export default function ScoringScreen() {
                     <View style={[styles.centerLine, styles.centerLineVertical]} />
                   </View>
                 </View>
-              )} 
-                                    'rgba(255,215,0,0.6)';
-                  return (
-                    <View
-                      key={i}
-                      style={[
-                        styles.ring,
-                        {
-                          width: ringSize,
-                          height: ringSize,
-                          borderRadius: ringSize / 2,
-                          borderColor: ringColor,
-                          borderWidth: 2,
-                        },
-                      ]}
-                    />
-                  );
-                })}
-                {/* Center dot */}
-                <View style={styles.centerDot} />
-              </View>
-            )}
+              )}
           </Pressable>
 
           {/* Arrow Markers - Outside Pressable so they don't block clicks */}
