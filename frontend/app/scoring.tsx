@@ -714,9 +714,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  targetBackground: {
+    position: 'absolute',
+    backgroundColor: '#f5f5f0',
+  },
   ring: {
     position: 'absolute',
     borderStyle: 'solid',
+  },
+  centerMark: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerLine: {
+    position: 'absolute',
+    width: 16,
+    height: 2,
+    backgroundColor: '#333',
+  },
+  centerLineVertical: {
+    transform: [{ rotate: '90deg' }],
   },
   centerDot: {
     width: 8,
