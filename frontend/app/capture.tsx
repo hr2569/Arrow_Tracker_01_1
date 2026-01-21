@@ -168,59 +168,80 @@ export default function CaptureScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Capture Your Target</Text>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.title}>New Session</Text>
         <Text style={styles.subtitle}>
-          Take a photo or select from your gallery
+          Choose how you want to score your target
         </Text>
 
         <View style={styles.optionsContainer}>
+          {/* Manual Scoring - Primary Option */}
           <TouchableOpacity
-            style={styles.optionCard}
-            onPress={openCamera}
+            style={styles.primaryOptionCard}
+            onPress={startManualScoring}
             activeOpacity={0.8}
+            disabled={isLoading}
           >
-            <View style={styles.optionIconContainer}>
-              <Ionicons name="camera" size={48} color="#e94560" />
-            </View>
-            <Text style={styles.optionTitle}>Take Photo</Text>
-            <Text style={styles.optionDescription}>
-              Use your camera to capture the target
-            </Text>
+            {isLoading ? (
+              <ActivityIndicator size="large" color="#fff" />
+            ) : (
+              <>
+                <View style={styles.primaryOptionIconContainer}>
+                  <Ionicons name="hand-left" size={48} color="#fff" />
+                </View>
+                <Text style={styles.primaryOptionTitle}>Manual Scoring</Text>
+                <Text style={styles.primaryOptionDescription}>
+                  Use a clean target and tap to add arrows
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={pickImage}
-            activeOpacity={0.8}
-          >
-            <View style={styles.optionIconContainer}>
-              <Ionicons name="images" size={48} color="#e94560" />
-            </View>
-            <Text style={styles.optionTitle}>From Gallery</Text>
-            <Text style={styles.optionDescription}>
-              Select an existing photo
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or use your own photo</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <View style={styles.secondaryOptionsRow}>
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={openCamera}
+              activeOpacity={0.8}
+            >
+              <View style={styles.optionIconContainer}>
+                <Ionicons name="camera" size={36} color="#e94560" />
+              </View>
+              <Text style={styles.optionTitle}>Camera</Text>
+              <Text style={styles.optionDescription}>
+                Take a photo
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={pickImage}
+              activeOpacity={0.8}
+            >
+              <View style={styles.optionIconContainer}>
+                <Ionicons name="images" size={36} color="#e94560" />
+              </View>
+              <Text style={styles.optionTitle}>Gallery</Text>
+              <Text style={styles.optionDescription}>
+                Select a photo
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Tips */}
-        <View style={styles.tipsContainer}>
-          <Text style={styles.tipsTitle}>Tips for best results:</Text>
-          <View style={styles.tipItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-            <Text style={styles.tipText}>Capture the entire target face</Text>
-          </View>
-          <View style={styles.tipItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-            <Text style={styles.tipText}>Ensure good lighting</Text>
-          </View>
-          <View style={styles.tipItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-            <Text style={styles.tipText}>Keep camera steady and level</Text>
-          </View>
+        {/* Info about camera/gallery options */}
+        <View style={styles.infoContainer}>
+          <Ionicons name="information-circle" size={20} color="#a0a0a0" />
+          <Text style={styles.infoText}>
+            Camera & Gallery options will use AI to detect your target and arrows
+          </Text>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
