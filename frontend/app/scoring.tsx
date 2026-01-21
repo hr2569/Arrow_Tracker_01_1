@@ -74,7 +74,8 @@ export default function ScoringScreen() {
       if (!manualMode) {
         detectArrows();
       }
-    } else {
+    } else if (!manualMode) {
+      // Only show error if not in manual mode (manual mode doesn't need an image)
       setError('No image available. Please go back and capture an image.');
     }
   }, []);
