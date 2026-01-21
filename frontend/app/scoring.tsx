@@ -114,15 +114,19 @@ export default function ScoringScreen() {
     const effectiveRadius = radius > 0.1 ? radius : 0.4;
     const normalizedDistance = distance / effectiveRadius;
     
-    // If outside 1.2x the radius, it's a miss (allow some margin)
-    if (normalizedDistance > 1.2) return 0;
+    // If outside the target radius, it's a miss
+    if (normalizedDistance > 1.1) return 0;
     
     // Calculate ring: 10 at center, 1 at edge
-    // Clamp normalizedDistance to max 1 for scoring
-    const clampedDistance = Math.min(normalizedDistance, 1);
-    const ring = Math.round(10 - clampedDistance * 9);
+    // Each ring occupies 1/10 of the radius
+    // Ring 10: 0 to 0.1, Ring 9: 0.1 to 0.2, ... Ring 1: 0.9 to 1.0
+    const ringFromCenter = Math.ceil(normalizedDistance * 10);
+    const ring = 11 - ringFromCenter;
     
-    return Math.max(1, Math.min(10, ring));
+    // Clamp to valid range (1-10), with 0 for complete misses
+    if (ring > 10) return 10; // Dead center
+    if (ring < 1) return 0;   // Miss
+    return ring;
   };
 
   const handleTargetPress = (event: any) => {
