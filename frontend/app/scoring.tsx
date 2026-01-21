@@ -268,9 +268,10 @@ export default function ScoringScreen() {
                 source={{ uri: currentImage }}
                 style={styles.targetImage}
                 resizeMode="cover"
+                pointerEvents="none"
               />
             ) : (
-              <View style={styles.noImageContainer}>
+              <View style={styles.noImageContainer} pointerEvents="none">
                 <Ionicons name="image-outline" size={48} color="#666" />
                 <Text style={styles.noImageText}>No image loaded</Text>
               </View>
@@ -279,6 +280,7 @@ export default function ScoringScreen() {
             {/* Target Rings Overlay */}
             {showTargetOverlay && (
               <View 
+                pointerEvents="none"
                 style={[
                   styles.targetOverlay,
                   {
