@@ -551,13 +551,51 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#16213e',
   },
+  zoomControlsContainer: {
+    backgroundColor: '#1a1a2e',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#2a2a4e',
+  },
+  zoomControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  zoomButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#e94560',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  zoomButtonDisabled: {
+    backgroundColor: '#2a2a4e',
+  },
+  zoomText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    minWidth: 60,
+    textAlign: 'center',
+  },
+  zoomHint: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 6,
+  },
   scrollContent: {
+    flexGrow: 1,
+  },
+  innerScrollContent: {
     padding: 20,
     paddingBottom: 40,
+    alignItems: 'center',
   },
   targetContainer: {
-    width: TARGET_SIZE,
-    height: TARGET_SIZE,
     backgroundColor: '#1a1a2e',
     borderRadius: 16,
     alignSelf: 'center',
@@ -565,12 +603,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   targetTouchArea: {
-    width: '100%',
-    height: '100%',
   },
   targetImage: {
-    width: '100%',
-    height: '100%',
     position: 'absolute',
   },
   noImageContainer: {
