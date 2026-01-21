@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,7 +14,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View style={styles.content}>
         {/* Hero Section */}
         <View style={styles.hero}>
           <View style={styles.targetIcon}>
@@ -27,21 +26,23 @@ export default function HomeScreen() {
           </View>
           <Text style={styles.title}>Archery Scorer</Text>
           <Text style={styles.subtitle}>
-            Capture, analyze, and score your archery targets with AI
+            Score your targets with precision
           </Text>
         </View>
 
-        {/* Main Actions */}
+        {/* Main Actions - Simplified */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={() => router.push('/capture')}
             activeOpacity={0.8}
           >
-            <Ionicons name="camera" size={28} color="#fff" />
-            <Text style={styles.primaryButtonText}>New Scoring Session</Text>
+            <View style={styles.buttonIconContainer}>
+              <Ionicons name="add-circle" size={48} color="#fff" />
+            </View>
+            <Text style={styles.primaryButtonText}>New Session</Text>
             <Text style={styles.buttonSubtext}>
-              Capture or upload target photo
+              Start scoring a new target
             </Text>
           </TouchableOpacity>
 
@@ -50,86 +51,16 @@ export default function HomeScreen() {
             onPress={() => router.push('/history')}
             activeOpacity={0.8}
           >
-            <Ionicons name="time" size={24} color="#e94560" />
-            <Text style={styles.secondaryButtonText}>View History</Text>
+            <View style={styles.buttonIconContainer}>
+              <Ionicons name="stats-chart" size={48} color="#e94560" />
+            </View>
+            <Text style={styles.secondaryButtonText}>View History & Stats</Text>
+            <Text style={styles.buttonSubtextSecondary}>
+              Track your progress over time
+            </Text>
           </TouchableOpacity>
         </View>
-
-        {/* How It Works */}
-        <View style={styles.howItWorks}>
-          <Text style={styles.sectionTitle}>How It Works</Text>
-          
-          <View style={styles.stepContainer}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>1</Text>
-            </View>
-            <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Capture Target</Text>
-              <Text style={styles.stepDescription}>
-                Take a photo or upload from gallery
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.stepContainer}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>2</Text>
-            </View>
-            <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Align & Verify</Text>
-              <Text style={styles.stepDescription}>
-                AI detects target corners, you verify alignment
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.stepContainer}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>3</Text>
-            </View>
-            <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Score Arrows</Text>
-              <Text style={styles.stepDescription}>
-                AI suggests arrow positions, confirm or edit
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.stepContainer}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>4</Text>
-            </View>
-            <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Track Progress</Text>
-              <Text style={styles.stepDescription}>
-                Save scores and view your history
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Scoring Info */}
-        <View style={styles.scoringInfo}>
-          <Text style={styles.sectionTitle}>Scoring Rings</Text>
-          <View style={styles.scoringRings}>
-            <View style={[styles.ringBadge, { backgroundColor: '#FFD700' }]}>
-              <Text style={styles.ringBadgeText}>10-9</Text>
-            </View>
-            <View style={[styles.ringBadge, { backgroundColor: '#DC143C' }]}>
-              <Text style={styles.ringBadgeTextWhite}>8-7</Text>
-            </View>
-            <View style={[styles.ringBadge, { backgroundColor: '#4169E1' }]}>
-              <Text style={styles.ringBadgeTextWhite}>6-5</Text>
-            </View>
-            <View style={[styles.ringBadge, { backgroundColor: '#1a1a2e' }]}>
-              <Text style={styles.ringBadgeTextWhite}>4-3</Text>
-            </View>
-            <View style={[styles.ringBadge, { backgroundColor: '#f0f0f0' }]}>
-              <Text style={styles.ringBadgeText}>2-1</Text>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
