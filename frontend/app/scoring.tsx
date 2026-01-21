@@ -318,32 +318,35 @@ export default function ScoringScreen() {
                 <View style={styles.centerDot} />
               </View>
             )}
-
-            {/* Arrow Markers */}
-            {arrows.map((arrow) => (
-              <Pressable
-                key={arrow.id}
-                style={[
-                  styles.arrowMarker,
-                  {
-                    left: arrow.x * TARGET_SIZE - 15,
-                    top: arrow.y * TARGET_SIZE - 15,
-                    backgroundColor: RING_COLORS[Math.max(0, arrow.ring - 1)] || '#e94560',
-                  },
-                  selectedArrow === arrow.id && styles.selectedArrow,
-                  !arrow.confirmed && styles.unconfirmedArrow,
-                ]}
-                onPress={() => handleArrowPress(arrow.id)}
-              >
-                <Text style={[
-                  styles.arrowScore,
-                  { color: arrow.ring >= 3 && arrow.ring <= 4 ? '#fff' : '#000' }
-                ]}>
-                  {arrow.ring}
-                </Text>
-              </Pressable>
-            ))}
           </Pressable>
+
+          {/* Arrow Markers - Outside Pressable so they don't block clicks */}
+          {arrows.map((arrow) => (
+            <Pressable
+              key={arrow.id}
+              style={[
+                styles.arrowMarker,
+                {
+                  left: arrow.x * TARGET_SIZE - 15,
+                  top: arrow.y * TARGET_SIZE - 15,
+                  backgroundColor: RING_COLORS[Math.max(0, arrow.ring - 1)] || '#e94560',
+                },
+                selectedArrow === arrow.id && styles.selectedArrow,
+                !arrow.confirmed && styles.unconfirmedArrow,
+              ]}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleArrowPress(arrow.id);
+              }}
+            >
+              <Text style={[
+                styles.arrowScore,
+                { color: arrow.ring >= 3 && arrow.ring <= 4 ? '#fff' : '#000' }
+              ]}>
+                {arrow.ring}
+              </Text>
+            </Pressable>
+          ))}
 
           {/* Loading Overlay */}
           {isDetecting && (
