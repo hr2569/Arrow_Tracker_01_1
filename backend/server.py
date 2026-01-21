@@ -83,6 +83,62 @@ class AddRoundRequest(BaseModel):
 class UpdateRoundRequest(BaseModel):
     shots: List[dict]
 
+class PerspectiveCropRequest(BaseModel):
+    image_base64: str
+    corners: List[dict]  # [{x, y}, {x, y}, {x, y}, {x, y}] - TL, TR, BR, BL
+    output_size: int = 800  # Output image size (square)
+
+# ============== Image Processing Functions ==============
+
+def perspective_crop(image_base64: str, corners: List[dict], output_size: int = 800) -> str:
+    """Perform perspective crop on an image given 4 corners"""
+    try:
+        # Decode base64 image
+        if ',' in image_base64:
+            image_base64 = image_base64.split(',')[1]
+        
+        image_data = base64.b64decode(image_base64)
+        nparr = np.frombuffer(image_data, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        if img is None:
+            raise ValueError("Failed to decode image")
+        
+        height, width = img.shape[:2]
+        
+        # Convert normalized coordinates to pixel coordinates
+        # Corners order: top-left, top-right, bottom-right, bottom-left
+        src_points = np.float32([
+            [corners[0]['x'] * width, corners[0]['y'] * height],  # TL
+            [corners[1]['x'] * width, corners[1]['y'] * height],  # TR
+            [corners[2]['x'] * width, corners[2]['y'] * height],  # BR
+            [corners[3]['x'] * width, corners[3]['y'] * height],  # BL
+        ])
+        
+        # Destination points (square output)
+        dst_points = np.float32([
+            [0, 0],
+            [output_size, 0],
+            [output_size, output_size],
+            [0, output_size],
+        ])
+        
+        # Calculate perspective transform matrix
+        matrix = cv2.getPerspectiveTransform(src_points, dst_points)
+        
+        # Apply the transformation
+        result = cv2.warpPerspective(img, matrix, (output_size, output_size))
+        
+        # Encode result to base64
+        _, buffer = cv2.imencode('.jpg', result, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        result_base64 = base64.b64encode(buffer).decode('utf-8')
+        
+        return f"data:image/jpeg;base64,{result_base64}"
+        
+    except Exception as e:
+        logger.error(f"Perspective crop error: {e}")
+        raise e
+
 # ============== AI Analysis Functions ==============
 
 async def analyze_target_corners(image_base64: str) -> dict:
