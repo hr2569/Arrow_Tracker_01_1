@@ -30,7 +30,7 @@ interface Corner {
 
 export default function AlignmentScreen() {
   const router = useRouter();
-  const { currentImage, setTargetData } = useAppStore();
+  const { currentImage, setCurrentImage, setTargetData } = useAppStore();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [corners, setCorners] = useState<Corner[]>([
