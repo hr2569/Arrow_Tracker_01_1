@@ -570,7 +570,11 @@ export default function ScoringScreen() {
           </View>
           <Text style={styles.arrowCount}>
             {arrows.length} arrow{arrows.length !== 1 ? 's' : ''} marked
-            {isCompetition && arrows.length < 3 && ` (3 required for competition)`}
+            {isCompetition && (
+              arrows.length < COMPETITION_ARROWS_PER_ROUND 
+                ? ` (${COMPETITION_ARROWS_PER_ROUND - arrows.length} more needed)`
+                : ' ✓ Ready to finish'
+            )}
           </Text>
         </View>
 
