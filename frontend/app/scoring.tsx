@@ -507,7 +507,7 @@ export default function ScoringScreen() {
                 {
                   left: arrow.x * TARGET_SIZE - 15,
                   top: arrow.y * TARGET_SIZE - 15,
-                  backgroundColor: RING_COLORS[Math.max(0, arrow.ring - 1)] || '#e94560',
+                  backgroundColor: RING_COLORS[Math.max(0, arrow.ring - 1)] || '#8B0000',
                 },
                 selectedArrow === arrow.id && styles.selectedArrow,
                 !arrow.confirmed && styles.unconfirmedArrow,
@@ -529,7 +529,7 @@ export default function ScoringScreen() {
           {/* Loading Overlay */}
           {isDetecting && (
             <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color="#e94560" />
+              <ActivityIndicator size="large" color="#8B0000" />
               <Text style={styles.loadingText}>Detecting arrows...</Text>
             </View>
           )}
@@ -626,7 +626,7 @@ export default function ScoringScreen() {
             <Ionicons
               name={showTargetOverlay ? 'eye' : 'eye-off'}
               size={20}
-              color="#e94560"
+              color="#8B0000"
             />
             <Text style={styles.toggleText}>
               {showTargetOverlay ? 'Hide' : 'Show'} Ring Overlay
@@ -641,7 +641,7 @@ export default function ScoringScreen() {
             onPress={detectArrows}
             disabled={isDetecting}
           >
-            <Ionicons name="scan" size={20} color="#e94560" />
+            <Ionicons name="scan" size={20} color="#8B0000" />
             <Text style={styles.redetectText}>Re-detect Arrows</Text>
           </Pressable>
         )}
@@ -652,7 +652,7 @@ export default function ScoringScreen() {
             style={styles.secondaryButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={20} color="#e94560" />
+            <Ionicons name="arrow-back" size={20} color="#8B0000" />
             <Text style={styles.secondaryButtonText}>Back</Text>
           </Pressable>
 
@@ -878,7 +878,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   scoreValue: {
-    color: '#e94560',
+    color: '#8B0000',
     fontSize: 36,
     fontWeight: 'bold',
   },
@@ -976,7 +976,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   toggleText: {
-    color: '#e94560',
+    color: '#8B0000',
     marginLeft: 8,
     fontSize: 14,
   },
@@ -989,10 +989,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#111111',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e94560',
+    borderColor: '#8B0000',
   },
   redetectText: {
-    color: '#e94560',
+    color: '#8B0000',
     marginLeft: 8,
     fontSize: 14,
   },
@@ -1005,7 +1005,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -1026,11 +1026,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#e94560',
+    borderColor: '#8B0000',
     gap: 8,
   },
   secondaryButtonText: {
-    color: '#e94560',
+    color: '#8B0000',
     fontSize: 16,
     fontWeight: '600',
   },
