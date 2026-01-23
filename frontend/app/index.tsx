@@ -34,7 +34,7 @@ export default function HomeScreen() {
         <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={styles.primaryButton}
-            onPress={() => router.push('/capture')}
+            onPress={() => router.push('/sessionType')}
             activeOpacity={0.8}
           >
             <View style={styles.buttonIconContainer}>
