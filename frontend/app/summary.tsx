@@ -228,7 +228,7 @@ export default function SummaryScreen() {
           <Ionicons 
             name={isCompetition ? "trophy" : "fitness"} 
             size={16} 
-            color={isCompetition ? "#FFD700" : "#4CAF50"} 
+            color={isCompetition ? "#FFD700" : "#ff4444"} 
           />
           <Text style={[styles.sessionTypeText, isCompetition ? styles.competitionText : styles.trainingText]}>
             {isCompetition ? 'Competition' : 'Training'}
