@@ -160,17 +160,26 @@ export default function AlignmentScreen() {
   const [isCropping, setIsCropping] = useState(false);
 
   const handleConfirm = async () => {
-    if (!currentImage) return;
+    if (!currentImage) {
+      Alert.alert('Error', 'No image to crop');
+      return;
+    }
     
     setIsCropping(true);
     
     try {
+      console.log('Starting perspective crop...');
+      console.log('Image length:', currentImage.length);
+      console.log('Corners:', JSON.stringify(corners.map(c => ({ x: c.x, y: c.y }))));
+      
       // Call perspective crop API
       const response = await axios.post(`${API_URL}/api/perspective-crop`, {
         image_base64: currentImage,
         corners: corners.map(c => ({ x: c.x, y: c.y })),
         output_size: 800,
       });
+      
+      console.log('Crop response success:', response.data.success);
       
       if (response.data.success && response.data.cropped_image) {
         // Update the current image with the cropped version
@@ -191,24 +200,36 @@ export default function AlignmentScreen() {
         
         router.push('/scoring');
       } else {
-        Alert.alert('Error', response.data.message || 'Failed to crop image');
+        console.error('Crop failed:', response.data.message);
+        Alert.alert('Crop Failed', response.data.message || 'Failed to crop image. Try adjusting corners.');
       }
     } catch (err: any) {
-      console.error('Crop error:', err);
-      Alert.alert('Error', 'Failed to crop image. Proceeding with original.');
+      console.error('Crop error:', err.message || err);
       
-      // Fallback - use original image with calculated center/radius
-      const center = calculateCenter();
-      const radius = calculateRadius();
-      
-      setTargetData({
-        corners: corners,
-        center: center,
-        radius: radius,
-        confidence: isManualMode ? 0.7 : 0.9,
-      });
-      
-      router.push('/scoring');
+      // Show error but allow proceeding with original
+      Alert.alert(
+        'Crop Error',
+        'Failed to crop image. Would you like to continue with the original image?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Continue',
+            onPress: () => {
+              const center = calculateCenter();
+              const radius = calculateRadius();
+              
+              setTargetData({
+                corners: corners,
+                center: center,
+                radius: radius,
+                confidence: isManualMode ? 0.7 : 0.9,
+              });
+              
+              router.push('/scoring');
+            }
+          }
+        ]
+      );
     } finally {
       setIsCropping(false);
     }
