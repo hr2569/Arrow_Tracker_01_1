@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
     color: '#FFD700',
   },
   trainingRoundText: {
-    color: '#4CAF50',
+    color: '#ff4444',
   },
   zoomControls: {
     flexDirection: 'row',
@@ -717,12 +717,12 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     alignItems: 'center',
     justifyContent: 'center',
   },
   zoomButtonDisabled: {
-    backgroundColor: '#2a2a4e',
+    backgroundColor: '#333333',
   },
   zoomText: {
     color: '#fff',
