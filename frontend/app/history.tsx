@@ -258,7 +258,7 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#16213e',
+    backgroundColor: '#000000',
   },
   scrollContent: {
     padding: 20,
