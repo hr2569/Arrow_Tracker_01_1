@@ -351,10 +351,30 @@ export default function AlignmentScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
           {/* Header */}
-          <Text style={styles.title}>Perspective Alignment</Text>
+          <Text style={styles.title}>Target Detection</Text>
           <Text style={styles.subtitle}>
-            Drag the corners to align with the target edges
+            {isAnalyzing 
+              ? 'Analyzing your photo...' 
+              : analysisComplete 
+                ? 'Adjust corners if needed' 
+                : 'Preparing to analyze...'}
           </Text>
+
+          {/* Detection Status Card */}
+          {analysisComplete && !isManualMode && (
+            <View style={styles.detectionSuccessCard}>
+              <View style={styles.detectionHeader}>
+                <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
+                <Text style={styles.detectionSuccessTitle}>Target Detected!</Text>
+              </View>
+              <View style={styles.confidenceBar}>
+                <View style={[styles.confidenceFill, { width: `${detectionConfidence * 100}%` }]} />
+              </View>
+              <Text style={styles.confidenceText}>
+                Confidence: {Math.round(detectionConfidence * 100)}%
+              </Text>
+            </View>
+          )}
 
           {/* Image with Corner Handles */}
           <View style={styles.imageContainer}>
@@ -376,6 +396,7 @@ export default function AlignmentScreen() {
               <View style={styles.analysisOverlay}>
                 <ActivityIndicator size="large" color="#8B0000" />
                 <Text style={styles.analysisText}>Detecting target corners...</Text>
+                <Text style={styles.analysisSubtext}>This may take a few seconds</Text>
               </View>
             )}
 
