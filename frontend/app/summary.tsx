@@ -44,22 +44,26 @@ export default function SummaryScreen() {
     sessionType,
     currentRoundNumber,
     incrementRoundNumber,
+    sessionRounds,
+    addSessionRound,
   } = useAppStore();
   const [isSaving, setIsSaving] = useState(false);
-  const [sessionRounds, setSessionRounds] = useState<any[]>([]);
+  const [roundAdded, setRoundAdded] = useState(false);
 
   const isCompetition = sessionType === 'competition';
   const isLastCompetitionRound = isCompetition && currentRoundNumber >= MAX_COMPETITION_ROUNDS;
 
   useEffect(() => {
-    // Add current round to session rounds if it exists
-    if (currentRound) {
-      setSessionRounds([...sessionRounds, {
+    // Add current round to session rounds if it exists and hasn't been added yet
+    if (currentRound && !roundAdded) {
+      addSessionRound({
         roundNumber: currentRoundNumber,
-        ...currentRound,
-      }]);
+        shots: currentRound.shots,
+        total: currentRound.total,
+      });
+      setRoundAdded(true);
     }
-  }, []);
+  }, [currentRound, roundAdded]);
 
   const getTotalSessionScore = () => {
     return sessionRounds.reduce((sum, round) => sum + (round.total || 0), 0);
