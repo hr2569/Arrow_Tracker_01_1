@@ -19,7 +19,19 @@ interface SessionData {
   total_score: number;
 }
 
+// Session type: 'competition' (10 rounds max) or 'training' (unlimited)
+type SessionType = 'competition' | 'training';
+
 interface AppState {
+  // Session type for current session
+  sessionType: SessionType;
+  setSessionType: (type: SessionType) => void;
+
+  // Round tracking
+  currentRoundNumber: number;
+  setCurrentRoundNumber: (num: number) => void;
+  incrementRoundNumber: () => void;
+
   // Current image being processed
   currentImage: string | null;
   setCurrentImage: (image: string | null) => void;
