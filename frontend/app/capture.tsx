@@ -211,7 +211,7 @@ export default function CaptureScreen() {
               activeOpacity={0.8}
             >
               <View style={styles.optionIconContainer}>
-                <Ionicons name="camera" size={36} color="#e94560" />
+                <Ionicons name="camera" size={36} color="#ff4444" />
               </View>
               <Text style={styles.optionTitle}>Camera</Text>
               <Text style={styles.optionDescription}>
@@ -225,7 +225,7 @@ export default function CaptureScreen() {
               activeOpacity={0.8}
             >
               <View style={styles.optionIconContainer}>
-                <Ionicons name="images" size={36} color="#e94560" />
+                <Ionicons name="images" size={36} color="#ff4444" />
               </View>
               <Text style={styles.optionTitle}>Gallery</Text>
               <Text style={styles.optionDescription}>
