@@ -113,6 +113,7 @@ export default function SummaryScreen() {
 
   const handleAddRound = () => {
     clearCurrentRound();
+    incrementRoundNumber();
     router.push('/capture');
   };
 
