@@ -143,7 +143,21 @@ export default function ScoringScreen() {
     return ring;
   };
 
+  // Competition mode arrow limit
+  const COMPETITION_ARROWS_PER_ROUND = 3;
+  const maxArrowsReached = isCompetition && arrows.length >= COMPETITION_ARROWS_PER_ROUND;
+
   const handleTargetPress = (event: any) => {
+    // In competition mode, prevent adding more than 3 arrows
+    if (maxArrowsReached) {
+      Alert.alert(
+        'Arrow Limit Reached',
+        'Competition rounds are limited to 3 arrows. Finish this round to continue.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
     // Try multiple methods to get correct coordinates
     let x, y;
     
