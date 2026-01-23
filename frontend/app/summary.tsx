@@ -16,6 +16,9 @@ import axios from 'axios';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
+// Max rounds for competition mode
+const MAX_COMPETITION_ROUNDS = 10;
+
 // Ring colors for FITA target
 const RING_COLORS = [
   '#f0f0f0', // 1 - White outer
@@ -32,15 +35,27 @@ const RING_COLORS = [
 
 export default function SummaryScreen() {
   const router = useRouter();
-  const { currentRound, currentSession, setCurrentSession, clearCurrentRound, clearAll } = useAppStore();
+  const { 
+    currentRound, 
+    currentSession, 
+    setCurrentSession, 
+    clearCurrentRound, 
+    clearAll,
+    sessionType,
+    currentRoundNumber,
+    incrementRoundNumber,
+  } = useAppStore();
   const [isSaving, setIsSaving] = useState(false);
   const [sessionRounds, setSessionRounds] = useState<any[]>([]);
+
+  const isCompetition = sessionType === 'competition';
+  const isLastCompetitionRound = isCompetition && currentRoundNumber >= MAX_COMPETITION_ROUNDS;
 
   useEffect(() => {
     // Add current round to session rounds if it exists
     if (currentRound) {
       setSessionRounds([...sessionRounds, {
-        roundNumber: sessionRounds.length + 1,
+        roundNumber: currentRoundNumber,
         ...currentRound,
       }]);
     }
