@@ -355,7 +355,7 @@ export default function AlignmentScreen() {
               />
             ) : (
               <View style={styles.placeholderImage}>
-                <Ionicons name="image-outline" size={64} color="#a0a0a0" />
+                <Ionicons name="image-outline" size={64} color="#888888" />
                 <Text style={styles.placeholderText}>No image</Text>
               </View>
             )}
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#a0a0a0',
+    color: '#888888',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   placeholderText: {
-    color: '#a0a0a0',
+    color: '#888888',
     marginTop: 8,
   },
   analysisOverlay: {
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   instructionText: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 14,
     flex: 1,
   },
