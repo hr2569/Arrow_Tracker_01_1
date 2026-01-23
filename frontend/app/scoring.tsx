@@ -556,7 +556,7 @@ export default function ScoringScreen() {
           </View>
           <Text style={styles.arrowCount}>
             {arrows.length} arrow{arrows.length !== 1 ? 's' : ''} marked
-            {arrows.length < 3 && ` (min 3 required)`}
+            {isCompetition && arrows.length < 3 && ` (3 required for competition)`}
           </Text>
         </View>
 
