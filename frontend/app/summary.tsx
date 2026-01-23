@@ -524,6 +524,26 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
   },
+  completionMessage: {
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+  },
+  completionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    marginTop: 12,
+  },
+  completionSubtitle: {
+    fontSize: 14,
+    color: '#a0a0a0',
+    marginTop: 4,
+  },
   quickStats: {
     backgroundColor: '#1a1a2e',
     borderRadius: 16,
