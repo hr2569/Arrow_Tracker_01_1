@@ -27,34 +27,45 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
+          name="sessionType" 
+          options={{ 
+            title: 'New Session',
+            headerBackTitle: 'Back'
+          }} 
+        />
+        <Stack.Screen 
           name="capture" 
           options={{ 
             title: 'New Session',
-            presentation: 'modal' 
+            headerBackTitle: 'Back'
           }} 
         />
         <Stack.Screen 
           name="alignment" 
           options={{ 
-            title: 'Target Detection' 
+            title: 'Target Detection',
+            headerBackTitle: 'Back'
           }} 
         />
         <Stack.Screen 
           name="scoring" 
           options={{ 
-            title: 'Score Arrows' 
+            title: 'Score Arrows',
+            headerBackTitle: 'Back'
           }} 
         />
         <Stack.Screen 
           name="summary" 
           options={{ 
-            title: 'Round Summary' 
+            title: 'Round Summary',
+            headerBackTitle: 'Back'
           }} 
         />
         <Stack.Screen 
           name="history" 
           options={{ 
-            title: 'Score History' 
+            title: 'Score History',
+            headerBackTitle: 'Back'
           }} 
         />
       </Stack>
