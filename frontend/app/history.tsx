@@ -98,7 +98,7 @@ export default function HistoryScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#e94560" />
+          <ActivityIndicator size="large" color="#8B0000" />
           <Text style={styles.loadingText}>Loading history...</Text>
         </View>
       </SafeAreaView>
@@ -113,7 +113,7 @@ export default function HistoryScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#e94560"
+            tintColor="#8B0000"
           />
         }
       >
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   overviewValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#e94560',
+    color: '#8B0000',
   },
   overviewLabel: {
     fontSize: 12,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   },
   startButton: {
     flexDirection: 'row',
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
   scoreValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#e94560',
+    color: '#8B0000',
   },
   scoreLabel: {
     fontSize: 12,
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,
