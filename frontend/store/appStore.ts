@@ -58,6 +58,13 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
+  sessionType: 'training',
+  setSessionType: (type) => set({ sessionType: type, currentRoundNumber: 1 }),
+
+  currentRoundNumber: 1,
+  setCurrentRoundNumber: (num) => set({ currentRoundNumber: num }),
+  incrementRoundNumber: () => set((state) => ({ currentRoundNumber: state.currentRoundNumber + 1 })),
+
   currentImage: null,
   setCurrentImage: (image) => set({ currentImage: image }),
 
@@ -76,6 +83,8 @@ export const useAppStore = create<AppState>((set) => ({
 
   clearAll: () =>
     set({
+      sessionType: 'training',
+      currentRoundNumber: 1,
       currentImage: null,
       targetData: null,
       manualMode: false,
