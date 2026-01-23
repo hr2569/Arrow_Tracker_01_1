@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   },
   overviewDivider: {
     width: 1,
-    backgroundColor: '#2a2a4e',
+    backgroundColor: '#333333',
   },
   emptyState: {
     alignItems: 'center',
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#2a2a4e',
+    borderTopColor: '#333333',
   },
   metaItem: {
     flexDirection: 'row',
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   },
   expandedDivider: {
     height: 1,
-    backgroundColor: '#2a2a4e',
+    backgroundColor: '#333333',
     marginBottom: 12,
   },
   roundsTitle: {
