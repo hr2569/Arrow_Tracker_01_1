@@ -23,8 +23,8 @@ const MAX_COMPETITION_ROUNDS = 10;
 const RING_COLORS = [
   '#f0f0f0', // 1 - White outer
   '#f0f0f0', // 2 - White inner
-  '#1a1a2e', // 3 - Black outer
-  '#1a1a2e', // 4 - Black inner
+  '#111111', // 3 - Black outer
+  '#111111', // 4 - Black inner
   '#4169E1', // 5 - Blue outer
   '#4169E1', // 6 - Blue inner
   '#DC143C', // 7 - Red outer
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   summaryCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 16,
     padding: 24,
     marginBottom: 16,
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   sessionCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
   },
   finishButton: {
     flexDirection: 'row',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   quickStats: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 16,
     padding: 20,
   },
