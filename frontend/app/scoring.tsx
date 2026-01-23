@@ -48,7 +48,7 @@ interface Arrow {
 
 export default function ScoringScreen() {
   const router = useRouter();
-  const { currentImage, targetData, setCurrentRound, manualMode } = useAppStore();
+  const { currentImage, targetData, setCurrentRound, manualMode, sessionType, currentRoundNumber } = useAppStore();
   const [isDetecting, setIsDetecting] = useState(false);
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrow, setSelectedArrow] = useState<string | null>(null);
@@ -58,6 +58,10 @@ export default function ScoringScreen() {
   const [zoomIndex, setZoomIndex] = useState(0); // Index into ZOOM_LEVELS
   const targetRef = useRef<View>(null);
   const scrollViewRef = useRef<ScrollView>(null);
+
+  // Session info
+  const isCompetition = sessionType === 'competition';
+  const MAX_ROUNDS = 10;
 
   // Current zoom level and target size
   const zoomLevel = ZOOM_LEVELS[zoomIndex];
