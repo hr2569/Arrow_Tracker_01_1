@@ -476,7 +476,7 @@ export default function AlignmentScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#16213e',
+    backgroundColor: '#000000',
   },
   scrollContent: {
     flexGrow: 1,
