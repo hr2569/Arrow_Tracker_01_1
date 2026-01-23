@@ -75,18 +75,26 @@ export default function AlignmentScreen() {
         image_base64: currentImage,
       });
 
+      console.log('Target analysis response:', response.data);
+
       if (response.data.success && response.data.corners?.length === 4) {
         setCorners(response.data.corners);
+        setDetectionConfidence(response.data.confidence || 0.8);
+        setDetectedCenter(response.data.center || { x: 0.5, y: 0.5 });
+        setDetectedRadius(response.data.radius || 0.4);
+        setIsManualMode(false);
         setAnalysisComplete(true);
       } else {
         // Use default corners for manual adjustment
         setIsManualMode(true);
         setAnalysisComplete(true);
+        setError(response.data.message || 'Could not detect target. Please adjust corners manually.');
       }
     } catch (err: any) {
       console.error('Analysis error:', err);
       setIsManualMode(true);
       setAnalysisComplete(true);
+      setError('Target detection failed. Please adjust corners manually.');
     } finally {
       setIsAnalyzing(false);
     }
