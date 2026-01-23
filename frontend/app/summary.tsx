@@ -412,6 +412,92 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 8,
   },
+  scoreTableCard: {
+    backgroundColor: '#111111',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+  },
+  scoreTableTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#1a1a1a',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  tableHeaderCell: {
+    color: '#888888',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#222222',
+  },
+  tableRowCompleted: {
+    backgroundColor: 'transparent',
+  },
+  tableRowPending: {
+    backgroundColor: 'transparent',
+    opacity: 0.5,
+  },
+  tableRowCurrent: {
+    backgroundColor: 'rgba(139, 0, 0, 0.2)',
+    borderRadius: 8,
+    borderBottomWidth: 0,
+  },
+  tableCell: {
+    color: '#fff',
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  tableCellPending: {
+    color: '#444444',
+  },
+  roundColumn: {
+    flex: 1,
+  },
+  arrowsColumn: {
+    flex: 1,
+  },
+  scoreColumn: {
+    flex: 1,
+  },
+  totalColumn: {
+    flex: 1,
+    fontWeight: 'bold',
+  },
+  tableFooter: {
+    flexDirection: 'row',
+    backgroundColor: '#8B0000',
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  tableFooterCell: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  grandTotal: {
+    fontSize: 16,
+  },
   summaryCard: {
     backgroundColor: '#111111',
     borderRadius: 16,
