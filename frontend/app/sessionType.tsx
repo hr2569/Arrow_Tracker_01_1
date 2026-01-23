@@ -84,8 +84,8 @@ export default function SessionTypeScreen() {
         <View style={styles.infoContainer}>
           <Ionicons name="information-circle" size={20} color="#a0a0a0" />
           <Text style={styles.infoText}>
-            Competition mode follows standard archery scoring with 10 ends.
-            Training mode allows unlimited practice.
+            Competition mode follows standard archery scoring with 10 ends of 3 arrows.
+            Training mode allows unlimited practice with no restrictions.
           </Text>
         </View>
       </View>
