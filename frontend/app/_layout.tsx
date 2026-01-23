@@ -36,7 +36,7 @@ export default function RootLayout() {
         <Stack.Screen 
           name="alignment" 
           options={{ 
-            title: 'Align Target' 
+            title: 'Target Detection' 
           }} 
         />
         <Stack.Screen 
