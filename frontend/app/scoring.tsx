@@ -234,10 +234,12 @@ export default function ScoringScreen() {
   };
 
   const handleFinishRound = () => {
-    if (arrows.length < 3) {
+    // Competition mode requires exactly 3 arrows per round
+    // Training mode has no restrictions
+    if (isCompetition && arrows.length < 3) {
       Alert.alert(
         'Minimum 3 Shots Required',
-        `You have ${arrows.length} arrow(s) marked. Add more or confirm with ${3 - arrows.length} miss(es)?`,
+        `Competition rounds require 3 arrows. You have ${arrows.length} arrow(s) marked. Add more or confirm with ${3 - arrows.length} miss(es)?`,
         [
           { text: 'Add More', style: 'cancel' },
           {
@@ -245,6 +247,12 @@ export default function ScoringScreen() {
             onPress: () => finishRound(true),
           },
         ]
+      );
+    } else if (arrows.length === 0) {
+      Alert.alert(
+        'No Arrows',
+        'Please mark at least one arrow before finishing the round.',
+        [{ text: 'OK' }]
       );
     } else {
       finishRound(false);
@@ -254,7 +262,8 @@ export default function ScoringScreen() {
   const finishRound = (addMisses: boolean) => {
     let finalArrows = [...arrows];
     
-    if (addMisses) {
+    // Only add misses for competition mode
+    if (addMisses && isCompetition) {
       while (finalArrows.length < 3) {
         finalArrows.push({
           id: `miss-${Date.now()}-${finalArrows.length}`,
