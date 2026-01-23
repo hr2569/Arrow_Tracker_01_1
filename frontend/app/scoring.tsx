@@ -674,6 +674,31 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#2a2a4e',
   },
+  roundBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    marginBottom: 10,
+    gap: 6,
+  },
+  competitionRoundBadge: {
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+  },
+  trainingRoundBadge: {
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+  },
+  roundBadgeText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  competitionRoundText: {
+    color: '#FFD700',
+  },
+  trainingRoundText: {
+    color: '#4CAF50',
+  },
   zoomControls: {
     flexDirection: 'row',
     alignItems: 'center',
