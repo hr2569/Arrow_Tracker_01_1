@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   overviewCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sessionCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
