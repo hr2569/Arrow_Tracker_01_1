@@ -179,49 +179,96 @@ export default function SummaryScreen() {
           )}
         </View>
 
-        {/* Session Total */}
-        {sessionRounds.length > 0 && (
-          <View style={styles.sessionCard}>
-            <Text style={styles.sessionTitle}>Session Total</Text>
-            <View style={styles.sessionStats}>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{sessionRounds.length}</Text>
-                <Text style={styles.statLabel}>Rounds</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{getTotalSessionScore()}</Text>
-                <Text style={styles.statLabel}>Total Points</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>
-                  {sessionRounds.length > 0
-                    ? Math.round(getTotalSessionScore() / sessionRounds.length)
-                    : 0}
-                </Text>
-                <Text style={styles.statLabel}>Avg/Round</Text>
-              </View>
-            </View>
-
-            {/* Previous Rounds */}
-            {sessionRounds.length > 1 && (
-              <View style={styles.previousRounds}>
-                <Text style={styles.previousTitle}>All Rounds</Text>
-                {sessionRounds.map((round, index) => (
-                  <View key={index} style={styles.previousRoundItem}>
-                    <Text style={styles.previousRoundNumber}>
-                      Round {round.roundNumber}
-                    </Text>
-                    <Text style={styles.previousRoundScore}>
-                      {round.total} pts
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
+        {/* Score Table */}
+        <View style={styles.scoreTableCard}>
+          <Text style={styles.scoreTableTitle}>Score Table</Text>
+          
+          {/* Table Header */}
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableHeaderCell, styles.roundColumn]}>Round</Text>
+            <Text style={[styles.tableHeaderCell, styles.arrowsColumn]}>Arrows</Text>
+            <Text style={[styles.tableHeaderCell, styles.scoreColumn]}>Score</Text>
+            <Text style={[styles.tableHeaderCell, styles.totalColumn]}>Total</Text>
           </View>
-        )}
+          
+          {/* Table Rows */}
+          {isCompetition ? (
+            // Competition: Show all 10 rows
+            Array.from({ length: MAX_COMPETITION_ROUNDS }, (_, i) => {
+              const round = sessionRounds.find(r => r.roundNumber === i + 1);
+              const runningTotal = sessionRounds
+                .filter(r => r.roundNumber <= i + 1)
+                .reduce((sum, r) => sum + (r.total || 0), 0);
+              
+              return (
+                <View 
+                  key={i} 
+                  style={[
+                    styles.tableRow,
+                    round ? styles.tableRowCompleted : styles.tableRowPending,
+                    i === currentRoundNumber - 1 && styles.tableRowCurrent
+                  ]}
+                >
+                  <Text style={[styles.tableCell, styles.roundColumn, !round && styles.tableCellPending]}>
+                    {i + 1}
+                  </Text>
+                  <Text style={[styles.tableCell, styles.arrowsColumn, !round && styles.tableCellPending]}>
+                    {round ? round.shots.length : '-'}
+                  </Text>
+                  <Text style={[styles.tableCell, styles.scoreColumn, !round && styles.tableCellPending]}>
+                    {round ? round.total : '-'}
+                  </Text>
+                  <Text style={[styles.tableCell, styles.totalColumn, !round && styles.tableCellPending]}>
+                    {round ? runningTotal : '-'}
+                  </Text>
+                </View>
+              );
+            })
+          ) : (
+            // Training: Show only completed rounds
+            sessionRounds.map((round, index) => {
+              const runningTotal = sessionRounds
+                .slice(0, index + 1)
+                .reduce((sum, r) => sum + (r.total || 0), 0);
+              
+              return (
+                <View 
+                  key={index} 
+                  style={[
+                    styles.tableRow,
+                    styles.tableRowCompleted,
+                    index === sessionRounds.length - 1 && styles.tableRowCurrent
+                  ]}
+                >
+                  <Text style={[styles.tableCell, styles.roundColumn]}>
+                    {round.roundNumber}
+                  </Text>
+                  <Text style={[styles.tableCell, styles.arrowsColumn]}>
+                    {round.shots.length}
+                  </Text>
+                  <Text style={[styles.tableCell, styles.scoreColumn]}>
+                    {round.total}
+                  </Text>
+                  <Text style={[styles.tableCell, styles.totalColumn]}>
+                    {runningTotal}
+                  </Text>
+                </View>
+              );
+            })
+          )}
+          
+          {/* Table Footer - Grand Total */}
+          <View style={styles.tableFooter}>
+            <Text style={[styles.tableFooterCell, styles.roundColumn]}>Total</Text>
+            <Text style={[styles.tableFooterCell, styles.arrowsColumn]}>
+              {sessionRounds.reduce((sum, r) => sum + r.shots.length, 0)}
+            </Text>
+            <Text style={[styles.tableFooterCell, styles.scoreColumn]}></Text>
+            <Text style={[styles.tableFooterCell, styles.totalColumn, styles.grandTotal]}>
+              {getTotalSessionScore()}
+            </Text>
+          </View>
+        </View>
 
         {/* Session Type Badge */}
         <View style={[styles.sessionTypeBadge, isCompetition ? styles.competitionBadge : styles.trainingBadge]}>
