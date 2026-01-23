@@ -673,15 +673,15 @@ export default function ScoringScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#16213e',
+    backgroundColor: '#000000',
   },
   zoomControlsContainer: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     paddingVertical: 12,
     paddingHorizontal: 20,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#2a2a4e',
+    borderBottomColor: '#333333',
   },
   roundBadge: {
     flexDirection: 'row',
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 215, 0, 0.15)',
   },
   trainingRoundBadge: {
-    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+    backgroundColor: 'rgba(139, 0, 0, 0.3)',
   },
   roundBadgeText: {
     fontSize: 14,
