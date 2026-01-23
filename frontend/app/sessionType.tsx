@@ -68,7 +68,7 @@ export default function SessionTypeScreen() {
             activeOpacity={0.8}
           >
             <View style={[styles.optionIconContainer, styles.trainingIconContainer]}>
-              <Ionicons name="fitness" size={48} color="#4CAF50" />
+              <Ionicons name="fitness" size={48} color="#ff4444" />
             </View>
             <Text style={styles.optionTitle}>Training</Text>
             <Text style={styles.optionDescription}>
