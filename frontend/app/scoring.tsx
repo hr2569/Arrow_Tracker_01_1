@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   targetContainer: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 16,
     alignSelf: 'center',
     position: 'relative',
