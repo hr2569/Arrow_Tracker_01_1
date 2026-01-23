@@ -96,7 +96,7 @@ export default function SessionTypeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#16213e',
+    backgroundColor: '#000000',
   },
   content: {
     flex: 1,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#a0a0a0',
+    color: '#888888',
     textAlign: 'center',
     marginBottom: 32,
   },
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   optionCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
@@ -142,19 +142,19 @@ const styles = StyleSheet.create({
     borderColor: '#FFD700',
   },
   trainingCard: {
-    borderColor: '#4CAF50',
+    borderColor: '#8B0000',
   },
   optionIconContainer: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
   },
   trainingIconContainer: {
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    backgroundColor: 'rgba(139, 0, 0, 0.2)',
   },
   optionTitle: {
     fontSize: 24,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   optionDescription: {
     fontSize: 16,
-    color: '#a0a0a0',
+    color: '#888888',
     marginBottom: 12,
   },
   optionBadge: {
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   trainingBadge: {
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    backgroundColor: 'rgba(139, 0, 0, 0.3)',
   },
   optionBadgeText: {
     color: '#FFD700',
@@ -182,18 +182,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   trainingBadgeText: {
-    color: '#4CAF50',
+    color: '#ff4444',
   },
   infoContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 12,
     padding: 16,
     marginTop: 24,
   },
   infoText: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 13,
     marginLeft: 10,
     flex: 1,
