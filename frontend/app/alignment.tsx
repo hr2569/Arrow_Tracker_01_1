@@ -569,6 +569,47 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
   },
+  analysisSubtext: {
+    color: '#888888',
+    marginTop: 8,
+    fontSize: 14,
+  },
+  detectionSuccessCard: {
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+  },
+  detectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  detectionSuccessTitle: {
+    color: '#4CAF50',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  confidenceBar: {
+    height: 6,
+    backgroundColor: '#333333',
+    borderRadius: 3,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  confidenceFill: {
+    height: '100%',
+    backgroundColor: '#4CAF50',
+    borderRadius: 3,
+  },
+  confidenceText: {
+    color: '#888888',
+    fontSize: 12,
+    textAlign: 'right',
+  },
   cornerHandle: {
     position: 'absolute',
     width: 40,
