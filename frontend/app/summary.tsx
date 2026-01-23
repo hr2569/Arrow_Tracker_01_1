@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     color: '#FFD700',
   },
   trainingText: {
-    color: '#4CAF50',
+    color: '#ff4444',
   },
   roundProgress: {
     color: '#888888',
