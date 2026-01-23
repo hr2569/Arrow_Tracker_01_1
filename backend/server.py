@@ -93,18 +93,25 @@ class PerspectiveCropRequest(BaseModel):
 def perspective_crop(image_base64: str, corners: List[dict], output_size: int = 800) -> str:
     """Perform perspective crop on an image given 4 corners"""
     try:
+        logger.info(f"Perspective crop started. Image length: {len(image_base64)}, Corners: {corners}")
+        
         # Decode base64 image
         if ',' in image_base64:
             image_base64 = image_base64.split(',')[1]
         
+        logger.info(f"Base64 after split: {len(image_base64)} chars")
+        
         image_data = base64.b64decode(image_base64)
+        logger.info(f"Decoded image data: {len(image_data)} bytes")
+        
         nparr = np.frombuffer(image_data, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         if img is None:
-            raise ValueError("Failed to decode image")
+            raise ValueError("Failed to decode image - cv2.imdecode returned None")
         
         height, width = img.shape[:2]
+        logger.info(f"Image dimensions: {width}x{height}")
         
         # Convert normalized coordinates to pixel coordinates
         # Corners order: top-left, top-right, bottom-right, bottom-left
@@ -114,6 +121,8 @@ def perspective_crop(image_base64: str, corners: List[dict], output_size: int = 
             [corners[2]['x'] * width, corners[2]['y'] * height],  # BR
             [corners[3]['x'] * width, corners[3]['y'] * height],  # BL
         ])
+        
+        logger.info(f"Source points: {src_points}")
         
         # Destination points (square output)
         dst_points = np.float32([
@@ -133,6 +142,7 @@ def perspective_crop(image_base64: str, corners: List[dict], output_size: int = 
         _, buffer = cv2.imencode('.jpg', result, [cv2.IMWRITE_JPEG_QUALITY, 90])
         result_base64 = base64.b64encode(buffer).decode('utf-8')
         
+        logger.info(f"Crop successful. Result size: {len(result_base64)} chars")
         return f"data:image/jpeg;base64,{result_base64}"
         
     except Exception as e:
