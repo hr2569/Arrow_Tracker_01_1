@@ -363,7 +363,7 @@ export default function AlignmentScreen() {
             {/* Loading Overlay */}
             {isAnalyzing && (
               <View style={styles.analysisOverlay}>
-                <ActivityIndicator size="large" color="#e94560" />
+                <ActivityIndicator size="large" color="#8B0000" />
                 <Text style={styles.analysisText}>Detecting target corners...</Text>
               </View>
             )}
@@ -396,7 +396,7 @@ export default function AlignmentScreen() {
           {/* Instructions */}
           <View style={styles.instructions}>
             <View style={styles.instructionRow}>
-              <Ionicons name="finger-print" size={20} color="#e94560" />
+              <Ionicons name="finger-print" size={20} color="#8B0000" />
               <Text style={styles.instructionText}>
                 Drag each numbered corner to match the target's edges
               </Text>
@@ -425,7 +425,7 @@ export default function AlignmentScreen() {
               style={styles.iconButton}
               onPress={handleRetake}
             >
-              <Ionicons name="camera" size={24} color="#e94560" />
+              <Ionicons name="camera" size={24} color="#8B0000" />
               <Text style={styles.iconButtonText}>Retake</Text>
             </TouchableOpacity>
 
@@ -433,7 +433,7 @@ export default function AlignmentScreen() {
               style={styles.iconButton}
               onPress={resetCorners}
             >
-              <Ionicons name="refresh" size={24} color="#e94560" />
+              <Ionicons name="refresh" size={24} color="#8B0000" />
               <Text style={styles.iconButtonText}>Reset</Text>
             </TouchableOpacity>
 
@@ -442,7 +442,7 @@ export default function AlignmentScreen() {
               onPress={analyzeTarget}
               disabled={isAnalyzing}
             >
-              <Ionicons name="scan" size={24} color="#e94560" />
+              <Ionicons name="scan" size={24} color="#8B0000" />
               <Text style={styles.iconButtonText}>Re-scan</Text>
             </TouchableOpacity>
           </View>
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     borderWidth: 3,
     borderColor: '#fff',
     alignItems: 'center',
@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
   line: {
     position: 'absolute',
     height: 3,
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
   },
   centerMarker: {
     position: 'absolute',
@@ -624,13 +624,13 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   iconButtonText: {
-    color: '#e94560',
+    color: '#8B0000',
     fontSize: 12,
     marginTop: 4,
   },
   confirmButton: {
     flexDirection: 'row',
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
