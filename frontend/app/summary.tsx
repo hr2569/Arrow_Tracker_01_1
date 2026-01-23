@@ -330,6 +330,41 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
   },
+  sessionTypeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginBottom: 16,
+    gap: 8,
+  },
+  competitionBadge: {
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+  },
+  trainingBadge: {
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(76, 175, 80, 0.3)',
+  },
+  sessionTypeText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  competitionText: {
+    color: '#FFD700',
+  },
+  trainingText: {
+    color: '#4CAF50',
+  },
+  roundProgress: {
+    color: '#a0a0a0',
+    fontSize: 14,
+    marginLeft: 8,
+  },
   summaryCard: {
     backgroundColor: '#1a1a2e',
     borderRadius: 16,
