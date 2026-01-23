@@ -42,6 +42,9 @@ export default function AlignmentScreen() {
   const [activeCorner, setActiveCorner] = useState<number | null>(null);
   const [isManualMode, setIsManualMode] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [detectionConfidence, setDetectionConfidence] = useState<number>(0);
+  const [detectedCenter, setDetectedCenter] = useState<{x: number, y: number} | null>(null);
+  const [detectedRadius, setDetectedRadius] = useState<number>(0);
   
   // Use refs to track corner positions during drag
   const cornersRef = useRef(corners);
