@@ -301,7 +301,7 @@ export default function ScoringScreen() {
           <Ionicons 
             name={isCompetition ? "trophy" : "fitness"} 
             size={14} 
-            color={isCompetition ? "#FFD700" : "#4CAF50"} 
+            color={isCompetition ? "#FFD700" : "#ff4444"} 
           />
           <Text style={[styles.roundBadgeText, isCompetition ? styles.competitionRoundText : styles.trainingRoundText]}>
             {isCompetition 
