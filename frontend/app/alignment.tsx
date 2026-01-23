@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: IMAGE_SIZE,
     height: IMAGE_SIZE,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 16,
     overflow: 'visible',
     alignSelf: 'center',
@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
   instructions: {
     marginTop: 20,
     padding: 16,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 12,
     gap: 12,
   },
