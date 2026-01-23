@@ -863,7 +863,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scoreSummary: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 12,
     padding: 16,
     marginTop: 20,
@@ -888,7 +888,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   arrowList: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 12,
     padding: 16,
     marginTop: 16,
@@ -959,7 +959,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
     padding: 12,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 8,
   },
   instructionText: {
@@ -986,7 +986,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 8,
     padding: 12,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#e94560',
@@ -1020,7 +1020,7 @@ const styles = StyleSheet.create({
   secondaryButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
