@@ -250,7 +250,7 @@ export default function CaptureScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#16213e',
+    backgroundColor: '#000000',
   },
   content: {
     flex: 1,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#a0a0a0',
+    color: '#888888',
     textAlign: 'center',
     marginBottom: 24,
   },
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   primaryOptionCard: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     borderRadius: 20,
     padding: 28,
     alignItems: 'center',
@@ -307,10 +307,10 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#2a2a4e',
+    backgroundColor: '#333333',
   },
   dividerText: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 12,
     marginHorizontal: 12,
   },
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: 'rgba(233, 69, 96, 0.1)',
+    backgroundColor: 'rgba(139, 0, 0, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
@@ -343,19 +343,19 @@ const styles = StyleSheet.create({
   },
   optionDescription: {
     fontSize: 12,
-    color: '#a0a0a0',
+    color: '#888888',
     textAlign: 'center',
   },
   infoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 12,
     padding: 16,
     marginTop: 8,
   },
   infoText: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 13,
     marginLeft: 10,
     flex: 1,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderTopWidth: 3,
     borderLeftWidth: 3,
-    borderColor: '#e94560',
+    borderColor: '#8B0000',
   },
   guideCornerTR: {
     position: 'absolute',
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderTopWidth: 3,
     borderRightWidth: 3,
-    borderColor: '#e94560',
+    borderColor: '#8B0000',
   },
   guideCornerBL: {
     position: 'absolute',
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderBottomWidth: 3,
     borderLeftWidth: 3,
-    borderColor: '#e94560',
+    borderColor: '#8B0000',
   },
   guideCornerBR: {
     position: 'absolute',
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderBottomWidth: 3,
     borderRightWidth: 3,
-    borderColor: '#e94560',
+    borderColor: '#8B0000',
   },
   guideText: {
     position: 'absolute',
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
