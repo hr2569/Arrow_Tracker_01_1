@@ -12,6 +12,12 @@ interface RoundData {
   total: number;
 }
 
+interface SessionRoundData {
+  roundNumber: number;
+  shots: Array<{ x: number; y: number; ring: number }>;
+  total: number;
+}
+
 interface SessionData {
   id: string;
   name: string;
@@ -31,6 +37,11 @@ interface AppState {
   currentRoundNumber: number;
   setCurrentRoundNumber: (num: number) => void;
   incrementRoundNumber: () => void;
+
+  // Session rounds - persists all completed rounds
+  sessionRounds: SessionRoundData[];
+  addSessionRound: (round: SessionRoundData) => void;
+  clearSessionRounds: () => void;
 
   // Current image being processed
   currentImage: string | null;
@@ -59,11 +70,17 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   sessionType: 'training',
-  setSessionType: (type) => set({ sessionType: type, currentRoundNumber: 1 }),
+  setSessionType: (type) => set({ sessionType: type, currentRoundNumber: 1, sessionRounds: [] }),
 
   currentRoundNumber: 1,
   setCurrentRoundNumber: (num) => set({ currentRoundNumber: num }),
   incrementRoundNumber: () => set((state) => ({ currentRoundNumber: state.currentRoundNumber + 1 })),
+
+  sessionRounds: [],
+  addSessionRound: (round) => set((state) => ({ 
+    sessionRounds: [...state.sessionRounds, round] 
+  })),
+  clearSessionRounds: () => set({ sessionRounds: [] }),
 
   currentImage: null,
   setCurrentImage: (image) => set({ currentImage: image }),
@@ -85,6 +102,7 @@ export const useAppStore = create<AppState>((set) => ({
     set({
       sessionType: 'training',
       currentRoundNumber: 1,
+      sessionRounds: [],
       currentImage: null,
       targetData: null,
       manualMode: false,
