@@ -285,8 +285,23 @@ export default function ScoringScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Zoom Controls - Fixed at top */}
+      {/* Header with Round Info and Zoom Controls */}
       <View style={styles.zoomControlsContainer}>
+        {/* Round Badge */}
+        <View style={[styles.roundBadge, isCompetition ? styles.competitionRoundBadge : styles.trainingRoundBadge]}>
+          <Ionicons 
+            name={isCompetition ? "trophy" : "fitness"} 
+            size={14} 
+            color={isCompetition ? "#FFD700" : "#4CAF50"} 
+          />
+          <Text style={[styles.roundBadgeText, isCompetition ? styles.competitionRoundText : styles.trainingRoundText]}>
+            {isCompetition 
+              ? `Round ${currentRoundNumber}/${MAX_ROUNDS}`
+              : `Round ${currentRoundNumber}`
+            }
+          </Text>
+        </View>
+        
         <View style={styles.zoomControls}>
           <Pressable
             style={[styles.zoomButton, zoomIndex === 0 && styles.zoomButtonDisabled]}
