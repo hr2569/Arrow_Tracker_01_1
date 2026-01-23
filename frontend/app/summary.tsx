@@ -346,9 +346,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 215, 0, 0.3)',
   },
   trainingBadge: {
-    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+    backgroundColor: 'rgba(139, 0, 0, 0.3)',
     borderWidth: 1,
-    borderColor: 'rgba(76, 175, 80, 0.3)',
+    borderColor: 'rgba(139, 0, 0, 0.5)',
   },
   sessionTypeText: {
     fontSize: 16,
