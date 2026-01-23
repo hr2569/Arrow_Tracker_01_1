@@ -72,7 +72,7 @@ export default function SessionTypeScreen() {
             </View>
             <Text style={styles.optionTitle}>Training</Text>
             <Text style={styles.optionDescription}>
-              Unlimited rounds • 3 arrows each
+              Unlimited rounds • Unlimited arrows
             </Text>
             <View style={[styles.optionBadge, styles.trainingBadge]}>
               <Text style={[styles.optionBadgeText, styles.trainingBadgeText]}>Practice freely</Text>
