@@ -914,7 +914,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#2a2a4e',
+    borderBottomColor: '#333333',
   },
   arrowInfo: {
     flexDirection: 'row',
