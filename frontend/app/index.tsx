@@ -68,7 +68,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#16213e',
+    backgroundColor: '#000000',
   },
   content: {
     flex: 1,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     width: 105,
     height: 105,
     borderRadius: 52.5,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#1a1a1a',
   },
   targetRing2: {
     position: 'absolute',
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#DC143C',
+    backgroundColor: '#8B0000',
   },
   targetCenter: {
     position: 'absolute',
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#a0a0a0',
+    color: '#888888',
     textAlign: 'center',
   },
   actionsContainer: {
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   primaryButton: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     borderRadius: 20,
     padding: 28,
     alignItems: 'center',
@@ -155,20 +155,20 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   secondaryButton: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#111111',
     borderRadius: 20,
     padding: 28,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#e94560',
+    borderColor: '#8B0000',
   },
   secondaryButtonText: {
-    color: '#e94560',
+    color: '#8B0000',
     fontSize: 22,
     fontWeight: 'bold',
   },
   buttonSubtextSecondary: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 14,
     marginTop: 6,
   },
