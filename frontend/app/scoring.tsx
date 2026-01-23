@@ -609,7 +609,7 @@ export default function ScoringScreen() {
 
         {/* Instructions */}
         <View style={styles.instructions}>
-          <Ionicons name="information-circle" size={20} color="#a0a0a0" />
+          <Ionicons name="information-circle" size={20} color="#888888" />
           <Text style={styles.instructionText}>
             {manualMode 
               ? 'Tap on the target to place your arrows. Tap an arrow to select and edit.'
@@ -874,7 +874,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scoreLabel: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 16,
   },
   scoreValue: {
@@ -883,7 +883,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   arrowCount: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 14,
     marginTop: 8,
   },
@@ -921,7 +921,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   arrowNumber: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 14,
     marginRight: 12,
     width: 30,
@@ -940,7 +940,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   unconfirmedLabel: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 12,
     marginLeft: 8,
   },
@@ -963,7 +963,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   instructionText: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 12,
     marginLeft: 8,
     flex: 1,
