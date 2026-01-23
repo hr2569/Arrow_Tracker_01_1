@@ -147,7 +147,7 @@ export default function HistoryScreen() {
         {/* Sessions List */}
         {sessions.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="trophy-outline" size={64} color="#a0a0a0" />
+            <Ionicons name="trophy-outline" size={64} color="#888888" />
             <Text style={styles.emptyTitle}>No Sessions Yet</Text>
             <Text style={styles.emptyText}>
               Start a new scoring session to track your progress!
@@ -185,13 +185,13 @@ export default function HistoryScreen() {
 
                 <View style={styles.sessionMeta}>
                   <View style={styles.metaItem}>
-                    <Ionicons name="layers" size={16} color="#a0a0a0" />
+                    <Ionicons name="layers" size={16} color="#888888" />
                     <Text style={styles.metaText}>
                       {session.rounds?.length || 0} rounds
                     </Text>
                   </View>
                   <View style={styles.metaItem}>
-                    <Ionicons name="analytics" size={16} color="#a0a0a0" />
+                    <Ionicons name="analytics" size={16} color="#888888" />
                     <Text style={styles.metaText}>
                       Avg: {getAverageScore(session)}/round
                     </Text>
@@ -235,7 +235,7 @@ export default function HistoryScreen() {
                   <Ionicons
                     name={expandedSession === session.id ? 'chevron-up' : 'chevron-down'}
                     size={20}
-                    color="#a0a0a0"
+                    color="#888888"
                   />
                 </View>
               </TouchableOpacity>
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loadingText: {
-    color: '#a0a0a0',
+    color: '#888888',
     marginTop: 12,
   },
   overviewCard: {
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   },
   overviewLabel: {
     fontSize: 12,
-    color: '#a0a0a0',
+    color: '#888888',
     marginTop: 4,
   },
   overviewDivider: {
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#a0a0a0',
+    color: '#888888',
     textAlign: 'center',
     marginTop: 8,
     paddingHorizontal: 40,
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   },
   sessionDate: {
     fontSize: 12,
-    color: '#a0a0a0',
+    color: '#888888',
     marginTop: 4,
   },
   sessionScore: {
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   },
   scoreLabel: {
     fontSize: 12,
-    color: '#a0a0a0',
+    color: '#888888',
   },
   sessionMeta: {
     flexDirection: 'row',
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-    color: '#a0a0a0',
+    color: '#888888',
     marginLeft: 4,
   },
   deleteBtn: {
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
   },
   roundNumber: {
     fontSize: 12,
-    color: '#a0a0a0',
+    color: '#888888',
     width: 60,
   },
   roundShots: {
