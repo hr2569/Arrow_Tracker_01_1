@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
   },
   shotsBreakdown: {
     borderTopWidth: 1,
-    borderTopColor: '#2a2a4e',
+    borderTopColor: '#333333',
     paddingTop: 20,
   },
   breakdownTitle: {
@@ -462,12 +462,12 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: 40,
-    backgroundColor: '#2a2a4e',
+    backgroundColor: '#333333',
   },
   previousRounds: {
     marginTop: 20,
     borderTopWidth: 1,
-    borderTopColor: '#2a2a4e',
+    borderTopColor: '#333333',
     paddingTop: 16,
   },
   previousTitle: {
