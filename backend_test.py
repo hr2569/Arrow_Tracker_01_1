@@ -13,7 +13,7 @@ import sys
 import time
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://target-tracker-45.preview.emergentagent.com/api"
+BACKEND_URL = "https://target-tracker-46.preview.emergentagent.com/api"
 
 def create_test_archery_target():
     """Create a simple archery target image for testing AI endpoints"""
