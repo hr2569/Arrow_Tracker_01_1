@@ -275,10 +275,10 @@ export default function SummaryScreen() {
             disabled={isSaving}
           >
             {isSaving ? (
-              <ActivityIndicator color="#e94560" />
+              <ActivityIndicator color="#8B0000" />
             ) : (
               <>
-                <Ionicons name="checkmark-done" size={24} color="#e94560" />
+                <Ionicons name="checkmark-done" size={24} color="#8B0000" />
                 <Text style={styles.finishText}>Finish & Save Session</Text>
               </>
             )}
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
   roundScore: {
     fontSize: 72,
     fontWeight: 'bold',
-    color: '#e94560',
+    color: '#8B0000',
   },
   pointsLabel: {
     fontSize: 18,
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#e94560',
+    color: '#8B0000',
   },
   statLabel: {
     fontSize: 12,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   previousRoundScore: {
-    color: '#e94560',
+    color: '#8B0000',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
   },
   addRoundButton: {
     flexDirection: 'row',
-    backgroundColor: '#e94560',
+    backgroundColor: '#8B0000',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -516,10 +516,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#e94560',
+    borderColor: '#8B0000',
   },
   finishText: {
-    color: '#e94560',
+    color: '#8B0000',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
