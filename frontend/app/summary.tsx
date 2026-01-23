@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
   },
   roundProgress: {
-    color: '#a0a0a0',
+    color: '#888888',
     fontSize: 14,
     marginLeft: 8,
   },
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   },
   roundLabel: {
     fontSize: 16,
-    color: '#a0a0a0',
+    color: '#888888',
     marginBottom: 8,
   },
   roundScore: {
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
   },
   pointsLabel: {
     fontSize: 18,
-    color: '#a0a0a0',
+    color: '#888888',
   },
   shotsBreakdown: {
     borderTopWidth: 1,
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
   },
   shotNumber: {
     fontSize: 12,
-    color: '#a0a0a0',
+    color: '#888888',
   },
   shotScore: {
     fontSize: 18,
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    color: '#a0a0a0',
+    color: '#888888',
     marginTop: 4,
   },
   statDivider: {
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
   previousTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#a0a0a0',
+    color: '#888888',
     marginBottom: 12,
   },
   previousRoundItem: {
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
   },
   completionSubtitle: {
     fontSize: 14,
-    color: '#a0a0a0',
+    color: '#888888',
     marginTop: 4,
   },
   quickStats: {
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
   },
   quickStatLabel: {
     fontSize: 12,
-    color: '#a0a0a0',
+    color: '#888888',
     marginTop: 4,
   },
 });
