@@ -216,12 +216,15 @@ export default function AlignmentScreen() {
         Alert.alert('Crop Failed', response.data.message || 'Failed to crop image. Try adjusting corners.');
       }
     } catch (err: any) {
-      console.error('Crop error:', err.message || err);
+      console.error('Crop error:', err);
+      console.error('Error response:', err.response?.data);
+      console.error('Error message:', err.message);
       
       // Show error but allow proceeding with original
+      const errorMessage = err.response?.data?.message || err.message || 'Unknown error';
       Alert.alert(
         'Crop Error',
-        'Failed to crop image. Would you like to continue with the original image?',
+        `Failed to crop image: ${errorMessage}\n\nWould you like to continue with the original image?`,
         [
           { text: 'Cancel', style: 'cancel' },
           { 
