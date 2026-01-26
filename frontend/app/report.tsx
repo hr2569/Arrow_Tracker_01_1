@@ -503,8 +503,8 @@ export default function ReportScreen() {
           <style>
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              background: #000;
-              color: #fff;
+              background: #fff;
+              color: #000;
               padding: 40px;
               margin: 0;
             }
@@ -517,12 +517,12 @@ export default function ReportScreen() {
               margin: 0 0 8px 0;
             }
             .header p {
-              color: #888;
+              color: #555;
               margin: 4px 0;
             }
             .filter-badge {
               display: inline-block;
-              background: rgba(139, 0, 0, 0.2);
+              background: rgba(139, 0, 0, 0.1);
               color: #8B0000;
               padding: 6px 12px;
               border-radius: 16px;
@@ -530,13 +530,14 @@ export default function ReportScreen() {
               margin-top: 8px;
             }
             .card {
-              background: #111;
+              background: #f5f5f5;
               border-radius: 12px;
               padding: 20px;
               margin-bottom: 16px;
+              border: 1px solid #ddd;
             }
             .card h3 {
-              color: #fff;
+              color: #000;
               margin: 0 0 16px 0;
             }
             .stats-grid {
@@ -555,7 +556,7 @@ export default function ReportScreen() {
             }
             .stat-label {
               font-size: 12px;
-              color: #888;
+              color: #555;
               margin-top: 4px;
             }
             .avg-row {
