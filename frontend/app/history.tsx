@@ -8,13 +8,17 @@ import {
   RefreshControl,
   Alert,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { LineChart, BarChart } from 'react-native-chart-kit';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const CHART_WIDTH = SCREEN_WIDTH - 72; // Account for padding
 
 type TimePeriod = 'day' | 'week' | 'month' | 'year' | 'all';
 
