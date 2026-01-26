@@ -283,21 +283,20 @@ export default function HistoryScreen() {
       '#85C1E9', // Light Blue
     ];
 
+    // The target fills 80% of the visualization (matching scoring's effectiveRadius = 0.4)
+    const targetScale = 0.8; // Target fills 80% of the view
+
     return (
       <View style={[targetMapStyles.container, { width: size, height: size }]}>
-        {/* Target Background */}
-        <View style={[targetMapStyles.targetBackground, { width: size, height: size, borderRadius: size / 2 }]}>
+        {/* Target Background - scaled to 80% of container */}
+        <View style={[targetMapStyles.targetBackground, { width: size * targetScale, height: size * targetScale, borderRadius: (size * targetScale) / 2 }]}>
           {/* Draw rings from outside to inside */}
           {/* Scoring: Ring 1 at 90-100% normalized distance, Ring 10 at 0-10% */}
-          {/* Each ring is 10% of the radius */}
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
-            // Ring 1 outer edge at 100% of diameter, Ring 10 outer edge at 10%
-            // But we draw from outer to inner, so ring 1 fills everything,
-            // ring 2 covers 90%, etc.
-            // Formula: diameter = (11 - ringNum) * 10% = (11-ringNum)/10
-            // Ring 1 = 100%, Ring 10 = 10%
+            // Each ring spans 10% of the target radius
+            // Ring 1: 90-100%, Ring 10: 0-10%
             const diameterPercent = (11 - ringNum) / 10;
-            const ringSize = size * diameterPercent;
+            const ringSize = size * targetScale * diameterPercent;
             const bgColor = ringColors[ringNum - 1];
             return (
               <View
