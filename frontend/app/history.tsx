@@ -181,7 +181,7 @@ export default function HistoryScreen() {
     setExpandedSession(expandedSession === sessionId ? null : sessionId);
   };
 
-  // Chart configuration
+  // Chart configuration for line chart
   const chartConfig = {
     backgroundColor: '#111111',
     backgroundGradientFrom: '#111111',
@@ -219,35 +219,149 @@ export default function HistoryScreen() {
     };
   };
 
-  // Get hit distribution data for bar chart
-  const getHitDistributionData = (session: Session) => {
+  // Get all shots from a session for target visualization
+  const getAllShots = (session: Session) => {
     if (!session.rounds || session.rounds.length === 0) {
-      return null;
+      return [];
     }
     
-    // Count hits by ring value (0-10)
-    const hitCounts: { [key: number]: number } = {};
-    for (let i = 0; i <= 10; i++) {
-      hitCounts[i] = 0;
-    }
+    const shots: { x: number; y: number; ring: number; roundIndex: number }[] = [];
     
-    session.rounds.forEach(round => {
+    session.rounds.forEach((round, roundIndex) => {
       round.shots?.forEach((shot: any) => {
-        const ring = shot.ring || 0;
-        hitCounts[ring] = (hitCounts[ring] || 0) + 1;
+        shots.push({
+          x: shot.x ?? 0.5,
+          y: shot.y ?? 0.5,
+          ring: shot.ring || 0,
+          roundIndex,
+        });
       });
     });
     
-    // Filter out empty rings and create chart data
-    const nonZeroRings = Object.entries(hitCounts)
-      .filter(([_, count]) => count > 0)
-      .sort((a, b) => parseInt(b[0]) - parseInt(a[0])); // Sort by ring value descending
+    return shots;
+  };
+
+  // Target Hit Map Component
+  const TargetHitMap = ({ session, size = 200 }: { session: Session; size?: number }) => {
+    const shots = getAllShots(session);
     
-    if (nonZeroRings.length === 0) {
+    if (shots.length === 0) {
       return null;
     }
-    
-    return {
+
+    // Ring colors matching the scoring screen
+    const ringColors = [
+      '#f5f5f0', // 1-2: White
+      '#f5f5f0',
+      '#2a2a2a', // 3-4: Black
+      '#2a2a2a',
+      '#00a2e8', // 5-6: Blue
+      '#00a2e8',
+      '#ed1c24', // 7-8: Red
+      '#ed1c24',
+      '#fff200', // 9-10: Gold
+      '#fff200',
+    ];
+
+    // Round colors for differentiating rounds
+    const roundColors = [
+      '#FF6B6B', // Red
+      '#4ECDC4', // Teal
+      '#45B7D1', // Blue
+      '#96CEB4', // Green
+      '#FFEAA7', // Yellow
+      '#DDA0DD', // Plum
+      '#98D8C8', // Mint
+      '#F7DC6F', // Gold
+      '#BB8FCE', // Purple
+      '#85C1E9', // Light Blue
+    ];
+
+    return (
+      <View style={[targetMapStyles.container, { width: size, height: size }]}>
+        {/* Target Background */}
+        <View style={[targetMapStyles.targetBackground, { width: size, height: size, borderRadius: size / 2 }]}>
+          {/* Draw rings from outside to inside */}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
+            const ringSize = size * (1 - (ringNum - 1) * 0.1);
+            const bgColor = ringColors[ringNum - 1];
+            return (
+              <View
+                key={`ring-${ringNum}`}
+                style={[
+                  targetMapStyles.ring,
+                  {
+                    width: ringSize,
+                    height: ringSize,
+                    borderRadius: ringSize / 2,
+                    backgroundColor: bgColor,
+                    borderColor: ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00',
+                    borderWidth: 1,
+                  },
+                ]}
+              />
+            );
+          })}
+          
+          {/* Center X mark */}
+          <View style={targetMapStyles.centerMark}>
+            <View style={targetMapStyles.centerLine} />
+            <View style={[targetMapStyles.centerLine, { transform: [{ rotate: '90deg' }] }]} />
+          </View>
+        </View>
+
+        {/* Plot shots */}
+        {shots.map((shot, index) => {
+          const dotSize = 12;
+          const left = shot.x * size - dotSize / 2;
+          const top = shot.y * size - dotSize / 2;
+          const roundColor = roundColors[shot.roundIndex % roundColors.length];
+          
+          return (
+            <View
+              key={`shot-${index}`}
+              style={[
+                targetMapStyles.shotDot,
+                {
+                  left,
+                  top,
+                  width: dotSize,
+                  height: dotSize,
+                  borderRadius: dotSize / 2,
+                  backgroundColor: roundColor,
+                },
+              ]}
+            >
+              <Text style={targetMapStyles.shotLabel}>{shot.ring}</Text>
+            </View>
+          );
+        })}
+      </View>
+    );
+  };
+
+  // Legend for round colors
+  const RoundLegend = ({ session }: { session: Session }) => {
+    if (!session.rounds || session.rounds.length <= 1) {
+      return null;
+    }
+
+    const roundColors = [
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+      '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+    ];
+
+    return (
+      <View style={targetMapStyles.legendContainer}>
+        {session.rounds.map((round, index) => (
+          <View key={index} style={targetMapStyles.legendItem}>
+            <View style={[targetMapStyles.legendDot, { backgroundColor: roundColors[index % roundColors.length] }]} />
+            <Text style={targetMapStyles.legendText}>R{index + 1}</Text>
+          </View>
+        ))}
+      </View>
+    );
+  };
       labels: nonZeroRings.map(([ring]) => ring === '0' ? 'M' : ring),
       datasets: [{ data: nonZeroRings.map(([_, count]) => count) }],
     };
