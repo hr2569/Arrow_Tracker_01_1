@@ -1349,6 +1349,90 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 4,
   },
+  dateEditRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  editIcon: {
+    marginLeft: 6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#111111',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  modalField: {
+    marginBottom: 20,
+  },
+  modalLabel: {
+    fontSize: 14,
+    color: '#888888',
+    marginBottom: 8,
+  },
+  modalInput: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+    color: '#fff',
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  dateButton: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: '#fff',
+  },
+  saveButton: {
+    backgroundColor: '#8B0000',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 8,
+  },
+  saveButtonDisabled: {
+    opacity: 0.6,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
 
 // Styles for the Target Hit Map component
