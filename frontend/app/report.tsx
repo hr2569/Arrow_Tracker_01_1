@@ -269,6 +269,307 @@ export default function ReportScreen() {
     }
   };
 
+  // Generate PDF HTML content
+  const generatePdfHtml = () => {
+    const ringDistributionRows = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+      .map((ring) => {
+        const count = reportStats.ringDistribution[ring] || 0;
+        const percentage = reportStats.totalArrows > 0 ? (count / reportStats.totalArrows) * 100 : 0;
+        return `
+          <tr>
+            <td style="font-weight: bold; width: 40px;">${ring === 0 ? 'M' : ring}</td>
+            <td style="padding: 4px 0;">
+              <div style="background: #333; border-radius: 4px; height: 16px; width: 100%;">
+                <div style="background: #8B0000; border-radius: 4px; height: 16px; width: ${percentage}%;"></div>
+              </div>
+            </td>
+            <td style="width: 50px; text-align: right;">${count}</td>
+          </tr>
+        `;
+      })
+      .join('');
+
+    const bowSection = Object.keys(reportStats.bowStats).length > 0 ? `
+      <div style="background: #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+        <h3 style="color: #8B0000; margin: 0 0 16px 0;">🏹 By Bow</h3>
+        ${Object.entries(reportStats.bowStats).map(([bow, stats]) => `
+          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #333;">
+            <div>
+              <div style="color: #fff; font-weight: 600;">${bow}</div>
+              <div style="color: #888; font-size: 12px;">${stats.sessions} sessions • ${stats.arrows} arrows</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="color: #8B0000; font-weight: bold; font-size: 18px;">${stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0'}</div>
+              <div style="color: #888; font-size: 10px;">avg/arrow</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : '';
+
+    const distanceSection = Object.keys(reportStats.distanceStats).length > 0 ? `
+      <div style="background: #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+        <h3 style="color: #8B0000; margin: 0 0 16px 0;">📏 By Distance</h3>
+        ${Object.entries(reportStats.distanceStats).map(([distance, stats]) => `
+          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #333;">
+            <div>
+              <div style="color: #fff; font-weight: 600;">${distance}</div>
+              <div style="color: #888; font-size: 12px;">${stats.sessions} sessions • ${stats.arrows} arrows</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="color: #8B0000; font-weight: bold; font-size: 18px;">${stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0'}</div>
+              <div style="color: #888; font-size: 10px;">avg/arrow</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : '';
+
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Archery Report</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              background: #000;
+              color: #fff;
+              padding: 40px;
+              margin: 0;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 32px;
+            }
+            .header h1 {
+              color: #8B0000;
+              margin: 0 0 8px 0;
+            }
+            .header p {
+              color: #888;
+              margin: 4px 0;
+            }
+            .filter-badge {
+              display: inline-block;
+              background: rgba(139, 0, 0, 0.2);
+              color: #8B0000;
+              padding: 6px 12px;
+              border-radius: 16px;
+              font-size: 12px;
+              margin-top: 8px;
+            }
+            .card {
+              background: #111;
+              border-radius: 12px;
+              padding: 20px;
+              margin-bottom: 16px;
+            }
+            .card h3 {
+              color: #fff;
+              margin: 0 0 16px 0;
+            }
+            .stats-grid {
+              display: flex;
+              flex-wrap: wrap;
+            }
+            .stat-item {
+              width: 50%;
+              text-align: center;
+              padding: 12px 0;
+            }
+            .stat-value {
+              font-size: 32px;
+              font-weight: bold;
+              color: #8B0000;
+            }
+            .stat-label {
+              font-size: 12px;
+              color: #888;
+              margin-top: 4px;
+            }
+            .avg-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 12px 0;
+              border-bottom: 1px solid #222;
+            }
+            .avg-label { color: #888; }
+            .avg-value { font-weight: bold; font-size: 18px; }
+            .highlight-row {
+              display: flex;
+              gap: 12px;
+            }
+            .highlight-item {
+              flex: 1;
+              background: #1a1a1a;
+              border-radius: 12px;
+              padding: 16px;
+              text-align: center;
+            }
+            .highlight-label {
+              font-size: 12px;
+              color: #888;
+              margin-bottom: 8px;
+            }
+            .highlight-value {
+              font-size: 24px;
+              font-weight: bold;
+              color: #4CAF50;
+            }
+            .highlight-value-low {
+              font-size: 24px;
+              font-weight: bold;
+              color: #FF6B6B;
+            }
+            .highlight-date {
+              font-size: 11px;
+              color: #666;
+              margin-top: 4px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            td {
+              color: #888;
+              padding: 6px 0;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 32px;
+              color: #666;
+              font-size: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🎯 Archery Performance Report</h1>
+            <p>${formatDateRange()}</p>
+            ${(selectedBow || selectedDistance) ? `<div class="filter-badge">Filter: ${getFilterSummary()}</div>` : ''}
+            <p style="font-size: 11px;">Generated ${new Date().toLocaleDateString()}</p>
+          </div>
+
+          <div class="card">
+            <h3>📊 Overview</h3>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-value">${reportStats.totalSessions}</div>
+                <div class="stat-label">Sessions</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${reportStats.totalRounds}</div>
+                <div class="stat-label">Rounds</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${reportStats.totalArrows}</div>
+                <div class="stat-label">Arrows</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${reportStats.totalPoints}</div>
+                <div class="stat-label">Total Points</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>📈 Averages</h3>
+            <div class="avg-row">
+              <span class="avg-label">Per Arrow</span>
+              <span class="avg-value">${reportStats.avgPerArrow}</span>
+            </div>
+            <div class="avg-row">
+              <span class="avg-label">Per Round</span>
+              <span class="avg-value">${reportStats.avgPerRound}</span>
+            </div>
+            <div class="avg-row">
+              <span class="avg-label">Per Session</span>
+              <span class="avg-value">${reportStats.avgPerSession}</span>
+            </div>
+          </div>
+
+          ${reportStats.totalSessions > 0 ? `
+            <div class="card">
+              <h3>🏆 Highlights</h3>
+              <div class="highlight-row">
+                <div class="highlight-item">
+                  <div class="highlight-label">Best Session</div>
+                  <div class="highlight-value">${reportStats.bestSession.score} pts</div>
+                  <div class="highlight-date">${reportStats.bestSession.date}</div>
+                </div>
+                <div class="highlight-item">
+                  <div class="highlight-label">Lowest Session</div>
+                  <div class="highlight-value-low">${reportStats.worstSession.score} pts</div>
+                  <div class="highlight-date">${reportStats.worstSession.date}</div>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+
+          ${reportStats.totalArrows > 0 ? `
+            <div class="card">
+              <h3>📊 Score Distribution</h3>
+              <table>
+                ${ringDistributionRows}
+              </table>
+            </div>
+          ` : ''}
+
+          ${bowSection}
+          ${distanceSection}
+
+          <div class="footer">
+            <p>Archery Scoring App • ${new Date().getFullYear()}</p>
+          </div>
+        </body>
+      </html>
+    `;
+  };
+
+  // Download PDF
+  const handleDownloadPdf = async () => {
+    try {
+      const html = generatePdfHtml();
+      
+      if (Platform.OS === 'web') {
+        // For web, open print dialog which allows saving as PDF
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(html);
+          printWindow.document.close();
+          printWindow.print();
+        }
+      } else {
+        // For native, generate PDF and share
+        const { uri } = await Print.printToFileAsync({
+          html,
+          base64: false,
+        });
+        
+        // Check if sharing is available
+        const isAvailable = await Sharing.isAvailableAsync();
+        if (isAvailable) {
+          await Sharing.shareAsync(uri, {
+            mimeType: 'application/pdf',
+            dialogTitle: 'Save Archery Report',
+            UTI: 'com.adobe.pdf',
+          });
+        } else {
+          Alert.alert('PDF Generated', `PDF saved to: ${uri}`);
+        }
+      }
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      if (Platform.OS === 'web') {
+        alert('Failed to generate PDF');
+      } else {
+        Alert.alert('Error', 'Failed to generate PDF');
+      }
+    }
+  };
+
   const handleStartDateChange = (event: any, selectedDate?: Date) => {
     setShowStartPicker(false);
     if (selectedDate) {
