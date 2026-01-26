@@ -88,6 +88,12 @@ export const useAppStore = create<AppState>((set) => ({
   sessionType: 'training',
   setSessionType: (type) => set({ sessionType: type, currentRoundNumber: 1, sessionRounds: [] }),
 
+  selectedBow: null,
+  setSelectedBow: (bow) => set({ selectedBow: bow }),
+
+  sessionDistance: '',
+  setSessionDistance: (distance) => set({ sessionDistance: distance }),
+
   currentRoundNumber: 1,
   setCurrentRoundNumber: (num) => set({ currentRoundNumber: num }),
   incrementRoundNumber: () => set((state) => ({ currentRoundNumber: state.currentRoundNumber + 1 })),
