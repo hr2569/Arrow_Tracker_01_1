@@ -289,10 +289,38 @@ export default function ReportScreen() {
       })
       .join('');
 
-    const bowSection = Object.keys(reportStats.bowStats).length > 0 ? `
+    // Calculate bow stats for PDF
+    const bowStats: { [key: string]: { sessions: number, points: number, arrows: number } } = {};
+    const distanceStats: { [key: string]: { sessions: number, points: number, arrows: number } } = {};
+    
+    filteredSessions.forEach((session) => {
+      if (session.bow_name) {
+        if (!bowStats[session.bow_name]) {
+          bowStats[session.bow_name] = { sessions: 0, points: 0, arrows: 0 };
+        }
+        bowStats[session.bow_name].sessions++;
+        bowStats[session.bow_name].points += session.total_score || 0;
+        session.rounds?.forEach((round) => {
+          bowStats[session.bow_name].arrows += round.shots?.length || 0;
+        });
+      }
+      
+      if (session.distance) {
+        if (!distanceStats[session.distance]) {
+          distanceStats[session.distance] = { sessions: 0, points: 0, arrows: 0 };
+        }
+        distanceStats[session.distance].sessions++;
+        distanceStats[session.distance].points += session.total_score || 0;
+        session.rounds?.forEach((round) => {
+          distanceStats[session.distance].arrows += round.shots?.length || 0;
+        });
+      }
+    });
+
+    const bowSection = Object.keys(bowStats).length > 0 ? `
       <div style="background: #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
         <h3 style="color: #8B0000; margin: 0 0 16px 0;">🏹 By Bow</h3>
-        ${Object.entries(reportStats.bowStats).map(([bow, stats]) => `
+        ${Object.entries(bowStats).map(([bow, stats]) => `
           <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #333;">
             <div>
               <div style="color: #fff; font-weight: 600;">${bow}</div>
@@ -307,10 +335,10 @@ export default function ReportScreen() {
       </div>
     ` : '';
 
-    const distanceSection = Object.keys(reportStats.distanceStats).length > 0 ? `
+    const distanceSection = Object.keys(distanceStats).length > 0 ? `
       <div style="background: #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
         <h3 style="color: #8B0000; margin: 0 0 16px 0;">📏 By Distance</h3>
-        ${Object.entries(reportStats.distanceStats).map(([distance, stats]) => `
+        ${Object.entries(distanceStats).map(([distance, stats]) => `
           <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #333;">
             <div>
               <div style="color: #fff; font-weight: 600;">${distance}</div>
