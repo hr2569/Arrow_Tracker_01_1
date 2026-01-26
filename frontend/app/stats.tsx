@@ -818,6 +818,71 @@ export default function StatsScreen() {
           <RingDistribution />
         </View>
 
+        {/* Daily Breakdown */}
+        {dailyStats.length > 0 && (
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>
+              <Ionicons name="calendar" size={18} color="#8B0000" /> Daily Breakdown
+            </Text>
+            <Text style={styles.sectionSubtitle}>
+              Performance by day ({dailyStats.length} day{dailyStats.length !== 1 ? 's' : ''})
+            </Text>
+            
+            <View style={styles.dailyList}>
+              {dailyStats.map((day, index) => (
+                <View key={day.dayKey} style={styles.dailyItem}>
+                  <View style={styles.dailyHeader}>
+                    <View style={styles.dailyDateContainer}>
+                      <Ionicons name="today-outline" size={16} color="#8B0000" />
+                      <Text style={styles.dailyDate}>
+                        {day.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                      </Text>
+                    </View>
+                    <View style={styles.dailyBadge}>
+                      <Text style={styles.dailyBadgeText}>
+                        {day.sessionCount} session{day.sessionCount !== 1 ? 's' : ''}
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.dailyStatsRow}>
+                    <View style={styles.dailyStat}>
+                      <Text style={styles.dailyStatValue}>{day.totalPoints}</Text>
+                      <Text style={styles.dailyStatLabel}>Points</Text>
+                    </View>
+                    <View style={styles.dailyStat}>
+                      <Text style={styles.dailyStatValue}>{day.totalArrows}</Text>
+                      <Text style={styles.dailyStatLabel}>Arrows</Text>
+                    </View>
+                    <View style={styles.dailyStat}>
+                      <Text style={styles.dailyStatValue}>{day.avgPerArrow}</Text>
+                      <Text style={styles.dailyStatLabel}>Avg/Arrow</Text>
+                    </View>
+                    <View style={styles.dailyStat}>
+                      <Text style={styles.dailyStatValue}>{day.avgPerRound}</Text>
+                      <Text style={styles.dailyStatLabel}>Avg/Round</Text>
+                    </View>
+                  </View>
+                  
+                  {/* Progress bar showing relative performance */}
+                  <View style={styles.dailyProgressContainer}>
+                    <View 
+                      style={[
+                        styles.dailyProgressBar, 
+                        { 
+                          width: `${Math.min(100, (parseFloat(day.avgPerArrow) / 10) * 100)}%`,
+                          backgroundColor: parseFloat(day.avgPerArrow) >= 8 ? '#4CAF50' : 
+                                          parseFloat(day.avgPerArrow) >= 6 ? '#FFC107' : '#8B0000'
+                        }
+                      ]} 
+                    />
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* Empty State */}
         {stats.totalArrows === 0 && (
           <View style={styles.emptyState}>
