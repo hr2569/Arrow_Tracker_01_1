@@ -870,10 +870,13 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   deleteBtn: {
-    marginLeft: 'auto',
+    position: 'absolute',
+    top: 12,
+    right: 12,
     padding: 12,
     backgroundColor: 'rgba(255, 107, 107, 0.15)',
     borderRadius: 8,
+    zIndex: 10,
   },
   expandedContent: {
     marginTop: 12,
