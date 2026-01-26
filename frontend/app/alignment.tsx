@@ -188,8 +188,13 @@ export default function AlignmentScreen() {
       
       console.log('Sending payload with image length:', payload.image_base64.length);
       
-      // Call perspective crop API
-      const response = await axios.post(`${API_URL}/api/perspective-crop`, payload);
+      // Call perspective crop API with timeout
+      const response = await axios.post(`${API_URL}/api/perspective-crop`, payload, {
+        timeout: 30000, // 30 second timeout for large images
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       
       console.log('Crop response success:', response.data.success);
       
