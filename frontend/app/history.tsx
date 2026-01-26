@@ -407,6 +407,53 @@ export default function HistoryScreen() {
                     {expandedSession === session.id && session.rounds && (
                       <View style={styles.expandedContent}>
                         <View style={styles.expandedDivider} />
+                        
+                        {/* Score by Round Chart */}
+                        {getRoundChartData(session) && session.rounds.length > 1 && (
+                          <View style={styles.chartSection}>
+                            <Text style={styles.chartTitle}>
+                              <Ionicons name="trending-up" size={16} color="#8B0000" /> Score by Round
+                            </Text>
+                            <LineChart
+                              data={getRoundChartData(session)!}
+                              width={CHART_WIDTH}
+                              height={160}
+                              chartConfig={chartConfig}
+                              bezier
+                              style={styles.chart}
+                              withInnerLines={true}
+                              withOuterLines={false}
+                              withVerticalLabels={true}
+                              withHorizontalLabels={true}
+                              fromZero={true}
+                            />
+                          </View>
+                        )}
+
+                        {/* Hit Distribution Chart */}
+                        {getHitDistributionData(session) && (
+                          <View style={styles.chartSection}>
+                            <Text style={styles.chartTitle}>
+                              <Ionicons name="bar-chart" size={16} color="#8B0000" /> Hit Distribution
+                            </Text>
+                            <BarChart
+                              data={getHitDistributionData(session)!}
+                              width={CHART_WIDTH}
+                              height={160}
+                              chartConfig={{
+                                ...chartConfig,
+                                barPercentage: 0.7,
+                              }}
+                              style={styles.chart}
+                              withInnerLines={true}
+                              showBarTops={false}
+                              fromZero={true}
+                              yAxisLabel=""
+                              yAxisSuffix=""
+                            />
+                          </View>
+                        )}
+
                         <Text style={styles.roundsTitle}>Round Details</Text>
                         {session.rounds.map((round, index) => (
                           <View key={round.id || index} style={styles.roundItem}>
