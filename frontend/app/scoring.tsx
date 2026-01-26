@@ -350,15 +350,25 @@ export default function ScoringScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
       >
-        {/* Target wrapper - centers the target and allows horizontal scroll when zoomed */}
+        {/* Target wrapper - centers the target */}
         <View style={styles.targetWrapper}>
+          {/* Two-directional scroll container for zoomed target */}
           <ScrollView 
             horizontal={true}
-            contentContainerStyle={styles.targetScrollContent}
+            contentContainerStyle={[
+              styles.targetScrollContent,
+              { minHeight: zoomLevel > 1 ? TARGET_SIZE : undefined }
+            ]}
             showsHorizontalScrollIndicator={zoomLevel > 1}
             nestedScrollEnabled={true}
             scrollEnabled={zoomLevel > 1}
           >
+            <ScrollView
+              contentContainerStyle={styles.targetVerticalScroll}
+              showsVerticalScrollIndicator={zoomLevel > 1}
+              nestedScrollEnabled={true}
+              scrollEnabled={zoomLevel > 1}
+            >
             {/* Target Area */}
             <View 
               ref={targetRef}
