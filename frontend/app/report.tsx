@@ -691,29 +691,62 @@ export default function ReportScreen() {
     `;
   };
 
-  // Download PDF
+  // Handle PDF with options
   const handleDownloadPdf = async () => {
-    try {
-      const html = generatePdfHtml();
-      
-      if (Platform.OS === 'web') {
-        // For web, open in new tab
+    if (Platform.OS === 'web') {
+      // For web, open in new tab directly
+      try {
+        const html = generatePdfHtml();
         const blob = new Blob([html], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
-      } else {
-        // For native, open PDF directly using print preview
-        await Print.printAsync({
-          html,
-        });
-      }
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      if (Platform.OS === 'web') {
+      } catch (error) {
         alert('Failed to open PDF. Please try again.');
-      } else {
-        Alert.alert('Error', 'Failed to open PDF');
       }
+    } else {
+      // For native, show options
+      Alert.alert(
+        'Open Report',
+        'How would you like to open the report?',
+        [
+          {
+            text: 'Print / Preview',
+            onPress: async () => {
+              try {
+                const html = generatePdfHtml();
+                await Print.printAsync({ html });
+              } catch (error) {
+                Alert.alert('Error', 'Failed to open print preview');
+              }
+            },
+          },
+          {
+            text: 'Save & Share',
+            onPress: async () => {
+              try {
+                const html = generatePdfHtml();
+                const { uri } = await Print.printToFileAsync({ html, base64: false });
+                const isAvailable = await Sharing.isAvailableAsync();
+                if (isAvailable) {
+                  await Sharing.shareAsync(uri, {
+                    mimeType: 'application/pdf',
+                    dialogTitle: 'Save Archery Report',
+                    UTI: 'com.adobe.pdf',
+                  });
+                } else {
+                  Alert.alert('PDF Saved', `File saved to: ${uri}`);
+                }
+              } catch (error) {
+                Alert.alert('Error', 'Failed to save PDF');
+              }
+            },
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ]
+      );
     }
   };
 
