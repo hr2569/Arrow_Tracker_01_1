@@ -16,9 +16,6 @@ import * as ImagePicker from 'expo-image-picker';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useAppStore } from '../store/appStore';
 
-// Static target image URL for manual scoring mode
-const STATIC_TARGET_URL = 'https://customer-assets.emergentagent.com/job_fcfa55b4-6097-4211-a8aa-34e3ff4ecd9c/artifacts/a1wjppkr_Untitled-1.jpg';
-
 export default function CaptureScreen() {
   const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
