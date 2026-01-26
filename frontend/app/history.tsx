@@ -362,10 +362,6 @@ export default function HistoryScreen() {
       </View>
     );
   };
-      labels: nonZeroRings.map(([ring]) => ring === '0' ? 'M' : ring),
-      datasets: [{ data: nonZeroRings.map(([_, count]) => count) }],
-    };
-  };
 
   if (isLoading) {
     return (
