@@ -148,6 +148,9 @@ export default function ScoringScreen() {
   const maxArrowsReached = isCompetition && arrows.length >= COMPETITION_ARROWS_PER_ROUND;
 
   const handleTargetPress = (event: any) => {
+    // Prevent default to ensure the event is captured
+    event.persist?.();
+    
     // In competition mode, prevent adding more than 3 arrows
     if (maxArrowsReached) {
       Alert.alert(
@@ -158,30 +161,51 @@ export default function ScoringScreen() {
       return;
     }
 
-    // Try multiple methods to get correct coordinates
-    let x, y;
+    // Get coordinates from the event - try multiple approaches
+    let x: number | undefined;
+    let y: number | undefined;
     
-    // Method 1: Use offsetX/offsetY (works on web)
-    if (event.nativeEvent.offsetX !== undefined && event.nativeEvent.offsetY !== undefined) {
-      x = event.nativeEvent.offsetX / TARGET_SIZE;
-      y = event.nativeEvent.offsetY / TARGET_SIZE;
+    const nativeEvent = event.nativeEvent;
+    
+    // Debug log to help diagnose issues
+    console.log('Touch event received:', {
+      locationX: nativeEvent.locationX,
+      locationY: nativeEvent.locationY,
+      pageX: nativeEvent.pageX,
+      pageY: nativeEvent.pageY,
+      offsetX: nativeEvent.offsetX,
+      offsetY: nativeEvent.offsetY,
+      targetLayout,
+      TARGET_SIZE,
+    });
+    
+    // Method 1: Use locationX/locationY (most reliable on React Native)
+    if (typeof nativeEvent.locationX === 'number' && typeof nativeEvent.locationY === 'number') {
+      x = nativeEvent.locationX / TARGET_SIZE;
+      y = nativeEvent.locationY / TARGET_SIZE;
+      console.log('Using locationX/Y:', x, y);
     }
-    // Method 2: Use locationX/locationY (works on native)
-    else if (event.nativeEvent.locationX !== undefined && event.nativeEvent.locationY !== undefined) {
-      x = event.nativeEvent.locationX / TARGET_SIZE;
-      y = event.nativeEvent.locationY / TARGET_SIZE;
+    // Method 2: Use offsetX/offsetY (works on web)
+    else if (typeof nativeEvent.offsetX === 'number' && typeof nativeEvent.offsetY === 'number') {
+      x = nativeEvent.offsetX / TARGET_SIZE;
+      y = nativeEvent.offsetY / TARGET_SIZE;
+      console.log('Using offsetX/Y:', x, y);
     }
-    // Method 3: Fallback using pageX/pageY with layout
-    else if (targetLayout && event.nativeEvent.pageX !== undefined) {
-      x = (event.nativeEvent.pageX - targetLayout.x) / targetLayout.width;
-      y = (event.nativeEvent.pageY - targetLayout.y) / targetLayout.height;
+    // Method 3: Fallback using pageX/pageY with measured layout
+    else if (targetLayout && typeof nativeEvent.pageX === 'number' && typeof nativeEvent.pageY === 'number') {
+      x = (nativeEvent.pageX - targetLayout.x) / targetLayout.width;
+      y = (nativeEvent.pageY - targetLayout.y) / targetLayout.height;
+      console.log('Using pageX/Y with layout:', x, y);
     }
-    else {
-      console.log('Could not determine click position');
+    
+    // Validate coordinates
+    if (typeof x !== 'number' || typeof y !== 'number' || isNaN(x) || isNaN(y)) {
+      console.log('Could not determine valid click position');
+      Alert.alert('Touch Error', 'Could not register the touch. Please try again.');
       return;
     }
 
-    // Clamp values
+    // Clamp values to valid range
     const clampedX = Math.max(0, Math.min(1, x));
     const clampedY = Math.max(0, Math.min(1, y));
 
@@ -190,7 +214,7 @@ export default function ScoringScreen() {
     const ring = calculateRingFromPosition(clampedX, clampedY);
 
     const newArrow: Arrow = {
-      id: `arrow-${Date.now()}`,
+      id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       x: clampedX,
       y: clampedY,
       ring,
