@@ -457,7 +457,10 @@ async def detect_arrows_endpoint(request: ImageAnalysisRequest):
 async def create_session(request: CreateSessionRequest):
     """Create a new scoring session"""
     session = Session(
-        name=request.name or f"Session {datetime.utcnow().strftime('%Y-%m-%d %H:%M')}"
+        name=request.name or f"Session {datetime.utcnow().strftime('%Y-%m-%d %H:%M')}",
+        bow_id=request.bow_id,
+        bow_name=request.bow_name,
+        distance=request.distance
     )
     session_dict = session.dict()
     # Convert datetime to ISO string for JSON serialization
