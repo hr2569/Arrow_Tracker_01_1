@@ -200,27 +200,48 @@ export default function HistoryScreen() {
           />
         }
       >
+        {/* Time Period Selector */}
+        <View style={styles.periodSelector}>
+          {(['day', 'week', 'month', 'year', 'all'] as TimePeriod[]).map((period) => (
+            <TouchableOpacity
+              key={period}
+              style={[
+                styles.periodButton,
+                selectedPeriod === period && styles.periodButtonActive,
+              ]}
+              onPress={() => setSelectedPeriod(period)}
+            >
+              <Text
+                style={[
+                  styles.periodButtonText,
+                  selectedPeriod === period && styles.periodButtonTextActive,
+                ]}
+              >
+                {period.charAt(0).toUpperCase() + period.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         {/* Stats Overview */}
         {sessions.length > 0 && (
           <View style={styles.overviewCard}>
-            <Text style={styles.overviewTitle}>Your Stats</Text>
+            <Text style={styles.overviewTitle}>
+              {selectedPeriod === 'all' ? 'All Time Stats' : `Stats by ${selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)}`}
+            </Text>
             <View style={styles.overviewStats}>
               <View style={styles.overviewStat}>
-                <Text style={styles.overviewValue}>{sessions.length}</Text>
+                <Text style={styles.overviewValue}>{periodStats.totalSessions}</Text>
                 <Text style={styles.overviewLabel}>Sessions</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
-                <Text style={styles.overviewValue}>
-                  {sessions.reduce((sum, s) => sum + (s.rounds?.length || 0), 0)}
-                </Text>
+                <Text style={styles.overviewValue}>{periodStats.totalRounds}</Text>
                 <Text style={styles.overviewLabel}>Rounds</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
-                <Text style={styles.overviewValue}>
-                  {sessions.reduce((sum, s) => sum + (s.total_score || 0), 0)}
-                </Text>
+                <Text style={styles.overviewValue}>{periodStats.totalPoints}</Text>
                 <Text style={styles.overviewLabel}>Total Pts</Text>
               </View>
             </View>
@@ -245,83 +266,104 @@ export default function HistoryScreen() {
           </View>
         ) : (
           <View style={styles.sessionsList}>
-            <Text style={styles.sectionTitle}>Session History</Text>
-            {sessions.map((session) => (
-              <TouchableOpacity
-                key={session.id}
-                style={styles.sessionCard}
-                onPress={() => toggleExpand(session.id)}
-                activeOpacity={0.8}
-              >
-                <View style={styles.sessionHeader}>
-                  <View style={styles.sessionInfo}>
-                    <Text style={styles.sessionName}>{session.name}</Text>
-                    <Text style={styles.sessionDate}>
-                      {formatDate(session.created_at)}
-                    </Text>
+            {groupedSessions.map((group) => (
+              <View key={group.label} style={styles.groupContainer}>
+                {/* Group Header */}
+                <View style={styles.groupHeader}>
+                  <View style={styles.groupTitleRow}>
+                    <Ionicons 
+                      name={selectedPeriod === 'day' ? 'today' : selectedPeriod === 'week' ? 'calendar' : selectedPeriod === 'month' ? 'calendar-outline' : 'time'} 
+                      size={18} 
+                      color="#8B0000" 
+                    />
+                    <Text style={styles.groupTitle}>{group.label}</Text>
                   </View>
-                  <View style={styles.sessionScore}>
-                    <Text style={styles.scoreValue}>{session.total_score}</Text>
-                    <Text style={styles.scoreLabel}>pts</Text>
+                  <View style={styles.groupStats}>
+                    <Text style={styles.groupStatText}>
+                      {group.sessions.length} session{group.sessions.length !== 1 ? 's' : ''} • {group.totalScore} pts
+                    </Text>
                   </View>
                 </View>
 
-                <View style={styles.sessionMeta}>
-                  <View style={styles.metaItem}>
-                    <Ionicons name="layers" size={16} color="#888888" />
-                    <Text style={styles.metaText}>
-                      {session.rounds?.length || 0} rounds
-                    </Text>
-                  </View>
-                  <View style={styles.metaItem}>
-                    <Ionicons name="analytics" size={16} color="#888888" />
-                    <Text style={styles.metaText}>
-                      Avg: {getAverageScore(session)}/round
-                    </Text>
-                  </View>
+                {/* Sessions in Group */}
+                {group.sessions.map((session) => (
                   <TouchableOpacity
-                    style={styles.deleteBtn}
-                    onPress={() => handleDeleteSession(session.id)}
+                    key={session.id}
+                    style={styles.sessionCard}
+                    onPress={() => toggleExpand(session.id)}
+                    activeOpacity={0.8}
                   >
-                    <Ionicons name="trash" size={16} color="#ff6b6b" />
-                  </TouchableOpacity>
-                </View>
-
-                {/* Expanded Details */}
-                {expandedSession === session.id && session.rounds && (
-                  <View style={styles.expandedContent}>
-                    <View style={styles.expandedDivider} />
-                    <Text style={styles.roundsTitle}>Round Details</Text>
-                    {session.rounds.map((round, index) => (
-                      <View key={round.id || index} style={styles.roundItem}>
-                        <Text style={styles.roundNumber}>
-                          Round {round.round_number || index + 1}
-                        </Text>
-                        <View style={styles.roundShots}>
-                          {round.shots?.map((shot: any, shotIndex: number) => (
-                            <View key={shotIndex} style={styles.shotBadge}>
-                              <Text style={styles.shotBadgeText}>
-                                {shot.ring || 0}
-                              </Text>
-                            </View>
-                          ))}
-                        </View>
-                        <Text style={styles.roundTotal}>
-                          {round.total_score || 0}
+                    <View style={styles.sessionHeader}>
+                      <View style={styles.sessionInfo}>
+                        <Text style={styles.sessionName}>{session.name}</Text>
+                        <Text style={styles.sessionDate}>
+                          {formatDate(session.created_at)}
                         </Text>
                       </View>
-                    ))}
-                  </View>
-                )}
+                      <View style={styles.sessionScore}>
+                        <Text style={styles.scoreValue}>{session.total_score}</Text>
+                        <Text style={styles.scoreLabel}>pts</Text>
+                      </View>
+                    </View>
 
-                <View style={styles.expandIndicator}>
-                  <Ionicons
-                    name={expandedSession === session.id ? 'chevron-up' : 'chevron-down'}
-                    size={20}
-                    color="#888888"
-                  />
-                </View>
-              </TouchableOpacity>
+                    <View style={styles.sessionMeta}>
+                      <View style={styles.metaItem}>
+                        <Ionicons name="layers" size={16} color="#888888" />
+                        <Text style={styles.metaText}>
+                          {session.rounds?.length || 0} rounds
+                        </Text>
+                      </View>
+                      <View style={styles.metaItem}>
+                        <Ionicons name="analytics" size={16} color="#888888" />
+                        <Text style={styles.metaText}>
+                          Avg: {getAverageScore(session)}/round
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.deleteBtn}
+                        onPress={() => handleDeleteSession(session.id)}
+                      >
+                        <Ionicons name="trash" size={16} color="#ff6b6b" />
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* Expanded Details */}
+                    {expandedSession === session.id && session.rounds && (
+                      <View style={styles.expandedContent}>
+                        <View style={styles.expandedDivider} />
+                        <Text style={styles.roundsTitle}>Round Details</Text>
+                        {session.rounds.map((round, index) => (
+                          <View key={round.id || index} style={styles.roundItem}>
+                            <Text style={styles.roundNumber}>
+                              Round {round.round_number || index + 1}
+                            </Text>
+                            <View style={styles.roundShots}>
+                              {round.shots?.map((shot: any, shotIndex: number) => (
+                                <View key={shotIndex} style={styles.shotBadge}>
+                                  <Text style={styles.shotBadgeText}>
+                                    {shot.ring || 0}
+                                  </Text>
+                                </View>
+                              ))}
+                            </View>
+                            <Text style={styles.roundTotal}>
+                              {round.total_score || 0}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+
+                    <View style={styles.expandIndicator}>
+                      <Ionicons
+                        name={expandedSession === session.id ? 'chevron-up' : 'chevron-down'}
+                        size={20}
+                        color="#888888"
+                      />
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
             ))}
           </View>
         )}
