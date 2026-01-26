@@ -409,8 +409,9 @@ export default function ScoringScreen() {
               onLayout={handleTargetLayout}
             >
               <Pressable
-                onPress={handleTargetPress}
+                onPressIn={handleTargetPress}
                 style={[styles.targetTouchArea, { width: TARGET_SIZE, height: TARGET_SIZE }]}
+                hitSlop={0}
               >
               {/* Background Image - Only show if NOT manual mode */}
               {!manualMode && currentImage ? (
