@@ -289,7 +289,7 @@ export default function ReportScreen() {
     '#fff200', '#fff200',
   ];
 
-  // Heatmap Component - Higher resolution for smoother appearance
+  // Heatmap Component - Using SVG RadialGradient for smooth appearance (same as stats)
   const HeatmapTargetMap = ({ size = 280 }: { size?: number }) => {
     if (allShots.length === 0) {
       return (
@@ -363,12 +363,11 @@ export default function ReportScreen() {
       const r = Math.round(lower.r + (upper.r - lower.r) * t);
       const g = Math.round(lower.g + (upper.g - lower.g) * t);
       const b = Math.round(lower.b + (upper.b - lower.b) * t);
-      const alpha = 0.4 + normalizedValue * 0.5;
       
-      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      return `rgb(${r}, ${g}, ${b})`;
     };
 
-    const heatmapCells: { x: number; y: number; color: string }[] = [];
+    const heatmapCells: { x: number; y: number; color: string; opacity: number }[] = [];
     densityGrid.forEach((row, y) => {
       row.forEach((density, x) => {
         if (density > 0) {
@@ -377,6 +376,7 @@ export default function ReportScreen() {
             x: x * cellSize,
             y: y * cellSize,
             color: getHeatColor(normalizedDensity),
+            opacity: 0.3 + normalizedDensity * 0.6,
           });
         }
       });
@@ -384,6 +384,7 @@ export default function ReportScreen() {
 
     return (
       <View style={[heatmapStyles.container, { width: size, height: size }]}>
+        {/* Target Background */}
         <View style={[heatmapStyles.targetBackground, { width: targetSize, height: targetSize, borderRadius: targetSize / 2 }]}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
             const diameterPercent = (11 - ringNum) / 10;
@@ -406,25 +407,45 @@ export default function ReportScreen() {
               />
             );
           })}
+          
+          {/* Center X mark */}
           <View style={heatmapStyles.centerMark}>
             <View style={heatmapStyles.centerLine} />
             <View style={[heatmapStyles.centerLine, { transform: [{ rotate: '90deg' }] }]} />
           </View>
         </View>
 
-        {heatmapCells.map((cell, index) => (
-          <View
-            key={`cell-${index}`}
-            style={{
-              position: 'absolute',
-              left: cell.x,
-              top: cell.y,
-              width: cellSize + 1,
-              height: cellSize + 1,
-              backgroundColor: cell.color,
-            }}
-          />
-        ))}
+        {/* Heatmap Overlay using SVG with RadialGradient */}
+        <View style={[StyleSheet.absoluteFill, { borderRadius: size / 2, overflow: 'hidden' }]}>
+          <Svg width={size} height={size}>
+            <Defs>
+              {heatmapCells.map((cell, index) => (
+                <RadialGradient
+                  key={`grad-${index}`}
+                  id={`heatGrad-${index}`}
+                  cx="50%"
+                  cy="50%"
+                  rx="50%"
+                  ry="50%"
+                >
+                  <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
+                  <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
+                </RadialGradient>
+              ))}
+            </Defs>
+            <G>
+              {heatmapCells.map((cell, index) => (
+                <Circle
+                  key={`heat-${index}`}
+                  cx={cell.x + cellSize / 2}
+                  cy={cell.y + cellSize / 2}
+                  r={cellSize * 1.5}
+                  fill={`url(#heatGrad-${index})`}
+                />
+              ))}
+            </G>
+          </Svg>
+        </View>
       </View>
     );
   };
