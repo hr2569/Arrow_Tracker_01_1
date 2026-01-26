@@ -558,6 +558,7 @@ export default function ScoringScreen() {
             </View>
           )}
         </View>
+            </ScrollView>
           </ScrollView>
         </View>
         
