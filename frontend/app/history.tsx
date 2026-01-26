@@ -228,6 +228,74 @@ export default function HistoryScreen() {
     });
   };
 
+  // Edit session functions
+  const openEditModal = (session: Session) => {
+    setEditingSession(session);
+    setEditDate(new Date(session.created_at));
+    setEditName(session.name);
+  };
+
+  const closeEditModal = () => {
+    setEditingSession(null);
+    setShowDatePicker(false);
+    setShowTimePicker(false);
+  };
+
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    if (selectedDate) {
+      // Keep the time from the current editDate, just update the date
+      const newDate = new Date(editDate);
+      newDate.setFullYear(selectedDate.getFullYear());
+      newDate.setMonth(selectedDate.getMonth());
+      newDate.setDate(selectedDate.getDate());
+      setEditDate(newDate);
+    }
+  };
+
+  const handleTimeChange = (event: any, selectedTime?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowTimePicker(false);
+    }
+    if (selectedTime) {
+      // Keep the date, just update the time
+      const newDate = new Date(editDate);
+      newDate.setHours(selectedTime.getHours());
+      newDate.setMinutes(selectedTime.getMinutes());
+      setEditDate(newDate);
+    }
+  };
+
+  const saveSessionEdit = async () => {
+    if (!editingSession) return;
+    
+    setIsSaving(true);
+    try {
+      const response = await axios.put(`${API_URL}/api/sessions/${editingSession.id}`, {
+        name: editName,
+        created_at: editDate.toISOString(),
+      });
+      
+      // Update the session in the local state
+      setSessions(sessions.map(s => 
+        s.id === editingSession.id ? response.data : s
+      ));
+      
+      closeEditModal();
+    } catch (err) {
+      console.error('Save error:', err);
+      if (Platform.OS === 'web') {
+        window.alert('Failed to save changes');
+      } else {
+        Alert.alert('Error', 'Failed to save changes');
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const getAverageScore = (session: Session) => {
     if (!session.rounds || session.rounds.length === 0) return 0;
     return Math.round(session.total_score / session.rounds.length);
