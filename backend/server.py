@@ -581,6 +581,80 @@ async def delete_session(session_id: str):
         raise HTTPException(status_code=404, detail="Session not found")
     return {"message": "Session deleted"}
 
+# ============== Bow Management Endpoints ==============
+
+@api_router.post("/bows")
+async def create_bow(request: CreateBowRequest):
+    """Create a new bow"""
+    bow = Bow(
+        name=request.name,
+        bow_type=request.bow_type,
+        draw_weight=request.draw_weight,
+        draw_length=request.draw_length,
+        notes=request.notes or ""
+    )
+    bow_dict = bow.dict()
+    bow_dict['created_at'] = bow_dict['created_at'].isoformat()
+    bow_dict['updated_at'] = bow_dict['updated_at'].isoformat()
+    await db.bows.insert_one(bow_dict)
+    bow_dict.pop('_id', None)
+    return bow_dict
+
+@api_router.get("/bows")
+async def get_bows():
+    """Get all bows"""
+    bows = await db.bows.find().sort("created_at", -1).to_list(100)
+    for bow in bows:
+        bow.pop('_id', None)
+    return bows
+
+@api_router.get("/bows/{bow_id}")
+async def get_bow(bow_id: str):
+    """Get a specific bow"""
+    bow = await db.bows.find_one({"id": bow_id})
+    if not bow:
+        raise HTTPException(status_code=404, detail="Bow not found")
+    bow.pop('_id', None)
+    return bow
+
+@api_router.put("/bows/{bow_id}")
+async def update_bow(bow_id: str, request: UpdateBowRequest):
+    """Update a bow"""
+    bow = await db.bows.find_one({"id": bow_id})
+    if not bow:
+        raise HTTPException(status_code=404, detail="Bow not found")
+    
+    update_data = {}
+    if request.name is not None:
+        update_data['name'] = request.name
+    if request.bow_type is not None:
+        update_data['bow_type'] = request.bow_type
+    if request.draw_weight is not None:
+        update_data['draw_weight'] = request.draw_weight
+    if request.draw_length is not None:
+        update_data['draw_length'] = request.draw_length
+    if request.notes is not None:
+        update_data['notes'] = request.notes
+    
+    update_data['updated_at'] = datetime.utcnow().isoformat()
+    
+    await db.bows.update_one(
+        {"id": bow_id},
+        {"$set": update_data}
+    )
+    
+    updated_bow = await db.bows.find_one({"id": bow_id})
+    updated_bow.pop('_id', None)
+    return updated_bow
+
+@api_router.delete("/bows/{bow_id}")
+async def delete_bow(bow_id: str):
+    """Delete a bow"""
+    result = await db.bows.delete_one({"id": bow_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Bow not found")
+    return {"message": "Bow deleted"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
