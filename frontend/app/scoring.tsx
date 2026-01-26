@@ -1023,7 +1023,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginTop: 20,
     gap: 12,
   },
@@ -1041,22 +1041,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  secondaryButton: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#111111',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#8B0000',
-    gap: 8,
-  },
-  secondaryButtonText: {
-    color: '#8B0000',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
