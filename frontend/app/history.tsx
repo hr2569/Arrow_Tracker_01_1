@@ -39,6 +39,7 @@ export default function HistoryScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [expandedSession, setExpandedSession] = useState<string | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
 
   const fetchSessions = async () => {
     try {
@@ -55,6 +56,79 @@ export default function HistoryScreen() {
   useEffect(() => {
     fetchSessions();
   }, []);
+
+  // Group sessions by selected time period
+  const groupedSessions = useMemo(() => {
+    const now = new Date();
+    const groups: { [key: string]: Session[] } = {};
+
+    sessions.forEach((session) => {
+      const sessionDate = new Date(session.created_at);
+      let groupKey: string;
+
+      switch (selectedPeriod) {
+        case 'day':
+          groupKey = sessionDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          });
+          break;
+        case 'week':
+          // Get the start of the week (Sunday)
+          const weekStart = new Date(sessionDate);
+          weekStart.setDate(sessionDate.getDate() - sessionDate.getDay());
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekStart.getDate() + 6);
+          groupKey = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+          break;
+        case 'month':
+          groupKey = sessionDate.toLocaleDateString('en-US', {
+            month: 'long',
+            year: 'numeric',
+          });
+          break;
+        case 'year':
+          groupKey = sessionDate.getFullYear().toString();
+          break;
+        case 'all':
+        default:
+          groupKey = 'All Sessions';
+          break;
+      }
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(session);
+    });
+
+    // Convert to array and sort by most recent first
+    const result: GroupedSessions[] = Object.entries(groups).map(([label, sessionList]) => ({
+      label,
+      sessions: sessionList.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+      totalScore: sessionList.reduce((sum, s) => sum + (s.total_score || 0), 0),
+      totalRounds: sessionList.reduce((sum, s) => sum + (s.rounds?.length || 0), 0),
+    }));
+
+    // Sort groups by most recent session in each group
+    return result.sort((a, b) => {
+      const aDate = new Date(a.sessions[0]?.created_at || 0).getTime();
+      const bDate = new Date(b.sessions[0]?.created_at || 0).getTime();
+      return bDate - aDate;
+    });
+  }, [sessions, selectedPeriod]);
+
+  // Calculate stats for selected period
+  const periodStats = useMemo(() => {
+    const allSessionsInPeriod = groupedSessions.flatMap(g => g.sessions);
+    return {
+      totalSessions: allSessionsInPeriod.length,
+      totalRounds: allSessionsInPeriod.reduce((sum, s) => sum + (s.rounds?.length || 0), 0),
+      totalPoints: allSessionsInPeriod.reduce((sum, s) => sum + (s.total_score || 0), 0),
+    };
+  }, [groupedSessions]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
