@@ -822,6 +822,45 @@ const styles = StyleSheet.create({
     padding: 4,
     marginBottom: 16,
   },
+  filterSection: {
+    marginBottom: 16,
+    gap: 8,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  filterLabel: {
+    color: '#888888',
+    fontSize: 12,
+    fontWeight: '600',
+    width: 60,
+  },
+  filterScroll: {
+    flex: 1,
+  },
+  filterChip: {
+    backgroundColor: '#111111',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  filterChipActive: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
+  },
+  filterChipText: {
+    color: '#888888',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  filterChipTextActive: {
+    color: '#fff',
+  },
   periodButton: {
     flex: 1,
     paddingVertical: 10,
