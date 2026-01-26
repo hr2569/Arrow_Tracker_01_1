@@ -841,7 +841,6 @@ const styles = StyleSheet.create({
   },
   sessionScore: {
     alignItems: 'flex-end',
-    marginRight: 50,
   },
   scoreValue: {
     fontSize: 28,
