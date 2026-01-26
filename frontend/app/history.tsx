@@ -961,6 +961,20 @@ const targetMapStyles = StyleSheet.create({
     height: 2,
     backgroundColor: '#333',
   },
+  ringLabelsContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  ringLabel: {
+    position: 'absolute',
+    backgroundColor: 'transparent',
+  },
+  ringLabelText: {
+    color: '#666',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
   shotDot: {
     position: 'absolute',
     alignItems: 'center',
