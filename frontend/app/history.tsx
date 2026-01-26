@@ -304,12 +304,16 @@ export default function HistoryScreen() {
         {/* Target Background */}
         <View style={[targetMapStyles.targetBackground, { width: size, height: size, borderRadius: size / 2 }]}>
           {/* Draw rings from outside to inside */}
-          {/* Ring scoring: Ring 1 = 0.9-1.0 radius, Ring 10 = 0-0.1 radius */}
+          {/* Scoring: Ring 1 at 90-100% normalized distance, Ring 10 at 0-10% */}
+          {/* Each ring is 10% of the radius */}
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
-            // Ring 1 is at 100% diameter (outermost), Ring 10 is at 10% diameter (center)
-            // Each ring takes up 10% of the diameter
-            const ringDiameterPercent = (11 - ringNum) / 10; // Ring 1 = 1.0, Ring 10 = 0.1
-            const ringSize = size * ringDiameterPercent;
+            // Ring 1 outer edge at 100% of diameter, Ring 10 outer edge at 10%
+            // But we draw from outer to inner, so ring 1 fills everything,
+            // ring 2 covers 90%, etc.
+            // Formula: diameter = (11 - ringNum) * 10% = (11-ringNum)/10
+            // Ring 1 = 100%, Ring 10 = 10%
+            const diameterPercent = (11 - ringNum) / 10;
+            const ringSize = size * diameterPercent;
             const bgColor = ringColors[ringNum - 1];
             return (
               <View
