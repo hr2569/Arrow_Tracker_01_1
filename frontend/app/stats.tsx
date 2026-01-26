@@ -1342,6 +1342,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  dailySublabel: {
+    color: '#888888',
+    fontSize: 11,
+    marginTop: 2,
+  },
   dailyBadge: {
     backgroundColor: 'rgba(139, 0, 0, 0.3)',
     paddingVertical: 4,
