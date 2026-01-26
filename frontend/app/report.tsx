@@ -13,10 +13,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-type ReportPeriod = 'week' | 'month' | 'year' | 'all';
+type ReportPeriod = 'week' | 'month' | 'year' | 'custom' | 'all';
 
 interface Session {
   id: string;
@@ -33,6 +34,17 @@ export default function ReportScreen() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<ReportPeriod>('month');
+  const [showReport, setShowReport] = useState(false);
+  
+  // Custom date range
+  const [startDate, setStartDate] = useState(() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 1);
+    return date;
+  });
+  const [endDate, setEndDate] = useState(new Date());
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
 
   useEffect(() => {
     fetchSessions();
@@ -49,30 +61,45 @@ export default function ReportScreen() {
     }
   };
 
-  // Filter sessions by period
-  const filteredSessions = useMemo(() => {
+  // Update date range when period changes
+  useEffect(() => {
     const now = new Date();
+    let newStartDate = new Date();
+    
+    switch (selectedPeriod) {
+      case 'week':
+        newStartDate.setDate(now.getDate() - 7);
+        break;
+      case 'month':
+        newStartDate.setMonth(now.getMonth() - 1);
+        break;
+      case 'year':
+        newStartDate.setFullYear(now.getFullYear() - 1);
+        break;
+      case 'all':
+        newStartDate = new Date(2020, 0, 1); // Far back date
+        break;
+      case 'custom':
+        // Don't change dates for custom
+        return;
+    }
+    
+    setStartDate(newStartDate);
+    setEndDate(now);
+  }, [selectedPeriod]);
+
+  // Filter sessions by date range
+  const filteredSessions = useMemo(() => {
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+    
     return sessions.filter((session) => {
       const sessionDate = new Date(session.created_at);
-      switch (selectedPeriod) {
-        case 'week':
-          const weekAgo = new Date(now);
-          weekAgo.setDate(now.getDate() - 7);
-          return sessionDate >= weekAgo;
-        case 'month':
-          const monthAgo = new Date(now);
-          monthAgo.setMonth(now.getMonth() - 1);
-          return sessionDate >= monthAgo;
-        case 'year':
-          const yearAgo = new Date(now);
-          yearAgo.setFullYear(now.getFullYear() - 1);
-          return sessionDate >= yearAgo;
-        case 'all':
-        default:
-          return true;
-      }
+      return sessionDate >= start && sessionDate <= end;
     });
-  }, [sessions, selectedPeriod]);
+  }, [sessions, startDate, endDate]);
 
   // Calculate report statistics
   const reportStats = useMemo(() => {
@@ -87,7 +114,6 @@ export default function ReportScreen() {
     filteredSessions.forEach((session) => {
       totalPoints += session.total_score || 0;
       
-      // Track best/worst sessions
       if (session.total_score > bestSession.score) {
         bestSession = { 
           score: session.total_score, 
@@ -103,7 +129,6 @@ export default function ReportScreen() {
         };
       }
 
-      // Track bow stats
       if (session.bow_name) {
         if (!bowStats[session.bow_name]) {
           bowStats[session.bow_name] = { sessions: 0, points: 0, arrows: 0 };
@@ -112,7 +137,6 @@ export default function ReportScreen() {
         bowStats[session.bow_name].points += session.total_score || 0;
       }
 
-      // Track distance stats
       if (session.distance) {
         if (!distanceStats[session.distance]) {
           distanceStats[session.distance] = { sessions: 0, points: 0, arrows: 0 };
@@ -154,13 +178,16 @@ export default function ReportScreen() {
     };
   }, [filteredSessions]);
 
+  const formatDateRange = () => {
+    const start = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const end = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return `${start} - ${end}`;
+  };
+
   // Generate shareable report text
   const generateReportText = () => {
-    const periodLabel = selectedPeriod === 'week' ? 'Weekly' : 
-                       selectedPeriod === 'month' ? 'Monthly' : 
-                       selectedPeriod === 'year' ? 'Yearly' : 'All Time';
-    
-    let report = `🎯 ARCHERY ${periodLabel.toUpperCase()} REPORT\n`;
+    let report = `🎯 ARCHERY REPORT\n`;
+    report += `Period: ${formatDateRange()}\n`;
     report += `Generated: ${new Date().toLocaleDateString()}\n`;
     report += `━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
@@ -208,7 +235,6 @@ export default function ReportScreen() {
     
     try {
       if (Platform.OS === 'web') {
-        // For web, copy to clipboard
         await navigator.clipboard.writeText(reportText);
         alert('Report copied to clipboard!');
       } else {
@@ -219,6 +245,22 @@ export default function ReportScreen() {
       }
     } catch (error) {
       console.error('Share error:', error);
+    }
+  };
+
+  const handleStartDateChange = (event: any, selectedDate?: Date) => {
+    setShowStartPicker(false);
+    if (selectedDate) {
+      setStartDate(selectedDate);
+      setSelectedPeriod('custom');
+    }
+  };
+
+  const handleEndDateChange = (event: any, selectedDate?: Date) => {
+    setShowEndPicker(false);
+    if (selectedDate) {
+      setEndDate(selectedDate);
+      setSelectedPeriod('custom');
     }
   };
 
@@ -234,21 +276,197 @@ export default function ReportScreen() {
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#8B0000" />
-          <Text style={styles.loadingText}>Generating report...</Text>
+          <Text style={styles.loadingText}>Loading data...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  const periodLabel = selectedPeriod === 'week' ? 'Weekly' : 
-                     selectedPeriod === 'month' ? 'Monthly' : 
-                     selectedPeriod === 'year' ? 'Yearly' : 'All Time';
+  // Date Selection Screen
+  if (!showReport) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Generate Report</Text>
+          <View style={styles.headerSpacer} />
+        </View>
 
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Icon and Title */}
+          <View style={styles.selectionHeader}>
+            <View style={styles.iconCircle}>
+              <Ionicons name="document-text" size={48} color="#8B0000" />
+            </View>
+            <Text style={styles.selectionTitle}>Select Time Range</Text>
+            <Text style={styles.selectionSubtitle}>
+              Choose the period for your performance report
+            </Text>
+          </View>
+
+          {/* Quick Select Buttons */}
+          <View style={styles.quickSelectContainer}>
+            <Text style={styles.sectionLabel}>Quick Select</Text>
+            <View style={styles.quickSelectGrid}>
+              {[
+                { key: 'week', label: 'Last Week', icon: 'calendar-outline' },
+                { key: 'month', label: 'Last Month', icon: 'calendar' },
+                { key: 'year', label: 'Last Year', icon: 'albums-outline' },
+                { key: 'all', label: 'All Time', icon: 'infinite' },
+              ].map((item) => (
+                <TouchableOpacity
+                  key={item.key}
+                  style={[
+                    styles.quickSelectButton,
+                    selectedPeriod === item.key && styles.quickSelectButtonActive,
+                  ]}
+                  onPress={() => setSelectedPeriod(item.key as ReportPeriod)}
+                >
+                  <Ionicons 
+                    name={item.icon as any} 
+                    size={24} 
+                    color={selectedPeriod === item.key ? '#fff' : '#8B0000'} 
+                  />
+                  <Text style={[
+                    styles.quickSelectText,
+                    selectedPeriod === item.key && styles.quickSelectTextActive,
+                  ]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Custom Date Range */}
+          <View style={styles.customRangeContainer}>
+            <Text style={styles.sectionLabel}>Custom Range</Text>
+            
+            {/* Start Date */}
+            <View style={styles.dateRow}>
+              <Text style={styles.dateLabel}>From</Text>
+              {Platform.OS === 'web' ? (
+                <input
+                  type="date"
+                  value={startDate.toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    setStartDate(new Date(e.target.value));
+                    setSelectedPeriod('custom');
+                  }}
+                  style={{
+                    backgroundColor: '#1a1a1a',
+                    color: '#ffffff',
+                    border: '1px solid #333333',
+                    borderRadius: 12,
+                    padding: 14,
+                    fontSize: 16,
+                    flex: 1,
+                  }}
+                />
+              ) : (
+                <TouchableOpacity
+                  style={styles.dateButton}
+                  onPress={() => setShowStartPicker(true)}
+                >
+                  <Ionicons name="calendar-outline" size={20} color="#8B0000" />
+                  <Text style={styles.dateButtonText}>
+                    {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* End Date */}
+            <View style={styles.dateRow}>
+              <Text style={styles.dateLabel}>To</Text>
+              {Platform.OS === 'web' ? (
+                <input
+                  type="date"
+                  value={endDate.toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    setEndDate(new Date(e.target.value));
+                    setSelectedPeriod('custom');
+                  }}
+                  style={{
+                    backgroundColor: '#1a1a1a',
+                    color: '#ffffff',
+                    border: '1px solid #333333',
+                    borderRadius: 12,
+                    padding: 14,
+                    fontSize: 16,
+                    flex: 1,
+                  }}
+                />
+              ) : (
+                <TouchableOpacity
+                  style={styles.dateButton}
+                  onPress={() => setShowEndPicker(true)}
+                >
+                  <Ionicons name="calendar-outline" size={20} color="#8B0000" />
+                  <Text style={styles.dateButtonText}>
+                    {endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {showStartPicker && Platform.OS !== 'web' && (
+              <DateTimePicker
+                value={startDate}
+                mode="date"
+                display="default"
+                onChange={handleStartDateChange}
+                maximumDate={endDate}
+              />
+            )}
+
+            {showEndPicker && Platform.OS !== 'web' && (
+              <DateTimePicker
+                value={endDate}
+                mode="date"
+                display="default"
+                onChange={handleEndDateChange}
+                minimumDate={startDate}
+                maximumDate={new Date()}
+              />
+            )}
+          </View>
+
+          {/* Summary Preview */}
+          <View style={styles.previewCard}>
+            <Text style={styles.previewTitle}>Report Preview</Text>
+            <View style={styles.previewRow}>
+              <Ionicons name="calendar" size={18} color="#888" />
+              <Text style={styles.previewText}>{formatDateRange()}</Text>
+            </View>
+            <View style={styles.previewRow}>
+              <Ionicons name="layers" size={18} color="#888" />
+              <Text style={styles.previewText}>
+                {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} found
+              </Text>
+            </View>
+          </View>
+
+          {/* Generate Button */}
+          <TouchableOpacity
+            style={styles.generateButton}
+            onPress={() => setShowReport(true)}
+          >
+            <Ionicons name="document-text" size={24} color="#fff" />
+            <Text style={styles.generateButtonText}>Generate Report</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // Report Display Screen
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.backButton} onPress={() => setShowReport(false)}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Report</Text>
@@ -258,36 +476,11 @@ export default function ReportScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Period Selector */}
-        <View style={styles.periodSelector}>
-          {(['week', 'month', 'year', 'all'] as ReportPeriod[]).map((period) => (
-            <TouchableOpacity
-              key={period}
-              style={[
-                styles.periodButton,
-                selectedPeriod === period && styles.periodButtonActive,
-              ]}
-              onPress={() => setSelectedPeriod(period)}
-            >
-              <Text
-                style={[
-                  styles.periodButtonText,
-                  selectedPeriod === period && styles.periodButtonTextActive,
-                ]}
-              >
-                {period === 'all' ? 'All' : period.charAt(0).toUpperCase() + period.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Report Title */}
+        {/* Report Header */}
         <View style={styles.reportHeader}>
           <Ionicons name="document-text" size={32} color="#8B0000" />
-          <Text style={styles.reportTitle}>{periodLabel} Report</Text>
-          <Text style={styles.reportDate}>
-            Generated {new Date().toLocaleDateString()}
-          </Text>
+          <Text style={styles.reportTitle}>Performance Report</Text>
+          <Text style={styles.reportDate}>{formatDateRange()}</Text>
         </View>
 
         {/* Overview Card */}
@@ -409,7 +602,7 @@ export default function ReportScreen() {
             <Ionicons name="document-outline" size={64} color="#888888" />
             <Text style={styles.emptyTitle}>No Data</Text>
             <Text style={styles.emptyText}>
-              No sessions found for this period. Start scoring to generate reports!
+              No sessions found for this period. Try selecting a different date range.
             </Text>
           </View>
         )}
@@ -418,6 +611,15 @@ export default function ReportScreen() {
         <TouchableOpacity style={styles.shareButtonLarge} onPress={handleShare}>
           <Ionicons name="share-social" size={24} color="#fff" />
           <Text style={styles.shareButtonText}>Share Report</Text>
+        </TouchableOpacity>
+
+        {/* Edit Range Button */}
+        <TouchableOpacity 
+          style={styles.editRangeButton} 
+          onPress={() => setShowReport(false)}
+        >
+          <Ionicons name="calendar-outline" size={20} color="#8B0000" />
+          <Text style={styles.editRangeButtonText}>Change Date Range</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -465,31 +667,138 @@ const styles = StyleSheet.create({
     color: '#888888',
     marginTop: 12,
   },
-  periodSelector: {
-    flexDirection: 'row',
-    backgroundColor: '#111111',
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 20,
-  },
-  periodButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderRadius: 8,
+  // Selection Screen Styles
+  selectionHeader: {
     alignItems: 'center',
+    marginBottom: 32,
   },
-  periodButtonActive: {
-    backgroundColor: '#8B0000',
+  iconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(139, 0, 0, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
-  periodButtonText: {
-    color: '#888888',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  periodButtonTextActive: {
+  selectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
     color: '#fff',
   },
+  selectionSubtitle: {
+    fontSize: 14,
+    color: '#888888',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#888888',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  quickSelectContainer: {
+    marginBottom: 24,
+  },
+  quickSelectGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  quickSelectButton: {
+    width: '47%',
+    backgroundColor: '#111111',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#8B0000',
+  },
+  quickSelectButtonActive: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
+  },
+  quickSelectText: {
+    color: '#8B0000',
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 8,
+  },
+  quickSelectTextActive: {
+    color: '#fff',
+  },
+  customRangeContainer: {
+    backgroundColor: '#111111',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  dateLabel: {
+    width: 50,
+    fontSize: 14,
+    color: '#888888',
+    fontWeight: '600',
+  },
+  dateButton: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: '#fff',
+  },
+  previewCard: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+  },
+  previewTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#888888',
+    marginBottom: 12,
+  },
+  previewRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  previewText: {
+    fontSize: 14,
+    color: '#fff',
+  },
+  generateButton: {
+    flexDirection: 'row',
+    backgroundColor: '#8B0000',
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  generateButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  // Report Display Styles
   reportHeader: {
     alignItems: 'center',
     marginBottom: 24,
@@ -651,5 +960,22 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  editRangeButton: {
+    flexDirection: 'row',
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#8B0000',
+  },
+  editRangeButtonText: {
+    color: '#8B0000',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
