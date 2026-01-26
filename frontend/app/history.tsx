@@ -398,6 +398,31 @@ const styles = StyleSheet.create({
     color: '#888888',
     marginTop: 12,
   },
+  periodSelector: {
+    flexDirection: 'row',
+    backgroundColor: '#111111',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 16,
+  },
+  periodButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  periodButtonActive: {
+    backgroundColor: '#8B0000',
+  },
+  periodButtonText: {
+    color: '#888888',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  periodButtonTextActive: {
+    color: '#fff',
+  },
   overviewCard: {
     backgroundColor: '#111111',
     borderRadius: 16,
