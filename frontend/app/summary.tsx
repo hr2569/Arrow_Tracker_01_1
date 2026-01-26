@@ -51,6 +51,7 @@ export default function SummaryScreen() {
   } = useAppStore();
   const [isSaving, setIsSaving] = useState(false);
   const [roundAdded, setRoundAdded] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const isCompetition = sessionType === 'competition';
   const isLastCompetitionRound = isCompetition && currentRoundNumber >= MAX_COMPETITION_ROUNDS;
