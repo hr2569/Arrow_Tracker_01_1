@@ -585,39 +585,106 @@ export default function StatsScreen() {
           </View>
         </View>
 
-        {/* Shot Distribution Map */}
+        {/* Shot Distribution / Heatmap Section */}
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>
-            <Ionicons name="locate" size={18} color="#8B0000" /> Shot Distribution
-          </Text>
-          <Text style={styles.sectionSubtitle}>All {stats.totalArrows} arrows from {stats.totalSessions} sessions</Text>
-          <View style={styles.targetWrapper}>
-            <AggregatedTargetMap size={SCREEN_WIDTH - 80} />
+          {/* View Mode Toggle */}
+          <View style={styles.viewModeToggle}>
+            <TouchableOpacity
+              style={[
+                styles.viewModeButton,
+                viewMode === 'distribution' && styles.viewModeButtonActive,
+              ]}
+              onPress={() => setViewMode('distribution')}
+            >
+              <Ionicons 
+                name="locate" 
+                size={16} 
+                color={viewMode === 'distribution' ? '#fff' : '#888888'} 
+              />
+              <Text
+                style={[
+                  styles.viewModeButtonText,
+                  viewMode === 'distribution' && styles.viewModeButtonTextActive,
+                ]}
+              >
+                Distribution
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.viewModeButton,
+                viewMode === 'heatmap' && styles.viewModeButtonActive,
+              ]}
+              onPress={() => setViewMode('heatmap')}
+            >
+              <Ionicons 
+                name="flame" 
+                size={16} 
+                color={viewMode === 'heatmap' ? '#fff' : '#888888'} 
+              />
+              <Text
+                style={[
+                  styles.viewModeButtonText,
+                  viewMode === 'heatmap' && styles.viewModeButtonTextActive,
+                ]}
+              >
+                Heatmap
+              </Text>
+            </TouchableOpacity>
           </View>
           
-          {/* Color Legend */}
-          <View style={styles.colorLegend}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#FFD700' }]} />
-              <Text style={styles.legendText}>9-10</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#FF6B6B' }]} />
-              <Text style={styles.legendText}>7-8</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#4ECDC4' }]} />
-              <Text style={styles.legendText}>5-6</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#45B7D1' }]} />
-              <Text style={styles.legendText}>3-4</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#888888' }]} />
-              <Text style={styles.legendText}>0-2</Text>
-            </View>
+          <Text style={styles.sectionSubtitle}>
+            {viewMode === 'distribution' 
+              ? `All ${stats.totalArrows} arrows from ${stats.totalSessions} sessions`
+              : `Shot density from ${stats.totalArrows} arrows`
+            }
+          </Text>
+          
+          <View style={styles.targetWrapper}>
+            {viewMode === 'distribution' ? (
+              <AggregatedTargetMap size={SCREEN_WIDTH - 80} />
+            ) : (
+              <HeatmapTargetMap size={SCREEN_WIDTH - 80} />
+            )}
           </View>
+          
+          {/* Legend */}
+          {viewMode === 'distribution' ? (
+            <View style={styles.colorLegend}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: '#FFD700' }]} />
+                <Text style={styles.legendText}>9-10</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: '#FF6B6B' }]} />
+                <Text style={styles.legendText}>7-8</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: '#4ECDC4' }]} />
+                <Text style={styles.legendText}>5-6</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: '#45B7D1' }]} />
+                <Text style={styles.legendText}>3-4</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: '#888888' }]} />
+                <Text style={styles.legendText}>0-2</Text>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.heatmapLegend}>
+              <Text style={styles.heatmapLegendLabel}>Low</Text>
+              <View style={styles.heatmapGradient}>
+                <View style={[styles.heatmapGradientStop, { backgroundColor: 'rgba(0, 0, 255, 0.7)' }]} />
+                <View style={[styles.heatmapGradientStop, { backgroundColor: 'rgba(0, 255, 255, 0.7)' }]} />
+                <View style={[styles.heatmapGradientStop, { backgroundColor: 'rgba(0, 255, 0, 0.7)' }]} />
+                <View style={[styles.heatmapGradientStop, { backgroundColor: 'rgba(255, 255, 0, 0.7)' }]} />
+                <View style={[styles.heatmapGradientStop, { backgroundColor: 'rgba(255, 0, 0, 0.7)' }]} />
+              </View>
+              <Text style={styles.heatmapLegendLabel}>High</Text>
+            </View>
+          )}
         </View>
 
         {/* Ring Breakdown */}
