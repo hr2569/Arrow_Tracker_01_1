@@ -271,19 +271,21 @@ export default function ReportScreen() {
 
   // Generate PDF HTML content
   const generatePdfHtml = () => {
+    // Score distribution with larger bars for full page
     const ringDistributionRows = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
       .map((ring) => {
         const count = reportStats.ringDistribution[ring] || 0;
         const percentage = reportStats.totalArrows > 0 ? (count / reportStats.totalArrows) * 100 : 0;
         return `
           <tr>
-            <td style="font-weight: bold; width: 40px;">${ring === 0 ? 'M' : ring}</td>
-            <td style="padding: 4px 0;">
-              <div style="background: #ddd; border-radius: 4px; height: 16px; width: 100%;">
-                <div style="background: #8B0000; border-radius: 4px; height: 16px; width: ${percentage}%;"></div>
+            <td style="font-weight: bold; font-size: 24px; width: 60px; padding: 12px 0;">${ring === 0 ? 'M' : ring}</td>
+            <td style="padding: 12px 0;">
+              <div style="background: #ddd; border-radius: 8px; height: 40px; width: 100%;">
+                <div style="background: #8B0000; border-radius: 8px; height: 40px; width: ${percentage}%;"></div>
               </div>
             </td>
-            <td style="width: 50px; text-align: right;">${count}</td>
+            <td style="width: 80px; text-align: right; font-size: 20px; font-weight: bold; padding: 12px 0;">${count}</td>
+            <td style="width: 80px; text-align: right; font-size: 16px; color: #666; padding: 12px 0;">${percentage.toFixed(1)}%</td>
           </tr>
         `;
       })
@@ -293,23 +295,22 @@ export default function ReportScreen() {
     const usedBows = [...new Set(filteredSessions.filter(s => s.bow_name).map(s => s.bow_name))];
     const usedDistances = [...new Set(filteredSessions.filter(s => s.distance).map(s => s.distance))];
 
-    // Generate heatmap SVG for PDF - full page width
+    // Generate heatmap SVG for PDF - full page
     const generateHeatmapSvg = () => {
       if (allShots.length === 0) {
         return `
-          <div style="width: 100%; aspect-ratio: 1; max-width: 500px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid #ddd;">
-            <span style="color: #666; font-size: 14px;">No shots in this period</span>
+          <div style="width: 100%; height: 500px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid #ddd;">
+            <span style="color: #666; font-size: 18px;">No shots in this period</span>
           </div>
         `;
       }
 
-      const size = 500;
-      const targetScale = 0.85;
+      const size = 600;
+      const targetScale = 0.9;
       const targetSize = size * targetScale;
-      const offset = (size - targetSize) / 2;
       
       // Grid for density calculation
-      const gridSize = 50;
+      const gridSize = 60;
       const cellSize = size / gridSize;
       const densityGrid: number[][] = [];
       for (let i = 0; i < gridSize; i++) {
@@ -324,14 +325,14 @@ export default function ReportScreen() {
         const gridX = Math.floor(shot.x * gridSize);
         const gridY = Math.floor(shot.y * gridSize);
         
-        const blurRadius = 5;
+        const blurRadius = 6;
         for (let dx = -blurRadius; dx <= blurRadius; dx++) {
           for (let dy = -blurRadius; dy <= blurRadius; dy++) {
             const nx = gridX + dx;
             const ny = gridY + dy;
             if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
               const distance = Math.sqrt(dx * dx + dy * dy);
-              const weight = Math.exp(-distance * distance / 5);
+              const weight = Math.exp(-distance * distance / 6);
               densityGrid[ny][nx] += weight;
             }
           }
@@ -408,30 +409,22 @@ export default function ReportScreen() {
         const bgColor = ringColorsPdf[ringNum - 1];
         const borderColor = ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00';
         targetRings += `
-          <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="${bgColor}" stroke="${borderColor}" stroke-width="1" />
+          <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="${bgColor}" stroke="${borderColor}" stroke-width="1.5" />
         `;
       }
 
       return `
-        <svg width="100%" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto; max-width: 100%;">
+        <svg width="100%" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;">
           <!-- Target rings -->
           ${targetRings}
           <!-- Center cross -->
-          <line x1="${size/2 - 10}" y1="${size/2}" x2="${size/2 + 10}" y2="${size/2}" stroke="#000" stroke-width="2" />
-          <line x1="${size/2}" y1="${size/2 - 10}" x2="${size/2}" y2="${size/2 + 10}" stroke="#000" stroke-width="2" />
+          <line x1="${size/2 - 12}" y1="${size/2}" x2="${size/2 + 12}" y2="${size/2}" stroke="#000" stroke-width="2" />
+          <line x1="${size/2}" y1="${size/2 - 12}" x2="${size/2}" y2="${size/2 + 12}" stroke="#000" stroke-width="2" />
           <!-- Heatmap overlay -->
           ${heatCircles}
         </svg>
       `;
     };
-
-    const heatmapSection = `
-      <div class="card heatmap-card">
-        <h3>Shot Distribution Heatmap</h3>
-        <p style="color: #666; font-size: 12px; margin: 0 0 16px 0;">${allShots.length} arrows from ${reportStats.totalSessions} session${reportStats.totalSessions !== 1 ? 's' : ''}</p>
-        ${generateHeatmapSvg()}
-      </div>
-    `;
 
     return `
       <!DOCTYPE html>
@@ -440,12 +433,41 @@ export default function ReportScreen() {
           <meta charset="utf-8">
           <title>Archery Report</title>
           <style>
+            @page {
+              size: A4;
+              margin: 20mm;
+            }
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               background: #ffffff;
               color: #000000;
-              padding: 40px;
+              padding: 0;
               margin: 0;
+            }
+            .page {
+              page-break-after: always;
+              min-height: 100vh;
+              padding: 40px;
+              box-sizing: border-box;
+            }
+            .page:last-child {
+              page-break-after: avoid;
+            }
+            .page-header {
+              text-align: center;
+              margin-bottom: 20px;
+              padding-bottom: 20px;
+              border-bottom: 2px solid #8B0000;
+            }
+            .page-header h2 {
+              color: #8B0000;
+              margin: 0;
+              font-size: 28px;
+            }
+            .page-header p {
+              color: #666;
+              margin: 8px 0 0 0;
+              font-size: 14px;
             }
             .header {
               text-align: center;
@@ -454,6 +476,7 @@ export default function ReportScreen() {
             .header h1 {
               color: #8B0000;
               margin: 0 0 8px 0;
+              font-size: 32px;
             }
             .header p {
               color: #333;
@@ -461,22 +484,20 @@ export default function ReportScreen() {
             }
             .equipment-info {
               color: #555;
-              font-size: 13px;
-              margin-top: 12px;
+              font-size: 14px;
+              margin-top: 16px;
             }
             .card {
               background: #f9f9f9;
               border-radius: 12px;
-              padding: 20px;
-              margin-bottom: 16px;
+              padding: 24px;
+              margin-bottom: 20px;
               border: 1px solid #ddd;
             }
             .card h3 {
               color: #000;
-              margin: 0 0 16px 0;
-            }
-            .heatmap-card {
-              padding: 20px 10px;
+              margin: 0 0 20px 0;
+              font-size: 20px;
             }
             .stats-grid {
               display: flex;
@@ -485,155 +506,186 @@ export default function ReportScreen() {
             .stat-item {
               width: 50%;
               text-align: center;
-              padding: 12px 0;
+              padding: 16px 0;
             }
             .stat-value {
-              font-size: 32px;
+              font-size: 42px;
               font-weight: bold;
               color: #8B0000;
             }
             .stat-label {
-              font-size: 12px;
+              font-size: 14px;
               color: #555;
-              margin-top: 4px;
+              margin-top: 8px;
             }
             .avg-row {
               display: flex;
               justify-content: space-between;
-              padding: 12px 0;
+              padding: 16px 0;
               border-bottom: 1px solid #ddd;
+              font-size: 18px;
             }
             .avg-label { color: #555; }
-            .avg-value { font-weight: bold; font-size: 18px; color: #000; }
+            .avg-value { font-weight: bold; font-size: 22px; color: #000; }
             .highlight-row {
               display: flex;
-              gap: 12px;
+              gap: 16px;
             }
             .highlight-item {
               flex: 1;
               background: #fff;
               border-radius: 12px;
-              padding: 16px;
+              padding: 20px;
               text-align: center;
               border: 1px solid #ddd;
             }
             .highlight-label {
-              font-size: 12px;
+              font-size: 14px;
               color: #555;
-              margin-bottom: 8px;
+              margin-bottom: 12px;
             }
             .highlight-value {
-              font-size: 24px;
+              font-size: 32px;
               font-weight: bold;
               color: #2E7D32;
             }
             .highlight-value-low {
-              font-size: 24px;
+              font-size: 32px;
               font-weight: bold;
               color: #C62828;
             }
             .highlight-date {
-              font-size: 11px;
+              font-size: 12px;
               color: #666;
-              margin-top: 4px;
+              margin-top: 8px;
             }
-            table {
+            .heatmap-container {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              min-height: 80vh;
+            }
+            .heatmap-info {
+              text-align: center;
+              margin-bottom: 20px;
+            }
+            .heatmap-info p {
+              color: #666;
+              font-size: 16px;
+              margin: 0;
+            }
+            .score-table {
               width: 100%;
               border-collapse: collapse;
             }
-            td {
+            .score-table td {
               color: #333;
-              padding: 6px 0;
             }
             .footer {
               text-align: center;
-              margin-top: 32px;
+              margin-top: 40px;
               color: #666;
               font-size: 12px;
             }
           </style>
         </head>
         <body>
-          <div class="header">
-            <h1>Archery Performance Report</h1>
-            <p>${formatDateRange()}</p>
-            <p style="font-size: 11px; color: #666;">Generated ${new Date().toLocaleDateString()}</p>
-            <div class="equipment-info">
-              ${usedBows.length > 0 ? `<div>Bow${usedBows.length > 1 ? 's' : ''}: ${usedBows.join(', ')}</div>` : ''}
-              ${usedDistances.length > 0 ? `<div>Distance${usedDistances.length > 1 ? 's' : ''}: ${usedDistances.join(', ')}</div>` : ''}
+          <!-- Page 1: Overview & Stats -->
+          <div class="page">
+            <div class="header">
+              <h1>Archery Performance Report</h1>
+              <p style="font-size: 16px;">${formatDateRange()}</p>
+              <p style="font-size: 12px; color: #666;">Generated ${new Date().toLocaleDateString()}</p>
+              <div class="equipment-info">
+                ${usedBows.length > 0 ? `<div>Bow${usedBows.length > 1 ? 's' : ''}: ${usedBows.join(', ')}</div>` : ''}
+                ${usedDistances.length > 0 ? `<div>Distance${usedDistances.length > 1 ? 's' : ''}: ${usedDistances.join(', ')}</div>` : ''}
+              </div>
             </div>
-          </div>
 
-          <div class="card">
-            <h3>Overview</h3>
-            <div class="stats-grid">
-              <div class="stat-item">
-                <div class="stat-value">${reportStats.totalSessions}</div>
-                <div class="stat-label">Sessions</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-value">${reportStats.totalRounds}</div>
-                <div class="stat-label">Rounds</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-value">${reportStats.totalArrows}</div>
-                <div class="stat-label">Arrows</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-value">${reportStats.totalPoints}</div>
-                <div class="stat-label">Total Points</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>Averages</h3>
-            <div class="avg-row">
-              <span class="avg-label">Per Arrow</span>
-              <span class="avg-value">${reportStats.avgPerArrow}</span>
-            </div>
-            <div class="avg-row">
-              <span class="avg-label">Per Round</span>
-              <span class="avg-value">${reportStats.avgPerRound}</span>
-            </div>
-            <div class="avg-row">
-              <span class="avg-label">Per Session</span>
-              <span class="avg-value">${reportStats.avgPerSession}</span>
-            </div>
-          </div>
-
-          ${reportStats.totalSessions > 0 ? `
             <div class="card">
-              <h3>Highlights</h3>
-              <div class="highlight-row">
-                <div class="highlight-item">
-                  <div class="highlight-label">Best Session</div>
-                  <div class="highlight-value">${reportStats.bestSession.score} pts</div>
-                  <div class="highlight-date">${reportStats.bestSession.date}</div>
+              <h3>Overview</h3>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-value">${reportStats.totalSessions}</div>
+                  <div class="stat-label">Sessions</div>
                 </div>
-                <div class="highlight-item">
-                  <div class="highlight-label">Lowest Session</div>
-                  <div class="highlight-value-low">${reportStats.worstSession.score} pts</div>
-                  <div class="highlight-date">${reportStats.worstSession.date}</div>
+                <div class="stat-item">
+                  <div class="stat-value">${reportStats.totalRounds}</div>
+                  <div class="stat-label">Rounds</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">${reportStats.totalArrows}</div>
+                  <div class="stat-label">Arrows</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">${reportStats.totalPoints}</div>
+                  <div class="stat-label">Total Points</div>
                 </div>
               </div>
             </div>
-          ` : ''}
 
-          ${heatmapSection}
+            <div class="card">
+              <h3>Averages</h3>
+              <div class="avg-row">
+                <span class="avg-label">Per Arrow</span>
+                <span class="avg-value">${reportStats.avgPerArrow}</span>
+              </div>
+              <div class="avg-row">
+                <span class="avg-label">Per Round</span>
+                <span class="avg-value">${reportStats.avgPerRound}</span>
+              </div>
+              <div class="avg-row">
+                <span class="avg-label">Per Session</span>
+                <span class="avg-value">${reportStats.avgPerSession}</span>
+              </div>
+            </div>
 
+            ${reportStats.totalSessions > 0 ? `
+              <div class="card">
+                <h3>Highlights</h3>
+                <div class="highlight-row">
+                  <div class="highlight-item">
+                    <div class="highlight-label">Best Session</div>
+                    <div class="highlight-value">${reportStats.bestSession.score} pts</div>
+                    <div class="highlight-date">${reportStats.bestSession.date}</div>
+                  </div>
+                  <div class="highlight-item">
+                    <div class="highlight-label">Lowest Session</div>
+                    <div class="highlight-value-low">${reportStats.worstSession.score} pts</div>
+                    <div class="highlight-date">${reportStats.worstSession.date}</div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Page 2: Shot Distribution Heatmap -->
+          <div class="page">
+            <div class="page-header">
+              <h2>Shot Distribution Heatmap</h2>
+              <p>${allShots.length} arrows from ${reportStats.totalSessions} session${reportStats.totalSessions !== 1 ? 's' : ''}</p>
+            </div>
+            <div class="heatmap-container">
+              ${generateHeatmapSvg()}
+            </div>
+          </div>
+
+          <!-- Page 3: Score Distribution -->
           ${reportStats.totalArrows > 0 ? `
-            <div class="card">
-              <h3>Score Distribution</h3>
-              <table>
-                ${ringDistributionRows}
-              </table>
+          <div class="page">
+            <div class="page-header">
+              <h2>Score Distribution</h2>
+              <p>${reportStats.totalArrows} total arrows</p>
             </div>
-          ` : ''}
-
-          <div class="footer">
-            <p>Archery Scoring App - ${new Date().getFullYear()}</p>
+            <table class="score-table">
+              ${ringDistributionRows}
+            </table>
+            <div class="footer">
+              <p>Archery Scoring App - ${new Date().getFullYear()}</p>
+            </div>
           </div>
+          ` : ''}
         </body>
       </html>
     `;
