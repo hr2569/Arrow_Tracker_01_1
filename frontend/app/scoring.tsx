@@ -818,7 +818,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignSelf: 'center',
     position: 'relative',
-    overflow: 'hidden',
+    overflow: 'visible',
   },
   targetTouchArea: {
     position: 'absolute',
