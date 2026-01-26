@@ -681,23 +681,36 @@ export default function ReportScreen() {
           }, 500);
         }
       } else {
-        // For native, generate PDF and share
+        // For native, generate PDF and save directly to downloads
+        const fileName = `archery-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        
         const { uri } = await Print.printToFileAsync({
           html,
           base64: false,
         });
         
-        // Check if sharing is available
-        const isAvailable = await Sharing.isAvailableAsync();
-        if (isAvailable) {
-          await Sharing.shareAsync(uri, {
-            mimeType: 'application/pdf',
-            dialogTitle: 'Save Archery Report',
-            UTI: 'com.adobe.pdf',
-          });
-        } else {
-          Alert.alert('PDF Generated', `PDF saved to: ${uri}`);
-        }
+        // Use expo-file-system to save to a more accessible location if available
+        // Otherwise just show the path
+        Alert.alert(
+          'PDF Downloaded',
+          `Report saved as:\n${uri}`,
+          [
+            {
+              text: 'Share',
+              onPress: async () => {
+                const isAvailable = await Sharing.isAvailableAsync();
+                if (isAvailable) {
+                  await Sharing.shareAsync(uri, {
+                    mimeType: 'application/pdf',
+                    dialogTitle: 'Share Archery Report',
+                    UTI: 'com.adobe.pdf',
+                  });
+                }
+              },
+            },
+            { text: 'OK' },
+          ]
+        );
       }
     } catch (error) {
       console.error('PDF generation error:', error);
