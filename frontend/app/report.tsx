@@ -458,17 +458,6 @@ export default function ReportScreen() {
       </View>
     );
   };
-                  cy={cell.y + cellSize / 2}
-                  r={cellSize * 1.5}
-                  fill={`url(#heatGrad-${index})`}
-                />
-              ))}
-            </G>
-          </Svg>
-        </View>
-      </View>
-    );
-  };
 
   if (isLoading) {
     return (
