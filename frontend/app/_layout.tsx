@@ -110,6 +110,26 @@ export default function RootLayout() {
             headerLeft: () => <HeaderBackButton />,
           }} 
         />
+        <Stack.Screen 
+          name="stats" 
+          options={{ 
+            title: 'Statistics',
+            headerBackTitle: 'Back',
+            headerLeft: () => <HeaderBackButton />,
+          }} 
+        />
+        <Stack.Screen 
+          name="bows" 
+          options={{ 
+            headerShown: false,
+          }} 
+        />
+        <Stack.Screen 
+          name="sessionSetup" 
+          options={{ 
+            headerShown: false,
+          }} 
+        />
       </Stack>
     </>
   );
