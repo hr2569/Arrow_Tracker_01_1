@@ -860,7 +860,9 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     marginLeft: 'auto',
-    padding: 8,
+    padding: 12,
+    backgroundColor: 'rgba(255, 107, 107, 0.15)',
+    borderRadius: 8,
   },
   expandedContent: {
     marginTop: 12,
