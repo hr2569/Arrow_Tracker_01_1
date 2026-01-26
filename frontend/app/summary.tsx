@@ -366,6 +366,38 @@ export default function SummaryScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Confirmation Modal */}
+      <Modal
+        visible={showConfirmModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowConfirmModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Ionicons name="help-circle" size={48} color="#8B0000" />
+            <Text style={styles.modalTitle}>Finish Session?</Text>
+            <Text style={styles.modalMessage}>Do you want to save this session?</Text>
+            
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalDiscardButton}
+                onPress={handleDiscard}
+              >
+                <Text style={styles.modalDiscardText}>Discard</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={styles.modalSaveButton}
+                onPress={handleSaveAndClose}
+              >
+                <Text style={styles.modalSaveText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
