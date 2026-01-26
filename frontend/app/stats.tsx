@@ -924,48 +924,55 @@ export default function StatsScreen() {
           <RingDistribution />
         </View>
 
-        {/* Daily Breakdown */}
-        {dailyStats.length > 0 && (
+        {/* Dynamic Time Breakdown */}
+        {timeBreakdown.length > 0 && (
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>
-              <Ionicons name="calendar" size={18} color="#8B0000" /> Daily Breakdown
+              <Ionicons name={getBreakdownIcon() as any} size={18} color="#8B0000" /> {getBreakdownTitle()}
             </Text>
             <Text style={styles.sectionSubtitle}>
-              Performance by day ({dailyStats.length} day{dailyStats.length !== 1 ? 's' : ''})
+              {selectedPeriod === 'day' && `Hourly performance (${timeBreakdown.length} time slot${timeBreakdown.length !== 1 ? 's' : ''})`}
+              {selectedPeriod === 'week' && `Daily performance (${timeBreakdown.length} day${timeBreakdown.length !== 1 ? 's' : ''})`}
+              {selectedPeriod === 'month' && `Weekly performance (${timeBreakdown.length} week${timeBreakdown.length !== 1 ? 's' : ''})`}
+              {selectedPeriod === 'year' && `Monthly performance (${timeBreakdown.length} month${timeBreakdown.length !== 1 ? 's' : ''})`}
+              {selectedPeriod === 'all' && `Yearly performance (${timeBreakdown.length} year${timeBreakdown.length !== 1 ? 's' : ''})`}
             </Text>
             
             <View style={styles.dailyList}>
-              {dailyStats.map((day, index) => (
-                <View key={day.dayKey} style={styles.dailyItem}>
+              {timeBreakdown.map((item) => (
+                <View key={item.key} style={styles.dailyItem}>
                   <View style={styles.dailyHeader}>
                     <View style={styles.dailyDateContainer}>
-                      <Ionicons name="today-outline" size={16} color="#8B0000" />
-                      <Text style={styles.dailyDate}>
-                        {day.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                      </Text>
+                      <Ionicons name={getBreakdownIcon() as any} size={16} color="#8B0000" />
+                      <View>
+                        <Text style={styles.dailyDate}>{item.label}</Text>
+                        {item.sublabel && (
+                          <Text style={styles.dailySublabel}>{item.sublabel}</Text>
+                        )}
+                      </View>
                     </View>
                     <View style={styles.dailyBadge}>
                       <Text style={styles.dailyBadgeText}>
-                        {day.sessionCount} session{day.sessionCount !== 1 ? 's' : ''}
+                        {item.sessionCount} session{item.sessionCount !== 1 ? 's' : ''}
                       </Text>
                     </View>
                   </View>
                   
                   <View style={styles.dailyStatsRow}>
                     <View style={styles.dailyStat}>
-                      <Text style={styles.dailyStatValue}>{day.totalPoints}</Text>
+                      <Text style={styles.dailyStatValue}>{item.totalPoints}</Text>
                       <Text style={styles.dailyStatLabel}>Points</Text>
                     </View>
                     <View style={styles.dailyStat}>
-                      <Text style={styles.dailyStatValue}>{day.totalArrows}</Text>
+                      <Text style={styles.dailyStatValue}>{item.totalArrows}</Text>
                       <Text style={styles.dailyStatLabel}>Arrows</Text>
                     </View>
                     <View style={styles.dailyStat}>
-                      <Text style={styles.dailyStatValue}>{day.avgPerArrow}</Text>
+                      <Text style={styles.dailyStatValue}>{item.avgPerArrow}</Text>
                       <Text style={styles.dailyStatLabel}>Avg/Arrow</Text>
                     </View>
                     <View style={styles.dailyStat}>
-                      <Text style={styles.dailyStatValue}>{day.avgPerRound}</Text>
+                      <Text style={styles.dailyStatValue}>{item.avgPerRound}</Text>
                       <Text style={styles.dailyStatLabel}>Avg/Round</Text>
                     </View>
                   </View>
@@ -976,9 +983,9 @@ export default function StatsScreen() {
                       style={[
                         styles.dailyProgressBar, 
                         { 
-                          width: `${Math.min(100, (parseFloat(day.avgPerArrow) / 10) * 100)}%`,
-                          backgroundColor: parseFloat(day.avgPerArrow) >= 8 ? '#4CAF50' : 
-                                          parseFloat(day.avgPerArrow) >= 6 ? '#FFC107' : '#8B0000'
+                          width: `${Math.min(100, (parseFloat(item.avgPerArrow) / 10) * 100)}%`,
+                          backgroundColor: parseFloat(item.avgPerArrow) >= 8 ? '#4CAF50' : 
+                                          parseFloat(item.avgPerArrow) >= 6 ? '#FFC107' : '#8B0000'
                         }
                       ]} 
                     />
