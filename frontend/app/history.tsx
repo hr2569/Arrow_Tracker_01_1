@@ -709,9 +709,18 @@ export default function HistoryScreen() {
                       <View style={styles.sessionHeader}>
                         <View style={styles.sessionInfo}>
                           <Text style={styles.sessionName}>{session.name}</Text>
-                          <Text style={styles.sessionDate}>
-                            {formatDate(session.created_at)}
-                          </Text>
+                          <TouchableOpacity
+                            style={styles.dateEditRow}
+                            onPress={(e) => {
+                              e.stopPropagation();
+                              openEditModal(session);
+                            }}
+                          >
+                            <Text style={styles.sessionDate}>
+                              {formatDate(session.created_at)}
+                            </Text>
+                            <Ionicons name="create-outline" size={14} color="#888888" style={styles.editIcon} />
+                          </TouchableOpacity>
                         </View>
                         <View style={styles.sessionScore}>
                           <Text style={styles.scoreValue}>{session.total_score}</Text>
