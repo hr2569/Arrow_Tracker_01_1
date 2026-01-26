@@ -289,51 +289,27 @@ export default function ReportScreen() {
       })
       .join('');
 
-    // Calculate bow stats for PDF
-    const bowStats: { [key: string]: { sessions: number, points: number, arrows: number } } = {};
-    const distanceStats: { [key: string]: { sessions: number, points: number, arrows: number } } = {};
-    
-    filteredSessions.forEach((session) => {
-      if (session.bow_name) {
-        if (!bowStats[session.bow_name]) {
-          bowStats[session.bow_name] = { sessions: 0, points: 0, arrows: 0 };
-        }
-        bowStats[session.bow_name].sessions++;
-        bowStats[session.bow_name].points += session.total_score || 0;
-        session.rounds?.forEach((round) => {
-          bowStats[session.bow_name].arrows += round.shots?.length || 0;
-        });
-      }
-      
-      if (session.distance) {
-        if (!distanceStats[session.distance]) {
-          distanceStats[session.distance] = { sessions: 0, points: 0, arrows: 0 };
-        }
-        distanceStats[session.distance].sessions++;
-        distanceStats[session.distance].points += session.total_score || 0;
-        session.rounds?.forEach((round) => {
-          distanceStats[session.distance].arrows += round.shots?.length || 0;
-        });
-      }
-    });
+    // Get unique bows and distances used in filtered sessions
+    const usedBows = [...new Set(filteredSessions.filter(s => s.bow_name).map(s => s.bow_name))];
+    const usedDistances = [...new Set(filteredSessions.filter(s => s.distance).map(s => s.distance))];
 
-    // Generate heatmap SVG for PDF - 50% bigger (420px instead of 280px)
+    // Generate heatmap SVG for PDF - full page width
     const generateHeatmapSvg = () => {
       if (allShots.length === 0) {
         return `
-          <div style="width: 420px; height: 420px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid #ddd;">
+          <div style="width: 100%; aspect-ratio: 1; max-width: 500px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid #ddd;">
             <span style="color: #666; font-size: 14px;">No shots in this period</span>
           </div>
         `;
       }
 
-      const size = 420;
-      const targetScale = 0.8;
+      const size = 500;
+      const targetScale = 0.85;
       const targetSize = size * targetScale;
       const offset = (size - targetSize) / 2;
       
       // Grid for density calculation
-      const gridSize = 42;
+      const gridSize = 50;
       const cellSize = size / gridSize;
       const densityGrid: number[][] = [];
       for (let i = 0; i < gridSize; i++) {
@@ -348,14 +324,14 @@ export default function ReportScreen() {
         const gridX = Math.floor(shot.x * gridSize);
         const gridY = Math.floor(shot.y * gridSize);
         
-        const blurRadius = 4;
+        const blurRadius = 5;
         for (let dx = -blurRadius; dx <= blurRadius; dx++) {
           for (let dy = -blurRadius; dy <= blurRadius; dy++) {
             const nx = gridX + dx;
             const ny = gridY + dy;
             if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
               const distance = Math.sqrt(dx * dx + dy * dy);
-              const weight = Math.exp(-distance * distance / 4);
+              const weight = Math.exp(-distance * distance / 5);
               densityGrid[ny][nx] += weight;
             }
           }
@@ -429,7 +405,6 @@ export default function ReportScreen() {
       for (let ringNum = 1; ringNum <= 10; ringNum++) {
         const diameterPercent = (11 - ringNum) / 10;
         const ringSize = targetSize * diameterPercent;
-        const ringOffset = offset + (targetSize - ringSize) / 2;
         const bgColor = ringColorsPdf[ringNum - 1];
         const borderColor = ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00';
         targetRings += `
@@ -438,12 +413,12 @@ export default function ReportScreen() {
       }
 
       return `
-        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;">
+        <svg width="100%" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto; max-width: 100%;">
           <!-- Target rings -->
           ${targetRings}
           <!-- Center cross -->
-          <line x1="${size/2 - 8}" y1="${size/2}" x2="${size/2 + 8}" y2="${size/2}" stroke="#000" stroke-width="2" />
-          <line x1="${size/2}" y1="${size/2 - 8}" x2="${size/2}" y2="${size/2 + 8}" stroke="#000" stroke-width="2" />
+          <line x1="${size/2 - 10}" y1="${size/2}" x2="${size/2 + 10}" y2="${size/2}" stroke="#000" stroke-width="2" />
+          <line x1="${size/2}" y1="${size/2 - 10}" x2="${size/2}" y2="${size/2 + 10}" stroke="#000" stroke-width="2" />
           <!-- Heatmap overlay -->
           ${heatCircles}
         </svg>
@@ -451,48 +426,12 @@ export default function ReportScreen() {
     };
 
     const heatmapSection = `
-      <div class="card">
+      <div class="card heatmap-card">
         <h3>Shot Distribution Heatmap</h3>
         <p style="color: #666; font-size: 12px; margin: 0 0 16px 0;">${allShots.length} arrows from ${reportStats.totalSessions} session${reportStats.totalSessions !== 1 ? 's' : ''}</p>
         ${generateHeatmapSvg()}
       </div>
     `;
-
-    const bowSection = Object.keys(bowStats).length > 0 ? `
-      <div class="card">
-        <h3>By Bow</h3>
-        ${Object.entries(bowStats).map(([bow, stats]) => `
-          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #ddd;">
-            <div>
-              <div style="color: #000; font-weight: 600;">${bow}</div>
-              <div style="color: #666; font-size: 12px;">${stats.sessions} sessions - ${stats.arrows} arrows</div>
-            </div>
-            <div style="text-align: right;">
-              <div style="color: #8B0000; font-weight: bold; font-size: 18px;">${stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0'}</div>
-              <div style="color: #666; font-size: 10px;">avg/arrow</div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    ` : '';
-
-    const distanceSection = Object.keys(distanceStats).length > 0 ? `
-      <div class="card">
-        <h3>By Distance</h3>
-        ${Object.entries(distanceStats).map(([distance, stats]) => `
-          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #ddd;">
-            <div>
-              <div style="color: #000; font-weight: 600;">${distance}</div>
-              <div style="color: #666; font-size: 12px;">${stats.sessions} sessions - ${stats.arrows} arrows</div>
-            </div>
-            <div style="text-align: right;">
-              <div style="color: #8B0000; font-weight: bold; font-size: 18px;">${stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0'}</div>
-              <div style="color: #666; font-size: 10px;">avg/arrow</div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    ` : '';
 
     return `
       <!DOCTYPE html>
@@ -520,14 +459,10 @@ export default function ReportScreen() {
               color: #333;
               margin: 4px 0;
             }
-            .filter-badge {
-              display: inline-block;
-              background: rgba(139, 0, 0, 0.1);
-              color: #8B0000;
-              padding: 6px 12px;
-              border-radius: 16px;
-              font-size: 12px;
-              margin-top: 8px;
+            .equipment-info {
+              color: #555;
+              font-size: 13px;
+              margin-top: 12px;
             }
             .card {
               background: #f9f9f9;
@@ -539,6 +474,9 @@ export default function ReportScreen() {
             .card h3 {
               color: #000;
               margin: 0 0 16px 0;
+            }
+            .heatmap-card {
+              padding: 20px 10px;
             }
             .stats-grid {
               display: flex;
@@ -619,8 +557,11 @@ export default function ReportScreen() {
           <div class="header">
             <h1>Archery Performance Report</h1>
             <p>${formatDateRange()}</p>
-            ${(selectedBow || selectedDistance) ? `<div class="filter-badge">Filter: ${getFilterSummary()}</div>` : ''}
             <p style="font-size: 11px; color: #666;">Generated ${new Date().toLocaleDateString()}</p>
+            <div class="equipment-info">
+              ${usedBows.length > 0 ? `<div>Bow${usedBows.length > 1 ? 's' : ''}: ${usedBows.join(', ')}</div>` : ''}
+              ${usedDistances.length > 0 ? `<div>Distance${usedDistances.length > 1 ? 's' : ''}: ${usedDistances.join(', ')}</div>` : ''}
+            </div>
           </div>
 
           <div class="card">
@@ -689,9 +630,6 @@ export default function ReportScreen() {
               </table>
             </div>
           ` : ''}
-
-          ${bowSection}
-          ${distanceSection}
 
           <div class="footer">
             <p>Archery Scoring App - ${new Date().getFullYear()}</p>
