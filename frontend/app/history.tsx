@@ -221,8 +221,6 @@ export default function HistoryScreen() {
 
   // Get all shots from a session for target visualization
   // Shots are stored as normalized coordinates (0-1) on the target image
-  // The scoring uses effectiveRadius = 0.4, which means the target fills 80% of the image
-  // Our visualization also shows the target filling most of the view
   const getAllShots = (session: Session) => {
     if (!session.rounds || session.rounds.length === 0) {
       return [];
@@ -232,27 +230,14 @@ export default function HistoryScreen() {
     
     session.rounds.forEach((round, roundIndex) => {
       round.shots?.forEach((shot: any) => {
-        // Use coordinates directly - they're already normalized 0-1
-        // The scoring effectiveRadius (0.4) means target edge is at 0.4 from center
-        // Our visualization target edge is at 0.5 from center (fills the view)
-        // But since both use 0.5 as center, we just need a simple scale
-        
+        // Use coordinates directly without scaling
+        // Both scoring and visualization use the same 0-1 normalized space
         const rawX = shot.x ?? 0.5;
         const rawY = shot.y ?? 0.5;
         
-        // Scale factor: visualization radius / scoring radius
-        // This ensures shots at the scoring edge appear at the visual edge
-        const scoringRadius = 0.4;  // From scoring.tsx effectiveRadius
-        const visualRadius = 0.5;   // Our target fills the view
-        const scale = visualRadius / scoringRadius;
-        
-        // Apply scaling from center
-        const visualX = 0.5 + (rawX - 0.5) * scale;
-        const visualY = 0.5 + (rawY - 0.5) * scale;
-        
         shots.push({
-          x: Math.max(0.02, Math.min(0.98, visualX)),
-          y: Math.max(0.02, Math.min(0.98, visualY)),
+          x: Math.max(0.02, Math.min(0.98, rawX)),
+          y: Math.max(0.02, Math.min(0.98, rawY)),
           ring: shot.ring || 0,
           roundIndex,
         });
