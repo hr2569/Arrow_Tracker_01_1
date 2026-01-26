@@ -410,7 +410,7 @@ export default function ScoringScreen() {
             >
               <Pressable
                 onPressIn={handleTargetPress}
-                style={[styles.targetTouchArea, { width: TARGET_SIZE, height: TARGET_SIZE }]}
+                style={styles.targetTouchArea}
                 hitSlop={0}
               >
               {/* Background Image - Only show if NOT manual mode */}
