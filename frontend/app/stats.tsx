@@ -855,6 +855,56 @@ const styles = StyleSheet.create({
     color: '#888888',
     fontSize: 12,
   },
+  viewModeToggle: {
+    flexDirection: 'row',
+    backgroundColor: '#222222',
+    borderRadius: 10,
+    padding: 4,
+    marginBottom: 12,
+  },
+  viewModeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    gap: 6,
+  },
+  viewModeButtonActive: {
+    backgroundColor: '#8B0000',
+  },
+  viewModeButtonText: {
+    color: '#888888',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  viewModeButtonTextActive: {
+    color: '#fff',
+  },
+  heatmapLegend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    gap: 8,
+  },
+  heatmapLegendLabel: {
+    color: '#888888',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  heatmapGradient: {
+    flexDirection: 'row',
+    height: 16,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  heatmapGradientStop: {
+    width: 40,
+    height: 16,
+  },
   ringDistribution: {
     gap: 8,
   },
