@@ -234,4 +234,28 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
   },
+  bottomRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  bottomButton: {
+    flex: 1,
+    backgroundColor: '#111111',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#8B0000',
+  },
+  bottomButtonText: {
+    color: '#8B0000',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 8,
+  },
+  bottomButtonSubtext: {
+    color: '#888888',
+    fontSize: 11,
+    marginTop: 2,
+  },
 });
