@@ -540,45 +540,51 @@ export default function HistoryScreen() {
 
                 {/* Sessions in Group */}
                 {group.sessions.map((session) => (
-                  <TouchableOpacity
-                    key={session.id}
-                    style={styles.sessionCard}
-                    onPress={() => toggleExpand(session.id)}
-                    activeOpacity={0.8}
-                  >
-                    <View style={styles.sessionHeader}>
-                      <View style={styles.sessionInfo}>
-                        <Text style={styles.sessionName}>{session.name}</Text>
-                        <Text style={styles.sessionDate}>
-                          {formatDate(session.created_at)}
-                        </Text>
+                  <View key={session.id} style={styles.sessionCard}>
+                    <Pressable
+                      onPress={() => toggleExpand(session.id)}
+                      style={styles.sessionCardPressable}
+                    >
+                      <View style={styles.sessionHeader}>
+                        <View style={styles.sessionInfo}>
+                          <Text style={styles.sessionName}>{session.name}</Text>
+                          <Text style={styles.sessionDate}>
+                            {formatDate(session.created_at)}
+                          </Text>
+                        </View>
+                        <View style={styles.sessionScore}>
+                          <Text style={styles.scoreValue}>{session.total_score}</Text>
+                          <Text style={styles.scoreLabel}>pts</Text>
+                        </View>
                       </View>
-                      <View style={styles.sessionScore}>
-                        <Text style={styles.scoreValue}>{session.total_score}</Text>
-                        <Text style={styles.scoreLabel}>pts</Text>
-                      </View>
-                    </View>
 
-                    <View style={styles.sessionMeta}>
-                      <View style={styles.metaItem}>
-                        <Ionicons name="layers" size={16} color="#888888" />
-                        <Text style={styles.metaText}>
-                          {session.rounds?.length || 0} rounds
-                        </Text>
+                      <View style={styles.sessionMeta}>
+                        <View style={styles.metaItem}>
+                          <Ionicons name="layers" size={16} color="#888888" />
+                          <Text style={styles.metaText}>
+                            {session.rounds?.length || 0} rounds
+                          </Text>
+                        </View>
+                        <View style={styles.metaItem}>
+                          <Ionicons name="analytics" size={16} color="#888888" />
+                          <Text style={styles.metaText}>
+                            Avg: {getAverageScore(session)}/round
+                          </Text>
+                        </View>
                       </View>
-                      <View style={styles.metaItem}>
-                        <Ionicons name="analytics" size={16} color="#888888" />
-                        <Text style={styles.metaText}>
-                          Avg: {getAverageScore(session)}/round
-                        </Text>
-                      </View>
-                      <TouchableOpacity
-                        style={styles.deleteBtn}
-                        onPress={() => handleDeleteSession(session.id)}
-                      >
-                        <Ionicons name="trash" size={16} color="#ff6b6b" />
-                      </TouchableOpacity>
-                    </View>
+                    </Pressable>
+                    
+                    {/* Delete button outside the main pressable area */}
+                    <Pressable
+                      style={styles.deleteBtn}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleDeleteSession(session.id);
+                      }}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <Ionicons name="trash" size={18} color="#ff6b6b" />
+                    </Pressable>
 
                     {/* Expanded Details */}
                     {expandedSession === session.id && session.rounds && (
