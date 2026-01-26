@@ -1557,6 +1557,16 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 8,
   },
+  downloadPdfButton: {
+    flexDirection: 'row',
+    backgroundColor: '#2E7D32',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 8,
+  },
   shareButtonText: {
     color: '#fff',
     fontSize: 16,
