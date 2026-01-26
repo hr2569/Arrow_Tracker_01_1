@@ -216,4 +216,17 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: 'center',
   },
+  bowsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#111111',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#8B0000',
+  },
+  bowsButtonTextContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
 });
