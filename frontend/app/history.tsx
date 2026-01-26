@@ -857,6 +857,146 @@ export default function HistoryScreen() {
       >
         <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
+
+      {/* Edit Session Modal */}
+      <Modal
+        visible={editingSession !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={closeEditModal}
+      >
+        <Pressable style={styles.modalOverlay} onPress={closeEditModal}>
+          <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Edit Session</Text>
+              <TouchableOpacity onPress={closeEditModal}>
+                <Ionicons name="close" size={24} color="#888888" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Session Name */}
+            <View style={styles.modalField}>
+              <Text style={styles.modalLabel}>Session Name</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={editName}
+                onChangeText={setEditName}
+                placeholder="Session name"
+                placeholderTextColor="#555555"
+              />
+            </View>
+
+            {/* Date */}
+            <View style={styles.modalField}>
+              <Text style={styles.modalLabel}>Date</Text>
+              {Platform.OS === 'web' ? (
+                <input
+                  type="date"
+                  value={editDate.toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    const newDate = new Date(e.target.value);
+                    newDate.setHours(editDate.getHours());
+                    newDate.setMinutes(editDate.getMinutes());
+                    setEditDate(newDate);
+                  }}
+                  style={{
+                    backgroundColor: '#1a1a1a',
+                    color: '#ffffff',
+                    border: '1px solid #333333',
+                    borderRadius: 8,
+                    padding: 12,
+                    fontSize: 16,
+                    width: '100%',
+                  }}
+                />
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={styles.dateButton}
+                    onPress={() => setShowDatePicker(true)}
+                  >
+                    <Ionicons name="calendar-outline" size={20} color="#8B0000" />
+                    <Text style={styles.dateButtonText}>
+                      {editDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </Text>
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={editDate}
+                      mode="date"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={handleDateChange}
+                    />
+                  )}
+                </>
+              )}
+            </View>
+
+            {/* Time */}
+            <View style={styles.modalField}>
+              <Text style={styles.modalLabel}>Time</Text>
+              {Platform.OS === 'web' ? (
+                <input
+                  type="time"
+                  value={`${editDate.getHours().toString().padStart(2, '0')}:${editDate.getMinutes().toString().padStart(2, '0')}`}
+                  onChange={(e) => {
+                    const [hours, minutes] = e.target.value.split(':');
+                    const newDate = new Date(editDate);
+                    newDate.setHours(parseInt(hours));
+                    newDate.setMinutes(parseInt(minutes));
+                    setEditDate(newDate);
+                  }}
+                  style={{
+                    backgroundColor: '#1a1a1a',
+                    color: '#ffffff',
+                    border: '1px solid #333333',
+                    borderRadius: 8,
+                    padding: 12,
+                    fontSize: 16,
+                    width: '100%',
+                  }}
+                />
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={styles.dateButton}
+                    onPress={() => setShowTimePicker(true)}
+                  >
+                    <Ionicons name="time-outline" size={20} color="#8B0000" />
+                    <Text style={styles.dateButtonText}>
+                      {editDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                    </Text>
+                  </TouchableOpacity>
+                  {showTimePicker && (
+                    <DateTimePicker
+                      value={editDate}
+                      mode="time"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={handleTimeChange}
+                    />
+                  )}
+                </>
+              )}
+            </View>
+
+            {/* Save Button */}
+            <TouchableOpacity
+              style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+              onPress={saveSessionEdit}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <ActivityIndicator size="small" color="#ffffff" />
+              ) : (
+                <>
+                  <Ionicons name="checkmark" size={20} color="#ffffff" />
+                  <Text style={styles.saveButtonText}>Save Changes</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
