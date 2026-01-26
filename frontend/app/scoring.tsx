@@ -828,6 +828,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 1,
   },
+  targetHitArea: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 100,
+    backgroundColor: 'transparent',
+  },
   targetImage: {
     position: 'absolute',
   },
