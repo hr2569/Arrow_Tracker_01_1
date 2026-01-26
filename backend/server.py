@@ -95,20 +95,39 @@ def perspective_crop(image_base64: str, corners: List[dict], output_size: int = 
     try:
         logger.info(f"Perspective crop started. Image length: {len(image_base64)}, Corners: {corners}")
         
-        # Decode base64 image
+        # Check if we received an empty or invalid image
+        if not image_base64 or len(image_base64) < 100:
+            raise ValueError(f"Image data too short: {len(image_base64)} chars")
+        
+        # Decode base64 image - handle both data URI and raw base64
+        base64_data = image_base64
         if ',' in image_base64:
-            image_base64 = image_base64.split(',')[1]
+            parts = image_base64.split(',')
+            if len(parts) >= 2:
+                base64_data = parts[1]
+            else:
+                raise ValueError("Invalid data URI format")
         
-        logger.info(f"Base64 after split: {len(image_base64)} chars")
+        logger.info(f"Base64 after split: {len(base64_data)} chars, starts with: {base64_data[:50]}...")
         
-        image_data = base64.b64decode(image_base64)
+        # Validate base64 string
+        try:
+            image_data = base64.b64decode(base64_data)
+        except Exception as e:
+            raise ValueError(f"Failed to decode base64: {str(e)}")
+        
         logger.info(f"Decoded image data: {len(image_data)} bytes")
+        
+        if len(image_data) < 100:
+            raise ValueError(f"Decoded image data too small: {len(image_data)} bytes")
         
         nparr = np.frombuffer(image_data, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         if img is None:
-            raise ValueError("Failed to decode image - cv2.imdecode returned None")
+            # Log more details about the data
+            logger.error(f"cv2.imdecode failed. First 50 bytes of image_data: {image_data[:50]}")
+            raise ValueError("Failed to decode image - cv2.imdecode returned None. The image data may be corrupted or in an unsupported format.")
         
         height, width = img.shape[:2]
         logger.info(f"Image dimensions: {width}x{height}")
