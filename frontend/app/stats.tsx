@@ -200,48 +200,154 @@ export default function StatsScreen() {
     fetchSessions();
   }, []);
 
-  // Group sessions by day for daily breakdown
-  const dailyStats = useMemo(() => {
-    const dayGroups: { [key: string]: { sessions: Session[], date: Date } } = {};
+  // Helper function to get week number
+  const getWeekNumber = (date: Date) => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  };
+
+  // Helper function to get start of week
+  const getWeekStart = (date: Date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    d.setDate(diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  // Calculate stats for a group of sessions
+  const calculateGroupStats = (groupSessions: Session[]) => {
+    let totalPoints = 0;
+    let totalArrows = 0;
+    let totalRounds = 0;
+    
+    groupSessions.forEach((session) => {
+      totalPoints += session.total_score || 0;
+      session.rounds?.forEach((round) => {
+        totalRounds++;
+        totalArrows += round.shots?.length || 0;
+      });
+    });
+    
+    return {
+      sessionCount: groupSessions.length,
+      totalPoints,
+      totalArrows,
+      totalRounds,
+      avgPerArrow: totalArrows > 0 ? (totalPoints / totalArrows).toFixed(1) : '0',
+      avgPerRound: totalRounds > 0 ? Math.round(totalPoints / totalRounds) : 0,
+    };
+  };
+
+  // Dynamic time period breakdown based on selected period
+  const timeBreakdown = useMemo(() => {
+    type BreakdownItem = {
+      key: string;
+      label: string;
+      sublabel?: string;
+      date: Date;
+      sessionCount: number;
+      totalPoints: number;
+      totalArrows: number;
+      totalRounds: number;
+      avgPerArrow: string;
+      avgPerRound: number;
+    };
+
+    const groups: { [key: string]: { sessions: Session[], date: Date, label: string, sublabel?: string } } = {};
     
     filteredSessions.forEach((session) => {
       const sessionDate = new Date(session.created_at);
-      const dayKey = sessionDate.toDateString();
+      let groupKey: string;
+      let label: string;
+      let sublabel: string | undefined;
       
-      if (!dayGroups[dayKey]) {
-        dayGroups[dayKey] = { sessions: [], date: sessionDate };
+      switch (selectedPeriod) {
+        case 'day':
+          // Group by hour for day view
+          groupKey = `${sessionDate.toDateString()}-${sessionDate.getHours()}`;
+          const hour = sessionDate.getHours();
+          label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
+          sublabel = sessionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          break;
+          
+        case 'week':
+          // Group by day for week view
+          groupKey = sessionDate.toDateString();
+          label = sessionDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+          break;
+          
+        case 'month':
+          // Group by week for month view
+          const weekStart = getWeekStart(sessionDate);
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekEnd.getDate() + 6);
+          groupKey = `week-${weekStart.toISOString()}`;
+          label = `Week of ${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+          sublabel = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+          break;
+          
+        case 'year':
+          // Group by month for year view
+          groupKey = `${sessionDate.getFullYear()}-${sessionDate.getMonth()}`;
+          label = sessionDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+          break;
+          
+        case 'all':
+        default:
+          // Group by year for all time view
+          groupKey = `${sessionDate.getFullYear()}`;
+          label = `${sessionDate.getFullYear()}`;
+          break;
       }
-      dayGroups[dayKey].sessions.push(session);
+      
+      if (!groups[groupKey]) {
+        groups[groupKey] = { sessions: [], date: sessionDate, label, sublabel };
+      }
+      groups[groupKey].sessions.push(session);
     });
     
-    // Convert to array and calculate stats for each day
-    return Object.entries(dayGroups)
-      .map(([key, { sessions: daySessions, date }]) => {
-        let totalPoints = 0;
-        let totalArrows = 0;
-        let totalRounds = 0;
-        
-        daySessions.forEach((session) => {
-          totalPoints += session.total_score || 0;
-          session.rounds?.forEach((round) => {
-            totalRounds++;
-            totalArrows += round.shots?.length || 0;
-          });
-        });
-        
-        return {
-          dayKey: key,
-          date,
-          sessionCount: daySessions.length,
-          totalPoints,
-          totalArrows,
-          totalRounds,
-          avgPerArrow: totalArrows > 0 ? (totalPoints / totalArrows).toFixed(1) : '0',
-          avgPerRound: totalRounds > 0 ? Math.round(totalPoints / totalRounds) : 0,
-        };
-      })
-      .sort((a, b) => b.date.getTime() - a.date.getTime()); // Most recent first
-  }, [filteredSessions]);
+    // Convert to array with stats
+    const result: BreakdownItem[] = Object.entries(groups)
+      .map(([key, { sessions: groupSessions, date, label, sublabel }]) => ({
+        key,
+        label,
+        sublabel,
+        date,
+        ...calculateGroupStats(groupSessions),
+      }))
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    
+    return result;
+  }, [filteredSessions, selectedPeriod]);
+
+  // Get breakdown title based on period
+  const getBreakdownTitle = () => {
+    switch (selectedPeriod) {
+      case 'day': return 'Hourly Breakdown';
+      case 'week': return 'Daily Breakdown';
+      case 'month': return 'Weekly Breakdown';
+      case 'year': return 'Monthly Breakdown';
+      case 'all': return 'Yearly Breakdown';
+      default: return 'Time Breakdown';
+    }
+  };
+
+  // Get breakdown icon based on period
+  const getBreakdownIcon = () => {
+    switch (selectedPeriod) {
+      case 'day': return 'time-outline';
+      case 'week': return 'today-outline';
+      case 'month': return 'calendar-outline';
+      case 'year': return 'calendar';
+      case 'all': return 'albums-outline';
+      default: return 'calendar';
+    }
+  };
 
   const getPeriodLabel = () => {
     switch (selectedPeriod) {
