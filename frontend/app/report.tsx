@@ -288,7 +288,7 @@ export default function ReportScreen() {
     '#fff200', '#fff200',
   ];
 
-  // Heatmap Component
+  // Heatmap Component - Higher resolution for smoother appearance
   const HeatmapTargetMap = ({ size = 280 }: { size?: number }) => {
     if (allShots.length === 0) {
       return (
@@ -302,7 +302,8 @@ export default function ReportScreen() {
     const targetScale = 0.8;
     const targetSize = size * targetScale;
     
-    const gridSize = 20;
+    // Higher resolution grid for smoother heatmap
+    const gridSize = 56;
     const cellSize = size / gridSize;
     const densityGrid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
     
@@ -310,14 +311,16 @@ export default function ReportScreen() {
       const gridX = Math.floor(shot.x * gridSize);
       const gridY = Math.floor(shot.y * gridSize);
       
-      const blurRadius = 2;
+      // Larger blur radius for smoother gradients
+      const blurRadius = 6;
       for (let dx = -blurRadius; dx <= blurRadius; dx++) {
         for (let dy = -blurRadius; dy <= blurRadius; dy++) {
           const nx = gridX + dx;
           const ny = gridY + dy;
           if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
             const distance = Math.sqrt(dx * dx + dy * dy);
-            const weight = Math.exp(-distance * distance / 2);
+            // Smoother gaussian falloff
+            const weight = Math.exp(-distance * distance / 8);
             densityGrid[ny][nx] += weight;
           }
         }
