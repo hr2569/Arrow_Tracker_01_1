@@ -30,7 +30,7 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Main Actions - Simplified */}
+        {/* Main Actions */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={styles.primaryButton}
@@ -46,19 +46,36 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => router.push('/history')}
-            activeOpacity={0.8}
-          >
-            <View style={styles.buttonIconContainer}>
-              <Ionicons name="stats-chart" size={48} color="#e94560" />
-            </View>
-            <Text style={styles.secondaryButtonText}>View History & Stats</Text>
-            <Text style={styles.buttonSubtextSecondary}>
-              Track your progress over time
-            </Text>
-          </TouchableOpacity>
+          {/* Two side-by-side buttons for History and Stats */}
+          <View style={styles.secondaryRow}>
+            <TouchableOpacity
+              style={styles.secondaryButtonHalf}
+              onPress={() => router.push('/history')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.buttonIconContainerSmall}>
+                <Ionicons name="time" size={36} color="#8B0000" />
+              </View>
+              <Text style={styles.secondaryButtonTextSmall}>History</Text>
+              <Text style={styles.buttonSubtextSecondarySmall}>
+                Past sessions
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.secondaryButtonHalf}
+              onPress={() => router.push('/stats')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.buttonIconContainerSmall}>
+                <Ionicons name="stats-chart" size={36} color="#8B0000" />
+              </View>
+              <Text style={styles.secondaryButtonTextSmall}>Stats</Text>
+              <Text style={styles.buttonSubtextSecondarySmall}>
+                Your performance
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </SafeAreaView>
