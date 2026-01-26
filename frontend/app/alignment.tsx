@@ -69,10 +69,14 @@ export default function AlignmentScreen() {
 
     setIsAnalyzing(true);
     setError(null);
+    setAnalysisComplete(false);
 
     try {
+      console.log('Starting automatic target analysis...');
       const response = await axios.post(`${API_URL}/api/analyze-target`, {
         image_base64: currentImage,
+      }, {
+        timeout: 60000, // 60 second timeout for AI analysis
       });
 
       console.log('Target analysis response:', response.data);
@@ -84,6 +88,7 @@ export default function AlignmentScreen() {
         setDetectedRadius(response.data.radius || 0.4);
         setIsManualMode(false);
         setAnalysisComplete(true);
+        console.log('Target detected successfully with', response.data.corners.length, 'corners');
       } else {
         // Use default corners for manual adjustment
         setIsManualMode(true);
