@@ -817,6 +817,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginLeft: -8,
   },
+  targetMapWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 8,
+  },
   roundsTitle: {
     fontSize: 14,
     fontWeight: '600',
