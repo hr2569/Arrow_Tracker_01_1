@@ -835,7 +835,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 100,
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(255, 0, 0, 0.1)', // Debug: make visible
   },
   targetImage: {
     position: 'absolute',
