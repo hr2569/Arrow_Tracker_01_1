@@ -125,24 +125,18 @@ export default function SummaryScreen() {
   };
 
   const handleFinishSession = () => {
-    Alert.alert(
-      'Finish Session?',
-      'Do you want to save this session?',
-      [
-        {
-          text: 'Discard',
-          style: 'destructive',
-          onPress: () => {
-            clearAll();
-            router.replace('/');
-          },
-        },
-        {
-          text: 'Save',
-          onPress: handleSaveSession,
-        },
-      ]
-    );
+    setShowConfirmModal(true);
+  };
+
+  const handleDiscard = () => {
+    setShowConfirmModal(false);
+    clearAll();
+    router.replace('/');
+  };
+
+  const handleSaveAndClose = async () => {
+    setShowConfirmModal(false);
+    await handleSaveSession();
   };
 
   return (
