@@ -16,12 +16,12 @@ export default function SessionTypeScreen() {
 
   const selectCompetition = () => {
     setSessionType('competition');
-    router.push('/capture');
+    router.push('/sessionSetup');
   };
 
   const selectTraining = () => {
     setSessionType('training');
-    router.push('/capture');
+    router.push('/sessionSetup');
   };
 
   return (
