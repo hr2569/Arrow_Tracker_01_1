@@ -39,6 +39,9 @@ interface Session {
   total_score: number;
   rounds: Round[];
   created_at: string;
+  bow_name?: string;
+  bow_id?: string;
+  distance?: string;
 }
 
 type ViewMode = 'distribution' | 'heatmap';
