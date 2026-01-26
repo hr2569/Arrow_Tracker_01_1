@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,12 +16,21 @@ import axios from 'axios';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
+type TimePeriod = 'day' | 'week' | 'month' | 'year' | 'all';
+
 interface Session {
   id: string;
   name: string;
   total_score: number;
   rounds: any[];
   created_at: string;
+}
+
+interface GroupedSessions {
+  label: string;
+  sessions: Session[];
+  totalScore: number;
+  totalRounds: number;
 }
 
 export default function HistoryScreen() {
