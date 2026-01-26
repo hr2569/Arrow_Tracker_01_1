@@ -123,6 +123,8 @@ export const useAppStore = create<AppState>((set) => ({
   clearAll: () =>
     set({
       sessionType: 'training',
+      selectedBow: null,
+      sessionDistance: '',
       currentRoundNumber: 1,
       sessionRounds: [],
       currentImage: null,
