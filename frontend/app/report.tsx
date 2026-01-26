@@ -26,15 +26,27 @@ interface Session {
   rounds: any[];
   created_at: string;
   bow_name?: string;
+  bow_id?: string;
   distance?: string;
+}
+
+interface Bow {
+  id: string;
+  name: string;
+  bow_type: string;
 }
 
 export default function ReportScreen() {
   const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [bows, setBows] = useState<Bow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<ReportPeriod>('month');
   const [showReport, setShowReport] = useState(false);
+  
+  // Filters
+  const [selectedBow, setSelectedBow] = useState<string | null>(null);
+  const [selectedDistance, setSelectedDistance] = useState<string | null>(null);
   
   // Custom date range
   const [startDate, setStartDate] = useState(() => {
@@ -47,19 +59,31 @@ export default function ReportScreen() {
   const [showEndPicker, setShowEndPicker] = useState(false);
 
   useEffect(() => {
-    fetchSessions();
+    fetchData();
   }, []);
 
-  const fetchSessions = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/sessions`);
-      setSessions(response.data);
+      const [sessionsRes, bowsRes] = await Promise.all([
+        axios.get(`${API_URL}/api/sessions`),
+        axios.get(`${API_URL}/api/bows`),
+      ]);
+      setSessions(sessionsRes.data);
+      setBows(bowsRes.data);
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Get unique distances from sessions
+  const availableDistances = useMemo(() => {
+    const distances = sessions
+      .filter(s => s.distance)
+      .map(s => s.distance as string);
+    return [...new Set(distances)];
+  }, [sessions]);
 
   // Update date range when period changes
   useEffect(() => {
@@ -77,10 +101,9 @@ export default function ReportScreen() {
         newStartDate.setFullYear(now.getFullYear() - 1);
         break;
       case 'all':
-        newStartDate = new Date(2020, 0, 1); // Far back date
+        newStartDate = new Date(2020, 0, 1);
         break;
       case 'custom':
-        // Don't change dates for custom
         return;
     }
     
@@ -88,7 +111,7 @@ export default function ReportScreen() {
     setEndDate(now);
   }, [selectedPeriod]);
 
-  // Filter sessions by date range
+  // Filter sessions by date range, bow, and distance
   const filteredSessions = useMemo(() => {
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
@@ -97,9 +120,31 @@ export default function ReportScreen() {
     
     return sessions.filter((session) => {
       const sessionDate = new Date(session.created_at);
-      return sessionDate >= start && sessionDate <= end;
+      if (sessionDate < start || sessionDate > end) return false;
+      if (selectedBow && session.bow_id !== selectedBow) return false;
+      if (selectedDistance && session.distance !== selectedDistance) return false;
+      return true;
     });
-  }, [sessions, startDate, endDate]);
+  }, [sessions, startDate, endDate, selectedBow, selectedDistance]);
+
+  // Get all shots for heatmap
+  const allShots = useMemo(() => {
+    const shots: { x: number; y: number; ring: number }[] = [];
+    filteredSessions.forEach((session) => {
+      session.rounds?.forEach((round) => {
+        round.shots?.forEach((shot: any) => {
+          if (shot.x !== undefined && shot.y !== undefined) {
+            shots.push({
+              x: shot.x,
+              y: shot.y,
+              ring: shot.ring || 0,
+            });
+          }
+        });
+      });
+    });
+    return shots;
+  }, [filteredSessions]);
 
   // Calculate report statistics
   const reportStats = useMemo(() => {
@@ -108,8 +153,7 @@ export default function ReportScreen() {
     let totalRounds = 0;
     let bestSession = { score: 0, name: '', date: '' };
     let worstSession = { score: Infinity, name: '', date: '' };
-    const bowStats: { [key: string]: { sessions: number, points: number, arrows: number } } = {};
-    const distanceStats: { [key: string]: { sessions: number, points: number, arrows: number } } = {};
+    const ringDistribution: { [key: number]: number } = {};
 
     filteredSessions.forEach((session) => {
       totalPoints += session.total_score || 0;
@@ -129,33 +173,13 @@ export default function ReportScreen() {
         };
       }
 
-      if (session.bow_name) {
-        if (!bowStats[session.bow_name]) {
-          bowStats[session.bow_name] = { sessions: 0, points: 0, arrows: 0 };
-        }
-        bowStats[session.bow_name].sessions++;
-        bowStats[session.bow_name].points += session.total_score || 0;
-      }
-
-      if (session.distance) {
-        if (!distanceStats[session.distance]) {
-          distanceStats[session.distance] = { sessions: 0, points: 0, arrows: 0 };
-        }
-        distanceStats[session.distance].sessions++;
-        distanceStats[session.distance].points += session.total_score || 0;
-      }
-
       session.rounds?.forEach((round) => {
         totalRounds++;
-        const arrowCount = round.shots?.length || 0;
-        totalArrows += arrowCount;
-        
-        if (session.bow_name) {
-          bowStats[session.bow_name].arrows += arrowCount;
-        }
-        if (session.distance) {
-          distanceStats[session.distance].arrows += arrowCount;
-        }
+        round.shots?.forEach((shot: any) => {
+          totalArrows++;
+          const ring = shot.ring || 0;
+          ringDistribution[ring] = (ringDistribution[ring] || 0) + 1;
+        });
       });
     });
 
@@ -173,8 +197,7 @@ export default function ReportScreen() {
       avgPerSession: filteredSessions.length > 0 ? Math.round(totalPoints / filteredSessions.length) : 0,
       bestSession,
       worstSession,
-      bowStats,
-      distanceStats,
+      ringDistribution,
     };
   }, [filteredSessions]);
 
@@ -184,10 +207,23 @@ export default function ReportScreen() {
     return `${start} - ${end}`;
   };
 
+  const getFilterSummary = () => {
+    const parts = [];
+    if (selectedBow) {
+      const bow = bows.find(b => b.id === selectedBow);
+      if (bow) parts.push(bow.name);
+    }
+    if (selectedDistance) parts.push(selectedDistance);
+    return parts.length > 0 ? parts.join(' • ') : 'All Equipment';
+  };
+
   // Generate shareable report text
   const generateReportText = () => {
     let report = `🎯 ARCHERY REPORT\n`;
     report += `Period: ${formatDateRange()}\n`;
+    if (selectedBow || selectedDistance) {
+      report += `Filter: ${getFilterSummary()}\n`;
+    }
     report += `Generated: ${new Date().toLocaleDateString()}\n`;
     report += `━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
@@ -206,25 +242,6 @@ export default function ReportScreen() {
       report += `🏆 HIGHLIGHTS\n`;
       report += `• Best Session: ${reportStats.bestSession.score} pts (${reportStats.bestSession.date})\n`;
       report += `• Lowest Session: ${reportStats.worstSession.score} pts (${reportStats.worstSession.date})\n\n`;
-    }
-
-    const bowEntries = Object.entries(reportStats.bowStats);
-    if (bowEntries.length > 0) {
-      report += `🏹 BY BOW\n`;
-      bowEntries.forEach(([bow, stats]) => {
-        const avg = stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0';
-        report += `• ${bow}: ${stats.sessions} sessions, ${avg} avg/arrow\n`;
-      });
-      report += `\n`;
-    }
-
-    const distanceEntries = Object.entries(reportStats.distanceStats);
-    if (distanceEntries.length > 0) {
-      report += `📏 BY DISTANCE\n`;
-      distanceEntries.forEach(([distance, stats]) => {
-        const avg = stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0';
-        report += `• ${distance}: ${stats.sessions} sessions, ${avg} avg/arrow\n`;
-      });
     }
 
     return report;
@@ -264,6 +281,150 @@ export default function ReportScreen() {
     }
   };
 
+  // Ring colors for heatmap
+  const ringColors = [
+    '#f5f5f0', '#f5f5f0', '#2a2a2a', '#2a2a2a',
+    '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24',
+    '#fff200', '#fff200',
+  ];
+
+  // Heatmap Component
+  const HeatmapTargetMap = ({ size = 280 }: { size?: number }) => {
+    if (allShots.length === 0) {
+      return (
+        <View style={[heatmapStyles.emptyContainer, { width: size, height: size }]}>
+          <Ionicons name="flame-outline" size={48} color="#888888" />
+          <Text style={heatmapStyles.emptyText}>No shots in this period</Text>
+        </View>
+      );
+    }
+
+    const targetScale = 0.8;
+    const targetSize = size * targetScale;
+    
+    const gridSize = 20;
+    const cellSize = size / gridSize;
+    const densityGrid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
+    
+    allShots.forEach((shot) => {
+      const gridX = Math.floor(shot.x * gridSize);
+      const gridY = Math.floor(shot.y * gridSize);
+      
+      const blurRadius = 2;
+      for (let dx = -blurRadius; dx <= blurRadius; dx++) {
+        for (let dy = -blurRadius; dy <= blurRadius; dy++) {
+          const nx = gridX + dx;
+          const ny = gridY + dy;
+          if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const weight = Math.exp(-distance * distance / 2);
+            densityGrid[ny][nx] += weight;
+          }
+        }
+      }
+    });
+    
+    let maxDensity = 0;
+    densityGrid.forEach(row => {
+      row.forEach(val => {
+        if (val > maxDensity) maxDensity = val;
+      });
+    });
+    
+    const getHeatColor = (normalizedValue: number) => {
+      if (normalizedValue === 0) return 'transparent';
+      
+      const colors = [
+        { pos: 0, r: 0, g: 0, b: 255 },
+        { pos: 0.25, r: 0, g: 255, b: 255 },
+        { pos: 0.5, r: 0, g: 255, b: 0 },
+        { pos: 0.75, r: 255, g: 255, b: 0 },
+        { pos: 1, r: 255, g: 0, b: 0 },
+      ];
+      
+      let lower = colors[0];
+      let upper = colors[colors.length - 1];
+      
+      for (let i = 0; i < colors.length - 1; i++) {
+        if (normalizedValue >= colors[i].pos && normalizedValue <= colors[i + 1].pos) {
+          lower = colors[i];
+          upper = colors[i + 1];
+          break;
+        }
+      }
+      
+      const range = upper.pos - lower.pos;
+      const t = range === 0 ? 0 : (normalizedValue - lower.pos) / range;
+      
+      const r = Math.round(lower.r + (upper.r - lower.r) * t);
+      const g = Math.round(lower.g + (upper.g - lower.g) * t);
+      const b = Math.round(lower.b + (upper.b - lower.b) * t);
+      const alpha = 0.4 + normalizedValue * 0.5;
+      
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
+    const heatmapCells: { x: number; y: number; color: string }[] = [];
+    densityGrid.forEach((row, y) => {
+      row.forEach((density, x) => {
+        if (density > 0) {
+          const normalizedDensity = maxDensity > 0 ? density / maxDensity : 0;
+          heatmapCells.push({
+            x: x * cellSize,
+            y: y * cellSize,
+            color: getHeatColor(normalizedDensity),
+          });
+        }
+      });
+    });
+
+    return (
+      <View style={[heatmapStyles.container, { width: size, height: size }]}>
+        <View style={[heatmapStyles.targetBackground, { width: targetSize, height: targetSize, borderRadius: targetSize / 2 }]}>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
+            const diameterPercent = (11 - ringNum) / 10;
+            const ringSize = targetSize * diameterPercent;
+            const bgColor = ringColors[ringNum - 1];
+            return (
+              <View
+                key={`ring-${ringNum}`}
+                style={[
+                  heatmapStyles.ring,
+                  {
+                    width: ringSize,
+                    height: ringSize,
+                    borderRadius: ringSize / 2,
+                    backgroundColor: bgColor,
+                    borderColor: ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00',
+                    borderWidth: 1,
+                  },
+                ]}
+              />
+            );
+          })}
+          <View style={heatmapStyles.centerMark}>
+            <View style={heatmapStyles.centerLine} />
+            <View style={[heatmapStyles.centerLine, { transform: [{ rotate: '90deg' }] }]} />
+          </View>
+        </View>
+
+        {heatmapCells.map((cell, index) => (
+          <View
+            key={`cell-${index}`}
+            style={{
+              position: 'absolute',
+              left: cell.x,
+              top: cell.y,
+              width: cellSize + 1,
+              height: cellSize + 1,
+              backgroundColor: cell.color,
+            }}
+          />
+        ))}
+      </View>
+    );
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -300,15 +461,67 @@ export default function ReportScreen() {
             <View style={styles.iconCircle}>
               <Ionicons name="document-text" size={48} color="#8B0000" />
             </View>
-            <Text style={styles.selectionTitle}>Select Time Range</Text>
+            <Text style={styles.selectionTitle}>Configure Report</Text>
             <Text style={styles.selectionSubtitle}>
-              Choose the period for your performance report
+              Select time range and filters for your report
             </Text>
           </View>
 
+          {/* Bow Filter */}
+          {bows.length > 0 && (
+            <View style={styles.filterSection}>
+              <Text style={styles.sectionLabel}>Filter by Bow</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <TouchableOpacity
+                  style={[styles.filterChip, !selectedBow && styles.filterChipActive]}
+                  onPress={() => setSelectedBow(null)}
+                >
+                  <Text style={[styles.filterChipText, !selectedBow && styles.filterChipTextActive]}>All Bows</Text>
+                </TouchableOpacity>
+                {bows.map((bow) => (
+                  <TouchableOpacity
+                    key={bow.id}
+                    style={[styles.filterChip, selectedBow === bow.id && styles.filterChipActive]}
+                    onPress={() => setSelectedBow(selectedBow === bow.id ? null : bow.id)}
+                  >
+                    <Text style={[styles.filterChipText, selectedBow === bow.id && styles.filterChipTextActive]}>
+                      {bow.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* Distance Filter */}
+          {availableDistances.length > 0 && (
+            <View style={styles.filterSection}>
+              <Text style={styles.sectionLabel}>Filter by Distance</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <TouchableOpacity
+                  style={[styles.filterChip, !selectedDistance && styles.filterChipActive]}
+                  onPress={() => setSelectedDistance(null)}
+                >
+                  <Text style={[styles.filterChipText, !selectedDistance && styles.filterChipTextActive]}>All Distances</Text>
+                </TouchableOpacity>
+                {availableDistances.map((distance) => (
+                  <TouchableOpacity
+                    key={distance}
+                    style={[styles.filterChip, selectedDistance === distance && styles.filterChipActive]}
+                    onPress={() => setSelectedDistance(selectedDistance === distance ? null : distance)}
+                  >
+                    <Text style={[styles.filterChipText, selectedDistance === distance && styles.filterChipTextActive]}>
+                      {distance}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
           {/* Quick Select Buttons */}
           <View style={styles.quickSelectContainer}>
-            <Text style={styles.sectionLabel}>Quick Select</Text>
+            <Text style={styles.sectionLabel}>Time Range</Text>
             <View style={styles.quickSelectGrid}>
               {[
                 { key: 'week', label: 'Last Week', icon: 'calendar-outline' },
@@ -342,9 +555,8 @@ export default function ReportScreen() {
 
           {/* Custom Date Range */}
           <View style={styles.customRangeContainer}>
-            <Text style={styles.sectionLabel}>Custom Range</Text>
+            <Text style={styles.sectionLabel}>Custom Date Range</Text>
             
-            {/* Start Date */}
             <View style={styles.dateRow}>
               <Text style={styles.dateLabel}>From</Text>
               {Platform.OS === 'web' ? (
@@ -378,7 +590,6 @@ export default function ReportScreen() {
               )}
             </View>
 
-            {/* End Date */}
             <View style={styles.dateRow}>
               <Text style={styles.dateLabel}>To</Text>
               {Platform.OS === 'web' ? (
@@ -442,6 +653,10 @@ export default function ReportScreen() {
               <Text style={styles.previewText}>{formatDateRange()}</Text>
             </View>
             <View style={styles.previewRow}>
+              <Ionicons name="options" size={18} color="#888" />
+              <Text style={styles.previewText}>{getFilterSummary()}</Text>
+            </View>
+            <View style={styles.previewRow}>
               <Ionicons name="layers" size={18} color="#888" />
               <Text style={styles.previewText}>
                 {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} found
@@ -481,6 +696,12 @@ export default function ReportScreen() {
           <Ionicons name="document-text" size={32} color="#8B0000" />
           <Text style={styles.reportTitle}>Performance Report</Text>
           <Text style={styles.reportDate}>{formatDateRange()}</Text>
+          {(selectedBow || selectedDistance) && (
+            <View style={styles.filterBadge}>
+              <Ionicons name="filter" size={14} color="#8B0000" />
+              <Text style={styles.filterBadgeText}>{getFilterSummary()}</Text>
+            </View>
+          )}
         </View>
 
         {/* Overview Card */}
@@ -550,49 +771,40 @@ export default function ReportScreen() {
           </View>
         )}
 
-        {/* Bow Breakdown Card */}
-        {Object.keys(reportStats.bowStats).length > 0 && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>
-              <Ionicons name="arrow-forward-outline" size={18} color="#8B0000" /> By Bow
-            </Text>
-            {Object.entries(reportStats.bowStats).map(([bow, stats]) => (
-              <View key={bow} style={styles.breakdownRow}>
-                <View style={styles.breakdownInfo}>
-                  <Text style={styles.breakdownName}>{bow}</Text>
-                  <Text style={styles.breakdownSub}>{stats.sessions} sessions • {stats.arrows} arrows</Text>
-                </View>
-                <View style={styles.breakdownStats}>
-                  <Text style={styles.breakdownValue}>
-                    {stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0'}
-                  </Text>
-                  <Text style={styles.breakdownLabel}>avg/arrow</Text>
-                </View>
-              </View>
-            ))}
+        {/* Heatmap Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>
+            <Ionicons name="flame" size={18} color="#8B0000" /> Shot Distribution Heatmap
+          </Text>
+          <Text style={styles.heatmapSubtitle}>
+            {allShots.length} arrows from {reportStats.totalSessions} session{reportStats.totalSessions !== 1 ? 's' : ''}
+          </Text>
+          <View style={styles.heatmapContainer}>
+            <HeatmapTargetMap size={280} />
           </View>
-        )}
+        </View>
 
-        {/* Distance Breakdown Card */}
-        {Object.keys(reportStats.distanceStats).length > 0 && (
+        {/* Score Distribution */}
+        {reportStats.totalArrows > 0 && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>
-              <Ionicons name="locate" size={18} color="#8B0000" /> By Distance
+              <Ionicons name="bar-chart" size={18} color="#8B0000" /> Score Distribution
             </Text>
-            {Object.entries(reportStats.distanceStats).map(([distance, stats]) => (
-              <View key={distance} style={styles.breakdownRow}>
-                <View style={styles.breakdownInfo}>
-                  <Text style={styles.breakdownName}>{distance}</Text>
-                  <Text style={styles.breakdownSub}>{stats.sessions} sessions • {stats.arrows} arrows</Text>
-                </View>
-                <View style={styles.breakdownStats}>
-                  <Text style={styles.breakdownValue}>
-                    {stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0'}
-                  </Text>
-                  <Text style={styles.breakdownLabel}>avg/arrow</Text>
-                </View>
-              </View>
-            ))}
+            <View style={styles.distributionList}>
+              {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((ring) => {
+                const count = reportStats.ringDistribution[ring] || 0;
+                const percentage = reportStats.totalArrows > 0 ? (count / reportStats.totalArrows) * 100 : 0;
+                return (
+                  <View key={ring} style={styles.distributionRow}>
+                    <Text style={styles.distributionLabel}>{ring === 0 ? 'M' : ring}</Text>
+                    <View style={styles.distributionBarContainer}>
+                      <View style={[styles.distributionBar, { width: `${percentage}%` }]} />
+                    </View>
+                    <Text style={styles.distributionCount}>{count}</Text>
+                  </View>
+                );
+              })}
+            </View>
           </View>
         )}
 
@@ -602,7 +814,7 @@ export default function ReportScreen() {
             <Ionicons name="document-outline" size={64} color="#888888" />
             <Text style={styles.emptyTitle}>No Data</Text>
             <Text style={styles.emptyText}>
-              No sessions found for this period. Try selecting a different date range.
+              No sessions found for this period. Try selecting a different date range or filters.
             </Text>
           </View>
         )}
@@ -618,8 +830,8 @@ export default function ReportScreen() {
           style={styles.editRangeButton} 
           onPress={() => setShowReport(false)}
         >
-          <Ionicons name="calendar-outline" size={20} color="#8B0000" />
-          <Text style={styles.editRangeButtonText}>Change Date Range</Text>
+          <Ionicons name="options-outline" size={20} color="#8B0000" />
+          <Text style={styles.editRangeButtonText}>Change Filters</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -667,10 +879,9 @@ const styles = StyleSheet.create({
     color: '#888888',
     marginTop: 12,
   },
-  // Selection Screen Styles
   selectionHeader: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   iconCircle: {
     width: 100,
@@ -700,8 +911,32 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
+  filterSection: {
+    marginBottom: 20,
+  },
+  filterChip: {
+    backgroundColor: '#111111',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  filterChipActive: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
+  },
+  filterChipText: {
+    color: '#888888',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  filterChipTextActive: {
+    color: '#fff',
+  },
   quickSelectContainer: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   quickSelectGrid: {
     flexDirection: 'row',
@@ -734,7 +969,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#111111',
     borderRadius: 16,
     padding: 20,
-    marginBottom: 24,
+    marginBottom: 20,
   },
   dateRow: {
     flexDirection: 'row',
@@ -766,7 +1001,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 24,
+    marginBottom: 20,
   },
   previewTitle: {
     fontSize: 14,
@@ -798,7 +1033,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  // Report Display Styles
   reportHeader: {
     alignItems: 'center',
     marginBottom: 24,
@@ -813,6 +1047,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#888888',
     marginTop: 4,
+  },
+  filterBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 0, 0, 0.2)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    marginTop: 8,
+    gap: 6,
+  },
+  filterBadgeText: {
+    color: '#8B0000',
+    fontSize: 12,
+    fontWeight: '600',
   },
   card: {
     backgroundColor: '#111111',
@@ -896,38 +1145,46 @@ const styles = StyleSheet.create({
     color: '#666666',
     marginTop: 4,
   },
-  breakdownRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#222',
-  },
-  breakdownInfo: {
-    flex: 1,
-  },
-  breakdownName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  breakdownSub: {
+  heatmapSubtitle: {
     fontSize: 12,
     color: '#888888',
-    marginTop: 2,
+    marginBottom: 16,
   },
-  breakdownStats: {
-    alignItems: 'flex-end',
+  heatmapContainer: {
+    alignItems: 'center',
   },
-  breakdownValue: {
-    fontSize: 18,
+  distributionList: {
+    gap: 8,
+  },
+  distributionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  distributionLabel: {
+    width: 24,
+    fontSize: 14,
     fontWeight: 'bold',
-    color: '#8B0000',
+    color: '#888',
+    textAlign: 'center',
   },
-  breakdownLabel: {
-    fontSize: 10,
-    color: '#888888',
+  distributionBarContainer: {
+    flex: 1,
+    height: 20,
+    backgroundColor: '#222',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  distributionBar: {
+    height: '100%',
+    backgroundColor: '#8B0000',
+    borderRadius: 4,
+  },
+  distributionCount: {
+    width: 30,
+    fontSize: 12,
+    color: '#888',
+    textAlign: 'right',
   },
   emptyState: {
     alignItems: 'center',
@@ -977,5 +1234,49 @@ const styles = StyleSheet.create({
     color: '#8B0000',
     fontSize: 14,
     fontWeight: '600',
+  },
+});
+
+const heatmapStyles = StyleSheet.create({
+  container: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  targetBackground: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  ring: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerMark: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerLine: {
+    position: 'absolute',
+    width: 12,
+    height: 2,
+    backgroundColor: '#000',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#111',
+    borderRadius: 16,
+  },
+  emptyText: {
+    color: '#888888',
+    fontSize: 14,
+    marginTop: 12,
+    textAlign: 'center',
   },
 });
