@@ -30,6 +30,9 @@ interface Session {
   total_score: number;
   rounds: any[];
   created_at: string;
+  bow_name?: string;
+  bow_id?: string;
+  distance?: string;
 }
 
 interface GroupedSessions {
