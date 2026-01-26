@@ -528,12 +528,11 @@ export default function StatsScreen() {
     const getHeatColor = (normalizedValue: number) => {
       if (normalizedValue === 0) return 'transparent';
       
-      // Color stops: blue (0) -> cyan (0.25) -> green (0.5) -> yellow (0.75) -> red (1)
+      // Green → Yellow → Orange → Red color scale
       const colors = [
-        { pos: 0, r: 0, g: 0, b: 255 },      // Blue
-        { pos: 0.25, r: 0, g: 255, b: 255 },  // Cyan
-        { pos: 0.5, r: 0, g: 255, b: 0 },     // Green
-        { pos: 0.75, r: 255, g: 255, b: 0 },  // Yellow
+        { pos: 0, r: 0, g: 200, b: 0 },       // Green
+        { pos: 0.33, r: 255, g: 255, b: 0 },  // Yellow
+        { pos: 0.66, r: 255, g: 165, b: 0 },  // Orange
         { pos: 1, r: 255, g: 0, b: 0 },       // Red
       ];
       
