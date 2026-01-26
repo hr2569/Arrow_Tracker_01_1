@@ -77,9 +77,12 @@ export default function SummaryScreen() {
   const handleSaveSession = async () => {
     setIsSaving(true);
     try {
-      // Create session
+      // Create session with bow and distance
       const sessionResponse = await axios.post(`${API_URL}/api/sessions`, {
         name: `Session ${new Date().toLocaleDateString()}`,
+        bow_id: selectedBow?.id || null,
+        bow_name: selectedBow?.name || null,
+        distance: sessionDistance || null,
       });
 
       const sessionId = sessionResponse.data.id;
