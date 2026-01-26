@@ -411,11 +411,6 @@ export default function ScoringScreen() {
               onStartShouldSetResponder={() => true}
               onResponderGrant={handleTargetPress}
             >
-              <Pressable
-                onPressIn={handleTargetPress}
-                style={styles.targetTouchArea}
-                hitSlop={0}
-              >
               {/* Background Image - Only show if NOT manual mode */}
               {!manualMode && currentImage ? (
                 <Image
