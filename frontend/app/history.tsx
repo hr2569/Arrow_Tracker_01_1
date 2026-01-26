@@ -341,6 +341,24 @@ export default function HistoryScreen() {
             <View style={targetMapStyles.centerLine} />
             <View style={[targetMapStyles.centerLine, { transform: [{ rotate: '90deg' }] }]} />
           </View>
+          
+          {/* Ring labels - show point values on the side */}
+          <View style={targetMapStyles.ringLabelsContainer}>
+            {[1, 3, 5, 7, 9].map((ringNum) => {
+              const labelDistance = ((10.5 - ringNum) / 10) * targetScale * 0.5; // radius position
+              return (
+                <View
+                  key={`label-${ringNum}`}
+                  style={[
+                    targetMapStyles.ringLabel,
+                    { right: -25, top: `${50 - labelDistance * 100}%` }
+                  ]}
+                >
+                  <Text style={targetMapStyles.ringLabelText}>{ringNum}</Text>
+                </View>
+              );
+            })}
+          </View>
         </View>
 
         {/* Plot shots */}
