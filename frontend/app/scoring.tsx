@@ -589,6 +589,7 @@ export default function ScoringScreen() {
             </View>
           )}
         </View>
+            </TouchableWithoutFeedback>
             </ScrollView>
           </ScrollView>
         </View>
