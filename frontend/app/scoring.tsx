@@ -778,6 +778,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  targetVerticalScroll: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   contentBelowTarget: {
     paddingHorizontal: 0,
     paddingTop: 16,
