@@ -317,6 +317,147 @@ export default function ReportScreen() {
       }
     });
 
+    // Generate heatmap SVG for PDF
+    const generateHeatmapSvg = () => {
+      if (allShots.length === 0) {
+        return `
+          <div style="width: 280px; height: 280px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+            <span style="color: #888; font-size: 14px;">No shots in this period</span>
+          </div>
+        `;
+      }
+
+      const size = 280;
+      const targetScale = 0.8;
+      const targetSize = size * targetScale;
+      const offset = (size - targetSize) / 2;
+      
+      // Grid for density calculation
+      const gridSize = 28;
+      const cellSize = size / gridSize;
+      const densityGrid: number[][] = [];
+      for (let i = 0; i < gridSize; i++) {
+        densityGrid[i] = [];
+        for (let j = 0; j < gridSize; j++) {
+          densityGrid[i][j] = 0;
+        }
+      }
+      
+      // Calculate density
+      allShots.forEach((shot) => {
+        const gridX = Math.floor(shot.x * gridSize);
+        const gridY = Math.floor(shot.y * gridSize);
+        
+        const blurRadius = 3;
+        for (let dx = -blurRadius; dx <= blurRadius; dx++) {
+          for (let dy = -blurRadius; dy <= blurRadius; dy++) {
+            const nx = gridX + dx;
+            const ny = gridY + dy;
+            if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              const weight = Math.exp(-distance * distance / 4);
+              densityGrid[ny][nx] += weight;
+            }
+          }
+        }
+      });
+      
+      let maxDensity = 0;
+      densityGrid.forEach(row => {
+        row.forEach(val => {
+          if (val > maxDensity) maxDensity = val;
+        });
+      });
+      
+      // Color function
+      const getHeatColor = (normalizedValue: number) => {
+        if (normalizedValue === 0) return null;
+        
+        const colors = [
+          { pos: 0, r: 0, g: 200, b: 0 },
+          { pos: 0.33, r: 255, g: 255, b: 0 },
+          { pos: 0.66, r: 255, g: 165, b: 0 },
+          { pos: 1, r: 255, g: 0, b: 0 },
+        ];
+        
+        let lower = colors[0];
+        let upper = colors[colors.length - 1];
+        
+        for (let i = 0; i < colors.length - 1; i++) {
+          if (normalizedValue >= colors[i].pos && normalizedValue <= colors[i + 1].pos) {
+            lower = colors[i];
+            upper = colors[i + 1];
+            break;
+          }
+        }
+        
+        const range = upper.pos - lower.pos;
+        const t = range === 0 ? 0 : (normalizedValue - lower.pos) / range;
+        
+        const r = Math.round(lower.r + (upper.r - lower.r) * t);
+        const g = Math.round(lower.g + (upper.g - lower.g) * t);
+        const b = Math.round(lower.b + (upper.b - lower.b) * t);
+        const alpha = 0.4 + normalizedValue * 0.5;
+        
+        return { r, g, b, alpha };
+      };
+
+      // Generate heat circles
+      let heatCircles = '';
+      densityGrid.forEach((row, y) => {
+        row.forEach((density, x) => {
+          if (density > 0) {
+            const normalizedDensity = maxDensity > 0 ? density / maxDensity : 0;
+            const color = getHeatColor(normalizedDensity);
+            if (color) {
+              const cx = x * cellSize + cellSize / 2;
+              const cy = y * cellSize + cellSize / 2;
+              const r = cellSize * 1.5;
+              heatCircles += `
+                <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha * normalizedDensity})" />
+              `;
+            }
+          }
+        });
+      });
+
+      // Target rings colors
+      const ringColorsPdf = ['#f5f5f0', '#f5f5f0', '#2a2a2a', '#2a2a2a', '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24', '#fff200', '#fff200'];
+      
+      // Generate target rings
+      let targetRings = '';
+      for (let ringNum = 1; ringNum <= 10; ringNum++) {
+        const diameterPercent = (11 - ringNum) / 10;
+        const ringSize = targetSize * diameterPercent;
+        const ringOffset = offset + (targetSize - ringSize) / 2;
+        const bgColor = ringColorsPdf[ringNum - 1];
+        const borderColor = ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00';
+        targetRings += `
+          <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="${bgColor}" stroke="${borderColor}" stroke-width="1" />
+        `;
+      }
+
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;">
+          <!-- Target rings -->
+          ${targetRings}
+          <!-- Center cross -->
+          <line x1="${size/2 - 6}" y1="${size/2}" x2="${size/2 + 6}" y2="${size/2}" stroke="#000" stroke-width="2" />
+          <line x1="${size/2}" y1="${size/2 - 6}" x2="${size/2}" y2="${size/2 + 6}" stroke="#000" stroke-width="2" />
+          <!-- Heatmap overlay -->
+          ${heatCircles}
+        </svg>
+      `;
+    };
+
+    const heatmapSection = `
+      <div style="background: #111; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+        <h3 style="color: #fff; margin: 0 0 8px 0;">🔥 Shot Distribution Heatmap</h3>
+        <p style="color: #888; font-size: 12px; margin: 0 0 16px 0;">${allShots.length} arrows from ${reportStats.totalSessions} session${reportStats.totalSessions !== 1 ? 's' : ''}</p>
+        ${generateHeatmapSvg()}
+      </div>
+    `;
+
     const bowSection = Object.keys(bowStats).length > 0 ? `
       <div style="background: #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
         <h3 style="color: #8B0000; margin: 0 0 16px 0;">🏹 By Bow</h3>
