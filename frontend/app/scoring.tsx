@@ -405,13 +405,11 @@ export default function ScoringScreen() {
               scrollEnabled={zoomLevel > 1}
             >
             {/* Target Area */}
+            <TouchableWithoutFeedback onPress={handleTargetPress}>
             <View 
               ref={targetRef}
               style={[styles.targetContainer, { width: TARGET_SIZE, height: TARGET_SIZE }]}
               onLayout={handleTargetLayout}
-              onTouchStart={handleTargetPress}
-              onStartShouldSetResponder={() => true}
-              onResponderGrant={handleTargetPress}
             >
               {/* Background Image - Only show if NOT manual mode */}
               {!manualMode && currentImage ? (
