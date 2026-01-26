@@ -141,25 +141,39 @@ export default function HistoryScreen() {
   }, []);
 
   const handleDeleteSession = (sessionId: string) => {
-    Alert.alert(
-      'Delete Session',
-      'Are you sure you want to delete this session?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await axios.delete(`${API_URL}/api/sessions/${sessionId}`);
-              setSessions(sessions.filter(s => s.id !== sessionId));
-            } catch (err) {
-              Alert.alert('Error', 'Failed to delete session');
-            }
+    const performDelete = async () => {
+      try {
+        await axios.delete(`${API_URL}/api/sessions/${sessionId}`);
+        setSessions(sessions.filter(s => s.id !== sessionId));
+      } catch (err) {
+        if (Platform.OS === 'web') {
+          window.alert('Failed to delete session');
+        } else {
+          Alert.alert('Error', 'Failed to delete session');
+        }
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      // Use browser confirm for web
+      if (window.confirm('Are you sure you want to delete this session?')) {
+        performDelete();
+      }
+    } else {
+      // Use native Alert for mobile
+      Alert.alert(
+        'Delete Session',
+        'Are you sure you want to delete this session?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: performDelete,
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   const formatDate = (dateString: string) => {
