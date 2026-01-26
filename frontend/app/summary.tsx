@@ -90,26 +90,9 @@ export default function SummaryScreen() {
         });
       }
 
-      Alert.alert(
-        'Session Saved!',
-        `Total score: ${getTotalSessionScore()} points`,
-        [
-          {
-            text: 'View History',
-            onPress: () => {
-              clearAll();
-              router.replace('/history');
-            },
-          },
-          {
-            text: 'New Session',
-            onPress: () => {
-              clearAll();
-              router.replace('/');
-            },
-          },
-        ]
-      );
+      // Clear all data and go to main screen
+      clearAll();
+      router.replace('/');
     } catch (err) {
       console.error('Save error:', err);
       Alert.alert('Error', 'Failed to save session');
