@@ -677,6 +677,8 @@ export default function ReportScreen() {
             </div>
           ` : ''}
 
+          ${heatmapSection}
+
           ${reportStats.totalArrows > 0 ? `
             <div class="card">
               <h3>📊 Score Distribution</h3>
