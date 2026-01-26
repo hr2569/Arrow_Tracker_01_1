@@ -825,6 +825,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    paddingRight: 45,
   },
   sessionInfo: {
     flex: 1,
