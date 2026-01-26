@@ -170,14 +170,26 @@ export default function AlignmentScreen() {
     try {
       console.log('Starting perspective crop...');
       console.log('Image length:', currentImage.length);
+      console.log('Image starts with:', currentImage.substring(0, 50));
       console.log('Corners:', JSON.stringify(corners.map(c => ({ x: c.x, y: c.y }))));
       
-      // Call perspective crop API
-      const response = await axios.post(`${API_URL}/api/perspective-crop`, {
-        image_base64: currentImage,
+      // Ensure image is properly formatted as a data URI
+      let imageData = currentImage;
+      if (!imageData.startsWith('data:')) {
+        // If it's raw base64, add the data URI prefix
+        imageData = `data:image/jpeg;base64,${imageData}`;
+      }
+      
+      const payload = {
+        image_base64: imageData,
         corners: corners.map(c => ({ x: c.x, y: c.y })),
         output_size: 800,
-      });
+      };
+      
+      console.log('Sending payload with image length:', payload.image_base64.length);
+      
+      // Call perspective crop API
+      const response = await axios.post(`${API_URL}/api/perspective-crop`, payload);
       
       console.log('Crop response success:', response.data.success);
       
