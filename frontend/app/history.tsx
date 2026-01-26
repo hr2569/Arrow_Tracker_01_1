@@ -97,7 +97,7 @@ export default function HistoryScreen() {
     const now = new Date();
     const groups: { [key: string]: Session[] } = {};
 
-    sessions.forEach((session) => {
+    filteredSessions.forEach((session) => {
       const sessionDate = new Date(session.created_at);
       let groupKey: string;
 
