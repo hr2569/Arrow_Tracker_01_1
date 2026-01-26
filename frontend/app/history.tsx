@@ -872,9 +872,9 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     position: 'absolute',
-    top: 12,
+    bottom: 12,
     right: 12,
-    padding: 12,
+    padding: 10,
     backgroundColor: 'rgba(255, 107, 107, 0.15)',
     borderRadius: 8,
     zIndex: 10,
