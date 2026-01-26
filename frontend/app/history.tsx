@@ -518,6 +518,17 @@ export default function HistoryScreen() {
                       <View style={styles.expandedContent}>
                         <View style={styles.expandedDivider} />
                         
+                        {/* Target Hit Map - Visual distribution of all hits */}
+                        <View style={styles.chartSection}>
+                          <Text style={styles.chartTitle}>
+                            <Ionicons name="locate" size={16} color="#8B0000" /> Shot Distribution
+                          </Text>
+                          <View style={styles.targetMapWrapper}>
+                            <TargetHitMap session={session} size={SCREEN_WIDTH - 100} />
+                          </View>
+                          <RoundLegend session={session} />
+                        </View>
+
                         {/* Score by Round Chart */}
                         {getRoundChartData(session) && session.rounds.length > 1 && (
                           <View style={styles.chartSection}>
@@ -536,30 +547,6 @@ export default function HistoryScreen() {
                               withVerticalLabels={true}
                               withHorizontalLabels={true}
                               fromZero={true}
-                            />
-                          </View>
-                        )}
-
-                        {/* Hit Distribution Chart */}
-                        {getHitDistributionData(session) && (
-                          <View style={styles.chartSection}>
-                            <Text style={styles.chartTitle}>
-                              <Ionicons name="bar-chart" size={16} color="#8B0000" /> Hit Distribution
-                            </Text>
-                            <BarChart
-                              data={getHitDistributionData(session)!}
-                              width={CHART_WIDTH}
-                              height={160}
-                              chartConfig={{
-                                ...chartConfig,
-                                barPercentage: 0.7,
-                              }}
-                              style={styles.chart}
-                              withInnerLines={true}
-                              showBarTops={false}
-                              fromZero={true}
-                              yAxisLabel=""
-                              yAxisSuffix=""
                             />
                           </View>
                         )}
