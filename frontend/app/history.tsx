@@ -231,29 +231,23 @@ export default function HistoryScreen() {
     
     session.rounds.forEach((round, roundIndex) => {
       round.shots?.forEach((shot: any) => {
-        // The shots are stored as coordinates on the target image
-        // Our visualization target fills the view, so we can use coordinates directly
-        // Just need a small adjustment since the original target has some padding
         const rawX = shot.x ?? 0.5;
         const rawY = shot.y ?? 0.5;
         
-        // The scoring screen target has center at 0.5,0.5 and radius ~0.45
-        // Our visualization also has center at 0.5,0.5 but fills more of the view
-        // Scale coordinates to spread them out more to match ring positions
-        const centerX = 0.5;
-        const centerY = 0.5;
+        // The scoring screen target has center at 0.5,0.5 and effective radius of 0.4
+        // Our visualization fills the entire view (radius 0.5)
+        // So we need to scale from 0.4 radius to 0.5 radius
+        const scoringRadius = 0.4;
+        const visualRadius = 0.5;
+        const scaleFactor = visualRadius / scoringRadius; // 1.25
         
-        // Offset from center
-        const offsetX = rawX - centerX;
-        const offsetY = rawY - centerY;
+        // Calculate offset from center and scale it
+        const offsetX = (rawX - 0.5) * scaleFactor;
+        const offsetY = (rawY - 0.5) * scaleFactor;
         
-        // The visualization target outer ring is at ~0.475 from center (95% of 0.5)
-        // The original scoring target outer ring is at ~0.45 from center
-        // So we need to scale up slightly: 0.475/0.45 ≈ 1.056
-        const scaleFactor = 1.0; // Use 1:1 mapping - coordinates should match
-        
-        const visualX = centerX + offsetX * scaleFactor;
-        const visualY = centerY + offsetY * scaleFactor;
+        // Map to visualization coordinates
+        const visualX = 0.5 + offsetX;
+        const visualY = 0.5 + offsetY;
         
         shots.push({
           x: Math.max(0.02, Math.min(0.98, visualX)),
