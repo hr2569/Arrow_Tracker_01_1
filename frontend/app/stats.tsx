@@ -294,6 +294,176 @@ export default function StatsScreen() {
     );
   };
 
+  // Heatmap Component - shows density of shots as a gradient overlay
+  const HeatmapTargetMap = ({ size = 280 }: { size?: number }) => {
+    const shots = stats.allShots;
+    
+    if (shots.length === 0) {
+      return (
+        <View style={[targetMapStyles.emptyContainer, { width: size, height: size }]}>
+          <Ionicons name="flame-outline" size={48} color="#888888" />
+          <Text style={targetMapStyles.emptyText}>No shots in this period</Text>
+        </View>
+      );
+    }
+
+    const targetScale = 0.8;
+    const targetSize = size * targetScale;
+    const centerOffset = (size - targetSize) / 2;
+    
+    // Create a grid for density calculation
+    const gridSize = 20; // 20x20 grid
+    const cellSize = size / gridSize;
+    const densityGrid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
+    
+    // Calculate density for each grid cell
+    shots.forEach((shot) => {
+      const gridX = Math.floor(shot.x * gridSize);
+      const gridY = Math.floor(shot.y * gridSize);
+      
+      // Apply Gaussian blur effect - each shot affects nearby cells
+      const blurRadius = 2;
+      for (let dx = -blurRadius; dx <= blurRadius; dx++) {
+        for (let dy = -blurRadius; dy <= blurRadius; dy++) {
+          const nx = gridX + dx;
+          const ny = gridY + dy;
+          if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const weight = Math.exp(-distance * distance / 2);
+            densityGrid[ny][nx] += weight;
+          }
+        }
+      }
+    });
+    
+    // Find max density for normalization
+    let maxDensity = 0;
+    densityGrid.forEach(row => {
+      row.forEach(val => {
+        if (val > maxDensity) maxDensity = val;
+      });
+    });
+    
+    // Generate heatmap colors (blue -> cyan -> green -> yellow -> red)
+    const getHeatColor = (normalizedValue: number) => {
+      if (normalizedValue === 0) return 'transparent';
+      
+      // Color stops: blue (0) -> cyan (0.25) -> green (0.5) -> yellow (0.75) -> red (1)
+      const colors = [
+        { pos: 0, r: 0, g: 0, b: 255 },      // Blue
+        { pos: 0.25, r: 0, g: 255, b: 255 },  // Cyan
+        { pos: 0.5, r: 0, g: 255, b: 0 },     // Green
+        { pos: 0.75, r: 255, g: 255, b: 0 },  // Yellow
+        { pos: 1, r: 255, g: 0, b: 0 },       // Red
+      ];
+      
+      let lower = colors[0];
+      let upper = colors[colors.length - 1];
+      
+      for (let i = 0; i < colors.length - 1; i++) {
+        if (normalizedValue >= colors[i].pos && normalizedValue <= colors[i + 1].pos) {
+          lower = colors[i];
+          upper = colors[i + 1];
+          break;
+        }
+      }
+      
+      const range = upper.pos - lower.pos;
+      const t = range === 0 ? 0 : (normalizedValue - lower.pos) / range;
+      
+      const r = Math.round(lower.r + (upper.r - lower.r) * t);
+      const g = Math.round(lower.g + (upper.g - lower.g) * t);
+      const b = Math.round(lower.b + (upper.b - lower.b) * t);
+      const alpha = 0.4 + normalizedValue * 0.5; // 0.4 to 0.9 opacity
+      
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
+    // Create heatmap cells
+    const heatmapCells: { x: number; y: number; color: string; opacity: number }[] = [];
+    densityGrid.forEach((row, y) => {
+      row.forEach((density, x) => {
+        if (density > 0) {
+          const normalizedDensity = maxDensity > 0 ? density / maxDensity : 0;
+          heatmapCells.push({
+            x: x * cellSize,
+            y: y * cellSize,
+            color: getHeatColor(normalizedDensity),
+            opacity: normalizedDensity,
+          });
+        }
+      });
+    });
+
+    return (
+      <View style={[targetMapStyles.container, { width: size, height: size }]}>
+        {/* Target Background */}
+        <View style={[targetMapStyles.targetBackground, { width: targetSize, height: targetSize, borderRadius: targetSize / 2 }]}>
+          {/* Draw rings from outside to inside */}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
+            const diameterPercent = (11 - ringNum) / 10;
+            const ringSize = targetSize * diameterPercent;
+            const bgColor = ringColors[ringNum - 1];
+            return (
+              <View
+                key={`ring-${ringNum}`}
+                style={[
+                  targetMapStyles.ring,
+                  {
+                    width: ringSize,
+                    height: ringSize,
+                    borderRadius: ringSize / 2,
+                    backgroundColor: bgColor,
+                    borderColor: ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00',
+                    borderWidth: 1,
+                  },
+                ]}
+              />
+            );
+          })}
+          
+          {/* Center X mark */}
+          <View style={targetMapStyles.centerMark}>
+            <View style={targetMapStyles.centerLine} />
+            <View style={[targetMapStyles.centerLine, { transform: [{ rotate: '90deg' }] }]} />
+          </View>
+        </View>
+
+        {/* Heatmap Overlay using SVG */}
+        <View style={[StyleSheet.absoluteFill, { borderRadius: size / 2, overflow: 'hidden' }]}>
+          <Svg width={size} height={size}>
+            <Defs>
+              {heatmapCells.map((cell, index) => (
+                <RadialGradient
+                  key={`grad-${index}`}
+                  id={`heatGrad-${index}`}
+                  cx="50%"
+                  cy="50%"
+                  rx="50%"
+                  ry="50%"
+                >
+                  <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
+                  <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
+                </RadialGradient>
+              ))}
+            </Defs>
+            <G>
+              {heatmapCells.map((cell, index) => (
+                <Circle
+                  key={`heat-${index}`}
+                  cx={cell.x + cellSize / 2}
+                  cy={cell.y + cellSize / 2}
+                  r={cellSize * 1.5}
+                  fill={`url(#heatGrad-${index})`}
+                />
+              ))}
+            </G>
+          </Svg>
+        </View>
+      </View>
+    );
+  };
+
   // Ring Distribution Bar Chart
   const RingDistribution = () => {
     const maxCount = Math.max(...Object.values(stats.ringCounts), 1);
