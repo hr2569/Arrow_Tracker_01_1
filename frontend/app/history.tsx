@@ -49,6 +49,32 @@ export default function HistoryScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [expandedSession, setExpandedSession] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
+  const [bowFilter, setBowFilter] = useState<string | null>(null);
+  const [distanceFilter, setDistanceFilter] = useState<string | null>(null);
+
+  // Get unique bows and distances for filters
+  const availableBows = useMemo(() => {
+    const bows = sessions
+      .filter(s => s.bow_name)
+      .map(s => s.bow_name as string);
+    return [...new Set(bows)];
+  }, [sessions]);
+
+  const availableDistances = useMemo(() => {
+    const distances = sessions
+      .filter(s => s.distance)
+      .map(s => s.distance as string);
+    return [...new Set(distances)];
+  }, [sessions]);
+
+  // Filter sessions by bow and distance
+  const filteredSessions = useMemo(() => {
+    return sessions.filter(session => {
+      if (bowFilter && session.bow_name !== bowFilter) return false;
+      if (distanceFilter && session.distance !== distanceFilter) return false;
+      return true;
+    });
+  }, [sessions, bowFilter, distanceFilter]);
 
   const fetchSessions = async () => {
     try {
