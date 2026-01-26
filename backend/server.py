@@ -69,6 +69,13 @@ class CreateSessionRequest(BaseModel):
     bow_name: Optional[str] = None
     distance: Optional[str] = None
 
+class UpdateSessionRequest(BaseModel):
+    name: Optional[str] = None
+    bow_id: Optional[str] = None
+    bow_name: Optional[str] = None
+    distance: Optional[str] = None
+    created_at: Optional[str] = None  # ISO format date string
+
 # Bow model for equipment tracking
 class Bow(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
