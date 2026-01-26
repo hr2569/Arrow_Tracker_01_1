@@ -9,15 +9,16 @@ function HeaderBackButton() {
   
   const handleBack = () => {
     console.log('HeaderBackButton pressed, pathname:', pathname);
+    console.log('canGoBack:', router.canGoBack());
+    
+    // On native, try back() first without checking canGoBack
+    // canGoBack() can sometimes return false even when back navigation is possible
     try {
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        // Fallback: navigate to home
-        router.replace('/');
-      }
+      router.back();
+      console.log('router.back() called');
     } catch (error) {
-      console.log('Back navigation error, going to home:', error);
+      console.log('Back navigation error:', error);
+      // Fallback: navigate to home
       router.replace('/');
     }
   };
@@ -25,8 +26,9 @@ function HeaderBackButton() {
   return (
     <TouchableOpacity 
       onPress={handleBack} 
-      style={{ marginLeft: 10, padding: 8, minWidth: 44, minHeight: 44, justifyContent: 'center' }}
+      style={{ marginLeft: 10, padding: 8, minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' }}
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      activeOpacity={0.7}
     >
       <Ionicons name="arrow-back" size={24} color="#fff" />
     </TouchableOpacity>
