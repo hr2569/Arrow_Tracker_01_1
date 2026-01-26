@@ -407,6 +407,9 @@ export default function ScoringScreen() {
               ref={targetRef}
               style={[styles.targetContainer, { width: TARGET_SIZE, height: TARGET_SIZE }]}
               onLayout={handleTargetLayout}
+              onTouchStart={handleTargetPress}
+              onStartShouldSetResponder={() => true}
+              onResponderGrant={handleTargetPress}
             >
               <Pressable
                 onPressIn={handleTargetPress}
