@@ -41,12 +41,15 @@ interface Session {
   created_at: string;
 }
 
+type ViewMode = 'distribution' | 'heatmap';
+
 export default function StatsScreen() {
   const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('distribution');
 
   const fetchSessions = async () => {
     try {
