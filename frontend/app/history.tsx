@@ -880,3 +880,74 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 });
+
+// Styles for the Target Hit Map component
+const targetMapStyles = StyleSheet.create({
+  container: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  targetBackground: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f0',
+  },
+  ring: {
+    position: 'absolute',
+  },
+  centerMark: {
+    position: 'absolute',
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerLine: {
+    position: 'absolute',
+    width: 12,
+    height: 2,
+    backgroundColor: '#333',
+  },
+  shotDot: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  shotLabel: {
+    color: '#fff',
+    fontSize: 8,
+    fontWeight: 'bold',
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginTop: 12,
+    gap: 12,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#fff',
+  },
+  legendText: {
+    color: '#888888',
+    fontSize: 12,
+  },
+});
