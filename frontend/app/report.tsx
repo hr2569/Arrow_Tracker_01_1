@@ -645,88 +645,22 @@ export default function ReportScreen() {
       const html = generatePdfHtml();
       
       if (Platform.OS === 'web') {
-        // For web, create an iframe and use print functionality
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.top = '-10000px';
-        iframe.style.left = '-10000px';
-        document.body.appendChild(iframe);
-        
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (iframeDoc) {
-          iframeDoc.open();
-          iframeDoc.write(html);
-          iframeDoc.close();
-          
-          // Wait for content to load then print
-          setTimeout(() => {
-            try {
-              iframe.contentWindow?.print();
-              // Remove iframe after print dialog
-              setTimeout(() => {
-                document.body.removeChild(iframe);
-              }, 1000);
-            } catch (e) {
-              document.body.removeChild(iframe);
-              // Fallback: open in new tab
-              const blob = new Blob([html], { type: 'text/html' });
-              const url = URL.createObjectURL(blob);
-              const newWindow = window.open(url, '_blank');
-              if (newWindow) {
-                newWindow.onload = () => {
-                  newWindow.print();
-                };
-              }
-            }
-          }, 500);
-        }
+        // For web, open in new tab
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
       } else {
-        // For native, generate PDF and save directly to downloads
-        const fileName = `archery-report-${new Date().toISOString().split('T')[0]}.pdf`;
-        
-        const { uri } = await Print.printToFileAsync({
+        // For native, open PDF directly using print preview
+        await Print.printAsync({
           html,
-          base64: false,
         });
-        
-        // Use expo-file-system to save to a more accessible location if available
-        // Otherwise just show the path
-        Alert.alert(
-          'PDF Downloaded',
-          `Report saved as:\n${uri}`,
-          [
-            {
-              text: 'Share',
-              onPress: async () => {
-                const isAvailable = await Sharing.isAvailableAsync();
-                if (isAvailable) {
-                  await Sharing.shareAsync(uri, {
-                    mimeType: 'application/pdf',
-                    dialogTitle: 'Share Archery Report',
-                    UTI: 'com.adobe.pdf',
-                  });
-                }
-              },
-            },
-            { text: 'OK' },
-          ]
-        );
       }
     } catch (error) {
       console.error('PDF generation error:', error);
       if (Platform.OS === 'web') {
-        // Final fallback - just show the HTML in a new window
-        try {
-          const html = generatePdfHtml();
-          const blob = new Blob([html], { type: 'text/html' });
-          const url = URL.createObjectURL(blob);
-          window.open(url, '_blank');
-          alert('Report opened in new tab. Use your browser\'s Print function (Ctrl+P / Cmd+P) to save as PDF.');
-        } catch (e) {
-          alert('Failed to generate PDF. Please try again.');
-        }
+        alert('Failed to open PDF. Please try again.');
       } else {
-        Alert.alert('Error', 'Failed to generate PDF');
+        Alert.alert('Error', 'Failed to open PDF');
       }
     }
   };
