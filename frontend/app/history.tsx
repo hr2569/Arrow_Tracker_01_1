@@ -220,8 +220,8 @@ export default function HistoryScreen() {
   };
 
   // Get all shots from a session for target visualization
-  // The shots are stored with x,y as position on the scoring image (0-1)
-  // After perspective crop, the target fills most of the image with some margin
+  // The shots are stored with x,y as position on the scoring image (0-1 normalized)
+  // The scoring screen has effective radius of 0.4, our visualization fills the view (radius 0.5)
   const getAllShots = (session: Session) => {
     if (!session.rounds || session.rounds.length === 0) {
       return [];
@@ -234,20 +234,22 @@ export default function HistoryScreen() {
         const rawX = shot.x ?? 0.5;
         const rawY = shot.y ?? 0.5;
         
-        // The scoring screen target has center at 0.5,0.5 and effective radius of 0.4
-        // Our visualization fills the entire view (radius 0.5)
-        // So we need to scale from 0.4 radius to 0.5 radius
+        // In scoring screen: target center at 0.5, effective radius = 0.4
+        // In visualization: center at 0.5, visual radius = 0.5
+        // Scale factor to map scoring positions to visual positions
         const scoringRadius = 0.4;
         const visualRadius = 0.5;
+        
+        // Calculate offset from center
+        const offsetX = rawX - 0.5;
+        const offsetY = rawY - 0.5;
+        
+        // Scale offsets: convert from scoring coordinate space to visual space
+        // This ensures a shot at the scoring target's edge maps to the visual target's edge
         const scaleFactor = visualRadius / scoringRadius; // 1.25
         
-        // Calculate offset from center and scale it
-        const offsetX = (rawX - 0.5) * scaleFactor;
-        const offsetY = (rawY - 0.5) * scaleFactor;
-        
-        // Map to visualization coordinates
-        const visualX = 0.5 + offsetX;
-        const visualY = 0.5 + offsetY;
+        const visualX = 0.5 + offsetX * scaleFactor;
+        const visualY = 0.5 + offsetY * scaleFactor;
         
         shots.push({
           x: Math.max(0.02, Math.min(0.98, visualX)),
