@@ -490,8 +490,8 @@ export default function StatsScreen() {
     const targetSize = size * targetScale;
     const centerOffset = (size - targetSize) / 2;
     
-    // Create a grid for density calculation
-    const gridSize = 20; // 20x20 grid
+    // Higher resolution grid for smoother heatmap
+    const gridSize = 56;
     const cellSize = size / gridSize;
     const densityGrid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
     
@@ -500,15 +500,16 @@ export default function StatsScreen() {
       const gridX = Math.floor(shot.x * gridSize);
       const gridY = Math.floor(shot.y * gridSize);
       
-      // Apply Gaussian blur effect - each shot affects nearby cells
-      const blurRadius = 2;
+      // Larger blur radius for smoother gradients
+      const blurRadius = 6;
       for (let dx = -blurRadius; dx <= blurRadius; dx++) {
         for (let dy = -blurRadius; dy <= blurRadius; dy++) {
           const nx = gridX + dx;
           const ny = gridY + dy;
           if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
             const distance = Math.sqrt(dx * dx + dy * dy);
-            const weight = Math.exp(-distance * distance / 2);
+            // Smoother gaussian falloff
+            const weight = Math.exp(-distance * distance / 8);
             densityGrid[ny][nx] += weight;
           }
         }
