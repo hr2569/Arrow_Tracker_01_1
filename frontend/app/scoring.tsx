@@ -405,12 +405,16 @@ export default function ScoringScreen() {
               scrollEnabled={zoomLevel > 1}
             >
             {/* Target Area */}
-            <TouchableWithoutFeedback onPress={handleTargetPress}>
             <View 
               ref={targetRef}
               style={[styles.targetContainer, { width: TARGET_SIZE, height: TARGET_SIZE }]}
               onLayout={handleTargetLayout}
             >
+              {/* Transparent hit area on top */}
+              <Pressable
+                style={styles.targetHitArea}
+                onPressIn={handleTargetPress}
+              />
               {/* Background Image - Only show if NOT manual mode */}
               {!manualMode && currentImage ? (
                 <Image
