@@ -308,8 +308,12 @@ export default function HistoryScreen() {
         {/* Target Background */}
         <View style={[targetMapStyles.targetBackground, { width: size, height: size, borderRadius: size / 2 }]}>
           {/* Draw rings from outside to inside */}
+          {/* Ring scoring: Ring 1 = 0.9-1.0 radius, Ring 10 = 0-0.1 radius */}
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
-            const ringSize = size * (1 - (ringNum - 1) * 0.1);
+            // Ring 1 is at 100% diameter (outermost), Ring 10 is at 10% diameter (center)
+            // Each ring takes up 10% of the diameter
+            const ringDiameterPercent = (11 - ringNum) / 10; // Ring 1 = 1.0, Ring 10 = 0.1
+            const ringSize = size * ringDiameterPercent;
             const bgColor = ringColors[ringNum - 1];
             return (
               <View
