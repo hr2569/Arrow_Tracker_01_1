@@ -87,11 +87,18 @@ export default function StatsScreen() {
     fetchSessions();
   }, []);
 
-  // Filter sessions by selected time period
+  // Filter sessions by selected time period, bow, and distance
   const filteredSessions = useMemo(() => {
     const now = new Date();
     
     return sessions.filter((session) => {
+      // Filter by bow
+      if (bowFilter && session.bow_name !== bowFilter) return false;
+      
+      // Filter by distance
+      if (distanceFilter && session.distance !== distanceFilter) return false;
+      
+      // Filter by time period
       const sessionDate = new Date(session.created_at);
       
       switch (selectedPeriod) {
@@ -114,7 +121,7 @@ export default function StatsScreen() {
           return true;
       }
     });
-  }, [sessions, selectedPeriod]);
+  }, [sessions, selectedPeriod, bowFilter, distanceFilter]);
 
   // Calculate aggregate stats
   const stats = useMemo(() => {
