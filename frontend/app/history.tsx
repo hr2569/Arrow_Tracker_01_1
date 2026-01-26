@@ -654,7 +654,7 @@ export default function HistoryScreen() {
                         color="#888888"
                       />
                     </View>
-                  </TouchableOpacity>
+                  </View>
                 ))}
               </View>
             ))}
