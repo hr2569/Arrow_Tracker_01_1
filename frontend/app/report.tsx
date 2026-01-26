@@ -563,35 +563,36 @@ export default function ReportScreen() {
               display: flex;
               justify-content: space-between;
               padding: 12px 0;
-              border-bottom: 1px solid #222;
+              border-bottom: 1px solid #ddd;
             }
-            .avg-label { color: #888; }
-            .avg-value { font-weight: bold; font-size: 18px; }
+            .avg-label { color: #555; }
+            .avg-value { font-weight: bold; font-size: 18px; color: #000; }
             .highlight-row {
               display: flex;
               gap: 12px;
             }
             .highlight-item {
               flex: 1;
-              background: #1a1a1a;
+              background: #fff;
               border-radius: 12px;
               padding: 16px;
               text-align: center;
+              border: 1px solid #ddd;
             }
             .highlight-label {
               font-size: 12px;
-              color: #888;
+              color: #555;
               margin-bottom: 8px;
             }
             .highlight-value {
               font-size: 24px;
               font-weight: bold;
-              color: #4CAF50;
+              color: #2E7D32;
             }
             .highlight-value-low {
               font-size: 24px;
               font-weight: bold;
-              color: #FF6B6B;
+              color: #C62828;
             }
             .highlight-date {
               font-size: 11px;
@@ -603,7 +604,7 @@ export default function ReportScreen() {
               border-collapse: collapse;
             }
             td {
-              color: #888;
+              color: #555;
               padding: 6px 0;
             }
             .footer {
@@ -616,7 +617,7 @@ export default function ReportScreen() {
         </head>
         <body>
           <div class="header">
-            <h1>🎯 Archery Performance Report</h1>
+            <h1>Archery Performance Report</h1>
             <p>${formatDateRange()}</p>
             ${(selectedBow || selectedDistance) ? `<div class="filter-badge">Filter: ${getFilterSummary()}</div>` : ''}
             <p style="font-size: 11px;">Generated ${new Date().toLocaleDateString()}</p>
