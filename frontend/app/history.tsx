@@ -871,12 +871,12 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     position: 'absolute',
-    bottom: 12,
-    right: 12,
-    padding: 10,
-    backgroundColor: 'rgba(255, 107, 107, 0.15)',
+    top: 16,
+    right: 16,
+    padding: 8,
+    backgroundColor: 'rgba(255, 107, 107, 0.2)',
     borderRadius: 8,
-    zIndex: 10,
+    zIndex: 100,
   },
   expandedContent: {
     marginTop: 12,
