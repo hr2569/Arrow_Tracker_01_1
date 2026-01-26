@@ -14,16 +14,6 @@ export default function SessionTypeScreen() {
   const router = useRouter();
   const { setSessionType } = useAppStore();
 
-  const handleBack = () => {
-    // Use replace to ensure we go back to home, or use canGoBack check
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      // Fallback to navigating to home
-      router.replace('/');
-    }
-  };
-
   const selectCompetition = () => {
     setSessionType('competition');
     router.push('/capture');
@@ -37,18 +27,6 @@ export default function SessionTypeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={handleBack}
-          >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.title}>New Session</Text>
-          <View style={styles.placeholder} />
-        </View>
-
         <Text style={styles.subtitle}>Choose your session type</Text>
 
         {/* Session Type Options */}
@@ -111,28 +89,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#111111',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  placeholder: {
-    width: 44,
   },
   subtitle: {
     fontSize: 16,
