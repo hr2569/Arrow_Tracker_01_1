@@ -524,7 +524,7 @@ export default function HistoryScreen() {
                             <Ionicons name="locate" size={16} color="#8B0000" /> Shot Distribution
                           </Text>
                           <View style={styles.targetMapWrapper}>
-                            <TargetHitMap session={session} size={SCREEN_WIDTH - 100} />
+                            <TargetHitMap session={session} size={240} />
                           </View>
                           <RoundLegend session={session} />
                         </View>
