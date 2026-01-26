@@ -492,11 +492,31 @@ const styles = StyleSheet.create({
   sessionsList: {
     marginTop: 8,
   },
-  sectionTitle: {
+  groupContainer: {
+    marginBottom: 20,
+  },
+  groupHeader: {
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333333',
+  },
+  groupTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  groupTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 16,
+  },
+  groupStats: {
+    marginTop: 4,
+  },
+  groupStatText: {
+    fontSize: 12,
+    color: '#888888',
   },
   sessionCard: {
     backgroundColor: '#111111',
