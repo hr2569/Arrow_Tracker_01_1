@@ -743,12 +743,8 @@ const targetMapStyles = StyleSheet.create({
   },
   shotDot: {
     position: 'absolute',
-    borderWidth: 2,
-    borderColor: '#ffffff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 3,
-    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#000000',
+    opacity: 0.6,
   },
 });
