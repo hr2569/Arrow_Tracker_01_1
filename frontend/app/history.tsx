@@ -54,6 +54,14 @@ export default function HistoryScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
   const [bowFilter, setBowFilter] = useState<string | null>(null);
   const [distanceFilter, setDistanceFilter] = useState<string | null>(null);
+  
+  // Edit session state
+  const [editingSession, setEditingSession] = useState<Session | null>(null);
+  const [editDate, setEditDate] = useState(new Date());
+  const [editName, setEditName] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Get unique bows and distances for filters
   const availableBows = useMemo(() => {
