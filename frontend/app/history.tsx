@@ -891,6 +891,26 @@ const styles = StyleSheet.create({
     color: '#888888',
     marginLeft: 4,
   },
+  sessionEquipment: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 10,
+    gap: 12,
+  },
+  equipmentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 0, 0, 0.15)',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    gap: 4,
+  },
+  equipmentText: {
+    fontSize: 12,
+    color: '#8B0000',
+    fontWeight: '500',
+  },
   deleteBtn: {
     position: 'absolute',
     top: 16,
