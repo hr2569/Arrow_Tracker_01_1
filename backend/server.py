@@ -597,6 +597,41 @@ async def delete_session(session_id: str):
         raise HTTPException(status_code=404, detail="Session not found")
     return {"message": "Session deleted"}
 
+@api_router.put("/sessions/{session_id}")
+async def update_session(session_id: str, request: UpdateSessionRequest):
+    """Update a session's details including date"""
+    session = await db.sessions.find_one({"id": session_id})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    update_data = {}
+    if request.name is not None:
+        update_data['name'] = request.name
+    if request.bow_id is not None:
+        update_data['bow_id'] = request.bow_id
+    if request.bow_name is not None:
+        update_data['bow_name'] = request.bow_name
+    if request.distance is not None:
+        update_data['distance'] = request.distance
+    if request.created_at is not None:
+        # Parse ISO format date string
+        try:
+            parsed_date = datetime.fromisoformat(request.created_at.replace('Z', '+00:00'))
+            update_data['created_at'] = parsed_date.isoformat()
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
+    
+    update_data['updated_at'] = datetime.utcnow().isoformat()
+    
+    await db.sessions.update_one(
+        {"id": session_id},
+        {"$set": update_data}
+    )
+    
+    updated_session = await db.sessions.find_one({"id": session_id})
+    updated_session.pop('_id', None)
+    return updated_session
+
 # ============== Bow Management Endpoints ==============
 
 @api_router.post("/bows")
