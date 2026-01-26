@@ -624,7 +624,7 @@ export default function ReportScreen() {
           </div>
 
           <div class="card">
-            <h3>📊 Overview</h3>
+            <h3>Overview</h3>
             <div class="stats-grid">
               <div class="stat-item">
                 <div class="stat-value">${reportStats.totalSessions}</div>
@@ -646,7 +646,7 @@ export default function ReportScreen() {
           </div>
 
           <div class="card">
-            <h3>📈 Averages</h3>
+            <h3>Averages</h3>
             <div class="avg-row">
               <span class="avg-label">Per Arrow</span>
               <span class="avg-value">${reportStats.avgPerArrow}</span>
@@ -663,7 +663,7 @@ export default function ReportScreen() {
 
           ${reportStats.totalSessions > 0 ? `
             <div class="card">
-              <h3>🏆 Highlights</h3>
+              <h3>Highlights</h3>
               <div class="highlight-row">
                 <div class="highlight-item">
                   <div class="highlight-label">Best Session</div>
@@ -683,7 +683,7 @@ export default function ReportScreen() {
 
           ${reportStats.totalArrows > 0 ? `
             <div class="card">
-              <h3>📊 Score Distribution</h3>
+              <h3>Score Distribution</h3>
               <table>
                 ${ringDistributionRows}
               </table>
