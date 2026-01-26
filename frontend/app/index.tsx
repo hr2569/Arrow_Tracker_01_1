@@ -155,6 +155,9 @@ const styles = StyleSheet.create({
   buttonIconContainer: {
     marginBottom: 12,
   },
+  buttonIconContainerSmall: {
+    marginBottom: 8,
+  },
   primaryButton: {
     backgroundColor: '#8B0000',
     borderRadius: 20,
@@ -171,22 +174,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 6,
   },
-  secondaryButton: {
+  secondaryRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  secondaryButtonHalf: {
+    flex: 1,
     backgroundColor: '#111111',
-    borderRadius: 20,
-    padding: 28,
+    borderRadius: 16,
+    padding: 20,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#8B0000',
   },
-  secondaryButtonText: {
+  secondaryButtonTextSmall: {
     color: '#8B0000',
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 'bold',
   },
-  buttonSubtextSecondary: {
+  buttonSubtextSecondarySmall: {
     color: '#888888',
-    fontSize: 14,
-    marginTop: 6,
+    fontSize: 12,
+    marginTop: 4,
+    textAlign: 'center',
   },
 });
