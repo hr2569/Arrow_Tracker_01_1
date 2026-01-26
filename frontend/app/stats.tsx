@@ -262,7 +262,7 @@ export default function StatsScreen() {
 
         {/* Plot all shots */}
         {shots.map((shot, index) => {
-          const dotSize = 10;
+          const dotSize = 16;
           const left = shot.x * size - dotSize / 2;
           const top = shot.y * size - dotSize / 2;
           
@@ -743,8 +743,12 @@ const targetMapStyles = StyleSheet.create({
   },
   shotDot: {
     position: 'absolute',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.6)',
-    opacity: 0.8,
+    borderWidth: 2,
+    borderColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 3,
+    elevation: 4,
   },
 });
