@@ -279,7 +279,7 @@ export default function ReportScreen() {
           <tr>
             <td style="font-weight: bold; width: 40px;">${ring === 0 ? 'M' : ring}</td>
             <td style="padding: 4px 0;">
-              <div style="background: #333; border-radius: 4px; height: 16px; width: 100%;">
+              <div style="background: #ddd; border-radius: 4px; height: 16px; width: 100%;">
                 <div style="background: #8B0000; border-radius: 4px; height: 16px; width: ${percentage}%;"></div>
               </div>
             </td>
@@ -317,23 +317,23 @@ export default function ReportScreen() {
       }
     });
 
-    // Generate heatmap SVG for PDF
+    // Generate heatmap SVG for PDF - 50% bigger (420px instead of 280px)
     const generateHeatmapSvg = () => {
       if (allShots.length === 0) {
         return `
-          <div style="width: 280px; height: 280px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-            <span style="color: #888; font-size: 14px;">No shots in this period</span>
+          <div style="width: 420px; height: 420px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid #ddd;">
+            <span style="color: #666; font-size: 14px;">No shots in this period</span>
           </div>
         `;
       }
 
-      const size = 280;
+      const size = 420;
       const targetScale = 0.8;
       const targetSize = size * targetScale;
       const offset = (size - targetSize) / 2;
       
       // Grid for density calculation
-      const gridSize = 28;
+      const gridSize = 42;
       const cellSize = size / gridSize;
       const densityGrid: number[][] = [];
       for (let i = 0; i < gridSize; i++) {
@@ -348,7 +348,7 @@ export default function ReportScreen() {
         const gridX = Math.floor(shot.x * gridSize);
         const gridY = Math.floor(shot.y * gridSize);
         
-        const blurRadius = 3;
+        const blurRadius = 4;
         for (let dx = -blurRadius; dx <= blurRadius; dx++) {
           for (let dy = -blurRadius; dy <= blurRadius; dy++) {
             const nx = gridX + dx;
@@ -442,8 +442,8 @@ export default function ReportScreen() {
           <!-- Target rings -->
           ${targetRings}
           <!-- Center cross -->
-          <line x1="${size/2 - 6}" y1="${size/2}" x2="${size/2 + 6}" y2="${size/2}" stroke="#000" stroke-width="2" />
-          <line x1="${size/2}" y1="${size/2 - 6}" x2="${size/2}" y2="${size/2 + 6}" stroke="#000" stroke-width="2" />
+          <line x1="${size/2 - 8}" y1="${size/2}" x2="${size/2 + 8}" y2="${size/2}" stroke="#000" stroke-width="2" />
+          <line x1="${size/2}" y1="${size/2 - 8}" x2="${size/2}" y2="${size/2 + 8}" stroke="#000" stroke-width="2" />
           <!-- Heatmap overlay -->
           ${heatCircles}
         </svg>
@@ -451,25 +451,25 @@ export default function ReportScreen() {
     };
 
     const heatmapSection = `
-      <div style="background: #111; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-        <h3 style="color: #fff; margin: 0 0 8px 0;">🔥 Shot Distribution Heatmap</h3>
-        <p style="color: #888; font-size: 12px; margin: 0 0 16px 0;">${allShots.length} arrows from ${reportStats.totalSessions} session${reportStats.totalSessions !== 1 ? 's' : ''}</p>
+      <div class="card">
+        <h3>Shot Distribution Heatmap</h3>
+        <p style="color: #666; font-size: 12px; margin: 0 0 16px 0;">${allShots.length} arrows from ${reportStats.totalSessions} session${reportStats.totalSessions !== 1 ? 's' : ''}</p>
         ${generateHeatmapSvg()}
       </div>
     `;
 
     const bowSection = Object.keys(bowStats).length > 0 ? `
-      <div style="background: #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-        <h3 style="color: #8B0000; margin: 0 0 16px 0;">🏹 By Bow</h3>
+      <div class="card">
+        <h3>By Bow</h3>
         ${Object.entries(bowStats).map(([bow, stats]) => `
-          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #333;">
+          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #ddd;">
             <div>
-              <div style="color: #fff; font-weight: 600;">${bow}</div>
-              <div style="color: #888; font-size: 12px;">${stats.sessions} sessions • ${stats.arrows} arrows</div>
+              <div style="color: #000; font-weight: 600;">${bow}</div>
+              <div style="color: #666; font-size: 12px;">${stats.sessions} sessions - ${stats.arrows} arrows</div>
             </div>
             <div style="text-align: right;">
               <div style="color: #8B0000; font-weight: bold; font-size: 18px;">${stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0'}</div>
-              <div style="color: #888; font-size: 10px;">avg/arrow</div>
+              <div style="color: #666; font-size: 10px;">avg/arrow</div>
             </div>
           </div>
         `).join('')}
@@ -477,17 +477,17 @@ export default function ReportScreen() {
     ` : '';
 
     const distanceSection = Object.keys(distanceStats).length > 0 ? `
-      <div style="background: #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-        <h3 style="color: #8B0000; margin: 0 0 16px 0;">📏 By Distance</h3>
+      <div class="card">
+        <h3>By Distance</h3>
         ${Object.entries(distanceStats).map(([distance, stats]) => `
-          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #333;">
+          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #ddd;">
             <div>
-              <div style="color: #fff; font-weight: 600;">${distance}</div>
-              <div style="color: #888; font-size: 12px;">${stats.sessions} sessions • ${stats.arrows} arrows</div>
+              <div style="color: #000; font-weight: 600;">${distance}</div>
+              <div style="color: #666; font-size: 12px;">${stats.sessions} sessions - ${stats.arrows} arrows</div>
             </div>
             <div style="text-align: right;">
               <div style="color: #8B0000; font-weight: bold; font-size: 18px;">${stats.arrows > 0 ? (stats.points / stats.arrows).toFixed(1) : '0'}</div>
-              <div style="color: #888; font-size: 10px;">avg/arrow</div>
+              <div style="color: #666; font-size: 10px;">avg/arrow</div>
             </div>
           </div>
         `).join('')}
@@ -503,8 +503,8 @@ export default function ReportScreen() {
           <style>
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              background: #fff;
-              color: #000;
+              background: #ffffff;
+              color: #000000;
               padding: 40px;
               margin: 0;
             }
@@ -517,7 +517,7 @@ export default function ReportScreen() {
               margin: 0 0 8px 0;
             }
             .header p {
-              color: #555;
+              color: #333;
               margin: 4px 0;
             }
             .filter-badge {
@@ -530,7 +530,7 @@ export default function ReportScreen() {
               margin-top: 8px;
             }
             .card {
-              background: #f5f5f5;
+              background: #f9f9f9;
               border-radius: 12px;
               padding: 20px;
               margin-bottom: 16px;
@@ -604,7 +604,7 @@ export default function ReportScreen() {
               border-collapse: collapse;
             }
             td {
-              color: #555;
+              color: #333;
               padding: 6px 0;
             }
             .footer {
@@ -620,7 +620,7 @@ export default function ReportScreen() {
             <h1>Archery Performance Report</h1>
             <p>${formatDateRange()}</p>
             ${(selectedBow || selectedDistance) ? `<div class="filter-badge">Filter: ${getFilterSummary()}</div>` : ''}
-            <p style="font-size: 11px;">Generated ${new Date().toLocaleDateString()}</p>
+            <p style="font-size: 11px; color: #666;">Generated ${new Date().toLocaleDateString()}</p>
           </div>
 
           <div class="card">
@@ -694,7 +694,7 @@ export default function ReportScreen() {
           ${distanceSection}
 
           <div class="footer">
-            <p>Archery Scoring App • ${new Date().getFullYear()}</p>
+            <p>Archery Scoring App - ${new Date().getFullYear()}</p>
           </div>
         </body>
       </html>
