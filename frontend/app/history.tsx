@@ -153,7 +153,7 @@ export default function HistoryScreen() {
       const bDate = new Date(b.sessions[0]?.created_at || 0).getTime();
       return bDate - aDate;
     });
-  }, [sessions, selectedPeriod]);
+  }, [filteredSessions, selectedPeriod]);
 
   // Calculate stats for selected period
   const periodStats = useMemo(() => {
