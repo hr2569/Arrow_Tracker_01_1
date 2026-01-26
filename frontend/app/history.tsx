@@ -561,6 +561,24 @@ export default function HistoryScreen() {
                         </View>
                       </View>
 
+                      {/* Bow & Distance Info */}
+                      {(session.bow_name || session.distance) && (
+                        <View style={styles.sessionEquipment}>
+                          {session.bow_name && (
+                            <View style={styles.equipmentItem}>
+                              <Ionicons name="fitness-outline" size={14} color="#8B0000" />
+                              <Text style={styles.equipmentText}>{session.bow_name}</Text>
+                            </View>
+                          )}
+                          {session.distance && (
+                            <View style={styles.equipmentItem}>
+                              <Ionicons name="locate-outline" size={14} color="#8B0000" />
+                              <Text style={styles.equipmentText}>{session.distance}</Text>
+                            </View>
+                          )}
+                        </View>
+                      )}
+
                       <View style={styles.sessionMeta}>
                         <View style={styles.metaItem}>
                           <Ionicons name="layers" size={16} color="#888888" />
