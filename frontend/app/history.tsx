@@ -181,6 +181,78 @@ export default function HistoryScreen() {
     setExpandedSession(expandedSession === sessionId ? null : sessionId);
   };
 
+  // Chart configuration
+  const chartConfig = {
+    backgroundColor: '#111111',
+    backgroundGradientFrom: '#111111',
+    backgroundGradientTo: '#111111',
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(139, 0, 0, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(136, 136, 136, ${opacity})`,
+    style: {
+      borderRadius: 12,
+    },
+    propsForDots: {
+      r: '4',
+      strokeWidth: '2',
+      stroke: '#8B0000',
+    },
+    propsForBackgroundLines: {
+      strokeDasharray: '',
+      stroke: '#333333',
+      strokeWidth: 1,
+    },
+  };
+
+  // Get round-by-round data for line chart
+  const getRoundChartData = (session: Session) => {
+    if (!session.rounds || session.rounds.length === 0) {
+      return null;
+    }
+    
+    const labels = session.rounds.map((_, i) => `R${i + 1}`);
+    const data = session.rounds.map(r => r.total_score || 0);
+    
+    return {
+      labels,
+      datasets: [{ data, strokeWidth: 2 }],
+    };
+  };
+
+  // Get hit distribution data for bar chart
+  const getHitDistributionData = (session: Session) => {
+    if (!session.rounds || session.rounds.length === 0) {
+      return null;
+    }
+    
+    // Count hits by ring value (0-10)
+    const hitCounts: { [key: number]: number } = {};
+    for (let i = 0; i <= 10; i++) {
+      hitCounts[i] = 0;
+    }
+    
+    session.rounds.forEach(round => {
+      round.shots?.forEach((shot: any) => {
+        const ring = shot.ring || 0;
+        hitCounts[ring] = (hitCounts[ring] || 0) + 1;
+      });
+    });
+    
+    // Filter out empty rings and create chart data
+    const nonZeroRings = Object.entries(hitCounts)
+      .filter(([_, count]) => count > 0)
+      .sort((a, b) => parseInt(b[0]) - parseInt(a[0])); // Sort by ring value descending
+    
+    if (nonZeroRings.length === 0) {
+      return null;
+    }
+    
+    return {
+      labels: nonZeroRings.map(([ring]) => ring === '0' ? 'M' : ring),
+      datasets: [{ data: nonZeroRings.map(([_, count]) => count) }],
+    };
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
