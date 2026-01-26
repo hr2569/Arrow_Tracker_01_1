@@ -53,6 +53,23 @@ export default function StatsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('distribution');
+  const [bowFilter, setBowFilter] = useState<string | null>(null);
+  const [distanceFilter, setDistanceFilter] = useState<string | null>(null);
+
+  // Get unique bows and distances for filters
+  const availableBows = useMemo(() => {
+    const bows = sessions
+      .filter(s => s.bow_name)
+      .map(s => s.bow_name as string);
+    return [...new Set(bows)];
+  }, [sessions]);
+
+  const availableDistances = useMemo(() => {
+    const distances = sessions
+      .filter(s => s.distance)
+      .map(s => s.distance as string);
+    return [...new Set(distances)];
+  }, [sessions]);
 
   const fetchSessions = async () => {
     try {
