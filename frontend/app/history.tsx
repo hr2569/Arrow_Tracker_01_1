@@ -220,8 +220,9 @@ export default function HistoryScreen() {
   };
 
   // Get all shots from a session for target visualization
-  // The shots are stored with x,y as position on the scoring image (0-1 normalized)
-  // The scoring screen has effective radius of 0.4, our visualization fills the view (radius 0.5)
+  // Shots are stored as normalized coordinates (0-1) on the target image
+  // The scoring uses effectiveRadius = 0.4, which means the target fills 80% of the image
+  // Our visualization also shows the target filling most of the view
   const getAllShots = (session: Session) => {
     if (!session.rounds || session.rounds.length === 0) {
       return [];
@@ -231,25 +232,23 @@ export default function HistoryScreen() {
     
     session.rounds.forEach((round, roundIndex) => {
       round.shots?.forEach((shot: any) => {
+        // Use coordinates directly - they're already normalized 0-1
+        // The scoring effectiveRadius (0.4) means target edge is at 0.4 from center
+        // Our visualization target edge is at 0.5 from center (fills the view)
+        // But since both use 0.5 as center, we just need a simple scale
+        
         const rawX = shot.x ?? 0.5;
         const rawY = shot.y ?? 0.5;
         
-        // In scoring screen: target center at 0.5, effective radius = 0.4
-        // In visualization: center at 0.5, visual radius = 0.5
-        // Scale factor to map scoring positions to visual positions
-        const scoringRadius = 0.4;
-        const visualRadius = 0.5;
+        // Scale factor: visualization radius / scoring radius
+        // This ensures shots at the scoring edge appear at the visual edge
+        const scoringRadius = 0.4;  // From scoring.tsx effectiveRadius
+        const visualRadius = 0.5;   // Our target fills the view
+        const scale = visualRadius / scoringRadius;
         
-        // Calculate offset from center
-        const offsetX = rawX - 0.5;
-        const offsetY = rawY - 0.5;
-        
-        // Scale offsets: convert from scoring coordinate space to visual space
-        // This ensures a shot at the scoring target's edge maps to the visual target's edge
-        const scaleFactor = visualRadius / scoringRadius; // 1.25
-        
-        const visualX = 0.5 + offsetX * scaleFactor;
-        const visualY = 0.5 + offsetY * scaleFactor;
+        // Apply scaling from center
+        const visualX = 0.5 + (rawX - 0.5) * scale;
+        const visualY = 0.5 + (rawY - 0.5) * scale;
         
         shots.push({
           x: Math.max(0.02, Math.min(0.98, visualX)),
