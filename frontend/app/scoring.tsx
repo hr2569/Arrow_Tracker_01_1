@@ -678,14 +678,6 @@ export default function ScoringScreen() {
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
           <Pressable
-            style={styles.secondaryButton}
-            onPress={() => router.back()}
-          >
-            <Ionicons name="arrow-back" size={20} color="#8B0000" />
-            <Text style={styles.secondaryButtonText}>Back</Text>
-          </Pressable>
-
-          <Pressable
             style={styles.primaryButton}
             onPress={handleFinishRound}
           >
