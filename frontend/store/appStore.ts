@@ -25,6 +25,14 @@ interface SessionData {
   total_score: number;
 }
 
+interface BowData {
+  id: string;
+  name: string;
+  bow_type: string;
+  draw_weight: number | null;
+  draw_length: number | null;
+}
+
 // Session type: 'competition' (10 rounds max) or 'training' (unlimited)
 type SessionType = 'competition' | 'training';
 
@@ -32,6 +40,14 @@ interface AppState {
   // Session type for current session
   sessionType: SessionType;
   setSessionType: (type: SessionType) => void;
+
+  // Selected bow for current session
+  selectedBow: BowData | null;
+  setSelectedBow: (bow: BowData | null) => void;
+
+  // Distance for current session (in meters or yards)
+  sessionDistance: string;
+  setSessionDistance: (distance: string) => void;
 
   // Round tracking
   currentRoundNumber: number;
