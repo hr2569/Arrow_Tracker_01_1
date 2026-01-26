@@ -200,6 +200,49 @@ export default function StatsScreen() {
     fetchSessions();
   }, []);
 
+  // Group sessions by day for daily breakdown
+  const dailyStats = useMemo(() => {
+    const dayGroups: { [key: string]: { sessions: Session[], date: Date } } = {};
+    
+    filteredSessions.forEach((session) => {
+      const sessionDate = new Date(session.created_at);
+      const dayKey = sessionDate.toDateString();
+      
+      if (!dayGroups[dayKey]) {
+        dayGroups[dayKey] = { sessions: [], date: sessionDate };
+      }
+      dayGroups[dayKey].sessions.push(session);
+    });
+    
+    // Convert to array and calculate stats for each day
+    return Object.entries(dayGroups)
+      .map(([key, { sessions: daySessions, date }]) => {
+        let totalPoints = 0;
+        let totalArrows = 0;
+        let totalRounds = 0;
+        
+        daySessions.forEach((session) => {
+          totalPoints += session.total_score || 0;
+          session.rounds?.forEach((round) => {
+            totalRounds++;
+            totalArrows += round.shots?.length || 0;
+          });
+        });
+        
+        return {
+          dayKey: key,
+          date,
+          sessionCount: daySessions.length,
+          totalPoints,
+          totalArrows,
+          totalRounds,
+          avgPerArrow: totalArrows > 0 ? (totalPoints / totalArrows).toFixed(1) : '0',
+          avgPerRound: totalRounds > 0 ? Math.round(totalPoints / totalRounds) : 0,
+        };
+      })
+      .sort((a, b) => b.date.getTime() - a.date.getTime()); // Most recent first
+  }, [filteredSessions]);
+
   const getPeriodLabel = () => {
     switch (selectedPeriod) {
       case 'day': return "Today's";
