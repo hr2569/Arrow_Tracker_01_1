@@ -275,24 +275,31 @@ async def detect_arrows(image_base64: str, target_center: dict, target_radius: f
         chat = LlmChat(
             api_key=api_key,
             session_id=f"arrow-detection-{uuid.uuid4()}",
-            system_message=f"""You are an expert archery target scorer. You analyze images of archery targets with arrows and detect the position of each arrow hit.
+            system_message=f"""You are an expert archery target scorer. You analyze images of archery targets with arrows and detect the EXACT POSITION where each arrow PIERCED THE PAPER (entry point).
+
+CRITICAL SCORING RULE:
+- The score is determined by WHERE THE ARROW SHAFT ENTERS THE TARGET PAPER
+- DO NOT use the fletching (feathers/vanes) position - that's at the back of the arrow
+- DO NOT use the nock position - that's the very end
+- FIND the point where the arrow shaft pierces/enters the target face
+- If the arrow shaft touches a line between two rings, score the HIGHER ring value
 
 The target has 10 scoring rings with these colors (from outside to inside):
 - Rings 1-2: White (outermost)
 - Rings 3-4: Black
 - Rings 5-6: Blue
 - Rings 7-8: Red
-- Rings 9-10: Yellow/Gold (center bullseye)
+- Rings 9-10: Yellow/Gold (center bullseye, ring 10 is the innermost X-ring)
 
 The target center is at approximately ({target_center.get('x', 0.5)}, {target_center.get('y', 0.5)}) in normalized coordinates.
 The target radius is approximately {target_radius} in normalized coordinates.
 
-For each ARROW (not old holes) you detect:
-1. Find its position as normalized coordinates (0-1) relative to the image
-2. Determine which colored ring zone it hit based on the colors above
-3. Assign the correct score (1-10)
-
-Look for arrows with fletching (feathers/vanes) - they look different from old holes in the target.
+For each arrow you detect:
+1. Identify the arrow by its fletching (feathers/vanes visible at the back)
+2. Trace the arrow shaft FORWARD toward the target to find where it ENTERS the paper
+3. Report the coordinates of the ENTRY POINT (not the fletching!)
+4. Determine which ring the entry point is in based on the colors
+5. Assign the correct score (1-10, with 10 being bullseye center)
 
 Respond ONLY in JSON format:
 {{
@@ -316,7 +323,18 @@ If no arrows found:
         image_content = ImageContent(image_base64=image_base64)
         
         user_message = UserMessage(
-            text=f"Analyze this archery target image and detect all ARROWS (not old holes). The target center is at ({target_center.get('x', 0.5)}, {target_center.get('y', 0.5)}) with radius {target_radius}. For each arrow, determine its position and which scoring ring (1-10) it hit based on the ring colors (White 1-2, Black 3-4, Blue 5-6, Red 7-8, Yellow 9-10).",
+            text=f"""Analyze this archery target image and detect all arrows.
+
+IMPORTANT: For each arrow, find the ENTRY POINT where the arrow shaft pierces the paper - NOT the fletching position!
+
+The target center is at ({target_center.get('x', 0.5)}, {target_center.get('y', 0.5)}) with radius {target_radius}.
+
+For each arrow:
+1. Locate the fletching (feathers) to identify the arrow
+2. Trace the shaft FORWARD to find where it enters the target
+3. Report that entry point's coordinates and which ring (1-10) it's in
+
+Ring colors: White=1-2, Black=3-4, Blue=5-6, Red=7-8, Yellow/Gold=9-10 (center)""",
             file_contents=[image_content]
         )
         
