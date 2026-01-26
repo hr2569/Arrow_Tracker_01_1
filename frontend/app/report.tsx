@@ -1258,10 +1258,10 @@ export default function ReportScreen() {
           <Text style={styles.shareButtonText}>Share Report</Text>
         </TouchableOpacity>
 
-        {/* Download PDF Button */}
+        {/* Open PDF Button */}
         <TouchableOpacity style={styles.downloadPdfButton} onPress={handleDownloadPdf}>
-          <Ionicons name="download-outline" size={24} color="#fff" />
-          <Text style={styles.shareButtonText}>Download PDF</Text>
+          <Ionicons name="document-text-outline" size={24} color="#fff" />
+          <Text style={styles.shareButtonText}>Open PDF</Text>
         </TouchableOpacity>
 
         {/* Edit Range Button */}
