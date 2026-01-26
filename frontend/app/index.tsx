@@ -76,6 +76,24 @@ export default function HomeScreen() {
               </Text>
             </TouchableOpacity>
           </View>
+
+          {/* Bows Button */}
+          <TouchableOpacity
+            style={styles.bowsButton}
+            onPress={() => router.push('/bows')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.buttonIconContainerSmall}>
+              <Ionicons name="arrow-forward-outline" size={36} color="#8B0000" />
+            </View>
+            <View style={styles.bowsButtonTextContainer}>
+              <Text style={styles.secondaryButtonTextSmall}>Bows</Text>
+              <Text style={styles.buttonSubtextSecondarySmall}>
+                Manage your equipment
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#444" />
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
