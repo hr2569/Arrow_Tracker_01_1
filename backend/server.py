@@ -63,6 +63,31 @@ class Session(BaseModel):
 class CreateSessionRequest(BaseModel):
     name: Optional[str] = ""
 
+# Bow model for equipment tracking
+class Bow(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    bow_type: str  # recurve, compound, longbow, barebow, etc.
+    draw_weight: Optional[float] = None  # in pounds
+    draw_length: Optional[float] = None  # in inches
+    notes: Optional[str] = ""
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CreateBowRequest(BaseModel):
+    name: str
+    bow_type: str
+    draw_weight: Optional[float] = None
+    draw_length: Optional[float] = None
+    notes: Optional[str] = ""
+
+class UpdateBowRequest(BaseModel):
+    name: Optional[str] = None
+    bow_type: Optional[str] = None
+    draw_weight: Optional[float] = None
+    draw_length: Optional[float] = None
+    notes: Optional[str] = None
+
 class ImageAnalysisRequest(BaseModel):
     image_base64: str
 
