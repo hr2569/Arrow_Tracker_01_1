@@ -289,9 +289,11 @@ export default function ReportScreen() {
     '#fff200', '#fff200',
   ];
 
-  // Heatmap Component - Using SVG RadialGradient for smooth appearance (same as stats)
+  // Heatmap Component - shows density of shots as a gradient overlay (same as stats)
   const HeatmapTargetMap = ({ size = 280 }: { size?: number }) => {
-    if (allShots.length === 0) {
+    const shots = allShots;
+    
+    if (shots.length === 0) {
       return (
         <View style={[heatmapStyles.emptyContainer, { width: size, height: size }]}>
           <Ionicons name="flame-outline" size={48} color="#888888" />
@@ -302,13 +304,15 @@ export default function ReportScreen() {
 
     const targetScale = 0.8;
     const targetSize = size * targetScale;
+    const centerOffset = (size - targetSize) / 2;
     
     // Higher resolution grid for smoother heatmap
     const gridSize = 56;
     const cellSize = size / gridSize;
     const densityGrid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
     
-    allShots.forEach((shot) => {
+    // Calculate density for each grid cell
+    shots.forEach((shot) => {
       const gridX = Math.floor(shot.x * gridSize);
       const gridY = Math.floor(shot.y * gridSize);
       
@@ -328,6 +332,7 @@ export default function ReportScreen() {
       }
     });
     
+    // Find max density for normalization
     let maxDensity = 0;
     densityGrid.forEach(row => {
       row.forEach(val => {
@@ -335,6 +340,7 @@ export default function ReportScreen() {
       });
     });
     
+    // Generate heatmap colors
     const getHeatColor = (normalizedValue: number) => {
       if (normalizedValue === 0) return 'transparent';
       
@@ -363,10 +369,12 @@ export default function ReportScreen() {
       const r = Math.round(lower.r + (upper.r - lower.r) * t);
       const g = Math.round(lower.g + (upper.g - lower.g) * t);
       const b = Math.round(lower.b + (upper.b - lower.b) * t);
+      const alpha = 0.4 + normalizedValue * 0.5; // 0.4 to 0.9 opacity
       
-      return `rgb(${r}, ${g}, ${b})`;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     };
 
+    // Create heatmap cells
     const heatmapCells: { x: number; y: number; color: string; opacity: number }[] = [];
     densityGrid.forEach((row, y) => {
       row.forEach((density, x) => {
@@ -376,7 +384,7 @@ export default function ReportScreen() {
             x: x * cellSize,
             y: y * cellSize,
             color: getHeatColor(normalizedDensity),
-            opacity: 0.3 + normalizedDensity * 0.6,
+            opacity: normalizedDensity,
           });
         }
       });
@@ -386,6 +394,7 @@ export default function ReportScreen() {
       <View style={[heatmapStyles.container, { width: size, height: size }]}>
         {/* Target Background */}
         <View style={[heatmapStyles.targetBackground, { width: targetSize, height: targetSize, borderRadius: targetSize / 2 }]}>
+          {/* Draw rings from outside to inside */}
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
             const diameterPercent = (11 - ringNum) / 10;
             const ringSize = targetSize * diameterPercent;
@@ -415,7 +424,7 @@ export default function ReportScreen() {
           </View>
         </View>
 
-        {/* Heatmap Overlay using SVG with RadialGradient */}
+        {/* Heatmap Overlay using SVG */}
         <View style={[StyleSheet.absoluteFill, { borderRadius: size / 2, overflow: 'hidden' }]}>
           <Svg width={size} height={size}>
             <Defs>
@@ -438,6 +447,17 @@ export default function ReportScreen() {
                 <Circle
                   key={`heat-${index}`}
                   cx={cell.x + cellSize / 2}
+                  cy={cell.y + cellSize / 2}
+                  r={cellSize * 1.5}
+                  fill={`url(#heatGrad-${index})`}
+                />
+              ))}
+            </G>
+          </Svg>
+        </View>
+      </View>
+    );
+  };
                   cy={cell.y + cellSize / 2}
                   r={cellSize * 1.5}
                   fill={`url(#heatGrad-${index})`}
