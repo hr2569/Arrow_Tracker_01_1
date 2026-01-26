@@ -221,8 +221,7 @@ export default function HistoryScreen() {
 
   // Get all shots from a session for target visualization
   // The shots are stored with x,y as position on the scoring image (0-1)
-  // After perspective crop, the target fills most of the image
-  // Center is at ~0.5, 0.5 and radius is ~0.45
+  // After perspective crop, the target fills most of the image with some margin
   const getAllShots = (session: Session) => {
     if (!session.rounds || session.rounds.length === 0) {
       return [];
@@ -230,31 +229,31 @@ export default function HistoryScreen() {
     
     const shots: { x: number; y: number; ring: number; roundIndex: number }[] = [];
     
-    // After perspective crop, the target center is at (0.5, 0.5) 
-    // and the target radius is about 0.45 of the image
-    const targetCenterX = 0.5;
-    const targetCenterY = 0.5;
-    const targetRadius = 0.45;
-    
-    // Our visualization target fills 95% of the view (ring 1 is at ~95% radius)
-    const visualRadius = 0.475; // Half of target fills 95% of visualization
-    
     session.rounds.forEach((round, roundIndex) => {
       round.shots?.forEach((shot: any) => {
-        // Get the raw coordinates (position on the cropped image)
+        // The shots are stored as coordinates on the target image
+        // Our visualization target fills the view, so we can use coordinates directly
+        // Just need a small adjustment since the original target has some padding
         const rawX = shot.x ?? 0.5;
         const rawY = shot.y ?? 0.5;
         
-        // Calculate offset from target center
-        const offsetX = rawX - targetCenterX;
-        const offsetY = rawY - targetCenterY;
+        // The scoring screen target has center at 0.5,0.5 and radius ~0.45
+        // Our visualization also has center at 0.5,0.5 but fills more of the view
+        // Scale coordinates to spread them out more to match ring positions
+        const centerX = 0.5;
+        const centerY = 0.5;
         
-        // Scale the offset to map target radius to visualization radius
-        const scale = visualRadius / targetRadius;
+        // Offset from center
+        const offsetX = rawX - centerX;
+        const offsetY = rawY - centerY;
         
-        // Map to visualization coordinates (centered at 0.5, 0.5)
-        const visualX = 0.5 + offsetX * scale;
-        const visualY = 0.5 + offsetY * scale;
+        // The visualization target outer ring is at ~0.475 from center (95% of 0.5)
+        // The original scoring target outer ring is at ~0.45 from center
+        // So we need to scale up slightly: 0.475/0.45 ≈ 1.056
+        const scaleFactor = 1.0; // Use 1:1 mapping - coordinates should match
+        
+        const visualX = centerX + offsetX * scaleFactor;
+        const visualY = centerY + offsetY * scaleFactor;
         
         shots.push({
           x: Math.max(0.02, Math.min(0.98, visualX)),
