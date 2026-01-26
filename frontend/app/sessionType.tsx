@@ -14,6 +14,16 @@ export default function SessionTypeScreen() {
   const router = useRouter();
   const { setSessionType } = useAppStore();
 
+  const handleBack = () => {
+    // Use replace to ensure we go back to home, or use canGoBack check
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      // Fallback to navigating to home
+      router.replace('/');
+    }
+  };
+
   const selectCompetition = () => {
     setSessionType('competition');
     router.push('/capture');
@@ -31,7 +41,7 @@ export default function SessionTypeScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={handleBack}
           >
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
