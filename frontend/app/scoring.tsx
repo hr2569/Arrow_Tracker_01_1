@@ -552,7 +552,6 @@ export default function ScoringScreen() {
                   </View>
                 </View>
               )}
-          </Pressable>
 
           {/* Arrow Markers - Outside Pressable so they don't block clicks */}
           {arrows.map((arrow) => (
