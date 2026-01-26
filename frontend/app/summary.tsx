@@ -48,6 +48,8 @@ export default function SummaryScreen() {
     incrementRoundNumber,
     sessionRounds,
     addSessionRound,
+    selectedBow,
+    sessionDistance,
   } = useAppStore();
   const [isSaving, setIsSaving] = useState(false);
   const [roundAdded, setRoundAdded] = useState(false);
