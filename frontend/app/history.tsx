@@ -707,6 +707,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#333333',
     marginBottom: 12,
   },
+  chartSection: {
+    marginBottom: 20,
+  },
+  chartTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 12,
+  },
+  chart: {
+    borderRadius: 12,
+    marginLeft: -8,
+  },
   roundsTitle: {
     fontSize: 14,
     fontWeight: '600',
