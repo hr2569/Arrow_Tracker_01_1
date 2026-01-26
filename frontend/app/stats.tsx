@@ -1203,6 +1203,72 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
   },
+  dailyList: {
+    gap: 12,
+  },
+  dailyItem: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 14,
+    borderLeftWidth: 3,
+    borderLeftColor: '#8B0000',
+  },
+  dailyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  dailyDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  dailyDate: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  dailyBadge: {
+    backgroundColor: 'rgba(139, 0, 0, 0.3)',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+  },
+  dailyBadgeText: {
+    color: '#8B0000',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  dailyStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  dailyStat: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  dailyStatValue: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  dailyStatLabel: {
+    color: '#888888',
+    fontSize: 10,
+    marginTop: 2,
+  },
+  dailyProgressContainer: {
+    height: 4,
+    backgroundColor: '#333333',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  dailyProgressBar: {
+    height: '100%',
+    borderRadius: 2,
+  },
 });
 
 // Styles for the Target Hit Map component
