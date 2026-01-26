@@ -225,13 +225,22 @@ export default function ScoringScreen() {
   };
 
   const handleTargetLayout = (event: any) => {
-    const { x, y, width, height } = event.nativeEvent.layout;
-    // Also measure in window for absolute positioning
-    if (targetRef.current) {
-      targetRef.current.measureInWindow((wx, wy, wwidth, wheight) => {
-        setTargetLayout({ x: wx, y: wy, width: wwidth || TARGET_SIZE, height: wheight || TARGET_SIZE });
-      });
-    }
+    const { width, height } = event.nativeEvent.layout;
+    // Measure in window for absolute positioning - with a small delay to ensure layout is complete
+    setTimeout(() => {
+      if (targetRef.current) {
+        targetRef.current.measureInWindow((wx, wy, wwidth, wheight) => {
+          const layout = { 
+            x: wx ?? 0, 
+            y: wy ?? 0, 
+            width: wwidth || width || TARGET_SIZE, 
+            height: wheight || height || TARGET_SIZE 
+          };
+          console.log('Target layout measured:', layout);
+          setTargetLayout(layout);
+        });
+      }
+    }, 100);
   };
 
   const handleArrowPress = (arrowId: string) => {
