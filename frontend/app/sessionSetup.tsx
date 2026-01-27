@@ -249,7 +249,7 @@ export default function SessionSetupScreen() {
                 activeOpacity={0.8}
               >
                 <View style={styles.targetPreview}>
-                  {/* Triangle arrangement: 2 on top, 1 on bottom */}
+                  {/* Inverted triangle: 1 on top, 2 on bottom */}
                   <View style={styles.vegasTrianglePreview}>
                     <View style={styles.vegasTopRow}>
                       <View style={[styles.miniTargetVegas]}>
@@ -259,6 +259,8 @@ export default function SessionSetupScreen() {
                           </View>
                         </View>
                       </View>
+                    </View>
+                    <View style={styles.vegasBottomRow}>
                       <View style={[styles.miniTargetVegas]}>
                         <View style={[styles.miniRing, { backgroundColor: '#00a2e8', width: 16, height: 16 }]}>
                           <View style={[styles.miniRing, { backgroundColor: '#ed1c24', width: 10, height: 10 }]}>
@@ -266,8 +268,6 @@ export default function SessionSetupScreen() {
                           </View>
                         </View>
                       </View>
-                    </View>
-                    <View style={styles.vegasBottomRow}>
                       <View style={[styles.miniTargetVegas]}>
                         <View style={[styles.miniRing, { backgroundColor: '#00a2e8', width: 16, height: 16 }]}>
                           <View style={[styles.miniRing, { backgroundColor: '#ed1c24', width: 10, height: 10 }]}>
