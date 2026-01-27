@@ -66,6 +66,7 @@ export default function StatsScreen() {
   const [viewMode, setViewMode] = useState<ViewMode>('distribution');
   const [bowFilter, setBowFilter] = useState<string | null>(null);
   const [distanceFilter, setDistanceFilter] = useState<string | null>(null);
+  const [targetTypeFilter, setTargetTypeFilter] = useState<string | null>(null);
 
   // Get unique bows and distances for filters
   const availableBows = useMemo(() => {
