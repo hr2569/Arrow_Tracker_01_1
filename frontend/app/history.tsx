@@ -605,8 +605,32 @@ export default function HistoryScreen() {
         </View>
 
         {/* Filter Buttons */}
-        {(availableBows.length > 0 || availableDistances.length > 0) && (
+        {(availableBows.length > 0 || availableDistances.length > 0 || availableTargetTypes.length > 0) && (
           <View style={styles.filterSection}>
+            {/* Target Type Filter */}
+            {availableTargetTypes.length > 0 && (
+              <View style={styles.filterRow}>
+                <Text style={styles.filterLabel}>Target:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+                  <TouchableOpacity
+                    style={[styles.filterChip, !targetTypeFilter && styles.filterChipActive]}
+                    onPress={() => setTargetTypeFilter(null)}
+                  >
+                    <Text style={[styles.filterChipText, !targetTypeFilter && styles.filterChipTextActive]}>All</Text>
+                  </TouchableOpacity>
+                  {availableTargetTypes.map((type) => (
+                    <TouchableOpacity
+                      key={type}
+                      style={[styles.filterChip, targetTypeFilter === type && styles.filterChipActive]}
+                      onPress={() => setTargetTypeFilter(targetTypeFilter === type ? null : type)}
+                    >
+                      <Text style={[styles.filterChipText, targetTypeFilter === type && styles.filterChipTextActive]}>{getTargetTypeName(type)}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+            
             {/* Bow Filter */}
             {availableBows.length > 0 && (
               <View style={styles.filterRow}>
