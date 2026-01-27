@@ -419,9 +419,9 @@ export default function ReportScreen() {
       for (let ringNum = 1; ringNum <= 10; ringNum++) {
         const diameterPercent = (11 - ringNum) / 10;
         const ringSize = targetSize * diameterPercent;
-        const borderColor = ringNum <= 2 ? '#666' : ringNum <= 4 ? '#333' : ringNum <= 6 ? '#004080' : ringNum <= 8 ? '#800010' : '#806000';
+        const borderColor = ringNum <= 2 ? '#888' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#005090' : ringNum <= 8 ? '#901015' : '#907000';
         targetRingLines += `
-          <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="none" stroke="${borderColor}" stroke-width="2.5" />
+          <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="none" stroke="${borderColor}" stroke-width="2" />
         `;
       }
 
