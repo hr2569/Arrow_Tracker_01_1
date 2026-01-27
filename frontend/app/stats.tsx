@@ -496,8 +496,9 @@ export default function StatsScreen() {
   };
 
   // Heatmap Component - shows density of shots as a gradient overlay
-  const HeatmapTargetMap = ({ size = 280 }: { size?: number }) => {
+  const HeatmapTargetMap = ({ size = 280, displayTargetType }: { size?: number, displayTargetType?: string }) => {
     const shots = stats.allShots;
+    const targetType = displayTargetType || 'wa_standard';
     
     if (shots.length === 0) {
       return (
@@ -510,7 +511,7 @@ export default function StatsScreen() {
 
     const targetScale = 0.8;
     const targetSize = size * targetScale;
-    const centerOffset = (size - targetSize) / 2;
+    const spotSize = targetType === 'wa_standard' ? targetSize : size * 0.28;
     
     // Higher resolution grid for smoother heatmap
     const gridSize = 56;
@@ -596,6 +597,103 @@ export default function StatsScreen() {
       });
     });
 
+    // Single spot component for multi-spot targets
+    const SingleSpot = ({ centerX, centerY }: { centerX: number, centerY: number }) => {
+      const spotRadius = spotSize / 2;
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            left: centerX - spotRadius,
+            top: centerY - spotRadius,
+            width: spotSize,
+            height: spotSize,
+          }}
+        >
+          <View style={[targetMapStyles.ring, {
+            width: spotSize, height: spotSize, borderRadius: spotSize / 2,
+            backgroundColor: '#00a2e8', borderColor: '#0077b3', borderWidth: 1,
+          }]}>
+            <View style={[targetMapStyles.ring, {
+              width: spotSize * 0.65, height: spotSize * 0.65, borderRadius: spotSize * 0.325,
+              backgroundColor: '#ed1c24', borderColor: '#b31217', borderWidth: 1,
+            }]}>
+              <View style={[targetMapStyles.ring, {
+                width: spotSize * 0.35, height: spotSize * 0.35, borderRadius: spotSize * 0.175,
+                backgroundColor: '#fff200', borderColor: '#ccaa00', borderWidth: 1,
+              }]} />
+            </View>
+          </View>
+        </View>
+      );
+    };
+
+    // Get spot centers based on target type
+    const getSpotCenters = () => {
+      const center = size / 2;
+      if (targetType === 'vegas_3spot') {
+        const spacing = size * 0.25;
+        return [
+          { x: center, y: center - spacing * 0.6 },
+          { x: center - spacing, y: center + spacing * 0.6 },
+          { x: center + spacing, y: center + spacing * 0.6 },
+        ];
+      } else if (targetType === 'nfaa_indoor') {
+        const spacing = size * 0.28;
+        return [
+          { x: center, y: center - spacing },
+          { x: center, y: center },
+          { x: center, y: center + spacing },
+        ];
+      }
+      return [];
+    };
+
+    // Render multi-spot target (Vegas or NFAA)
+    if (targetType !== 'wa_standard') {
+      const spotCenters = getSpotCenters();
+      return (
+        <View style={[targetMapStyles.container, { width: size, height: size }]}>
+          {/* Multi-spot target background */}
+          <View style={[targetMapStyles.multiSpotBackground, { width: size, height: size }]}>
+            {spotCenters.map((spot, idx) => (
+              <SingleSpot key={`spot-${idx}`} centerX={spot.x} centerY={spot.y} />
+            ))}
+          </View>
+
+          {/* Heatmap Overlay */}
+          <View style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
+            <Svg width={size} height={size}>
+              <Defs>
+                {heatmapCells.map((cell, index) => (
+                  <RadialGradient
+                    key={`grad-${index}`}
+                    id={`heatGrad-${index}`}
+                    cx="50%" cy="50%" rx="50%" ry="50%"
+                  >
+                    <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
+                    <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
+                  </RadialGradient>
+                ))}
+              </Defs>
+              <G>
+                {heatmapCells.map((cell, index) => (
+                  <Circle
+                    key={`heat-${index}`}
+                    cx={cell.x + cellSize / 2}
+                    cy={cell.y + cellSize / 2}
+                    r={cellSize * 1.5}
+                    fill={`url(#heatGrad-${index})`}
+                  />
+                ))}
+              </G>
+            </Svg>
+          </View>
+        </View>
+      );
+    }
+
+    // Render WA Standard target
     return (
       <View style={[targetMapStyles.container, { width: size, height: size }]}>
         {/* Target Background */}
