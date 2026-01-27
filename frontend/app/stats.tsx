@@ -978,18 +978,6 @@ export default function StatsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header with back button */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Statistics</Text>
-        <View style={styles.headerSpacer} />
-      </View>
-
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
