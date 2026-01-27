@@ -1149,7 +1149,7 @@ export default function HistoryScreen() {
                     <DateTimePicker
                       value={editDate}
                       mode="date"
-                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      display="default"
                       onChange={handleDateChange}
                     />
                   )}
@@ -1196,7 +1196,7 @@ export default function HistoryScreen() {
                     <DateTimePicker
                       value={editDate}
                       mode="time"
-                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      display="default"
                       onChange={handleTimeChange}
                     />
                   )}
