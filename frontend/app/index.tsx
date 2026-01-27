@@ -175,6 +175,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
+  secondaryButton: {
+    backgroundColor: '#111111',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#8B0000',
+    marginBottom: 12,
+  },
+  secondaryButtonText: {
+    color: '#8B0000',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  buttonSubtextSecondary: {
+    color: '#888888',
+    fontSize: 12,
+    marginTop: 4,
+    textAlign: 'center',
+  },
   secondaryButtonHalf: {
     flex: 1,
     backgroundColor: '#111111',
