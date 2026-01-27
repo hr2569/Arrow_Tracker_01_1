@@ -14,11 +14,9 @@ export default function SettingsScreen() {
   const router = useRouter();
 
   const settingsItems = [
-    { icon: 'person-outline', title: 'Profile', subtitle: 'Manage your profile' },
-    { icon: 'notifications-outline', title: 'Notifications', subtitle: 'Configure alerts' },
-    { icon: 'color-palette-outline', title: 'Appearance', subtitle: 'Theme and display' },
+    { icon: 'language-outline', title: 'Language', subtitle: 'English' },
+    { icon: 'moon-outline', title: 'Theme', subtitle: 'Dark' },
     { icon: 'cloud-outline', title: 'Backup & Sync', subtitle: 'Data management' },
-    { icon: 'information-circle-outline', title: 'About', subtitle: 'App version and info' },
   ];
 
   return (
