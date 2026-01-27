@@ -170,7 +170,7 @@ export default function SessionSetupScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="height"
         style={styles.keyboardView}
       >
         {/* Header */}

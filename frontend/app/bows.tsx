@@ -295,7 +295,7 @@ export default function BowsScreen() {
         onRequestClose={() => setModalVisible(false)}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior="height"
           style={styles.modalOverlay}
         >
           <View style={styles.modalContent}>
