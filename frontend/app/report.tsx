@@ -831,9 +831,10 @@ export default function ReportScreen() {
     '#fff200', '#fff200',
   ];
 
-  // Heatmap Component - shows density of shots as a gradient overlay (same as stats)
-  const HeatmapTargetMap = ({ size = 280 }: { size?: number }) => {
+  // Heatmap Component - shows density of shots as a gradient overlay with target type support
+  const HeatmapTargetMap = ({ size = 280, displayTargetType }: { size?: number, displayTargetType?: string }) => {
     const shots = allShots;
+    const targetType = displayTargetType || 'wa_standard';
     
     if (shots.length === 0) {
       return (
@@ -846,7 +847,65 @@ export default function ReportScreen() {
 
     const targetScale = 0.8;
     const targetSize = size * targetScale;
-    const centerOffset = (size - targetSize) / 2;
+    
+    // Spot radii for multi-spot targets
+    const vegasSpotRadius = 0.19;
+    const nfaaSpotRadius = 0.14;
+
+    // Get spot centers in normalized coordinates (0-1) - MUST MATCH scoring.tsx
+    const getSpotCentersNormalized = () => {
+      if (targetType === 'vegas_3spot') {
+        return [
+          { x: 0.5, y: 0.28 },   // Top center
+          { x: 0.29, y: 0.72 },  // Bottom left
+          { x: 0.71, y: 0.72 },  // Bottom right
+        ];
+      } else if (targetType === 'nfaa_indoor') {
+        return [
+          { x: 0.5, y: 0.17 },   // Top
+          { x: 0.5, y: 0.5 },    // Middle
+          { x: 0.5, y: 0.83 },   // Bottom
+        ];
+      }
+      return [{ x: 0.5, y: 0.5 }];
+    };
+
+    const spotCentersNormalized = getSpotCentersNormalized();
+    const spotCenters = spotCentersNormalized.map(c => ({ x: c.x * size, y: c.y * size }));
+    const spotRadius = targetType === 'vegas_3spot' ? vegasSpotRadius : nfaaSpotRadius;
+    const spotSize = spotRadius * 2 * size;
+
+    // Single spot component for multi-spot targets
+    const SingleSpot = ({ centerX, centerY }: { centerX: number, centerY: number }) => {
+      const currentSpotSize = targetType === 'vegas_3spot' ? size * 0.19 * 2 : size * 0.14 * 2;
+      const spotRadiusPx = currentSpotSize / 2;
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            left: centerX - spotRadiusPx,
+            top: centerY - spotRadiusPx,
+            width: currentSpotSize,
+            height: currentSpotSize,
+          }}
+        >
+          <View style={[heatmapStyles.ring, {
+            width: currentSpotSize, height: currentSpotSize, borderRadius: currentSpotSize / 2,
+            backgroundColor: '#00a2e8', borderColor: '#0077b3', borderWidth: 1,
+          }]}>
+            <View style={[heatmapStyles.ring, {
+              width: currentSpotSize * 0.65, height: currentSpotSize * 0.65, borderRadius: currentSpotSize * 0.325,
+              backgroundColor: '#ed1c24', borderColor: '#b31217', borderWidth: 1,
+            }]}>
+              <View style={[heatmapStyles.ring, {
+                width: currentSpotSize * 0.35, height: currentSpotSize * 0.35, borderRadius: currentSpotSize * 0.175,
+                backgroundColor: '#fff200', borderColor: '#ccaa00', borderWidth: 1,
+              }]} />
+            </View>
+          </View>
+        </View>
+      );
+    };
     
     // Higher resolution grid for smoother heatmap
     const gridSize = 56;
@@ -932,6 +991,53 @@ export default function ReportScreen() {
       });
     });
 
+    // Render multi-spot target (Vegas or NFAA)
+    if (targetType !== 'wa_standard') {
+      return (
+        <View style={[heatmapStyles.container, { width: size, height: size }]}>
+          {/* Multi-spot target background */}
+          <View style={[heatmapStyles.multiSpotBackground, { width: size, height: size }]}>
+            {spotCenters.map((spot, idx) => (
+              <SingleSpot key={`spot-${idx}`} centerX={spot.x} centerY={spot.y} />
+            ))}
+          </View>
+
+          {/* Heatmap Overlay using SVG */}
+          <View style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
+            <Svg width={size} height={size}>
+              <Defs>
+                {heatmapCells.map((cell, index) => (
+                  <RadialGradient
+                    key={`grad-${index}`}
+                    id={`heatGradReport-${index}`}
+                    cx="50%"
+                    cy="50%"
+                    rx="50%"
+                    ry="50%"
+                  >
+                    <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
+                    <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
+                  </RadialGradient>
+                ))}
+              </Defs>
+              <G>
+                {heatmapCells.map((cell, index) => (
+                  <Circle
+                    key={`heat-${index}`}
+                    cx={cell.x + cellSize / 2}
+                    cy={cell.y + cellSize / 2}
+                    r={cellSize * 1.5}
+                    fill={`url(#heatGradReport-${index})`}
+                  />
+                ))}
+              </G>
+            </Svg>
+          </View>
+        </View>
+      );
+    }
+
+    // Render WA Standard single-spot target
     return (
       <View style={[heatmapStyles.container, { width: size, height: size }]}>
         {/* Target Background */}
@@ -973,7 +1079,7 @@ export default function ReportScreen() {
               {heatmapCells.map((cell, index) => (
                 <RadialGradient
                   key={`grad-${index}`}
-                  id={`heatGrad-${index}`}
+                  id={`heatGradReport-${index}`}
                   cx="50%"
                   cy="50%"
                   rx="50%"
@@ -991,7 +1097,7 @@ export default function ReportScreen() {
                   cx={cell.x + cellSize / 2}
                   cy={cell.y + cellSize / 2}
                   r={cellSize * 1.5}
-                  fill={`url(#heatGrad-${index})`}
+                  fill={`url(#heatGradReport-${index})`}
                 />
               ))}
             </G>
