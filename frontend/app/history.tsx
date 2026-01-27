@@ -1307,6 +1307,14 @@ const styles = StyleSheet.create({
     color: '#8B0000',
     fontWeight: '500',
   },
+  targetTypeBadge: {
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+  },
+  targetTypeText: {
+    color: '#FFD700',
+  },
   deleteBtn: {
     position: 'absolute',
     top: 16,
