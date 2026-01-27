@@ -500,37 +500,8 @@ export default function StatsScreen() {
       const spotRadius = targetType === 'vegas_3spot' ? vegasSpotRadius : nfaaSpotRadius;
       const spotSize = spotRadius * 2 * size;
 
-      // Find which spot a shot belongs to (closest spot)
-      const findClosestSpot = (shotX: number, shotY: number) => {
-        let closestIdx = 0;
-        let minDist = Infinity;
-        spotCentersNormalized.forEach((center, idx) => {
-          const dist = Math.sqrt(Math.pow(shotX - center.x, 2) + Math.pow(shotY - center.y, 2));
-          if (dist < minDist) {
-            minDist = dist;
-            closestIdx = idx;
-          }
-        });
-        return closestIdx;
-      };
-
-      // Transform shot coordinates for multi-spot targets
-      const transformedShots = shots.map(shot => {
-        const spotIdx = findClosestSpot(shot.x, shot.y);
-        const spotCenter = spotCentersNormalized[spotIdx];
-        const spotCenterPx = spotCenters[spotIdx];
-        
-        const offsetX = shot.x - spotCenter.x;
-        const offsetY = shot.y - spotCenter.y;
-        const scaleFactor = (spotSize / 2) / spotRadius;
-        
-        return {
-          x: (spotCenterPx.x + (offsetX * scaleFactor)) / size,
-          y: (spotCenterPx.y + (offsetY * scaleFactor)) / size,
-          ring: shot.ring,
-        };
-      });
-
+      // For multi-spot targets, use raw coordinates directly
+      // The raw coordinates are already relative to the correct spot from the scoring screen
       return (
         <View style={[targetMapStyles.container, { width: size, height: size }]}>
           {/* Multi-spot target background */}
@@ -540,11 +511,12 @@ export default function StatsScreen() {
             ))}
           </View>
 
-          {/* Plot all shots */}
-          {transformedShots.map((shot, index) => {
+          {/* Plot all shots using raw coordinates */}
+          {shots.map((shot, index) => {
             const dotSize = 14;
-            const left = shot.x * size - dotSize / 2;
-            const top = shot.y * size - dotSize / 2;
+            // Use raw coordinates for accurate positioning on multi-spot targets
+            const left = shot.rawX * size - dotSize / 2;
+            const top = shot.rawY * size - dotSize / 2;
             
             return (
               <View
