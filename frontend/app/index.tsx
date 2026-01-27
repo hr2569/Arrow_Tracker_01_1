@@ -8,6 +8,38 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
+
+// Custom Bow Icon component
+const BowIcon = ({ size = 36, color = '#8B0000' }: { size?: number; color?: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    {/* Bow curve */}
+    <Path
+      d="M4 4C4 4 4 12 4 12C4 16 8 20 12 20C16 20 20 16 20 12C20 12 20 4 20 4"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      fill="none"
+    />
+    {/* Bow string */}
+    <Path
+      d="M4 4L12 12L20 4"
+      stroke={color}
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      fill="none"
+    />
+    {/* Arrow */}
+    <Path
+      d="M12 12L12 22M10 20L12 22L14 20"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </Svg>
+);
 
 export default function HomeScreen() {
   const router = useRouter();
