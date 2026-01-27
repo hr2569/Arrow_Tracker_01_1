@@ -512,13 +512,17 @@ export default function HistoryScreen() {
   // Target Hit Map Component
   const TargetHitMap = ({ session, size = 200 }: { session: Session; size?: number }) => {
     const shots = getAllShots(session);
+    const targetType = session.target_type || 'wa_standard';
     
     if (shots.length === 0) {
       return null;
     }
 
-    // Ring colors matching the scoring screen
-    const ringColors = [
+    // Ring colors for multi-spot targets (Vegas/NFAA)
+    const multiSpotRingColors = ['#00a2e8', '#ed1c24', '#fff200']; // Blue, Red, Gold (outer to inner)
+    
+    // Ring colors for WA Standard (10 rings)
+    const waRingColors = [
       '#f5f5f0', // 1-2: White
       '#f5f5f0',
       '#2a2a2a', // 3-4: Black
@@ -533,99 +537,149 @@ export default function HistoryScreen() {
 
     // Round colors for differentiating rounds
     const roundColors = [
-      '#FF6B6B', // Red
-      '#4ECDC4', // Teal
-      '#45B7D1', // Blue
-      '#96CEB4', // Green
-      '#FFEAA7', // Yellow
-      '#DDA0DD', // Plum
-      '#98D8C8', // Mint
-      '#F7DC6F', // Gold
-      '#BB8FCE', // Purple
-      '#85C1E9', // Light Blue
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+      '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
     ];
 
-    // The target fills 80% of the visualization (matching scoring's effectiveRadius = 0.4)
-    const targetScale = 0.8; // Target fills 80% of the view
+    const targetScale = 0.8;
+    const spotSize = targetType === 'wa_standard' ? size * targetScale : size * 0.28;
 
-    return (
-      <View style={[targetMapStyles.container, { width: size, height: size }]}>
-        {/* Target Background - scaled to 80% of container */}
-        <View style={[targetMapStyles.targetBackground, { width: size * targetScale, height: size * targetScale, borderRadius: (size * targetScale) / 2 }]}>
-          {/* Draw rings from outside to inside */}
-          {/* Scoring: Ring 1 at 90-100% normalized distance, Ring 10 at 0-10% */}
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
-            // Each ring spans 10% of the target radius
-            // Ring 1: 90-100%, Ring 10: 0-10%
-            const diameterPercent = (11 - ringNum) / 10;
-            const ringSize = size * targetScale * diameterPercent;
-            const bgColor = ringColors[ringNum - 1];
-            return (
-              <View
-                key={`ring-${ringNum}`}
-                style={[
-                  targetMapStyles.ring,
-                  {
-                    width: ringSize,
-                    height: ringSize,
-                    borderRadius: ringSize / 2,
-                    backgroundColor: bgColor,
-                    borderColor: ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00',
-                    borderWidth: 1,
-                  },
-                ]}
-              />
-            );
-          })}
-          
-          {/* Center X mark */}
-          <View style={targetMapStyles.centerMark}>
-            <View style={targetMapStyles.centerLine} />
-            <View style={[targetMapStyles.centerLine, { transform: [{ rotate: '90deg' }] }]} />
+    // Single spot component for multi-spot targets
+    const SingleSpot = ({ centerX, centerY, spotIdx }: { centerX: number, centerY: number, spotIdx: number }) => {
+      const spotRadius = spotSize / 2;
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            left: centerX - spotRadius,
+            top: centerY - spotRadius,
+            width: spotSize,
+            height: spotSize,
+          }}
+        >
+          {/* Blue ring (outer) */}
+          <View style={[targetMapStyles.ring, {
+            width: spotSize, height: spotSize, borderRadius: spotSize / 2,
+            backgroundColor: '#00a2e8', borderColor: '#0077b3', borderWidth: 1,
+          }]}>
+            {/* Red ring */}
+            <View style={[targetMapStyles.ring, {
+              width: spotSize * 0.65, height: spotSize * 0.65, borderRadius: spotSize * 0.325,
+              backgroundColor: '#ed1c24', borderColor: '#b31217', borderWidth: 1,
+            }]}>
+              {/* Gold ring (center) */}
+              <View style={[targetMapStyles.ring, {
+                width: spotSize * 0.35, height: spotSize * 0.35, borderRadius: spotSize * 0.175,
+                backgroundColor: '#fff200', borderColor: '#ccaa00', borderWidth: 1,
+              }]} />
+            </View>
           </View>
-          
-          {/* Ring labels - show point values on the side */}
-          <View style={targetMapStyles.ringLabelsContainer}>
-            {[1, 3, 5, 7, 9].map((ringNum) => {
-              const labelDistance = ((10.5 - ringNum) / 10) * targetScale * 0.5; // radius position
+        </View>
+      );
+    };
+
+    // Get spot centers based on target type
+    const getSpotCenters = () => {
+      const center = size / 2;
+      if (targetType === 'vegas_3spot') {
+        // Inverted triangle: 1 on top, 2 on bottom
+        const spacing = size * 0.25;
+        return [
+          { x: center, y: center - spacing * 0.6 },  // Top
+          { x: center - spacing, y: center + spacing * 0.6 },  // Bottom left
+          { x: center + spacing, y: center + spacing * 0.6 },  // Bottom right
+        ];
+      } else if (targetType === 'nfaa_indoor') {
+        // Vertical stack: 3 targets
+        const spacing = size * 0.28;
+        return [
+          { x: center, y: center - spacing },  // Top
+          { x: center, y: center },  // Middle
+          { x: center, y: center + spacing },  // Bottom
+        ];
+      }
+      return [{ x: center, y: center }]; // WA Standard - single target
+    };
+
+    const spotCenters = getSpotCenters();
+
+    // Render WA Standard target
+    if (targetType === 'wa_standard') {
+      return (
+        <View style={[targetMapStyles.container, { width: size, height: size }]}>
+          <View style={[targetMapStyles.targetBackground, { width: size * targetScale, height: size * targetScale, borderRadius: (size * targetScale) / 2 }]}>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
+              const diameterPercent = (11 - ringNum) / 10;
+              const ringSize = size * targetScale * diameterPercent;
+              const bgColor = waRingColors[ringNum - 1];
               return (
                 <View
-                  key={`label-${ringNum}`}
+                  key={`ring-${ringNum}`}
                   style={[
-                    targetMapStyles.ringLabel,
-                    { right: -25, top: `${50 - labelDistance * 100}%` }
+                    targetMapStyles.ring,
+                    {
+                      width: ringSize, height: ringSize, borderRadius: ringSize / 2,
+                      backgroundColor: bgColor,
+                      borderColor: ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00',
+                      borderWidth: 1,
+                    },
                   ]}
-                >
-                  <Text style={targetMapStyles.ringLabelText}>{ringNum}</Text>
-                </View>
+                />
               );
             })}
+            <View style={targetMapStyles.centerMark}>
+              <View style={targetMapStyles.centerLine} />
+              <View style={[targetMapStyles.centerLine, { transform: [{ rotate: '90deg' }] }]} />
+            </View>
           </View>
+
+          {/* Plot shots */}
+          {shots.map((shot, index) => {
+            const dotSize = 12;
+            const left = shot.x * size - dotSize / 2;
+            const top = shot.y * size - dotSize / 2;
+            const roundColor = roundColors[shot.roundIndex % roundColors.length];
+            return (
+              <View
+                key={`shot-${index}`}
+                style={[
+                  targetMapStyles.shotDot,
+                  { left, top, width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: roundColor },
+                ]}
+              >
+                <Text style={targetMapStyles.shotLabel}>{shot.ring}</Text>
+              </View>
+            );
+          })}
+        </View>
+      );
+    }
+
+    // Render Vegas 3-Spot or NFAA Indoor
+    return (
+      <View style={[targetMapStyles.container, { width: size, height: size }]}>
+        {/* Draw the multi-spot target background */}
+        <View style={[targetMapStyles.multiSpotBackground, { width: size, height: size }]}>
+          {spotCenters.map((spot, idx) => (
+            <SingleSpot key={`spot-${idx}`} centerX={spot.x} centerY={spot.y} spotIdx={idx} />
+          ))}
         </View>
 
         {/* Plot shots */}
         {shots.map((shot, index) => {
-          const dotSize = 12;
+          const dotSize = 10;
           const left = shot.x * size - dotSize / 2;
           const top = shot.y * size - dotSize / 2;
           const roundColor = roundColors[shot.roundIndex % roundColors.length];
-          
           return (
             <View
               key={`shot-${index}`}
               style={[
                 targetMapStyles.shotDot,
-                {
-                  left,
-                  top,
-                  width: dotSize,
-                  height: dotSize,
-                  borderRadius: dotSize / 2,
-                  backgroundColor: roundColor,
-                },
+                { left, top, width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: roundColor },
               ]}
             >
-              <Text style={targetMapStyles.shotLabel}>{shot.ring}</Text>
+              <Text style={[targetMapStyles.shotLabel, { fontSize: 6 }]}>{shot.ring}</Text>
             </View>
           );
         })}
