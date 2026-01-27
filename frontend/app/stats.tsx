@@ -664,20 +664,6 @@ export default function StatsScreen() {
     const spotCentersNormalized = getSpotCentersNormalized();
     const spotCenters = spotCentersNormalized.map(c => ({ x: c.x * size, y: c.y * size }));
 
-    // Find which spot a shot belongs to (closest spot)
-    const findClosestSpot = (shotX: number, shotY: number) => {
-      let closestIdx = 0;
-      let minDist = Infinity;
-      spotCentersNormalized.forEach((center, idx) => {
-        const dist = Math.sqrt(Math.pow(shotX - center.x, 2) + Math.pow(shotY - center.y, 2));
-        if (dist < minDist) {
-          minDist = dist;
-          closestIdx = idx;
-        }
-      });
-      return closestIdx;
-    };
-
     // For multi-spot targets, use raw coordinates directly
     // For WA standard, use the transformed coordinates (which look better for single target)
     const shotsForHeatmap = shots.map(shot => {
