@@ -114,22 +114,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-  targetRing1: {
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#FFD700',
-    borderWidth: 2,
-    borderColor: '#FFC000',
-  },
-  targetCenter: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#fff',
-  },
-  title: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#ffffff',
