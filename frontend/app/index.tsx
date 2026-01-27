@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   secondaryButton: {
-    backgroundColor: '#111111',
+    backgroundColor: '#1e1e1e',
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
   secondaryButtonHalf: {
     flex: 1,
-    backgroundColor: '#111111',
+    backgroundColor: '#1e1e1e',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#2a2a2a',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
