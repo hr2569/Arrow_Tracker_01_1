@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../hooks/useTheme';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 
