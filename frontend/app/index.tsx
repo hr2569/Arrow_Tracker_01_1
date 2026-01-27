@@ -46,31 +46,34 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
 
-          {/* History Button - Full Width */}
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => router.push('/history')}
-            activeOpacity={0.8}
-          >
-            <View style={styles.buttonIconContainerSmall}>
-              <Ionicons name="time" size={36} color="#8B0000" />
-            </View>
-            <Text style={styles.secondaryButtonText}>History & Stats</Text>
-            <Text style={styles.buttonSubtextSecondary}>
-              Sessions and performance
-            </Text>
-          </TouchableOpacity>
-
-          {/* Bows Button */}
-          <View style={styles.bottomRow}>
+          {/* History and Bows side by side */}
+          <View style={styles.secondaryRow}>
             <TouchableOpacity
-              style={[styles.bottomButton, { flex: 1 }]}
+              style={styles.secondaryButtonHalf}
+              onPress={() => router.push('/history')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.buttonIconContainerSmall}>
+                <Ionicons name="time" size={36} color="#8B0000" />
+              </View>
+              <Text style={styles.secondaryButtonTextSmall}>History</Text>
+              <Text style={styles.buttonSubtextSecondarySmall}>
+                Sessions & Stats
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.secondaryButtonHalf}
               onPress={() => router.push('/bows')}
               activeOpacity={0.8}
             >
-              <Ionicons name="arrow-forward-outline" size={28} color="#8B0000" />
-              <Text style={styles.bottomButtonText}>Bows</Text>
-              <Text style={styles.bottomButtonSubtext}>Equipment</Text>
+              <View style={styles.buttonIconContainerSmall}>
+                <Ionicons name="arrow-forward-outline" size={36} color="#8B0000" />
+              </View>
+              <Text style={styles.secondaryButtonTextSmall}>Bows</Text>
+              <Text style={styles.buttonSubtextSecondarySmall}>
+                Equipment
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
