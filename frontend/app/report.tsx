@@ -1093,6 +1093,32 @@ export default function ReportScreen() {
             </View>
           )}
 
+          {/* Target Type Filter */}
+          {availableTargetTypes.length > 0 && (
+            <View style={styles.filterSection}>
+              <Text style={styles.sectionLabel}>Filter by Target</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <TouchableOpacity
+                  style={[styles.filterChip, !selectedTargetType && styles.filterChipActive]}
+                  onPress={() => setSelectedTargetType(null)}
+                >
+                  <Text style={[styles.filterChipText, !selectedTargetType && styles.filterChipTextActive]}>All Targets</Text>
+                </TouchableOpacity>
+                {availableTargetTypes.map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={[styles.filterChip, selectedTargetType === type && styles.filterChipActive]}
+                    onPress={() => setSelectedTargetType(selectedTargetType === type ? null : type)}
+                  >
+                    <Text style={[styles.filterChipText, selectedTargetType === type && styles.filterChipTextActive]}>
+                      {getTargetTypeName(type)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
           {/* Quick Select Buttons */}
           <View style={styles.quickSelectContainer}>
             <Text style={styles.sectionLabel}>Time Range</Text>
