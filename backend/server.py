@@ -470,7 +470,8 @@ async def create_session(request: CreateSessionRequest):
         name=request.name or f"Session {datetime.utcnow().strftime('%Y-%m-%d %H:%M')}",
         bow_id=request.bow_id,
         bow_name=request.bow_name,
-        distance=request.distance
+        distance=request.distance,
+        target_type=request.target_type or "wa_standard"
     )
     session_dict = session.dict()
     # Convert datetime to ISO string for JSON serialization
