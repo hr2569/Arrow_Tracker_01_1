@@ -403,27 +403,39 @@ export default function ReportScreen() {
       // Target rings colors
       const ringColorsPdf = ['#f5f5f0', '#f5f5f0', '#2a2a2a', '#2a2a2a', '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24', '#fff200', '#fff200'];
       
-      // Generate target rings
-      let targetRings = '';
+      // Generate target ring backgrounds (filled circles)
+      let targetRingBgs = '';
       for (let ringNum = 1; ringNum <= 10; ringNum++) {
         const diameterPercent = (11 - ringNum) / 10;
         const ringSize = targetSize * diameterPercent;
         const bgColor = ringColorsPdf[ringNum - 1];
-        const borderColor = ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00';
-        targetRings += `
-          <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="${bgColor}" stroke="${borderColor}" stroke-width="1.5" />
+        targetRingBgs += `
+          <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="${bgColor}" />
+        `;
+      }
+      
+      // Generate target ring outlines (to draw on top of heatmap)
+      let targetRingLines = '';
+      for (let ringNum = 1; ringNum <= 10; ringNum++) {
+        const diameterPercent = (11 - ringNum) / 10;
+        const ringSize = targetSize * diameterPercent;
+        const borderColor = ringNum <= 2 ? '#999' : ringNum <= 4 ? '#555' : ringNum <= 6 ? '#0066a0' : ringNum <= 8 ? '#a01015' : '#aa9000';
+        targetRingLines += `
+          <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="none" stroke="${borderColor}" stroke-width="1.5" />
         `;
       }
 
       return `
         <svg width="100%" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;">
-          <!-- Target rings -->
-          ${targetRings}
+          <!-- Target ring backgrounds -->
+          ${targetRingBgs}
+          <!-- Heatmap overlay -->
+          ${heatCircles}
+          <!-- Target ring lines (on top of heatmap) -->
+          ${targetRingLines}
           <!-- Center cross -->
           <line x1="${size/2 - 12}" y1="${size/2}" x2="${size/2 + 12}" y2="${size/2}" stroke="#000" stroke-width="2" />
           <line x1="${size/2}" y1="${size/2 - 12}" x2="${size/2}" y2="${size/2 + 12}" stroke="#000" stroke-width="2" />
-          <!-- Heatmap overlay -->
-          ${heatCircles}
         </svg>
       `;
     };
