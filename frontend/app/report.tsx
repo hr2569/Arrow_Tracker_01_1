@@ -64,6 +64,7 @@ export default function ReportScreen() {
   // Filters
   const [selectedBow, setSelectedBow] = useState<string | null>(null);
   const [selectedDistance, setSelectedDistance] = useState<string | null>(null);
+  const [selectedTargetType, setSelectedTargetType] = useState<string | null>(null);
   
   // Custom date range
   const [startDate, setStartDate] = useState(() => {
