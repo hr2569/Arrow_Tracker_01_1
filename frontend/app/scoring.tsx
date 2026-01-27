@@ -58,7 +58,6 @@ export default function ScoringScreen() {
   const [error, setError] = useState<string | null>(null);
   const [targetLayout, setTargetLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [zoomIndex, setZoomIndex] = useState(0); // Index into ZOOM_LEVELS
-  const targetRef = useRef<Pressable>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
   // Session info
