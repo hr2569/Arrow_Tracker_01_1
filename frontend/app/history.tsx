@@ -1663,8 +1663,15 @@ const targetMapStyles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#f5f5f0',
   },
+  multiSpotBackground: {
+    position: 'relative',
+    backgroundColor: 'rgba(30, 30, 30, 0.3)',
+    borderRadius: 8,
+  },
   ring: {
     position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centerMark: {
     position: 'absolute',
