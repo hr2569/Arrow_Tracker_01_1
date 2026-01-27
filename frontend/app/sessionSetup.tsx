@@ -32,13 +32,14 @@ type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
 
 export default function SessionSetupScreen() {
   const router = useRouter();
-  const { sessionType, setSelectedBow, setSessionDistance } = useAppStore();
+  const { sessionType, setSelectedBow, setSessionDistance, targetType, setTargetType } = useAppStore();
   
   const [bows, setBows] = useState<Bow[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBowId, setSelectedBowId] = useState<string | null>(null);
   const [distance, setDistance] = useState('');
   const [distanceUnit, setDistanceUnit] = useState<'m' | 'yd'>('m');
+  const [selectedTargetType, setSelectedTargetType] = useState<TargetType>(targetType as TargetType);
 
   const fetchBows = async () => {
     try {
