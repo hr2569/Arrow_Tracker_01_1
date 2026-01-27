@@ -77,26 +77,16 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Bows and Report Buttons */}
+          {/* Bows Button */}
           <View style={styles.bottomRow}>
             <TouchableOpacity
-              style={styles.bottomButton}
+              style={[styles.bottomButton, { flex: 1 }]}
               onPress={() => router.push('/bows')}
               activeOpacity={0.8}
             >
               <Ionicons name="arrow-forward-outline" size={28} color="#8B0000" />
               <Text style={styles.bottomButtonText}>Bows</Text>
               <Text style={styles.bottomButtonSubtext}>Equipment</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.bottomButton}
-              onPress={() => router.push('/report')}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="document-text-outline" size={28} color="#8B0000" />
-              <Text style={styles.bottomButtonText}>Report</Text>
-              <Text style={styles.bottomButtonSubtext}>Generate</Text>
             </TouchableOpacity>
           </View>
         </View>
