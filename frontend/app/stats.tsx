@@ -66,7 +66,7 @@ export default function StatsScreen() {
   const [viewMode, setViewMode] = useState<ViewMode>('distribution');
   const [bowFilter, setBowFilter] = useState<string | null>(null);
   const [distanceFilter, setDistanceFilter] = useState<string | null>(null);
-  const [targetTypeFilter, setTargetTypeFilter] = useState<string | null>(null);
+  const [targetTypeFilter, setTargetTypeFilter] = useState<string>('wa_standard');
 
   // Get unique bows and distances for filters
   const availableBows = useMemo(() => {
@@ -86,8 +86,22 @@ export default function StatsScreen() {
   const availableTargetTypes = useMemo(() => {
     // Include default 'wa_standard' for sessions without target_type
     const types = sessions.map(s => s.target_type || 'wa_standard');
-    return [...new Set(types)];
+    const uniqueTypes = [...new Set(types)];
+    // Ensure wa_standard is always first in the list for consistent ordering
+    const sortedTypes = uniqueTypes.sort((a, b) => {
+      if (a === 'wa_standard') return -1;
+      if (b === 'wa_standard') return 1;
+      return a.localeCompare(b);
+    });
+    return sortedTypes;
   }, [sessions]);
+
+  // Set initial target type filter when sessions load
+  useEffect(() => {
+    if (availableTargetTypes.length > 0 && !availableTargetTypes.includes(targetTypeFilter)) {
+      setTargetTypeFilter(availableTargetTypes[0]);
+    }
+  }, [availableTargetTypes]);
 
   const fetchSessions = async () => {
     try {
