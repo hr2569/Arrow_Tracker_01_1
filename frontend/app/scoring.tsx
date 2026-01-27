@@ -451,10 +451,39 @@ export default function ScoringScreen() {
                 >
                   {/* Render based on target layout type */}
                   {targetConfig.layout === 'triple_triangle' ? (
-                    // Vegas 3-Spot: Triangle arrangement (2 on top, 1 on bottom)
+                    // Vegas 3-Spot: Inverted triangle arrangement (1 on top, 2 on bottom)
                     <View style={styles.tripleTargetLayout}>
-                      {/* Top row - 2 targets */}
+                      {/* Top row - 1 target centered */}
                       <View style={styles.tripleTopRow}>
+                        <View style={[styles.spotTarget, { width: TARGET_SIZE * 0.42, height: TARGET_SIZE * 0.42 }]}>
+                          {targetConfig.colors.map((color, i) => {
+                            const numRings = targetConfig.colors.length;
+                            const ringSize = TARGET_SIZE * 0.42 * 0.95 * ((numRings - i) / numRings);
+                            return (
+                              <View
+                                key={`ring-top-${i}`}
+                                style={[
+                                  styles.ring,
+                                  {
+                                    width: ringSize,
+                                    height: ringSize,
+                                    borderRadius: ringSize / 2,
+                                    backgroundColor: manualMode ? color.bg : 'transparent',
+                                    borderColor: manualMode ? color.border : `${color.bg}99`,
+                                    borderWidth: manualMode ? 1 : 1.5,
+                                  },
+                                ]}
+                              />
+                            );
+                          })}
+                          <View style={styles.centerMark}>
+                            <View style={[styles.centerLine, { width: 8 }]} />
+                            <View style={[styles.centerLine, styles.centerLineVertical, { height: 8 }]} />
+                          </View>
+                        </View>
+                      </View>
+                      {/* Bottom row - 2 targets */}
+                      <View style={styles.tripleBottomRow}>
                         {[0, 1].map((spotIndex) => (
                           <View key={`spot-${spotIndex}`} style={[styles.spotTarget, { width: TARGET_SIZE * 0.42, height: TARGET_SIZE * 0.42 }]}>
                             {targetConfig.colors.map((color, i) => {
@@ -483,35 +512,6 @@ export default function ScoringScreen() {
                             </View>
                           </View>
                         ))}
-                      </View>
-                      {/* Bottom row - 1 target centered */}
-                      <View style={styles.tripleBottomRow}>
-                        <View style={[styles.spotTarget, { width: TARGET_SIZE * 0.42, height: TARGET_SIZE * 0.42 }]}>
-                          {targetConfig.colors.map((color, i) => {
-                            const numRings = targetConfig.colors.length;
-                            const ringSize = TARGET_SIZE * 0.42 * 0.95 * ((numRings - i) / numRings);
-                            return (
-                              <View
-                                key={`ring-bottom-${i}`}
-                                style={[
-                                  styles.ring,
-                                  {
-                                    width: ringSize,
-                                    height: ringSize,
-                                    borderRadius: ringSize / 2,
-                                    backgroundColor: manualMode ? color.bg : 'transparent',
-                                    borderColor: manualMode ? color.border : `${color.bg}99`,
-                                    borderWidth: manualMode ? 1 : 1.5,
-                                  },
-                                ]}
-                              />
-                            );
-                          })}
-                          <View style={styles.centerMark}>
-                            <View style={[styles.centerLine, { width: 8 }]} />
-                            <View style={[styles.centerLine, styles.centerLineVertical, { height: 8 }]} />
-                          </View>
-                        </View>
                       </View>
                     </View>
                   ) : targetConfig.layout === 'triple_vertical' ? (
