@@ -1233,7 +1233,7 @@ export default function StatsScreen() {
           
           <View style={styles.targetWrapper}>
             {viewMode === 'distribution' ? (
-              <AggregatedTargetMap size={SCREEN_WIDTH - 80} />
+              <AggregatedTargetMap size={SCREEN_WIDTH - 80} displayTargetType={targetTypeFilter} />
             ) : (
               <HeatmapTargetMap size={SCREEN_WIDTH - 80} displayTargetType={targetTypeFilter} />
             )}
