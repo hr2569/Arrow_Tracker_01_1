@@ -772,9 +772,15 @@ export default function HistoryScreen() {
                         </View>
                       </View>
 
-                      {/* Bow & Distance Info */}
-                      {(session.bow_name || session.distance) && (
+                      {/* Bow & Distance & Target Type Info */}
+                      {(session.bow_name || session.distance || session.target_type) && (
                         <View style={styles.sessionEquipment}>
+                          {session.target_type && (
+                            <View style={[styles.equipmentItem, styles.targetTypeBadge]}>
+                              <Ionicons name="disc-outline" size={14} color="#FFD700" />
+                              <Text style={[styles.equipmentText, styles.targetTypeText]}>{getTargetTypeName(session.target_type)}</Text>
+                            </View>
+                          )}
                           {session.bow_name && (
                             <View style={styles.equipmentItem}>
                               <Ionicons name="fitness-outline" size={14} color="#8B0000" />
