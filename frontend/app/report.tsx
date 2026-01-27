@@ -334,7 +334,6 @@ export default function ReportScreen() {
       const targetScale = 0.9;
       const targetSize = size * targetScale;
       const targetType = selectedTargetType || 'wa_standard';
-      console.log('[PDF Debug] targetType:', targetType, 'selectedTargetType:', selectedTargetType);
       
       // Spot centers for multi-spot targets (normalized 0-1)
       const getSpotCentersNormalized = () => {
