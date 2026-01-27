@@ -449,38 +449,140 @@ export default function ScoringScreen() {
                     },
                   ]}
                 >
-                  {/* White/Cream background for the target */}
-                  {manualMode && (
-                    <View style={[styles.targetBackground, { width: TARGET_SIZE, height: TARGET_SIZE, borderRadius: TARGET_SIZE / 2 }]} />
+                  {/* Render based on target layout type */}
+                  {targetConfig.layout === 'triple_triangle' ? (
+                    // Vegas 3-Spot: Triangle arrangement (2 on top, 1 on bottom)
+                    <View style={styles.tripleTargetLayout}>
+                      {/* Top row - 2 targets */}
+                      <View style={styles.tripleTopRow}>
+                        {[0, 1].map((spotIndex) => (
+                          <View key={`spot-${spotIndex}`} style={[styles.spotTarget, { width: TARGET_SIZE * 0.42, height: TARGET_SIZE * 0.42 }]}>
+                            {targetConfig.colors.map((color, i) => {
+                              const numRings = targetConfig.colors.length;
+                              const ringSize = TARGET_SIZE * 0.42 * 0.95 * ((numRings - i) / numRings);
+                              return (
+                                <View
+                                  key={`ring-${spotIndex}-${i}`}
+                                  style={[
+                                    styles.ring,
+                                    {
+                                      width: ringSize,
+                                      height: ringSize,
+                                      borderRadius: ringSize / 2,
+                                      backgroundColor: manualMode ? color.bg : 'transparent',
+                                      borderColor: manualMode ? color.border : `${color.bg}99`,
+                                      borderWidth: manualMode ? 1 : 1.5,
+                                    },
+                                  ]}
+                                />
+                              );
+                            })}
+                            <View style={styles.centerMark}>
+                              <View style={[styles.centerLine, { width: 8 }]} />
+                              <View style={[styles.centerLine, styles.centerLineVertical, { height: 8 }]} />
+                            </View>
+                          </View>
+                        ))}
+                      </View>
+                      {/* Bottom row - 1 target centered */}
+                      <View style={styles.tripleBottomRow}>
+                        <View style={[styles.spotTarget, { width: TARGET_SIZE * 0.42, height: TARGET_SIZE * 0.42 }]}>
+                          {targetConfig.colors.map((color, i) => {
+                            const numRings = targetConfig.colors.length;
+                            const ringSize = TARGET_SIZE * 0.42 * 0.95 * ((numRings - i) / numRings);
+                            return (
+                              <View
+                                key={`ring-bottom-${i}`}
+                                style={[
+                                  styles.ring,
+                                  {
+                                    width: ringSize,
+                                    height: ringSize,
+                                    borderRadius: ringSize / 2,
+                                    backgroundColor: manualMode ? color.bg : 'transparent',
+                                    borderColor: manualMode ? color.border : `${color.bg}99`,
+                                    borderWidth: manualMode ? 1 : 1.5,
+                                  },
+                                ]}
+                              />
+                            );
+                          })}
+                          <View style={styles.centerMark}>
+                            <View style={[styles.centerLine, { width: 8 }]} />
+                            <View style={[styles.centerLine, styles.centerLineVertical, { height: 8 }]} />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  ) : targetConfig.layout === 'triple_vertical' ? (
+                    // NFAA Indoor: Vertical stack (3 targets in a column)
+                    <View style={styles.verticalTargetLayout}>
+                      {[0, 1, 2].map((spotIndex) => (
+                        <View key={`spot-${spotIndex}`} style={[styles.spotTarget, { width: TARGET_SIZE * 0.3, height: TARGET_SIZE * 0.3 }]}>
+                          {targetConfig.colors.map((color, i) => {
+                            const numRings = targetConfig.colors.length;
+                            const ringSize = TARGET_SIZE * 0.3 * 0.95 * ((numRings - i) / numRings);
+                            return (
+                              <View
+                                key={`ring-${spotIndex}-${i}`}
+                                style={[
+                                  styles.ring,
+                                  {
+                                    width: ringSize,
+                                    height: ringSize,
+                                    borderRadius: ringSize / 2,
+                                    backgroundColor: manualMode ? color.bg : 'transparent',
+                                    borderColor: manualMode ? color.border : `${color.bg}99`,
+                                    borderWidth: manualMode ? 1 : 1.5,
+                                  },
+                                ]}
+                              />
+                            );
+                          })}
+                          <View style={styles.centerMark}>
+                            <View style={[styles.centerLine, { width: 6 }]} />
+                            <View style={[styles.centerLine, styles.centerLineVertical, { height: 6 }]} />
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  ) : (
+                    // Standard single target
+                    <>
+                      {/* White/Cream background for the target */}
+                      {manualMode && (
+                        <View style={[styles.targetBackground, { width: TARGET_SIZE, height: TARGET_SIZE, borderRadius: TARGET_SIZE / 2 }]} />
+                      )}
+                      
+                      {/* Dynamic ring rendering based on target type */}
+                      {targetConfig.colors.map((color, i) => {
+                        const numRings = targetConfig.colors.length;
+                        const ringSize = TARGET_SIZE * 0.95 * ((numRings - i) / numRings);
+                        return (
+                          <View
+                            key={`ring-${i}`}
+                            style={[
+                              styles.ring,
+                              {
+                                width: ringSize,
+                                height: ringSize,
+                                borderRadius: ringSize / 2,
+                                backgroundColor: manualMode ? color.bg : 'transparent',
+                                borderColor: manualMode ? color.border : `${color.bg}99`,
+                                borderWidth: manualMode ? 1 : 2,
+                              },
+                            ]}
+                          />
+                        );
+                      })}
+                      
+                      {/* Center X mark */}
+                      <View style={styles.centerMark}>
+                        <View style={styles.centerLine} />
+                        <View style={[styles.centerLine, styles.centerLineVertical]} />
+                      </View>
+                    </>
                   )}
-                  
-                  {/* Dynamic ring rendering based on target type */}
-                  {targetConfig.colors.map((color, i) => {
-                    const numRings = targetConfig.colors.length;
-                    const ringSize = TARGET_SIZE * 0.95 * ((numRings - i) / numRings);
-                    return (
-                      <View
-                        key={`ring-${i}`}
-                        style={[
-                          styles.ring,
-                          {
-                            width: ringSize,
-                            height: ringSize,
-                            borderRadius: ringSize / 2,
-                            backgroundColor: manualMode ? color.bg : 'transparent',
-                            borderColor: manualMode ? color.border : `${color.bg}99`,
-                            borderWidth: manualMode ? 1 : 2,
-                          },
-                        ]}
-                      />
-                    );
-                  })}
-                  
-                  {/* Center X mark */}
-                  <View style={styles.centerMark}>
-                    <View style={styles.centerLine} />
-                    <View style={[styles.centerLine, styles.centerLineVertical]} />
-                  </View>
                 </View>
               )}
 
