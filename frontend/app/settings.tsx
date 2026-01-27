@@ -1,37 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Modal,
-  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useSettingsStore } from '../store/settingsStore';
-import { useTheme } from '../hooks/useTheme';
-
-type ThemeType = 'dark' | 'light' | 'system';
-
-const themeOptions: { value: ThemeType; label: string; icon: string }[] = [
-  { value: 'light', label: 'Light', icon: 'sunny-outline' },
-  { value: 'dark', label: 'Dark', icon: 'moon-outline' },
-  { value: 'system', label: 'System', icon: 'phone-portrait-outline' },
-];
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { theme, setTheme } = useSettingsStore();
-  const colors = useTheme();
-  const [showThemeModal, setShowThemeModal] = useState(false);
-
-  const getThemeLabel = () => {
-    const option = themeOptions.find(o => o.value === theme);
-    return option ? option.label : 'Dark';
-  };
 
   const settingsItems = [
     { 
@@ -39,12 +19,6 @@ export default function SettingsScreen() {
       title: 'Language', 
       subtitle: 'English',
       onPress: () => {} // TODO: Language selection
-    },
-    { 
-      icon: 'moon-outline', 
-      title: 'Theme', 
-      subtitle: getThemeLabel(),
-      onPress: () => setShowThemeModal(true)
     },
     { 
       icon: 'cloud-outline', 
@@ -55,15 +29,15 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
+        <Text style={styles.headerTitle}>Settings</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -71,82 +45,25 @@ export default function SettingsScreen() {
         {settingsItems.map((item, index) => (
           <TouchableOpacity 
             key={index} 
-            style={[styles.settingsItem, { backgroundColor: colors.card }]} 
+            style={styles.settingsItem} 
             activeOpacity={0.7}
             onPress={item.onPress}
           >
-            <View style={[styles.settingsIconContainer, { backgroundColor: colors.cardAlt }]}>
-              <Ionicons name={item.icon as any} size={24} color={colors.accent} />
+            <View style={styles.settingsIconContainer}>
+              <Ionicons name={item.icon as any} size={24} color="#8B0000" />
             </View>
             <View style={styles.settingsTextContainer}>
-              <Text style={[styles.settingsTitle, { color: colors.text }]}>{item.title}</Text>
-              <Text style={[styles.settingsSubtitle, { color: colors.textSecondary }]}>{item.subtitle}</Text>
+              <Text style={styles.settingsTitle}>{item.title}</Text>
+              <Text style={styles.settingsSubtitle}>{item.subtitle}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+            <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
         ))}
 
         <View style={styles.versionContainer}>
-          <Text style={[styles.versionText, { color: colors.textMuted }]}>Archery Scorer v1.0.0</Text>
+          <Text style={styles.versionText}>Archery Scorer v1.0.0</Text>
         </View>
       </ScrollView>
-
-      {/* Theme Selection Modal */}
-      <Modal
-        visible={showThemeModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowThemeModal(false)}
-      >
-        <Pressable 
-          style={styles.modalOverlay}
-          onPress={() => setShowThemeModal(false)}
-        >
-          <Pressable style={[styles.modalContent, { backgroundColor: colors.card }]} onPress={e => e.stopPropagation()}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Choose Theme</Text>
-            
-            {themeOptions.map((option) => (
-              <TouchableOpacity
-                key={option.value}
-                style={[
-                  styles.themeOption,
-                  { backgroundColor: colors.cardAlt },
-                  theme === option.value && [styles.themeOptionSelected, { backgroundColor: colors.accentLight }]
-                ]}
-                onPress={() => {
-                  setTheme(option.value);
-                  setShowThemeModal(false);
-                }}
-              >
-                <View style={styles.themeOptionLeft}>
-                  <Ionicons 
-                    name={option.icon as any} 
-                    size={24} 
-                    color={theme === option.value ? colors.accent : colors.textSecondary} 
-                  />
-                  <Text style={[
-                    styles.themeOptionText,
-                    { color: colors.textSecondary },
-                    theme === option.value && [styles.themeOptionTextSelected, { color: colors.text }]
-                  ]}>
-                    {option.label}
-                  </Text>
-                </View>
-                {theme === option.value && (
-                  <Ionicons name="checkmark-circle" size={24} color={colors.accent} />
-                )}
-              </TouchableOpacity>
-            ))}
-
-            <TouchableOpacity
-              style={[styles.modalCloseButton, { backgroundColor: colors.cardAlt }]}
-              onPress={() => setShowThemeModal(false)}
-            >
-              <Text style={[styles.modalCloseButtonText, { color: colors.textSecondary }]}>Cancel</Text>
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -216,65 +133,5 @@ const styles = StyleSheet.create({
   versionText: {
     fontSize: 13,
     color: '#666',
-  },
-  // Modal styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 20,
-    padding: 24,
-    width: '85%',
-    maxWidth: 340,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  themeOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#222',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 10,
-  },
-  themeOptionSelected: {
-    backgroundColor: '#2a1a1a',
-    borderWidth: 1,
-    borderColor: '#8B0000',
-  },
-  themeOptionLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  themeOptionText: {
-    fontSize: 16,
-    color: '#888',
-  },
-  themeOptionTextSelected: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  modalCloseButton: {
-    backgroundColor: '#333',
-    borderRadius: 12,
-    padding: 14,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  modalCloseButtonText: {
-    color: '#888',
-    fontSize: 16,
-    fontWeight: '500',
   },
 });
