@@ -1,9 +1,9 @@
 import { useColorScheme } from 'react-native';
-import { useAppStore } from '../store/appStore';
+import { useSettingsStore } from '../store/settingsStore';
 import { themes, ThemeColors } from '../constants/theme';
 
 export function useTheme(): ThemeColors {
-  const { theme } = useAppStore();
+  const { theme } = useSettingsStore();
   const systemColorScheme = useColorScheme();
 
   // Determine which theme to use
