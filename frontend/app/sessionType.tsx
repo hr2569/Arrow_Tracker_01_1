@@ -25,23 +25,23 @@ export default function SessionTypeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Choose your session type</Text>
+        <Text style={styles.subtitle}>Choose your session type</Text>
 
         {/* Session Type Options */}
         <View style={styles.optionsContainer}>
           {/* Competition Mode */}
           <TouchableOpacity
-            style={[styles.optionCard, { backgroundColor: colors.card }]}
+            style={styles.optionCard}
             onPress={selectCompetition}
             activeOpacity={0.8}
           >
-            <View style={[styles.optionIconContainer, { backgroundColor: colors.cardAlt }]}>
+            <View style={styles.optionIconContainer}>
               <Ionicons name="trophy" size={48} color="#FFD700" />
             </View>
-            <Text style={[styles.optionTitle, { color: colors.text }]}>Competition</Text>
-            <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
+            <Text style={styles.optionTitle}>Competition</Text>
+            <Text style={styles.optionDescription}>
               10 rounds • 3 arrows each
             </Text>
             <View style={styles.optionBadge}>
@@ -51,15 +51,15 @@ export default function SessionTypeScreen() {
 
           {/* Training Mode */}
           <TouchableOpacity
-            style={[styles.optionCard, styles.trainingCard, { backgroundColor: colors.card }]}
+            style={[styles.optionCard, styles.trainingCard]}
             onPress={selectTraining}
             activeOpacity={0.8}
           >
-            <View style={[styles.optionIconContainer, styles.trainingIconContainer, { backgroundColor: colors.cardAlt }]}>
+            <View style={[styles.optionIconContainer, styles.trainingIconContainer]}>
               <Ionicons name="fitness" size={48} color="#ff4444" />
             </View>
-            <Text style={[styles.optionTitle, { color: colors.text }]}>Training</Text>
-            <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
+            <Text style={styles.optionTitle}>Training</Text>
+            <Text style={styles.optionDescription}>
               Unlimited rounds • Unlimited arrows
             </Text>
             <View style={[styles.optionBadge, styles.trainingBadge]}>
@@ -69,9 +69,9 @@ export default function SessionTypeScreen() {
         </View>
 
         {/* Info */}
-        <View style={[styles.infoContainer, { backgroundColor: colors.card }]}>
-          <Ionicons name="information-circle" size={20} color={colors.textSecondary} />
-          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+        <View style={styles.infoContainer}>
+          <Ionicons name="information-circle" size={20} color="#a0a0a0" />
+          <Text style={styles.infoText}>
             Competition mode follows standard archery scoring with 10 ends of 3 arrows.
             Training mode allows unlimited practice with no restrictions.
           </Text>
