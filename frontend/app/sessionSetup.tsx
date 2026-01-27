@@ -788,7 +788,9 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   vegasBottomRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
   miniTargetVegas: {
     alignItems: 'center',
