@@ -1308,6 +1308,18 @@ export default function StatsScreen() {
           </View>
         )}
 
+        {/* Generate Report Button */}
+        {stats.totalArrows > 0 && (
+          <TouchableOpacity
+            style={styles.reportButton}
+            onPress={() => router.push('/report')}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="document-text-outline" size={24} color="#fff" />
+            <Text style={styles.reportButtonText}>Generate Report</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Empty State */}
         {stats.totalArrows === 0 && (
           <View style={styles.emptyState}>
