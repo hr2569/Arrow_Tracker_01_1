@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppStore } from '../store/appStore';
+import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 import axios from 'axios';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -25,7 +25,7 @@ const ZOOM_LEVELS = [1, 1.5, 2, 2.5];
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Ring colors for FITA target (index 0 = ring 1, index 9 = ring 10)
+// Ring colors for WA Standard target (index 0 = ring 1, index 9 = ring 10)
 const RING_COLORS = [
   '#e8e8e8', // 1 - White outer
   '#e8e8e8', // 2 - White inner
@@ -39,6 +39,30 @@ const RING_COLORS = [
   '#FFD700', // 10 - Gold inner/center
 ];
 
+// Ring colors for different target types
+const getTargetRingColors = (targetType: string): string[] => {
+  switch (targetType) {
+    case 'vegas_3spot':
+      return [
+        '#00a2e8', // 7 - Blue outer
+        '#00a2e8', // 8 - Blue
+        '#00a2e8', // 9 - Blue
+        '#FFD700', // 10 - Gold
+        '#FFD700', // X - Gold center
+      ];
+    case 'nfaa_indoor':
+      return [
+        '#f5f5f0', // 1 - White outer
+        '#f5f5f0', // 2 - White
+        '#00a2e8', // 3 - Blue
+        '#00a2e8', // 4 - Blue
+        '#f5f5f0', // 5/X - White center
+      ];
+    default: // wa_standard
+      return RING_COLORS;
+  }
+};
+
 interface Arrow {
   id: string;
   x: number;
@@ -49,7 +73,7 @@ interface Arrow {
 
 export default function ScoringScreen() {
   const router = useRouter();
-  const { currentImage, targetData, setCurrentRound, manualMode, sessionType, currentRoundNumber } = useAppStore();
+  const { currentImage, targetData, setCurrentRound, manualMode, sessionType, currentRoundNumber, targetType } = useAppStore();
   const [isDetecting, setIsDetecting] = useState(false);
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrow, setSelectedArrow] = useState<string | null>(null);
@@ -58,6 +82,10 @@ export default function ScoringScreen() {
   const [targetLayout, setTargetLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [zoomIndex, setZoomIndex] = useState(0); // Index into ZOOM_LEVELS
   const scrollViewRef = useRef<ScrollView>(null);
+
+  // Get target configuration
+  const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
+  const ringColors = getTargetRingColors(targetType);
 
   // Session info
   const isCompetition = sessionType === 'competition';
