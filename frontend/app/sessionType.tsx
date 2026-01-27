@@ -14,6 +14,7 @@ import { useAppStore } from '../store/appStore';
 export default function SessionTypeScreen() {
   const router = useRouter();
   const { setSessionType } = useAppStore();
+  const colors = useTheme();
 
   const selectCompetition = () => {
     setSessionType('competition');
@@ -26,23 +27,23 @@ export default function SessionTypeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.content}>
-        <Text style={styles.subtitle}>Choose your session type</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Choose your session type</Text>
 
         {/* Session Type Options */}
         <View style={styles.optionsContainer}>
           {/* Competition Mode */}
           <TouchableOpacity
-            style={styles.optionCard}
+            style={[styles.optionCard, { backgroundColor: colors.card }]}
             onPress={selectCompetition}
             activeOpacity={0.8}
           >
-            <View style={styles.optionIconContainer}>
+            <View style={[styles.optionIconContainer, { backgroundColor: colors.cardAlt }]}>
               <Ionicons name="trophy" size={48} color="#FFD700" />
             </View>
-            <Text style={styles.optionTitle}>Competition</Text>
-            <Text style={styles.optionDescription}>
+            <Text style={[styles.optionTitle, { color: colors.text }]}>Competition</Text>
+            <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
               10 rounds • 3 arrows each
             </Text>
             <View style={styles.optionBadge}>
