@@ -24,7 +24,7 @@ const themeOptions: { value: ThemeType; label: string; icon: string }[] = [
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { theme, setTheme } = useAppStore();
+  const { theme, setTheme } = useSettingsStore();
   const colors = useTheme();
   const [showThemeModal, setShowThemeModal] = useState(false);
 
