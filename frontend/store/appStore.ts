@@ -151,6 +151,9 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
+  targetType: 'wa_standard',
+  setTargetType: (type) => set({ targetType: type }),
+
   sessionType: 'training',
   setSessionType: (type) => set({ sessionType: type, currentRoundNumber: 1, sessionRounds: [] }),
 
