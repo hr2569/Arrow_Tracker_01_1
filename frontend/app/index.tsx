@@ -27,13 +27,6 @@ export default function HomeScreen() {
       <View style={styles.content}>
         {/* Hero Section */}
         <View style={styles.hero}>
-          <View style={styles.targetIcon}>
-            <View style={styles.targetRing4} />
-            <View style={styles.targetRing3} />
-            <View style={styles.targetRing2} />
-            <View style={styles.targetRing1} />
-            <View style={styles.targetCenter} />
-          </View>
           <Text style={styles.title}>Archery Scorer</Text>
           <Text style={styles.subtitle}>
             Score your targets with precision
