@@ -99,6 +99,10 @@ export const TARGET_CONFIGS = {
 };
 
 interface AppState {
+  // Target type for current session
+  targetType: TargetType;
+  setTargetType: (type: TargetType) => void;
+
   // Session type for current session
   sessionType: SessionType;
   setSessionType: (type: SessionType) => void;
