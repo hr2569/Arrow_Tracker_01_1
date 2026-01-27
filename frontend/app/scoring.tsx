@@ -392,7 +392,6 @@ export default function ScoringScreen() {
           >
             {/* Target Area - Pressable wraps the entire target for reliable touch capture */}
             <Pressable
-              ref={targetRef}
               style={[styles.targetContainer, { width: TARGET_SIZE, height: TARGET_SIZE }]}
               onLayout={handleTargetLayout}
               onPress={handleTargetPress}
