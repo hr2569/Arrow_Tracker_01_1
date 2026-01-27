@@ -10,30 +10,45 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 
-// Custom Bow Icon component
+// Custom Bow Icon component - side view of bow with arrow
 const BowIcon = ({ size = 36, color = '#8B0000' }: { size?: number; color?: string }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    {/* Bow curve */}
+    {/* Bow limb - curved */}
     <Path
-      d="M4 4C4 4 4 12 4 12C4 16 8 20 12 20C16 20 20 16 20 12C20 12 20 4 20 4"
+      d="M6 3C6 3 3 8 3 12C3 16 6 21 6 21"
       stroke={color}
-      strokeWidth={2}
+      strokeWidth={2.5}
       strokeLinecap="round"
       fill="none"
     />
     {/* Bow string */}
     <Path
-      d="M4 4L12 12L20 4"
+      d="M6 3L6 21"
       stroke={color}
       strokeWidth={1.5}
       strokeLinecap="round"
-      fill="none"
     />
-    {/* Arrow */}
+    {/* Arrow shaft */}
     <Path
-      d="M12 12L12 22M10 20L12 22L14 20"
+      d="M6 12L21 12"
       stroke={color}
       strokeWidth={2}
+      strokeLinecap="round"
+    />
+    {/* Arrow head */}
+    <Path
+      d="M18 9L21 12L18 15"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+    {/* Arrow fletching */}
+    <Path
+      d="M8 10L6 12L8 14"
+      stroke={color}
+      strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"
       fill="none"
