@@ -721,29 +721,29 @@ export default function HistoryScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
       {/* Tab Selector */}
-      <View style={[styles.tabContainer, { backgroundColor: colors.card }]}>
+      <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'history' && styles.tabButtonActive]}
           onPress={() => setActiveTab('history')}
         >
-          <Ionicons name="time-outline" size={18} color={activeTab === 'history' ? '#fff' : colors.textSecondary} />
-          <Text style={[styles.tabButtonText, { color: colors.textSecondary }, activeTab === 'history' && styles.tabButtonTextActive]}>History</Text>
+          <Ionicons name="time-outline" size={18} color={activeTab === 'history' ? '#fff' : '#888'} />
+          <Text style={[styles.tabButtonText, activeTab === 'history' && styles.tabButtonTextActive]}>History</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'stats' && styles.tabButtonActive]}
           onPress={() => router.push('/stats')}
         >
-          <Ionicons name="stats-chart-outline" size={18} color={activeTab === 'stats' ? '#fff' : colors.textSecondary} />
-          <Text style={[styles.tabButtonText, { color: colors.textSecondary }, activeTab === 'stats' && styles.tabButtonTextActive]}>Stats</Text>
+          <Ionicons name="stats-chart-outline" size={18} color={activeTab === 'stats' ? '#fff' : '#888'} />
+          <Text style={[styles.tabButtonText, activeTab === 'stats' && styles.tabButtonTextActive]}>Stats</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'report' && styles.tabButtonActive]}
           onPress={() => router.push('/report')}
         >
-          <Ionicons name="document-text-outline" size={18} color={activeTab === 'report' ? '#fff' : colors.textSecondary} />
-          <Text style={[styles.tabButtonText, { color: colors.textSecondary }, activeTab === 'report' && styles.tabButtonTextActive]}>Report</Text>
+          <Ionicons name="document-text-outline" size={18} color={activeTab === 'report' ? '#fff' : '#888'} />
+          <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>Report</Text>
         </TouchableOpacity>
       </View>
 
@@ -753,7 +753,7 @@ export default function HistoryScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.accent}
+            tintColor="#8B0000"
           />
         }
       >
@@ -764,7 +764,6 @@ export default function HistoryScreen() {
               key={period}
               style={[
                 styles.periodButton,
-                { backgroundColor: colors.card },
                 selectedPeriod === period && styles.periodButtonActive,
               ]}
               onPress={() => setSelectedPeriod(period)}
@@ -772,7 +771,6 @@ export default function HistoryScreen() {
               <Text
                 style={[
                   styles.periodButtonText,
-                  { color: colors.textSecondary },
                   selectedPeriod === period && styles.periodButtonTextActive,
                 ]}
               >
