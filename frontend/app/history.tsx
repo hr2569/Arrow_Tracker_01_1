@@ -90,6 +90,13 @@ export default function HistoryScreen() {
     return [...new Set(distances)];
   }, [sessions]);
 
+  const availableTargetTypes = useMemo(() => {
+    const types = sessions
+      .filter(s => s.target_type)
+      .map(s => s.target_type as string);
+    return [...new Set(types)];
+  }, [sessions]);
+
   // Filter sessions by bow and distance
   const filteredSessions = useMemo(() => {
     return sessions.filter(session => {
