@@ -1338,8 +1338,14 @@ const styles = StyleSheet.create({
   sessionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     paddingRight: 45,
+  },
+  targetFaceContainer: {
+    marginRight: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 8,
+    padding: 4,
   },
   sessionInfo: {
     flex: 1,
