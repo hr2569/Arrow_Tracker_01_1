@@ -693,7 +693,7 @@ export default function ReportScreen() {
     `;
   };
 
-  // Handle PDF with options
+  // Handle PDF - open directly in Google Drive
   const handleDownloadPdf = async () => {
     if (Platform.OS === 'web') {
       // For web, open in new tab directly
@@ -706,8 +706,8 @@ export default function ReportScreen() {
         console.error('Web PDF error:', error);
         alert('Failed to open PDF. Please try again.');
       }
-    } else {
-      // For native mobile
+    } else if (Platform.OS === 'android') {
+      // Android - open directly in Google Drive
       try {
         const html = generatePdfHtml();
         console.log('Generating PDF...');
@@ -715,28 +715,59 @@ export default function ReportScreen() {
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
         
-        // Use sharing to open the PDF - this gives user choice of apps including Google Drive
+        // Get content URI for Android
+        const contentUri = await getContentUriAsync(uri);
+        console.log('Content URI:', contentUri);
+        
+        // Try to open directly in Google Drive
+        try {
+          await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+            data: contentUri,
+            flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+            type: 'application/pdf',
+            packageName: 'com.google.android.apps.docs',
+          });
+        } catch (driveError) {
+          console.log('Google Drive not available, trying default viewer...');
+          // Fallback to any PDF viewer
+          try {
+            await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+              data: contentUri,
+              flags: 1,
+              type: 'application/pdf',
+            });
+          } catch (viewerError) {
+            console.log('No PDF viewer, using share sheet...');
+            // Last resort - share sheet
+            const isAvailable = await Sharing.isAvailableAsync();
+            if (isAvailable) {
+              await Sharing.shareAsync(uri, {
+                mimeType: 'application/pdf',
+                dialogTitle: 'Open Report',
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('PDF error:', error);
+        Alert.alert('Error', 'Failed to generate PDF');
+      }
+    } else {
+      // iOS - use share sheet (can't force specific app on iOS)
+      try {
+        const html = generatePdfHtml();
+        const { uri } = await Print.printToFileAsync({ html });
+        
         const isAvailable = await Sharing.isAvailableAsync();
         if (isAvailable) {
           await Sharing.shareAsync(uri, {
             mimeType: 'application/pdf',
-            dialogTitle: 'Open Archery Report',
             UTI: 'com.adobe.pdf',
           });
-        } else {
-          // Fallback to print preview
-          await Print.printAsync({ html });
         }
       } catch (error) {
-        console.error('PDF generation error:', error);
-        // Try simpler approach - just print preview
-        try {
-          const html = generatePdfHtml();
-          await Print.printAsync({ html });
-        } catch (printError) {
-          console.error('Print error:', printError);
-          Alert.alert('Error', 'Failed to generate PDF. Please try again.');
-        }
+        console.error('PDF error:', error);
+        Alert.alert('Error', 'Failed to generate PDF');
       }
     }
   };
