@@ -249,18 +249,39 @@ export default function SessionSetupScreen() {
                 activeOpacity={0.8}
               >
                 <View style={styles.targetPreview}>
-                  <View style={styles.tripleTargetContainer}>
-                    {[0, 1, 2].map((i) => (
-                      <View key={i} style={[styles.miniTarget, { backgroundColor: '#00a2e8' }]}>
-                        <View style={[styles.miniTargetCenter, { backgroundColor: '#fff200' }]} />
+                  {/* Triangle arrangement: 2 on top, 1 on bottom */}
+                  <View style={styles.vegasTrianglePreview}>
+                    <View style={styles.vegasTopRow}>
+                      <View style={[styles.miniTargetVegas]}>
+                        <View style={[styles.miniRing, { backgroundColor: '#00a2e8', width: 16, height: 16 }]}>
+                          <View style={[styles.miniRing, { backgroundColor: '#ed1c24', width: 10, height: 10 }]}>
+                            <View style={[styles.miniRing, { backgroundColor: '#fff200', width: 5, height: 5 }]} />
+                          </View>
+                        </View>
                       </View>
-                    ))}
+                      <View style={[styles.miniTargetVegas]}>
+                        <View style={[styles.miniRing, { backgroundColor: '#00a2e8', width: 16, height: 16 }]}>
+                          <View style={[styles.miniRing, { backgroundColor: '#ed1c24', width: 10, height: 10 }]}>
+                            <View style={[styles.miniRing, { backgroundColor: '#fff200', width: 5, height: 5 }]} />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View style={styles.vegasBottomRow}>
+                      <View style={[styles.miniTargetVegas]}>
+                        <View style={[styles.miniRing, { backgroundColor: '#00a2e8', width: 16, height: 16 }]}>
+                          <View style={[styles.miniRing, { backgroundColor: '#ed1c24', width: 10, height: 10 }]}>
+                            <View style={[styles.miniRing, { backgroundColor: '#fff200', width: 5, height: 5 }]} />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
                   </View>
                 </View>
                 <Text style={[styles.targetTypeName, selectedTargetType === 'vegas_3spot' && styles.targetTypeNameSelected]}>
                   Vegas 3-Spot
                 </Text>
-                <Text style={styles.targetTypeDesc}>Indoor, 3 faces</Text>
+                <Text style={styles.targetTypeDesc}>Indoor, triangle</Text>
                 {selectedTargetType === 'vegas_3spot' && (
                   <View style={styles.targetCheckmark}>
                     <Ionicons name="checkmark" size={14} color="#fff" />
@@ -278,16 +299,21 @@ export default function SessionSetupScreen() {
                 activeOpacity={0.8}
               >
                 <View style={styles.targetPreview}>
-                  <View style={[styles.targetRing, { backgroundColor: '#f5f5f0', width: 50, height: 50 }]}>
-                    <View style={[styles.targetRing, { backgroundColor: '#00a2e8', width: 35, height: 35 }]}>
-                      <View style={[styles.targetRing, { backgroundColor: '#f5f5f0', width: 15, height: 15 }]} />
-                    </View>
+                  {/* Vertical stack: 3 targets */}
+                  <View style={styles.nfaaVerticalPreview}>
+                    {[0, 1, 2].map((i) => (
+                      <View key={i} style={[styles.miniRing, { backgroundColor: '#00a2e8', width: 14, height: 14 }]}>
+                        <View style={[styles.miniRing, { backgroundColor: '#ed1c24', width: 9, height: 9 }]}>
+                          <View style={[styles.miniRing, { backgroundColor: '#fff200', width: 4, height: 4 }]} />
+                        </View>
+                      </View>
+                    ))}
                   </View>
                 </View>
                 <Text style={[styles.targetTypeName, selectedTargetType === 'nfaa_indoor' && styles.targetTypeNameSelected]}>
                   NFAA Indoor
                 </Text>
-                <Text style={styles.targetTypeDesc}>5-ring, blue/white</Text>
+                <Text style={styles.targetTypeDesc}>3-spot vertical</Text>
                 {selectedTargetType === 'nfaa_indoor' && (
                   <View style={styles.targetCheckmark}>
                     <Ionicons name="checkmark" size={14} color="#fff" />
