@@ -36,6 +36,68 @@ interface BowData {
 // Session type: 'competition' (10 rounds max) or 'training' (unlimited)
 type SessionType = 'competition' | 'training';
 
+// Target type definitions
+type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
+
+// Target configuration for each type
+export const TARGET_CONFIGS = {
+  wa_standard: {
+    name: 'WA Standard',
+    description: '10-ring World Archery target',
+    rings: 10,
+    maxScore: 10,
+    // Ring scores from outside to inside
+    scores: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    // Ring colors from outside to inside (2 rings per color zone)
+    colors: [
+      { bg: '#f5f5f0', border: '#333' },     // Ring 1 - White
+      { bg: '#f5f5f0', border: '#333' },     // Ring 2 - White
+      { bg: '#2a2a2a', border: '#555' },     // Ring 3 - Black
+      { bg: '#2a2a2a', border: '#555' },     // Ring 4 - Black
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 5 - Blue
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 6 - Blue
+      { bg: '#ed1c24', border: '#b31217' },  // Ring 7 - Red
+      { bg: '#ed1c24', border: '#b31217' },  // Ring 8 - Red
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 10 - Gold (X)
+    ],
+  },
+  vegas_3spot: {
+    name: 'Vegas 3-Spot',
+    description: 'Indoor target with 3 faces',
+    rings: 5,
+    maxScore: 10,
+    // X=10, 10, 9, 8, 7
+    scores: [7, 8, 9, 10, 10], // X-ring is also 10
+    colors: [
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 7 - Blue (outer)
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 8 - Blue
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 9 - Blue
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 10 - Gold
+      { bg: '#fff200', border: '#ccaa00' },  // X-ring - Gold (center)
+    ],
+    hasXRing: true,
+    isTriple: true,
+  },
+  nfaa_indoor: {
+    name: 'NFAA Indoor',
+    description: '5-ring blue/white target',
+    rings: 5,
+    maxScore: 5,
+    // X=5, 5, 4, 3, 2 (outer white is 1 but usually off-target)
+    scores: [1, 2, 3, 4, 5],
+    colors: [
+      { bg: '#f5f5f0', border: '#333' },     // Ring 1 - White (outer)
+      { bg: '#f5f5f0', border: '#333' },     // Ring 2 - White
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 3 - Blue
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 4 - Blue
+      { bg: '#f5f5f0', border: '#333' },     // Ring 5/X - White (center)
+    ],
+    hasXRing: true,
+    isTriple: false,
+  },
+};
+
 interface AppState {
   // Session type for current session
   sessionType: SessionType;
