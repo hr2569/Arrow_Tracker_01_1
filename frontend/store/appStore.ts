@@ -161,6 +161,9 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
+  theme: 'dark',
+  setTheme: (theme) => set({ theme }),
+
   targetType: 'wa_standard',
   setTargetType: (type) => set({ targetType: type }),
 
