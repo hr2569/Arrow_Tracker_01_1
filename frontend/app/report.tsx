@@ -637,6 +637,7 @@ export default function ReportScreen() {
               <div class="equipment-info">
                 ${usedBows.length > 0 ? `<div>Bow${usedBows.length > 1 ? 's' : ''}: ${usedBows.join(', ')}</div>` : ''}
                 ${usedDistances.length > 0 ? `<div>Distance${usedDistances.length > 1 ? 's' : ''}: ${usedDistances.join(', ')}</div>` : ''}
+                ${usedTargetTypes.length > 0 ? `<div>Target${usedTargetTypes.length > 1 ? 's' : ''}: ${usedTargetTypes.join(', ')}</div>` : ''}
               </div>
             </div>
 
