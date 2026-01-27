@@ -925,14 +925,14 @@ export default function StatsScreen() {
           ))}
         </View>
 
-        {/* Filter Buttons */}
-        {(availableBows.length > 0 || availableDistances.length > 0 || availableTargetTypes.length > 0) && (
-          <View style={styles.filterSection}>
-            {/* Target Type Filter - always visible, no "All" option */}
-            <View style={styles.filterRow}>
-              <Text style={styles.filterLabel}>Target:</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-                {availableTargetTypes.map((type) => (
+        {/* Filter Buttons - Target type filter always visible */}
+        <View style={styles.filterSection}>
+          {/* Target Type Filter - always visible, no "All" option */}
+          <View style={styles.filterRow}>
+            <Text style={styles.filterLabel}>Target:</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+              {availableTargetTypes.length > 0 ? (
+                availableTargetTypes.map((type) => (
                   <TouchableOpacity
                     key={type}
                     style={[styles.filterChip, targetTypeFilter === type && styles.filterChipActive]}
@@ -940,59 +940,70 @@ export default function StatsScreen() {
                   >
                     <Text style={[styles.filterChipText, targetTypeFilter === type && styles.filterChipTextActive]}>{getTargetTypeName(type)}</Text>
                   </TouchableOpacity>
+                ))
+              ) : (
+                // Default options when no sessions exist
+                ['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={[styles.filterChip, targetTypeFilter === type && styles.filterChipActive]}
+                    onPress={() => setTargetTypeFilter(type)}
+                  >
+                    <Text style={[styles.filterChipText, targetTypeFilter === type && styles.filterChipTextActive]}>{getTargetTypeName(type)}</Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </ScrollView>
+          </View>
+          
+          {/* Bow Filter */}
+          {availableBows.length > 0 && (
+            <View style={styles.filterRow}>
+              <Text style={styles.filterLabel}>Bow:</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+                <TouchableOpacity
+                  style={[styles.filterChip, !bowFilter && styles.filterChipActive]}
+                  onPress={() => setBowFilter(null)}
+                >
+                  <Text style={[styles.filterChipText, !bowFilter && styles.filterChipTextActive]}>All</Text>
+                </TouchableOpacity>
+                {availableBows.map((bow) => (
+                  <TouchableOpacity
+                    key={bow}
+                    style={[styles.filterChip, bowFilter === bow && styles.filterChipActive]}
+                    onPress={() => setBowFilter(bowFilter === bow ? null : bow)}
+                  >
+                    <Text style={[styles.filterChipText, bowFilter === bow && styles.filterChipTextActive]}>{bow}</Text>
+                  </TouchableOpacity>
                 ))}
               </ScrollView>
             </View>
-            
-            {/* Bow Filter */}
-            {availableBows.length > 0 && (
-              <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Bow:</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+          )}
+          
+          {/* Distance Filter */}
+          {availableDistances.length > 0 && (
+            <View style={styles.filterRow}>
+              <Text style={styles.filterLabel}>Distance:</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+                <TouchableOpacity
+                  style={[styles.filterChip, !distanceFilter && styles.filterChipActive]}
+                  onPress={() => setDistanceFilter(null)}
+                >
+                  <Text style={[styles.filterChipText, !distanceFilter && styles.filterChipTextActive]}>All</Text>
+                </TouchableOpacity>
+                {availableDistances.map((distance) => (
                   <TouchableOpacity
-                    style={[styles.filterChip, !bowFilter && styles.filterChipActive]}
-                    onPress={() => setBowFilter(null)}
+                    key={distance}
+                    style={[styles.filterChip, distanceFilter === distance && styles.filterChipActive]}
+                    onPress={() => setDistanceFilter(distanceFilter === distance ? null : distance)}
                   >
-                    <Text style={[styles.filterChipText, !bowFilter && styles.filterChipTextActive]}>All</Text>
+                    <Text style={[styles.filterChipText, distanceFilter === distance && styles.filterChipTextActive]}>{distance}</Text>
                   </TouchableOpacity>
-                  {availableBows.map((bow) => (
-                    <TouchableOpacity
-                      key={bow}
-                      style={[styles.filterChip, bowFilter === bow && styles.filterChipActive]}
-                      onPress={() => setBowFilter(bowFilter === bow ? null : bow)}
-                    >
-                      <Text style={[styles.filterChipText, bowFilter === bow && styles.filterChipTextActive]}>{bow}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
-            
-            {/* Distance Filter */}
-            {availableDistances.length > 0 && (
-              <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Distance:</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-                  <TouchableOpacity
-                    style={[styles.filterChip, !distanceFilter && styles.filterChipActive]}
-                    onPress={() => setDistanceFilter(null)}
-                  >
-                    <Text style={[styles.filterChipText, !distanceFilter && styles.filterChipTextActive]}>All</Text>
-                  </TouchableOpacity>
-                  {availableDistances.map((distance) => (
-                    <TouchableOpacity
-                      key={distance}
-                      style={[styles.filterChip, distanceFilter === distance && styles.filterChipActive]}
-                      onPress={() => setDistanceFilter(distanceFilter === distance ? null : distance)}
-                    >
-                      <Text style={[styles.filterChipText, distanceFilter === distance && styles.filterChipTextActive]}>{distance}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-        )}
+                ))}
+              </ScrollView>
+            </View>
+          )}
+        </View>
 
         {/* Stats Overview */}
         <View style={styles.statsCard}>
