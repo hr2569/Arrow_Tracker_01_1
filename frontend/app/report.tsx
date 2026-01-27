@@ -510,7 +510,7 @@ export default function ReportScreen() {
       }
 
       return `
-        <svg width="100%" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;">
+        <svg width="600" height="600" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
           <!-- Target ring backgrounds -->
           ${targetRingBgs}
           <!-- Heatmap overlay -->
