@@ -36,8 +36,8 @@ export default function HomeScreen() {
             <View style={styles.targetRing1} />
             <View style={styles.targetCenter} />
           </View>
-          <Text style={styles.title}>Archery Scorer</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: colors.text }]}>Archery Scorer</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Score your targets with precision
           </Text>
         </View>
@@ -61,33 +61,33 @@ export default function HomeScreen() {
           {/* History and Bows side by side */}
           <View style={styles.secondaryRow}>
             <TouchableOpacity
-              style={styles.secondaryButtonHalf}
+              style={[styles.secondaryButtonHalf, { backgroundColor: colors.card, borderColor: colors.accent }]}
               onPress={() => router.push('/history')}
               activeOpacity={0.8}
             >
-              <View style={styles.buttonIconContainerSmall}>
-                <Ionicons name="time" size={36} color="#8B0000" />
+              <View style={[styles.buttonIconContainerSmall, { backgroundColor: colors.cardAlt }]}>
+                <Ionicons name="time" size={36} color={colors.accent} />
               </View>
-              <Text style={styles.secondaryButtonTextSmall}>History</Text>
-              <Text style={styles.buttonSubtextSecondarySmall}>
+              <Text style={[styles.secondaryButtonTextSmall, { color: colors.accent }]}>History</Text>
+              <Text style={[styles.buttonSubtextSecondarySmall, { color: colors.textSecondary }]}>
                 Sessions & Stats
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.secondaryButtonHalf}
+              style={[styles.secondaryButtonHalf, { backgroundColor: colors.card, borderColor: colors.accent }]}
               onPress={() => router.push('/bows')}
               activeOpacity={0.8}
             >
-              <View style={styles.buttonIconContainerSmall}>
+              <View style={[styles.buttonIconContainerSmall, { backgroundColor: colors.cardAlt }]}>
                 <Image 
                   source={require('../assets/images/bow-icon.png')} 
                   style={{ width: 40, height: 40 }}
                   resizeMode="contain"
                 />
               </View>
-              <Text style={styles.secondaryButtonTextSmall}>Bows</Text>
-              <Text style={styles.buttonSubtextSecondarySmall}>
+              <Text style={[styles.secondaryButtonTextSmall, { color: colors.accent }]}>Bows</Text>
+              <Text style={[styles.buttonSubtextSecondarySmall, { color: colors.textSecondary }]}>
                 Equipment
               </Text>
             </TouchableOpacity>
