@@ -135,7 +135,7 @@ export default function ReportScreen() {
     setEndDate(now);
   }, [selectedPeriod]);
 
-  // Filter sessions by date range, bow, and distance
+  // Filter sessions by date range, bow, distance, and target type
   const filteredSessions = useMemo(() => {
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
@@ -147,9 +147,12 @@ export default function ReportScreen() {
       if (sessionDate < start || sessionDate > end) return false;
       if (selectedBow && session.bow_id !== selectedBow) return false;
       if (selectedDistance && session.distance !== selectedDistance) return false;
+      // Filter by target type (treat missing as 'wa_standard')
+      const sessionTargetType = session.target_type || 'wa_standard';
+      if (selectedTargetType && sessionTargetType !== selectedTargetType) return false;
       return true;
     });
-  }, [sessions, startDate, endDate, selectedBow, selectedDistance]);
+  }, [sessions, startDate, endDate, selectedBow, selectedDistance, selectedTargetType]);
 
   // Get all shots for heatmap
   const allShots = useMemo(() => {
