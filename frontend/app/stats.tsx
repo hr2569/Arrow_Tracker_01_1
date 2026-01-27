@@ -1093,16 +1093,24 @@ export default function StatsScreen() {
 
         {/* Generate Report Button */}
         {stats.totalArrows > 0 && (
-          <View style={styles.reportButtonContainer}>
-            <TouchableOpacity
-              style={styles.reportButton}
-              onPress={() => router.push('/report')}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="document-text-outline" size={20} color="#fff" />
-              <Text style={styles.reportButtonText}>Generate Report</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#8B0000',
+              borderRadius: 12,
+              paddingVertical: 14,
+              paddingHorizontal: 20,
+              marginTop: 8,
+              marginBottom: 8,
+            }}
+            onPress={() => router.push('/report')}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="document-text-outline" size={20} color="#fff" style={{ marginRight: 10 }} />
+            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>Generate Report</Text>
+          </TouchableOpacity>
         )}
 
         {/* Stats Overview */}
