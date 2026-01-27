@@ -65,6 +65,7 @@ export default function HistoryScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
   const [bowFilter, setBowFilter] = useState<string | null>(null);
   const [distanceFilter, setDistanceFilter] = useState<string | null>(null);
+  const [targetTypeFilter, setTargetTypeFilter] = useState<string | null>(null);
   
   // Edit session state
   const [editingSession, setEditingSession] = useState<Session | null>(null);
