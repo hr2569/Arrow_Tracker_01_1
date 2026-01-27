@@ -678,24 +678,14 @@ export default function StatsScreen() {
       return closestIdx;
     };
 
-    // Transform shot coordinates for multi-spot targets
-    const transformedShots = shots.map(shot => {
+    // For multi-spot targets, use raw coordinates directly
+    // For WA standard, use the transformed coordinates (which look better for single target)
+    const shotsForHeatmap = shots.map(shot => {
       if (targetType === 'wa_standard') {
         return { x: shot.x, y: shot.y };
       }
-      // For multi-spot targets, transform to position relative to the spot
-      const spotIdx = findClosestSpot(shot.x, shot.y);
-      const spotCenter = spotCentersNormalized[spotIdx];
-      const spotCenterPx = spotCenters[spotIdx];
-      
-      const offsetX = shot.x - spotCenter.x;
-      const offsetY = shot.y - spotCenter.y;
-      const scaleFactor = (spotSize / 2) / spotRadius;
-      
-      return {
-        x: (spotCenterPx.x + (offsetX * scaleFactor)) / size,
-        y: (spotCenterPx.y + (offsetY * scaleFactor)) / size,
-      };
+      // For multi-spot targets, use raw coordinates
+      return { x: shot.rawX, y: shot.rawY };
     });
     
     // Higher resolution grid for smoother heatmap
@@ -703,8 +693,8 @@ export default function StatsScreen() {
     const cellSize = size / gridSize;
     const densityGrid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
     
-    // Calculate density for each grid cell using transformed shots
-    transformedShots.forEach((shot) => {
+    // Calculate density for each grid cell using raw shots for multi-spot
+    shotsForHeatmap.forEach((shot) => {
       const gridX = Math.floor(shot.x * gridSize);
       const gridY = Math.floor(shot.y * gridSize);
       
