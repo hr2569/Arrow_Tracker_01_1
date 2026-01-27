@@ -4,11 +4,27 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path, Line } from 'react-native-svg';
+
+// Classic Recurve Bow Icon
+const BowIcon = ({ size = 36, color = '#8B0000' }: { size?: number; color?: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M5 2C2 5 1 9 1 12C1 15 2 19 5 22"
+      stroke={color}
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      fill="none"
+    />
+    <Line x1="5" y1="2" x2="5" y2="22" stroke={color} strokeWidth={1.2} />
+    <Line x1="2" y1="12" x2="22" y2="12" stroke={color} strokeWidth={1.8} />
+    <Path d="M20 9L23 12L20 15Z" fill={color} />
+  </Svg>
+);
 
 export default function HomeScreen() {
   const router = useRouter();
