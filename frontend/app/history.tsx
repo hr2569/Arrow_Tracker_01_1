@@ -518,9 +518,6 @@ export default function HistoryScreen() {
       return null;
     }
 
-    // Ring colors for multi-spot targets (Vegas/NFAA)
-    const multiSpotRingColors = ['#00a2e8', '#ed1c24', '#fff200']; // Blue, Red, Gold (outer to inner)
-    
     // Ring colors for WA Standard (10 rings)
     const waRingColors = [
       '#f5f5f0', // 1-2: White
@@ -542,10 +539,16 @@ export default function HistoryScreen() {
     ];
 
     const targetScale = 0.8;
-    const spotSize = targetType === 'wa_standard' ? size * targetScale : size * 0.28;
+    
+    // Spot sizes matching scoring screen (radius * 2 = diameter)
+    // Vegas: spotRadius = 0.19, NFAA: spotRadius = 0.14
+    const vegasSpotSize = size * 0.19 * 2;  // 38% of container
+    const nfaaSpotSize = size * 0.14 * 2;   // 28% of container
+    const spotSize = targetType === 'vegas_3spot' ? vegasSpotSize : 
+                     targetType === 'nfaa_indoor' ? nfaaSpotSize : size * targetScale;
 
     // Single spot component for multi-spot targets
-    const SingleSpot = ({ centerX, centerY, spotIdx }: { centerX: number, centerY: number, spotIdx: number }) => {
+    const SingleSpot = ({ centerX, centerY }: { centerX: number, centerY: number }) => {
       const spotRadius = spotSize / 2;
       return (
         <View
@@ -578,27 +581,24 @@ export default function HistoryScreen() {
       );
     };
 
-    // Get spot centers based on target type
+    // Get spot centers - MUST MATCH scoring.tsx exactly (normalized 0-1 coordinates)
     const getSpotCenters = () => {
-      const center = size / 2;
       if (targetType === 'vegas_3spot') {
-        // Inverted triangle: 1 on top, 2 on bottom
-        const spacing = size * 0.25;
+        // Vegas 3-Spot: 1 on top, 2 on bottom (inverted triangle) - matches scoring.tsx
         return [
-          { x: center, y: center - spacing * 0.6 },  // Top
-          { x: center - spacing, y: center + spacing * 0.6 },  // Bottom left
-          { x: center + spacing, y: center + spacing * 0.6 },  // Bottom right
+          { x: 0.5 * size, y: 0.28 * size },   // Top center
+          { x: 0.29 * size, y: 0.72 * size },  // Bottom left
+          { x: 0.71 * size, y: 0.72 * size },  // Bottom right
         ];
       } else if (targetType === 'nfaa_indoor') {
-        // Vertical stack: 3 targets
-        const spacing = size * 0.28;
+        // NFAA Indoor: 3 vertical spots - matches scoring.tsx
         return [
-          { x: center, y: center - spacing },  // Top
-          { x: center, y: center },  // Middle
-          { x: center, y: center + spacing },  // Bottom
+          { x: 0.5 * size, y: 0.17 * size },   // Top
+          { x: 0.5 * size, y: 0.5 * size },    // Middle
+          { x: 0.5 * size, y: 0.83 * size },   // Bottom
         ];
       }
-      return [{ x: center, y: center }]; // WA Standard - single target
+      return [{ x: size / 2, y: size / 2 }]; // WA Standard - single target
     };
 
     const spotCenters = getSpotCenters();
@@ -661,11 +661,11 @@ export default function HistoryScreen() {
         {/* Draw the multi-spot target background */}
         <View style={[targetMapStyles.multiSpotBackground, { width: size, height: size }]}>
           {spotCenters.map((spot, idx) => (
-            <SingleSpot key={`spot-${idx}`} centerX={spot.x} centerY={spot.y} spotIdx={idx} />
+            <SingleSpot key={`spot-${idx}`} centerX={spot.x} centerY={spot.y} />
           ))}
         </View>
 
-        {/* Plot shots */}
+        {/* Plot shots - coordinates are already normalized to 0-1 from scoring screen */}
         {shots.map((shot, index) => {
           const dotSize = 10;
           const left = shot.x * size - dotSize / 2;
