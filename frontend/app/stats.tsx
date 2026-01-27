@@ -928,29 +928,21 @@ export default function StatsScreen() {
         {/* Filter Buttons */}
         {(availableBows.length > 0 || availableDistances.length > 0 || availableTargetTypes.length > 0) && (
           <View style={styles.filterSection}>
-            {/* Target Type Filter */}
-            {availableTargetTypes.length > 0 && (
-              <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Target:</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+            {/* Target Type Filter - always visible, no "All" option */}
+            <View style={styles.filterRow}>
+              <Text style={styles.filterLabel}>Target:</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+                {availableTargetTypes.map((type) => (
                   <TouchableOpacity
-                    style={[styles.filterChip, !targetTypeFilter && styles.filterChipActive]}
-                    onPress={() => setTargetTypeFilter(null)}
+                    key={type}
+                    style={[styles.filterChip, targetTypeFilter === type && styles.filterChipActive]}
+                    onPress={() => setTargetTypeFilter(type)}
                   >
-                    <Text style={[styles.filterChipText, !targetTypeFilter && styles.filterChipTextActive]}>All</Text>
+                    <Text style={[styles.filterChipText, targetTypeFilter === type && styles.filterChipTextActive]}>{getTargetTypeName(type)}</Text>
                   </TouchableOpacity>
-                  {availableTargetTypes.map((type) => (
-                    <TouchableOpacity
-                      key={type}
-                      style={[styles.filterChip, targetTypeFilter === type && styles.filterChipActive]}
-                      onPress={() => setTargetTypeFilter(targetTypeFilter === type ? null : type)}
-                    >
-                      <Text style={[styles.filterChipText, targetTypeFilter === type && styles.filterChipTextActive]}>{getTargetTypeName(type)}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
+                ))}
+              </ScrollView>
+            </View>
             
             {/* Bow Filter */}
             {availableBows.length > 0 && (
