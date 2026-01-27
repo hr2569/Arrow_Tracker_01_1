@@ -99,8 +99,8 @@ export default function SessionSetupScreen() {
     setSessionDistance(`${distance}${distanceUnit}`);
     setTargetType(selectedTargetType);
 
-    // Navigate to capture
-    router.push('/capture');
+    // Navigate directly to scoring (manual mode)
+    router.push('/scoring');
   };
 
   const navigateToAddBow = () => {
