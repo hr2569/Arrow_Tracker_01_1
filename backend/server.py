@@ -617,6 +617,8 @@ async def update_session(session_id: str, request: UpdateSessionRequest):
         update_data['bow_name'] = request.bow_name
     if request.distance is not None:
         update_data['distance'] = request.distance
+    if request.target_type is not None:
+        update_data['target_type'] = request.target_type
     if request.created_at is not None:
         # Parse ISO format date string
         try:
