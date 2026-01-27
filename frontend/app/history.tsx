@@ -49,6 +49,103 @@ const getTargetTypeName = (type?: string): string => {
   }
 };
 
+// Mini Target Face Component
+const MiniTargetFace = ({ targetType, size = 44 }: { targetType?: string, size?: number }) => {
+  const type = targetType || 'wa_standard';
+  const miniSize = size * 0.35;
+  
+  if (type === 'vegas_3spot') {
+    // Inverted triangle: 1 on top, 2 on bottom
+    return (
+      <View style={[miniTargetStyles.container, { width: size, height: size }]}>
+        <View style={miniTargetStyles.vegasTriangle}>
+          <View style={miniTargetStyles.vegasTopRow}>
+            <View style={[miniTargetStyles.ring, { backgroundColor: '#00a2e8', width: miniSize, height: miniSize }]}>
+              <View style={[miniTargetStyles.ring, { backgroundColor: '#ed1c24', width: miniSize * 0.65, height: miniSize * 0.65 }]}>
+                <View style={[miniTargetStyles.ring, { backgroundColor: '#fff200', width: miniSize * 0.35, height: miniSize * 0.35 }]} />
+              </View>
+            </View>
+          </View>
+          <View style={miniTargetStyles.vegasBottomRow}>
+            <View style={[miniTargetStyles.ring, { backgroundColor: '#00a2e8', width: miniSize, height: miniSize }]}>
+              <View style={[miniTargetStyles.ring, { backgroundColor: '#ed1c24', width: miniSize * 0.65, height: miniSize * 0.65 }]}>
+                <View style={[miniTargetStyles.ring, { backgroundColor: '#fff200', width: miniSize * 0.35, height: miniSize * 0.35 }]} />
+              </View>
+            </View>
+            <View style={[miniTargetStyles.ring, { backgroundColor: '#00a2e8', width: miniSize, height: miniSize }]}>
+              <View style={[miniTargetStyles.ring, { backgroundColor: '#ed1c24', width: miniSize * 0.65, height: miniSize * 0.65 }]}>
+                <View style={[miniTargetStyles.ring, { backgroundColor: '#fff200', width: miniSize * 0.35, height: miniSize * 0.35 }]} />
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  }
+  
+  if (type === 'nfaa_indoor') {
+    // Vertical stack: 3 targets
+    const nfaaSize = miniSize * 0.85;
+    return (
+      <View style={[miniTargetStyles.container, { width: size, height: size }]}>
+        <View style={miniTargetStyles.nfaaVertical}>
+          {[0, 1, 2].map((i) => (
+            <View key={i} style={[miniTargetStyles.ring, { backgroundColor: '#00a2e8', width: nfaaSize, height: nfaaSize }]}>
+              <View style={[miniTargetStyles.ring, { backgroundColor: '#ed1c24', width: nfaaSize * 0.65, height: nfaaSize * 0.65 }]}>
+                <View style={[miniTargetStyles.ring, { backgroundColor: '#fff200', width: nfaaSize * 0.35, height: nfaaSize * 0.35 }]} />
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  }
+  
+  // WA Standard - single target with all rings
+  const waSize = size * 0.9;
+  return (
+    <View style={[miniTargetStyles.container, { width: size, height: size }]}>
+      <View style={[miniTargetStyles.ring, { backgroundColor: '#FFFFFF', width: waSize, height: waSize, borderWidth: 1, borderColor: '#ddd' }]}>
+        <View style={[miniTargetStyles.ring, { backgroundColor: '#000000', width: waSize * 0.85, height: waSize * 0.85 }]}>
+          <View style={[miniTargetStyles.ring, { backgroundColor: '#00a2e8', width: waSize * 0.7, height: waSize * 0.7 }]}>
+            <View style={[miniTargetStyles.ring, { backgroundColor: '#ed1c24', width: waSize * 0.5, height: waSize * 0.5 }]}>
+              <View style={[miniTargetStyles.ring, { backgroundColor: '#fff200', width: waSize * 0.3, height: waSize * 0.3 }]} />
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const miniTargetStyles = StyleSheet.create({
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ring: {
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  vegasTriangle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  vegasTopRow: {
+    marginBottom: 2,
+  },
+  vegasBottomRow: {
+    flexDirection: 'row',
+    gap: 3,
+  },
+  nfaaVertical: {
+    flexDirection: 'column',
+    gap: 2,
+    alignItems: 'center',
+  },
+});
+
 interface GroupedSessions {
   label: string;
   sessions: Session[];
