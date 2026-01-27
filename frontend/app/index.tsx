@@ -92,7 +92,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#121212',
   },
   settingsButton: {
     position: 'absolute',
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     padding: 8,
     borderRadius: 20,
-    backgroundColor: '#111',
+    backgroundColor: '#1e1e1e',
   },
   content: {
     flex: 1,
@@ -113,41 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  targetIcon: {
-    position: 'relative',
-    width: 120,
-    height: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  targetRing4: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#1a1a1a',
-    borderWidth: 3,
-    borderColor: '#333',
-  },
-  targetRing3: {
-    position: 'absolute',
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#2a2a2a',
-    borderWidth: 2,
-    borderColor: '#3498db',
-  },
-  targetRing2: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#8B0000',
-    borderWidth: 2,
-    borderColor: '#a00000',
-  },
+  title: {
   targetRing1: {
     position: 'absolute',
     width: 30,
