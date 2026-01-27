@@ -13,7 +13,6 @@ import { useAppStore } from '../store/appStore';
 export default function SessionTypeScreen() {
   const router = useRouter();
   const { setSessionType } = useAppStore();
-  const colors = useTheme();
 
   const selectCompetition = () => {
     setSessionType('competition');

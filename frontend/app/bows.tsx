@@ -42,7 +42,6 @@ const BOW_TYPES = [
 
 export default function BowsScreen() {
   const router = useRouter();
-  const colors = useTheme();
   const [bows, setBows] = useState<Bow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
