@@ -4,53 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Path } from 'react-native-svg';
-
-// Custom Bow Icon component - vertical bow with horizontal arrow
-const BowIcon = ({ size = 36, color = '#8B0000' }: { size?: number; color?: string }) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    {/* Bow - curved D shape */}
-    <Path
-      d="M6 3 C6 3 2 6 2 12 C2 18 6 21 6 21"
-      stroke={color}
-      strokeWidth={3}
-      strokeLinecap="round"
-      fill="none"
-    />
-    {/* Bowstring - straight line */}
-    <Path
-      d="M6 3 L6 21"
-      stroke={color}
-      strokeWidth={1.5}
-      strokeLinecap="round"
-    />
-    {/* Arrow shaft */}
-    <Path
-      d="M3 12 L21 12"
-      stroke={color}
-      strokeWidth={2}
-      strokeLinecap="round"
-    />
-    {/* Arrowhead - filled triangle */}
-    <Path
-      d="M19 8 L23 12 L19 16 Z"
-      fill={color}
-    />
-    {/* Fletching - back feathers */}
-    <Path
-      d="M5 9 L3 12 L5 15"
-      stroke={color}
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-    />
-  </Svg>
-);
 
 export default function HomeScreen() {
   const router = useRouter();
