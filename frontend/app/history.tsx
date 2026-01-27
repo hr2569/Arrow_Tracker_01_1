@@ -471,36 +471,13 @@ export default function HistoryScreen() {
     const shots: { x: number; y: number; ring: number; roundIndex: number }[] = [];
     
     session.rounds.forEach((round, roundIndex) => {
-      round.shots?.forEach((shot: any, shotIndex: number) => {
-        const rawX = shot.x ?? 0.5;
-        const rawY = shot.y ?? 0.5;
-        const ring = shot.ring || 0;
-        
-        // Calculate angle from original coordinates (to preserve direction)
-        const offsetX = rawX - 0.5;
-        const offsetY = rawY - 0.5;
-        let angle = Math.atan2(offsetY, offsetX);
-        
-        // If shot is at center, give it a pseudo-random angle based on index
-        if (Math.abs(offsetX) < 0.01 && Math.abs(offsetY) < 0.01) {
-          angle = (shotIndex * 137.5 * Math.PI / 180); // Golden angle for spread
-        }
-        
-        // Calculate distance based on ring value
-        // Ring 10 = center (0-10% of radius), Ring 1 = edge (90-100% of radius)
-        // Place shot in the middle of its ring band
-        const ringBandCenter = (10.5 - ring) / 10; // Ring 10 -> 0.05, Ring 1 -> 0.95
-        const targetRadius = 0.4; // Matches scoring effectiveRadius
-        const distance = ringBandCenter * targetRadius;
-        
-        // Convert polar to cartesian
-        const visualX = 0.5 + Math.cos(angle) * distance;
-        const visualY = 0.5 + Math.sin(angle) * distance;
-        
+      round.shots?.forEach((shot: any) => {
+        // IMPORTANT: Preserve original coordinates from scoring screen
+        // These are normalized (0-1) positions where the user actually clicked
         shots.push({
-          x: Math.max(0.05, Math.min(0.95, visualX)),
-          y: Math.max(0.05, Math.min(0.95, visualY)),
-          ring: ring,
+          x: shot.x ?? 0.5,
+          y: shot.y ?? 0.5,
+          ring: shot.ring || 0,
           roundIndex,
         });
       });
