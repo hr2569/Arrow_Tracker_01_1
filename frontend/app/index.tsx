@@ -9,19 +9,21 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../hooks/useTheme';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const colors = useTheme();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Settings Button - Top Right */}
       <TouchableOpacity
-        style={styles.settingsButton}
+        style={[styles.settingsButton, { backgroundColor: colors.card }]}
         onPress={() => router.push('/settings')}
         activeOpacity={0.7}
       >
-        <Ionicons name="settings-outline" size={24} color="#888" />
+        <Ionicons name="settings-outline" size={24} color={colors.textSecondary} />
       </TouchableOpacity>
 
       <View style={styles.content}>
