@@ -83,6 +83,13 @@ export default function StatsScreen() {
     return [...new Set(distances)];
   }, [sessions]);
 
+  const availableTargetTypes = useMemo(() => {
+    const types = sessions
+      .filter(s => s.target_type)
+      .map(s => s.target_type as string);
+    return [...new Set(types)];
+  }, [sessions]);
+
   const fetchSessions = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/sessions`);
