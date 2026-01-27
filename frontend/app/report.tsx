@@ -492,14 +492,14 @@ export default function ReportScreen() {
             .card {
               background: #f9f9f9;
               border-radius: 12px;
-              padding: 24px;
-              margin-bottom: 20px;
+              padding: 16px;
+              margin-bottom: 12px;
               border: 1px solid #ddd;
             }
             .card h3 {
               color: #000;
-              margin: 0 0 20px 0;
-              font-size: 20px;
+              margin: 0 0 12px 0;
+              font-size: 18px;
             }
             .stats-grid {
               display: flex;
@@ -508,56 +508,56 @@ export default function ReportScreen() {
             .stat-item {
               width: 50%;
               text-align: center;
-              padding: 16px 0;
+              padding: 10px 0;
             }
             .stat-value {
-              font-size: 42px;
+              font-size: 32px;
               font-weight: bold;
               color: #8B0000;
             }
             .stat-label {
-              font-size: 14px;
+              font-size: 12px;
               color: #555;
-              margin-top: 8px;
+              margin-top: 4px;
             }
             .avg-row {
               display: flex;
               justify-content: space-between;
-              padding: 16px 0;
+              padding: 10px 0;
               border-bottom: 1px solid #ddd;
-              font-size: 18px;
+              font-size: 14px;
             }
             .avg-label { color: #555; }
-            .avg-value { font-weight: bold; font-size: 22px; color: #000; }
+            .avg-value { font-weight: bold; font-size: 18px; color: #000; }
             .highlight-row {
               display: flex;
-              gap: 16px;
+              gap: 12px;
             }
             .highlight-item {
               flex: 1;
               background: #fff;
               border-radius: 12px;
-              padding: 20px;
+              padding: 14px;
               text-align: center;
               border: 1px solid #ddd;
             }
             .highlight-label {
-              font-size: 14px;
+              font-size: 12px;
               color: #555;
-              margin-bottom: 12px;
+              margin-bottom: 8px;
             }
             .highlight-value {
-              font-size: 32px;
+              font-size: 24px;
               font-weight: bold;
               color: #2E7D32;
             }
             .highlight-value-low {
-              font-size: 32px;
+              font-size: 24px;
               font-weight: bold;
               color: #C62828;
             }
             .highlight-date {
-              font-size: 12px;
+              font-size: 11px;
               color: #666;
               margin-top: 8px;
             }
