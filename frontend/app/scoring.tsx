@@ -151,10 +151,11 @@ export default function ScoringScreen() {
   const getSpotCenters = () => {
     if (targetConfig.layout === 'triple_triangle') {
       // Vegas 3-Spot: 1 on top, 2 on bottom (inverted triangle)
+      // Spots are 42% of the target size, positioned within the square
       return [
-        { x: 0.5, y: 0.25 },   // Top center
-        { x: 0.29, y: 0.7 },   // Bottom left
-        { x: 0.71, y: 0.7 },   // Bottom right
+        { x: 0.5, y: 0.28 },   // Top center
+        { x: 0.29, y: 0.72 },  // Bottom left
+        { x: 0.71, y: 0.72 },  // Bottom right
       ];
     } else if (targetConfig.layout === 'triple_vertical') {
       // NFAA Indoor: 3 vertical spots
@@ -168,9 +169,10 @@ export default function ScoringScreen() {
     return [{ x: centerX, y: centerY }];
   };
 
-  const spotRadius = targetConfig.layout === 'triple_triangle' ? 0.21 
-    : targetConfig.layout === 'triple_vertical' ? 0.15 
-    : (radius > 0.1 ? radius : 0.4);
+  // Spot radius relative to target size (each spot is roughly 42% of target for Vegas, 30% for NFAA)
+  const spotRadius = targetConfig.layout === 'triple_triangle' ? 0.19 
+    : targetConfig.layout === 'triple_vertical' ? 0.14 
+    : (radius > 0.1 ? radius : 0.45);
 
   const calculateRingFromPosition = (x: number, y: number): number => {
     const spotCenters = getSpotCenters();
@@ -191,17 +193,20 @@ export default function ScoringScreen() {
     const normalizedDistance = minDistance / spotRadius;
     
     // If outside the target radius, it's a miss
-    if (normalizedDistance > 1.1) return 0;
+    if (normalizedDistance > 1.15) return 0;
     
-    // Different scoring based on target type
+    // Get number of rings for this target type
     const numRings = targetConfig.rings;
     
-    // Calculate which ring the arrow is in (0 = outermost, numRings-1 = center)
+    // Calculate which ring based on distance (each ring is 1/numRings of the radius)
+    // ringFromCenter: 1 = innermost, numRings = outermost
     const ringFromCenter = Math.ceil(normalizedDistance * numRings);
+    
+    // Convert to array index (0 = outermost ring, numRings-1 = center)
     const ringIndex = numRings - ringFromCenter;
     
-    // Get the score for this ring from the target config
-    if (ringIndex >= numRings) return targetConfig.scores[numRings - 1]; // Dead center = max score
+    // Clamp and return score
+    if (ringIndex >= numRings) return targetConfig.scores[numRings - 1]; // Dead center
     if (ringIndex < 0) return 0; // Miss
     
     return targetConfig.scores[Math.max(0, Math.min(ringIndex, numRings - 1))];
