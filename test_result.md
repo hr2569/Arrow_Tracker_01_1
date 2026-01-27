@@ -273,7 +273,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Session management APIs (CRUD) - target_type field"
+    []
   stuck_tasks: 
     - "Target analysis with AI (corner detection)"
     - "Arrow detection with AI"
