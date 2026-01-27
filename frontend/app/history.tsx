@@ -156,6 +156,7 @@ interface GroupedSessions {
 
 export default function HistoryScreen() {
   const router = useRouter();
+  const colors = useTheme();
   const [activeTab, setActiveTab] = useState<'history' | 'stats' | 'report'>('history');
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
