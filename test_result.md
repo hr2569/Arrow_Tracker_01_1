@@ -243,6 +243,24 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Lists all sessions, expandable details, delete functionality"
+      - working: "NA"
+        agent: "main"
+        comment: "Added target type display and filtering: Each session card now shows target type badge (WA Standard, Vegas 3-Spot, NFAA Indoor) with golden styling. Added target type filter chips in the filter section. Filter logic updated to include targetTypeFilter."
+
+  - task: "Stats screen"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/stats.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Shows aggregated statistics with target distribution and heatmap views"
+      - working: "NA"
+        agent: "main"
+        comment: "Added target type filtering: Session interface updated with target_type field. Added availableTargetTypes memo and targetTypeFilter state. Filter logic updated to include target type. Added target type filter UI chips."
 
 metadata:
   created_by: "main_agent"
