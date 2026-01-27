@@ -147,14 +147,48 @@ export default function ScoringScreen() {
     }
   };
 
+  // Define spot centers for multi-spot targets (normalized 0-1 coordinates)
+  const getSpotCenters = () => {
+    if (targetConfig.layout === 'triple_triangle') {
+      // Vegas 3-Spot: 1 on top, 2 on bottom (inverted triangle)
+      return [
+        { x: 0.5, y: 0.25 },   // Top center
+        { x: 0.29, y: 0.7 },   // Bottom left
+        { x: 0.71, y: 0.7 },   // Bottom right
+      ];
+    } else if (targetConfig.layout === 'triple_vertical') {
+      // NFAA Indoor: 3 vertical spots
+      return [
+        { x: 0.5, y: 0.17 },   // Top
+        { x: 0.5, y: 0.5 },    // Middle
+        { x: 0.5, y: 0.83 },   // Bottom
+      ];
+    }
+    // Single target - use the center from targetData
+    return [{ x: centerX, y: centerY }];
+  };
+
+  const spotRadius = targetConfig.layout === 'triple_triangle' ? 0.21 
+    : targetConfig.layout === 'triple_vertical' ? 0.15 
+    : (radius > 0.1 ? radius : 0.4);
+
   const calculateRingFromPosition = (x: number, y: number): number => {
-    const dx = x - centerX;
-    const dy = y - centerY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const spotCenters = getSpotCenters();
     
-    // Use the radius, but if it's 0 or very small, use a default
-    const effectiveRadius = radius > 0.1 ? radius : 0.4;
-    const normalizedDistance = distance / effectiveRadius;
+    // Find the closest spot center
+    let closestSpot = spotCenters[0];
+    let minDistance = Infinity;
+    
+    for (const spot of spotCenters) {
+      const dist = Math.sqrt((x - spot.x) ** 2 + (y - spot.y) ** 2);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestSpot = spot;
+      }
+    }
+    
+    // Calculate distance from closest spot center
+    const normalizedDistance = minDistance / spotRadius;
     
     // If outside the target radius, it's a miss
     if (normalizedDistance > 1.1) return 0;
@@ -162,7 +196,7 @@ export default function ScoringScreen() {
     // Different scoring based on target type
     const numRings = targetConfig.rings;
     
-    // Calculate which ring the arrow is in (0 = center, numRings-1 = outermost)
+    // Calculate which ring the arrow is in (0 = outermost, numRings-1 = center)
     const ringFromCenter = Math.ceil(normalizedDistance * numRings);
     const ringIndex = numRings - ringFromCenter;
     
