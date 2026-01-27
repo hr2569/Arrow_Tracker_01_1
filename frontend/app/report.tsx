@@ -315,9 +315,10 @@ export default function ReportScreen() {
       })
       .join('');
 
-    // Get unique bows and distances used in filtered sessions
+    // Get unique bows, distances, and target types used in filtered sessions
     const usedBows = [...new Set(filteredSessions.filter(s => s.bow_name).map(s => s.bow_name))];
     const usedDistances = [...new Set(filteredSessions.filter(s => s.distance).map(s => s.distance))];
+    const usedTargetTypes = [...new Set(filteredSessions.map(s => getTargetTypeName(s.target_type)))];
 
     // Generate heatmap SVG for PDF - full page
     const generateHeatmapSvg = () => {
