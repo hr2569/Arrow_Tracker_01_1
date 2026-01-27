@@ -191,6 +191,7 @@ export const useAppStore = create<AppState>((set) => ({
 
   clearAll: () =>
     set({
+      targetType: 'wa_standard',
       sessionType: 'training',
       selectedBow: null,
       sessionDistance: '',
