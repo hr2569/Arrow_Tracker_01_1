@@ -71,22 +71,6 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
-          name="capture" 
-          options={{ 
-            title: 'New Session',
-            headerBackTitle: 'Back',
-            headerLeft: () => <HeaderBackButton />,
-          }} 
-        />
-        <Stack.Screen 
-          name="alignment" 
-          options={{ 
-            title: 'Target Detection',
-            headerBackTitle: 'Back',
-            headerLeft: () => <HeaderBackButton />,
-          }} 
-        />
-        <Stack.Screen 
           name="scoring" 
           options={{ 
             title: 'Score Arrows',
