@@ -85,16 +85,16 @@ export const TARGET_CONFIGS = {
     name: 'NFAA Indoor',
     description: '3-spot vertical strip',
     rings: 5,
-    maxScore: 5,
-    // X=5, 5, 4, 4, 3 scoring
-    scores: [3, 4, 4, 5, 5],
-    // Colors from outside to inside: Blue → Red → Gold (similar to Vegas)
+    maxScore: 10,
+    // Same scoring as Vegas: Gold 10/9, Red 8/7, Blue 6
+    scores: [6, 7, 8, 9, 10],
+    // Colors from outside to inside: Blue → Red → Gold
     colors: [
-      { bg: '#00a2e8', border: '#0077b3' },  // Ring 3 - Blue outer
-      { bg: '#ed1c24', border: '#b31217' },  // Ring 4 - Red
-      { bg: '#ed1c24', border: '#b31217' },  // Ring 4 - Red
-      { bg: '#fff200', border: '#ccaa00' },  // Ring 5 - Gold
-      { bg: '#fff200', border: '#ccaa00' },  // Ring 5/X - Gold center
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 6 - Blue outer
+      { bg: '#ed1c24', border: '#b31217' },  // Ring 7 - Red
+      { bg: '#ed1c24', border: '#b31217' },  // Ring 8 - Red
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 10/X - Gold center
     ],
     layout: 'triple_vertical', // 3 targets stacked vertically
     hasXRing: true,
