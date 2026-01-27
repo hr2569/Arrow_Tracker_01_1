@@ -1103,29 +1103,6 @@ export default function StatsScreen() {
           )}
         </View>
 
-        {/* Generate Report Button */}
-        {stats.totalArrows > 0 && (
-          <View style={{ marginTop: 8, marginBottom: 8, width: '100%' }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#8B0000',
-                borderRadius: 12,
-                paddingVertical: 14,
-                paddingHorizontal: 20,
-                width: '100%',
-              }}
-              onPress={() => router.push('/report')}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="document-text-outline" size={20} color="#fff" />
-              <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600', marginLeft: 10 }}>Generate Report</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
         {/* Stats Overview */}
         <View style={styles.statsCard}>
           <Text style={styles.statsTitle}>{getPeriodLabel()} Statistics</Text>
