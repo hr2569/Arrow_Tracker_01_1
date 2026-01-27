@@ -1,19 +1,60 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Archery Target Scoring App
-Tests all backend endpoints including AI image analysis
+Backend API Testing Script for Archery Target Scoring App
+Focus: Session management APIs with target_type field testing
 """
 
 import requests
 import json
-import base64
-import io
-from PIL import Image, ImageDraw
+import uuid
+from datetime import datetime
 import sys
-import time
+import os
 
-# Backend URL from frontend .env
-BACKEND_URL = "https://bullseye-stats.preview.emergentagent.com/api"
+# Get backend URL from frontend .env file
+def get_backend_url():
+    try:
+        with open('/app/frontend/.env', 'r') as f:
+            for line in f:
+                if line.startswith('EXPO_PUBLIC_BACKEND_URL='):
+                    return line.split('=', 1)[1].strip()
+    except:
+        pass
+    return "http://localhost:8001"
+
+BASE_URL = get_backend_url()
+API_BASE = f"{BASE_URL}/api"
+
+print(f"Testing backend at: {API_BASE}")
+
+class TestResults:
+    def __init__(self):
+        self.passed = 0
+        self.failed = 0
+        self.errors = []
+    
+    def test_pass(self, test_name):
+        print(f"✅ {test_name}")
+        self.passed += 1
+    
+    def test_fail(self, test_name, error):
+        print(f"❌ {test_name}: {error}")
+        self.failed += 1
+        self.errors.append(f"{test_name}: {error}")
+    
+    def summary(self):
+        total = self.passed + self.failed
+        print(f"\n=== TEST SUMMARY ===")
+        print(f"Total tests: {total}")
+        print(f"Passed: {self.passed}")
+        print(f"Failed: {self.failed}")
+        if self.errors:
+            print(f"\nErrors:")
+            for error in self.errors:
+                print(f"  - {error}")
+        return self.failed == 0
+
+results = TestResults()
 
 def create_test_archery_target():
     """Create a simple archery target image for testing AI endpoints"""
