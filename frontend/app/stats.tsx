@@ -1782,6 +1782,10 @@ const targetMapStyles = StyleSheet.create({
     borderColor: '#000000',
     opacity: 0.6,
   },
+  reportButtonContainer: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
   reportButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1790,8 +1794,6 @@ const targetMapStyles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 20,
-    marginTop: 8,
-    marginBottom: 8,
     gap: 10,
   },
   reportButtonText: {
