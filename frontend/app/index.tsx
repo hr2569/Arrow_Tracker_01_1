@@ -69,7 +69,11 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <View style={styles.buttonIconContainerSmall}>
-                <BowIcon size={36} color="#8B0000" />
+                <Image 
+                  source={require('../assets/images/bow-icon.png')} 
+                  style={{ width: 40, height: 40 }}
+                  resizeMode="contain"
+                />
               </View>
               <Text style={styles.secondaryButtonTextSmall}>Bows</Text>
               <Text style={styles.buttonSubtextSecondarySmall}>
