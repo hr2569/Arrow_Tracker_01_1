@@ -1488,7 +1488,7 @@ export default function ReportScreen() {
             {allShots.length} arrows from {reportStats.totalSessions} session{reportStats.totalSessions !== 1 ? 's' : ''}
           </Text>
           <View style={styles.heatmapContainer}>
-            <HeatmapTargetMap size={280} />
+            <HeatmapTargetMap size={280} displayTargetType={selectedTargetType || undefined} />
           </View>
         </View>
 
