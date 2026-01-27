@@ -1,157 +1,130 @@
 <analysis>
 
 <original_problem_statement>
-The user initially requested to work through a backlog of pending issues, starting with a critical bug where arrow clicks were being missed on the scoring screen.
+The user's initial request from the previous session was to integrate the  into the session data for display and filtering on the history and stats pages.
 
-The session quickly pivoted based on user feedback to a series of rapid, iterative enhancements for the PDF reporting feature. The user's requests included:
-- **Styling:** Change the PDF to a professional-looking document with a white background, black text, and no emojis.
-- **Layout:**
-    - Move By Bow and By Distance information to the top of the report.
-    - Make the shot distribution heatmap occupy the full width of the page.
-    - Create a multi-page document, with the main summary and highlights on the first page, and the heatmap and score distribution tables on their own separate pages.
-- **Functionality:**
-    - Change the PDF action from download or share to open directly.
-    - Provide options for how to handle the generated PDF (e.g., View, Share, Save).
-    - Attempt to open the PDF directly in Google Drive, falling back to other methods if unavailable.
-- **Visuals:**
-    - Make the target's concentric ring lines visible through the heatmap overlay.
-    - Iteratively adjust the thickness of these lines for optimal visibility.
+In this session, the user expanded the requirements:
+1.  **Stats Page Filter:** Remove the All option from the target type filter on the stats page (), forcing the view to always be scoped to a single target type.
+2.  **Stats Page Visuals:** The shot distribution graph () on the stats page must render the correct multi-spot target face (Vegas, NFAA) when that type is selected.
+3.  **Stats Page Bug Fix:** The shot markers on the stats page's distribution graph were misplaced for multi-spot targets. This was a recurrence of a previously fixed bug.
+4.  **Report Page Integration:** Add a Target Type filter to the report generation screen ().
+5.  **Report Page Visuals:** The heatmap on the report screen () and in the generated PDF must also render the correct multi-spot target faces.
+
 </original_problem_statement>
 
 **User's preferred language**: English
 
 **what currently exists?**
-The agent successfully fixed a recurring ESLint configuration issue that was preventing proper TypeScript parsing. It then attempted an extensive debugging and fixing process for a high-priority bug where arrow clicks were not registering on the scoring screen, but this remains unresolved due to complexities with React Native Web's event handling.
+The agent has successfully completed the requested enhancements, extending the  functionality to the Stats and Report pages.
 
-The majority of the session was spent on significant, iterative improvements to the PDF reporting feature in . The PDF is now a multi-page, professionally styled document. The layout has been re-architected to place key stats on the first page and larger visualizations on subsequent pages. The heatmap visualization itself was improved to show the underlying target lines, with their visibility fine-tuned based on direct user feedback. The PDF opening mechanism was also iterated upon, with the final implementation using the standard Expo  API for robust cross-platform behavior.
+1.  **Stats Page ():**
+    *   The All option has been removed from the target type filter. The view now defaults to the first available target type.
+    *   The aggregated shot distribution map () now correctly renders the visual layout for WA Standard, Vegas 3-Spot, and NFAA Indoor targets.
+    *   A critical recurring bug causing incorrect shot marker placement on multi-spot targets has been fixed by ensuring raw shot coordinates are used for rendering.
+
+2.  **Report Page ():**
+    *   A new Filter by Target section has been added to the report configuration screen.
+    *   The generated report now includes a filter badge in the header indicating the selected target type.
+    *   The on-screen heatmap () now dynamically renders the correct multi-spot target faces.
+    *   The PDF generation logic () has been updated to render the correct multi-spot target faces within the exported PDF file.
 
 **Last working item**:
-    - Last item agent was working: Adjusting the stroke width of the target ring lines within the PDF's SVG heatmap to make them slightly less prominent, as per the user's final request. The stroke width was set to .
-    - Status: COMPLETED
-    - Agent Testing Done: N
-    - Which testing method agent to use? NA
-    - User Testing Done: Y (The user provided iterative feedback and the agent implemented the final requested change.)
+    - Last item agent was working: Updating the PDF generation logic in  to render the correct multi-spot target faces (Vegas, NFAA) in the heatmap SVG. The user requested that the prints (PDFs) have the same correct visuals as the on-screen reports.
+    - Status: USER VERIFICATION PENDING
+    - Agent Testing Done: Y (Agent verified the on-screen report rendering was correct after the change, but did not explicitly view the generated PDF file).
+    - Which testing method agent to use? manual testing by user
+    - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-  - Issue 1: (P0) Arrow clicks are missed on the scoring screen ().
-  - Issue 2: (P1) Verify redirect to home screen after saving a session.
-  - Issue 3: (P2) Verify improved arrow scoring accuracy from the AI model.
+  - Issue 1:  (P2) Verify improved arrow scoring accuracy from the AI model.
 
   Issues Detail:
   - Issue 1: 
-     - Description: A high-priority, recurring bug where user clicks to mark arrow locations in  are not registered, particularly in the web preview. The agent identified this as a complex event propagation issue where nested  components are likely swallowing touch events.
-     - Attempted fixes: Multiple approaches were tried and failed: using , changing  to , using  responders, and adding a dedicated absolutely-positioned  hit area. Debugging revealed the hit area was not receiving events at all.
-     - Next debug checklist: The current implementation with nested s is problematic for web. The recommended next step is to refactor the zoom/pan functionality in  to use a single  or a different gesture handling library to avoid the event swallowing issue.
-     - Why fix this issue and what will be achieved with the fix? This is a critical core-functionality bug that makes scoring arrows impossible, blocking the primary user flow.
-     - Status:  IN PROGRESS
-     - Is recurring issue? Y
-     - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on other issue: None
-  - Issue 2: 
-     - Description: A feature from a previous session to redirect the user to the home screen after saving a session from the  page has not been tested or verified by the user. The agent confirmed the code exists but did not test its functionality.
-     - Status: USER VERIFICATION PENDING
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on other issue: None
-  - Issue 3: 
      - Description: The AI prompt in  was updated in a previous session to improve arrow detection, but this has not been verified by the user.
-     - Status: USER VERIFICATION PENDING
+     - Status:  USER VERIFICATION PENDING
      - Is recurring issue? Y
      - Should Test frontend/backend/both after fix? Backend/AI model
      - Blocked on other issue: None
 
 **In progress Task List**:
-- None.
+  - None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-    - (P1) Implement camera capture functionality in . This was a pending task from the initial backlog that has not been started.
+    - (P1) Implement camera capture functionality in . This is a pending task from the initial backlog.
 - **Future Tasks:**
-    - Refactor the  component, which is duplicated in  and , into a single reusable component.
-    - Refactor the  component, which is duplicated in  and .
-    - Implement pinch-to-zoom on target visualizations.
-    - Refactor hardcoded colors into a centralized theme/constants file.
-    - Add user profiles.
+    - (P0) **Refactor Target Rendering Logic:** The logic for rendering target faces (, , ) is now duplicated across  and . This should be extracted into a single reusable React component and a shared SVG utility function to reduce technical debt.
+    - (P1) Refactor the  component in .
+    - (P2) Extract the  component from  into a shared component file.
+    - (P2) Implement pinch-to-zoom on target visualizations.
+    - (P3) Refactor hardcoded colors into a centralized theme/constants file.
+    - (P3) Add user profiles.
 
 **Completed work in this session**
-- **Fix: ESLint Configuration**
-  - Updated  to correctly parse TypeScript () files, resolving the  error.
-- **Feature: PDF Report Styling and Layout**
-  - Modified  in  to produce a clean document with a white background, black text, and no emojis.
-  - Implemented a multi-page PDF layout using CSS page breaks, ensuring highlights are on page 1, with the shot heatmap and score distribution on separate pages.
-  - Adjusted the layout to move bow/distance filters to the header and make the heatmap full-width.
-- **Feature: PDF Heatmap Visual Enhancement**
-  - Re-engineered the SVG generation logic in  to render the target ring lines on top of the heatmap overlay, making them visible.
-  - Iteratively adjusted the  of the ring lines for optimal visibility based on user feedback.
-- **Feature: PDF Opening/Sharing**
-  - Iterated through multiple PDF handling mechanisms (, ,  intents) in , finally settling on using  to present the user with multiple options (View, Share, Save) on native platforms for a robust experience.
+- **Stats Page Enhancements ()**
+    - Removed the All option from the target type filter.
+    - Implemented dynamic multi-spot target rendering in the  component.
+    - **Bug Fix:** Fixed incorrect shot marker positioning on multi-spot targets by preserving and using raw coordinates (, ).
+- **Report Page Feature ()**
+    - Added a target type filter to the report configuration UI.
+    - Updated the report header to display the selected target type as a filter badge.
+    - Implemented dynamic multi-spot target rendering in the on-screen  component.
+    - Implemented dynamic multi-spot target rendering in the  function for PDF exports.
 
 **Earlier issues found/mentioned but not fixed**
-   - The missed arrow clicks on  was the top-priority item from the backlog. Extensive work was done, but the issue persists and is now blocked pending a more significant refactor.
+- None in this session.
 
 **Known issue recurrence from previous fork**
-  - Issue recurrence in previous fork: Missed arrow clicks on  and ESLint parsing error in .
-  - Recurrence count: 2+
-  - Status: 
-    - ESLint error: RESOLVED
-    - Missed arrow clicks: IN PROGRESS
+- **Issue:** Incorrect shot positioning on multi-spot targets.
+- **Description:** A bug where shot coordinates were incorrectly transformed, causing markers to be misplaced on multi-spot targets, was fixed in  in a previous session. The same bug was present in  because the fix had not been applied there.
+- **Recurrence count:** 1
+- **Status:** RESOLVED. The fix (using raw coordinates) has now been applied to the components in .
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **React Native Web Event Handling:** Encountered and diagnosed complex event-swallowing issues between nested  and  components.
-- **Dynamic SVG Generation:** Manipulated SVG string generation logic to re-layer elements (fills, overlays, strokes) to achieve a desired visual effect (target lines visible through a heatmap).
-- **CSS for Print:** Utilized  to create a multi-page PDF from a single HTML string.
-- **Expo APIs:** Used , , , and  to generate and handle PDF files across web and native platforms.
-- **Iterative Development:** Responded to a high volume of small, iterative user requests for visual and functional changes, particularly for the PDF report.
-- **ESLint Flat Config:** Debugged and correctly configured ESLint 9's flat configuration () for a TypeScript/Expo project.
+- **Component Logic Duplication:** This session highlighted the technical debt from duplicated components. The same features (multi-spot rendering) and bug fixes (shot positioning) had to be implemented separately in  and .
+- **SVG Generation for PDFs:** The agent successfully updated a function () to dynamically create SVG string literals for complex multi-spot target visualizations to be embedded in an HTML-to-PDF report.
+- **State Management & Filtering:** Enhanced the filtering logic on both the stats and report pages to incorporate the .
 
 **key DB schema**
-  - No changes.
+  - No changes in this session.
 
 **changes in tech stack**
-  - Added  to the project.
+  - No changes in this session.
 
 **All files of reference**
-- : Contains all the new PDF styling, layout, SVG, and sharing logic.
-- : Contains the unresolved touch event bug and the multiple attempted fixes.
-- : Contains the fix for the TypeScript parsing issue.
+- : Heavily modified to remove the All filter, add multi-spot target visuals, and fix the recurring shot positioning bug.
+- : Heavily modified to add a new target filter and to implement multi-spot target visuals on both the on-screen heatmap and the generated PDF report.
 
 **Areas that need refactoring**:
-- **:** The component's layout, specifically the use of nested s for zoom, needs to be refactored to properly handle touch events on web.
-- **Component Duplication:** The  and  components are still duplicated across multiple files and should be extracted into reusable components.
+- **Critical:** The  component logic is duplicated in  and . This should be extracted into a single, reusable component in a  directory.
+- **High Priority:** The SVG generation logic in  () duplicates the visual rendering logic from the React components. This could be refactored into a shared utility that provides coordinates and dimensions, which both React and SVG functions can consume.
 
 **key api endpoints**
-- No changes.
+- No changes in this session.
 
 **Critical Info for New Agent**
-- The highest priority technical debt is the **missed arrow clicks bug in **. This is not a simple fix and will likely require a structural refactor of the component's layout and gesture handling. The previous agent's notes on failed attempts are crucial.
-- The user is highly focused on the visual output and user experience of the reporting feature. Be prepared for more fine-tuning requests.
-- The PDF generation logic in  is now quite complex, involving dynamic HTML/SVG generation and platform-specific handling via the Expo  API.
-- Since the user's immediate requests regarding the PDF have been completed, the next logical step is to propose tackling the P0 missed arrow clicks bug again, clearly stating that it will require a refactor.
+- **Verify PDF Output:** The last action was to update the PDF generation logic. While the on-screen report was verified, the final PDF output itself was not. The first step should be to generate a report for a multi-spot target (NFAA or Vegas) and verify the heatmap in the PDF is correct.
+- **Beware of Coordinate Bugs:** A bug related to incorrectly transforming shot coordinates has now appeared and been fixed twice (once in , once in ). When creating any new visual component that plots shots, ensure you use the raw  coordinates for multi-spot targets to avoid this issue.
+- **Prioritize Refactoring:** The target rendering logic is now spread across three files (, , ) and two formats (React components, SVG strings). This is a significant source of technical debt. Refactoring this into shared, reusable code should be a high-priority future task to simplify future maintenance and bug fixes.
 
 **documents created in this job**
-  - The agent updated  to document the fixes.
+- None.
 
 **Last 10 User Messages and any pending HUMAN messages** 
-- 10. : User reported a bug in the PDF generation. (Status: Fixed by simplifying the code)
-- 9. : User requested a specific app integration for viewing the PDF. (Status: Attempted, then reverted to a more robust generic share dialog)
-- 8. : User confirmed a previous step worked, but noted a new layout issue. (Status: Fixed by adjusting CSS)
-- 7. : User requested a significant visual enhancement to the heatmap. (Status: Completed)
-- 6. : User requested fine-tuning of the heatmap lines. (Status: Completed)
-- 5. : User's final request for fine-tuning the heatmap lines. (Status: Completed)
-- 4. : User requested a multi-page PDF layout and options for opening. (Status: Completed)
-- 3. : User requested a change in the PDF button's behavior. (Status: Completed)
-- 2. : User requested layout changes to the PDF. (Status: Completed)
-- 1. : User requested specific layout rules and PDF opening behavior. (Status: Completed)
+- 10.  - User requested multi-spot target visuals in the PDF report. (Status: Completed, pending user verification)
+- 9.  - User requested multi-spot visuals on the report page's heatmap. (Status: Completed)
+- 8.  - User requested a target type filter for the report screen. (Status: Completed)
+- 7.  - User reported the recurring bug of misplaced shot markers on the stats page. (Status: Completed)
+- 6.  - User requested multi-spot visuals on the stats page distribution graph. (Status: Completed)
+- 5.  - User requested to remove the All filter from the stats page. (Status: Completed)
+- (Older messages relate to work completed in previous forks/sessions)
 
 **Project Health Check:**
-- **Broken**:
-  - The core functionality of adding arrows on the  screen is non-functional in the web preview due to an event-handling bug.
-- **Needs Refactoring**:
-  - : The layout with nested ScrollViews needs to be refactored to fix the touch input bug.
-  - Duplicated  and  components.
+- **Fixed:** All user requests from this session have been implemented. The application now has consistent target type filtering and visualization across the stats and report pages. A recurring bug was identified and fixed.
+- **Needs Refactoring:** The codebase has accrued significant technical debt due to duplicated target rendering logic across multiple files and formats. This is the most pressing architectural issue.
 
 **3rd Party Integrations**
 - **OpenAI GPT-4o**: Used via Emergent LLM Key for AI-powered corner and arrow detection in .
@@ -160,22 +133,17 @@ The majority of the session was spent on significant, iterative improvements to 
 - **expo-print**: Used for generating PDF reports.
 - **expo-sharing**: Used for sharing the generated PDF file.
 - **@react-native-community/datetimepicker**: Used for the date/time editing modal.
-- **expo-intent-launcher**: (NEW) Added for attempting to open specific Android intents.
-- **expo-linking**: Used for handling URLs and deep links.
 
 **Testing status**
   - Testing agent used after significant changes: NO
   - Troubleshoot agent used after agent stuck in loop: NO
   - Test files created: []
-  - Known regressions: None identified, but the scoring screen bug remains critical.
+  - Known regressions: None.
 
 **Credentials to test flow:**
 - No credentials are required.
 
 **What agent forgot to execute**
-- The agent correctly prioritized the user's new, iterative requests over the initial backlog. The following backlog items were not addressed:
-    - Implementing camera functionality in .
-    - Verifying the post-save redirect on .
-    - Verifying the AI model improvements.
+- The agent successfully executed all user requests in this session. No tasks were overlooked.
 
 </analysis>
