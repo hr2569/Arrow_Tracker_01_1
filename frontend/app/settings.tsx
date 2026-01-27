@@ -25,6 +25,7 @@ const themeOptions: { value: ThemeType; label: string; icon: string }[] = [
 export default function SettingsScreen() {
   const router = useRouter();
   const { theme, setTheme } = useAppStore();
+  const colors = useTheme();
   const [showThemeModal, setShowThemeModal] = useState(false);
 
   const getThemeLabel = () => {
@@ -54,15 +55,15 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Settings</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
         <View style={styles.headerSpacer} />
       </View>
 
