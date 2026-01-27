@@ -733,26 +733,13 @@ export default function HistoryScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'stats' && styles.tabButtonActive]}
-          onPress={() => setActiveTab('stats')}
+          onPress={() => router.push('/stats')}
         >
           <Ionicons name="stats-chart-outline" size={20} color={activeTab === 'stats' ? '#fff' : '#888'} />
           <Text style={[styles.tabButtonText, activeTab === 'stats' && styles.tabButtonTextActive]}>Stats</Text>
         </TouchableOpacity>
       </View>
 
-      {activeTab === 'stats' ? (
-        // Stats Tab - Navigate to Stats screen
-        <View style={styles.statsTabContent}>
-          <TouchableOpacity
-            style={styles.goToStatsButton}
-            onPress={() => router.push('/stats')}
-          >
-            <Ionicons name="stats-chart" size={48} color="#8B0000" />
-            <Text style={styles.goToStatsTitle}>View Statistics</Text>
-            <Text style={styles.goToStatsSubtitle}>See your detailed performance analytics</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
