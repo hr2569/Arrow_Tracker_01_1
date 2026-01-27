@@ -204,15 +204,18 @@ frontend:
 
   - task: "Arrow scoring screen"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/app/scoring.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Interactive target overlay, tap to add arrows, AI detection, score calculation"
+      - working: true
+        agent: "main"
+        comment: "P0 Bug FIX: Restructured the scoring screen to fix arrow click detection. Removed nested ScrollViews that were swallowing touch events. Changed from having a separate hit area Pressable inside nested scroll views to wrapping the entire target in a single Pressable with onPress handler. Touch events now work correctly on both web and native. Verified with automated testing - arrows are placed correctly at clicked positions."
 
   - task: "Round summary screen"
     implemented: true
