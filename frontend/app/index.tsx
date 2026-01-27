@@ -100,7 +100,7 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <View style={styles.buttonIconContainerSmall}>
-                <Ionicons name="disc-outline" size={36} color="#8B0000" />
+                <BowIcon size={36} color="#8B0000" />
               </View>
               <Text style={styles.secondaryButtonTextSmall}>Bows</Text>
               <Text style={styles.buttonSubtextSecondarySmall}>
