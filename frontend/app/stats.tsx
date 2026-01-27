@@ -130,9 +130,9 @@ export default function StatsScreen() {
       // Filter by distance
       if (distanceFilter && session.distance !== distanceFilter) return false;
       
-      // Filter by target type (treat missing as 'wa_standard')
+      // Filter by target type (treat missing as 'wa_standard') - always required
       const sessionTargetType = session.target_type || 'wa_standard';
-      if (targetTypeFilter && sessionTargetType !== targetTypeFilter) return false;
+      if (sessionTargetType !== targetTypeFilter) return false;
       
       // Filter by time period
       const sessionDate = new Date(session.created_at);
