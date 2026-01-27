@@ -728,15 +728,22 @@ export default function HistoryScreen() {
           style={[styles.tabButton, activeTab === 'history' && styles.tabButtonActive]}
           onPress={() => setActiveTab('history')}
         >
-          <Ionicons name="time-outline" size={20} color={activeTab === 'history' ? '#fff' : '#888'} />
+          <Ionicons name="time-outline" size={18} color={activeTab === 'history' ? '#fff' : '#888'} />
           <Text style={[styles.tabButtonText, activeTab === 'history' && styles.tabButtonTextActive]}>History</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'stats' && styles.tabButtonActive]}
           onPress={() => router.push('/stats')}
         >
-          <Ionicons name="stats-chart-outline" size={20} color={activeTab === 'stats' ? '#fff' : '#888'} />
+          <Ionicons name="stats-chart-outline" size={18} color={activeTab === 'stats' ? '#fff' : '#888'} />
           <Text style={[styles.tabButtonText, activeTab === 'stats' && styles.tabButtonTextActive]}>Stats</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'report' && styles.tabButtonActive]}
+          onPress={() => router.push('/report')}
+        >
+          <Ionicons name="document-text-outline" size={18} color={activeTab === 'report' ? '#fff' : '#888'} />
+          <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>Report</Text>
         </TouchableOpacity>
       </View>
 
