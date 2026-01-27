@@ -15,6 +15,15 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Settings Button - Top Right */}
+      <TouchableOpacity
+        style={styles.settingsButton}
+        onPress={() => router.push('/settings')}
+        activeOpacity={0.7}
+      >
+        <Ionicons name="settings-outline" size={24} color="#888" />
+      </TouchableOpacity>
+
       <View style={styles.content}>
         {/* Hero Section */}
         <View style={styles.hero}>
