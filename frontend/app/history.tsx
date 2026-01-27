@@ -657,7 +657,7 @@ export default function HistoryScreen() {
 
     // Render Vegas 3-Spot or NFAA Indoor
     return (
-      <View style={[targetMapStyles.container, { width: size, height: size }]}>
+      <View style={[targetMapStyles.container, { width: size, height: size, alignItems: 'flex-start', justifyContent: 'flex-start' }]}>
         {/* Draw the multi-spot target background */}
         <View style={[targetMapStyles.multiSpotBackground, { width: size, height: size }]}>
           {spotCenters.map((spot, idx) => (
