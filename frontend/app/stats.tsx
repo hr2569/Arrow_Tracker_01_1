@@ -106,7 +106,7 @@ export default function StatsScreen() {
     fetchSessions();
   }, []);
 
-  // Filter sessions by selected time period, bow, and distance
+  // Filter sessions by selected time period, bow, distance, and target type
   const filteredSessions = useMemo(() => {
     const now = new Date();
     
@@ -116,6 +116,9 @@ export default function StatsScreen() {
       
       // Filter by distance
       if (distanceFilter && session.distance !== distanceFilter) return false;
+      
+      // Filter by target type
+      if (targetTypeFilter && session.target_type !== targetTypeFilter) return false;
       
       // Filter by time period
       const sessionDate = new Date(session.created_at);
@@ -140,7 +143,7 @@ export default function StatsScreen() {
           return true;
       }
     });
-  }, [sessions, selectedPeriod, bowFilter, distanceFilter]);
+  }, [sessions, selectedPeriod, bowFilter, distanceFilter, targetTypeFilter]);
 
   // Calculate aggregate stats
   const stats = useMemo(() => {
