@@ -159,15 +159,18 @@ export default function ScoringScreen() {
     // If outside the target radius, it's a miss
     if (normalizedDistance > 1.1) return 0;
     
-    // Calculate ring: 10 at center, 1 at edge
-    // Each ring occupies 1/10 of the radius
-    // Ring 10: 0 to 0.1, Ring 9: 0.1 to 0.2, ... Ring 1: 0.9 to 1.0
-    const ringFromCenter = Math.ceil(normalizedDistance * 10);
-    const ring = 11 - ringFromCenter;
+    // Different scoring based on target type
+    const numRings = targetConfig.rings;
     
-    // Clamp to valid range (1-10), with 0 for complete misses
-    if (ring > 10) return 10; // Dead center
-    if (ring < 1) return 0;   // Miss
+    // Calculate which ring the arrow is in (0 = center, numRings-1 = outermost)
+    const ringFromCenter = Math.ceil(normalizedDistance * numRings);
+    const ringIndex = numRings - ringFromCenter;
+    
+    // Get the score for this ring from the target config
+    if (ringIndex >= numRings) return targetConfig.scores[numRings - 1]; // Dead center = max score
+    if (ringIndex < 0) return 0; // Miss
+    
+    return targetConfig.scores[Math.max(0, Math.min(ringIndex, numRings - 1))];
     return ring;
   };
 
