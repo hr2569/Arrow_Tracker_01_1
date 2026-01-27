@@ -71,23 +71,23 @@ export default function SettingsScreen() {
         {settingsItems.map((item, index) => (
           <TouchableOpacity 
             key={index} 
-            style={styles.settingsItem} 
+            style={[styles.settingsItem, { backgroundColor: colors.card }]} 
             activeOpacity={0.7}
             onPress={item.onPress}
           >
-            <View style={styles.settingsIconContainer}>
-              <Ionicons name={item.icon as any} size={24} color="#8B0000" />
+            <View style={[styles.settingsIconContainer, { backgroundColor: colors.cardAlt }]}>
+              <Ionicons name={item.icon as any} size={24} color={colors.accent} />
             </View>
             <View style={styles.settingsTextContainer}>
-              <Text style={styles.settingsTitle}>{item.title}</Text>
-              <Text style={styles.settingsSubtitle}>{item.subtitle}</Text>
+              <Text style={[styles.settingsTitle, { color: colors.text }]}>{item.title}</Text>
+              <Text style={[styles.settingsSubtitle, { color: colors.textSecondary }]}>{item.subtitle}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
+            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
           </TouchableOpacity>
         ))}
 
         <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>Archery Scorer v1.0.0</Text>
+          <Text style={[styles.versionText, { color: colors.textMuted }]}>Archery Scorer v1.0.0</Text>
         </View>
       </ScrollView>
 
@@ -102,15 +102,16 @@ export default function SettingsScreen() {
           style={styles.modalOverlay}
           onPress={() => setShowThemeModal(false)}
         >
-          <Pressable style={styles.modalContent} onPress={e => e.stopPropagation()}>
-            <Text style={styles.modalTitle}>Choose Theme</Text>
+          <Pressable style={[styles.modalContent, { backgroundColor: colors.card }]} onPress={e => e.stopPropagation()}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Choose Theme</Text>
             
             {themeOptions.map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={[
                   styles.themeOption,
-                  theme === option.value && styles.themeOptionSelected
+                  { backgroundColor: colors.cardAlt },
+                  theme === option.value && [styles.themeOptionSelected, { backgroundColor: colors.accentLight }]
                 ]}
                 onPress={() => {
                   setTheme(option.value);
@@ -121,11 +122,12 @@ export default function SettingsScreen() {
                   <Ionicons 
                     name={option.icon as any} 
                     size={24} 
-                    color={theme === option.value ? '#8B0000' : '#888'} 
+                    color={theme === option.value ? colors.accent : colors.textSecondary} 
                   />
                   <Text style={[
                     styles.themeOptionText,
-                    theme === option.value && styles.themeOptionTextSelected
+                    { color: colors.textSecondary },
+                    theme === option.value && [styles.themeOptionTextSelected, { color: colors.text }]
                   ]}>
                     {option.label}
                   </Text>
