@@ -1973,6 +1973,10 @@ const heatmapStyles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
+  multiSpotBackground: {
+    position: 'absolute',
+    backgroundColor: '#1a1a1a',
+  },
   ring: {
     position: 'absolute',
     alignItems: 'center',
