@@ -238,14 +238,14 @@ export default function BowsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>My Bows</Text>
+        <Text style={styles.headerTitle}>My Bows</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={openAddModal}
@@ -257,16 +257,16 @@ export default function BowsScreen() {
       {/* Content */}
       {loading ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color={colors.accent} />
-          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading bows...</Text>
+          <ActivityIndicator size="large" color="#8B0000" />
+          <Text style={styles.loadingText}>Loading bows...</Text>
         </View>
       ) : bows.length === 0 ? (
         <View style={styles.centerContainer}>
-          <View style={[styles.emptyIcon, { backgroundColor: colors.card }]}>
-            <Ionicons name="arrow-forward-outline" size={64} color={colors.textMuted} />
+          <View style={styles.emptyIcon}>
+            <Ionicons name="arrow-forward-outline" size={64} color="#333" />
           </View>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>No Bows Yet</Text>
-          <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+          <Text style={styles.emptyTitle}>No Bows Yet</Text>
+          <Text style={styles.emptySubtitle}>
             Add your first bow to track your equipment
           </Text>
           <TouchableOpacity
