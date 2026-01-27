@@ -171,7 +171,6 @@ export default function ScoringScreen() {
     if (ringIndex < 0) return 0; // Miss
     
     return targetConfig.scores[Math.max(0, Math.min(ringIndex, numRings - 1))];
-    return ring;
   };
 
   // Competition mode arrow limit
