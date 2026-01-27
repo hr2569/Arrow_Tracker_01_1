@@ -877,6 +877,7 @@ const styles = StyleSheet.create({
   tripleBottomRow: {
     flexDirection: 'row',
     justifyContent: 'center',
+    gap: 8,
   },
   verticalTargetLayout: {
     flex: 1,
