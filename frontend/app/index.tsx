@@ -9,21 +9,19 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../hooks/useTheme';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const colors = useTheme();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
       {/* Settings Button - Top Right */}
       <TouchableOpacity
-        style={[styles.settingsButton, { backgroundColor: colors.card }]}
+        style={styles.settingsButton}
         onPress={() => router.push('/settings')}
         activeOpacity={0.7}
       >
-        <Ionicons name="settings-outline" size={24} color={colors.textSecondary} />
+        <Ionicons name="settings-outline" size={24} color="#888" />
       </TouchableOpacity>
 
       <View style={styles.content}>
@@ -36,8 +34,8 @@ export default function HomeScreen() {
             <View style={styles.targetRing1} />
             <View style={styles.targetCenter} />
           </View>
-          <Text style={[styles.title, { color: colors.text }]}>Archery Scorer</Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <Text style={styles.title}>Archery Scorer</Text>
+          <Text style={styles.subtitle}>
             Score your targets with precision
           </Text>
         </View>
@@ -61,33 +59,33 @@ export default function HomeScreen() {
           {/* History and Bows side by side */}
           <View style={styles.secondaryRow}>
             <TouchableOpacity
-              style={[styles.secondaryButtonHalf, { backgroundColor: colors.card, borderColor: colors.accent }]}
+              style={styles.secondaryButtonHalf}
               onPress={() => router.push('/history')}
               activeOpacity={0.8}
             >
-              <View style={[styles.buttonIconContainerSmall, { backgroundColor: colors.cardAlt }]}>
-                <Ionicons name="time" size={36} color={colors.accent} />
+              <View style={styles.buttonIconContainerSmall}>
+                <Ionicons name="time" size={36} color="#8B0000" />
               </View>
-              <Text style={[styles.secondaryButtonTextSmall, { color: colors.accent }]}>History</Text>
-              <Text style={[styles.buttonSubtextSecondarySmall, { color: colors.textSecondary }]}>
+              <Text style={styles.secondaryButtonTextSmall}>History</Text>
+              <Text style={styles.buttonSubtextSecondarySmall}>
                 Sessions & Stats
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.secondaryButtonHalf, { backgroundColor: colors.card, borderColor: colors.accent }]}
+              style={styles.secondaryButtonHalf}
               onPress={() => router.push('/bows')}
               activeOpacity={0.8}
             >
-              <View style={[styles.buttonIconContainerSmall, { backgroundColor: colors.cardAlt }]}>
+              <View style={styles.buttonIconContainerSmall}>
                 <Image 
                   source={require('../assets/images/bow-icon.png')} 
                   style={{ width: 40, height: 40 }}
                   resizeMode="contain"
                 />
               </View>
-              <Text style={[styles.secondaryButtonTextSmall, { color: colors.accent }]}>Bows</Text>
-              <Text style={[styles.buttonSubtextSecondarySmall, { color: colors.textSecondary }]}>
+              <Text style={styles.secondaryButtonTextSmall}>Bows</Text>
+              <Text style={styles.buttonSubtextSecondarySmall}>
                 Equipment
               </Text>
             </TouchableOpacity>
@@ -114,90 +112,109 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 24,
     justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   hero: {
     alignItems: 'center',
-    marginBottom: 48,
+    marginBottom: 40,
   },
   targetIcon: {
-    width: 140,
-    height: 140,
+    position: 'relative',
+    width: 120,
+    height: 120,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
   },
   targetRing4: {
     position: 'absolute',
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: '#f0f0f0',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#1a1a1a',
+    borderWidth: 3,
+    borderColor: '#333',
   },
   targetRing3: {
     position: 'absolute',
-    width: 105,
-    height: 105,
-    borderRadius: 52.5,
-    backgroundColor: '#1a1a1a',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: '#2a2a2a',
+    borderWidth: 2,
+    borderColor: '#3498db',
   },
   targetRing2: {
     position: 'absolute',
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#4169E1',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#8B0000',
+    borderWidth: 2,
+    borderColor: '#a00000',
   },
   targetRing1: {
     position: 'absolute',
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#8B0000',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#FFD700',
+    borderWidth: 2,
+    borderColor: '#FFC000',
   },
   targetCenter: {
-    position: 'absolute',
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#FFD700',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#fff',
   },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
+    color: '#ffffff',
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#888888',
+    color: '#a0a0a0',
     textAlign: 'center',
+    marginTop: 8,
   },
   actionsContainer: {
     gap: 16,
   },
-  buttonIconContainer: {
-    marginBottom: 12,
-  },
-  buttonIconContainerSmall: {
-    marginBottom: 8,
-  },
   primaryButton: {
     backgroundColor: '#8B0000',
     borderRadius: 20,
-    padding: 28,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
     alignItems: 'center',
+    shadowColor: '#8B0000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  buttonIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
   },
   primaryButtonText: {
-    color: '#fff',
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#ffffff',
   },
   buttonSubtext: {
-    color: 'rgba(255,255,255,0.7)',
     fontSize: 14,
-    marginTop: 6,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 4,
   },
   secondaryRow: {
     flexDirection: 'row',
@@ -227,57 +244,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#111111',
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#8B0000',
   },
+  buttonIconContainerSmall: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#1a1a1a',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
   secondaryButtonTextSmall: {
     color: '#8B0000',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   buttonSubtextSecondarySmall: {
     color: '#888888',
-    fontSize: 12,
-    marginTop: 4,
-    textAlign: 'center',
-  },
-  bowsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#111111',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 2,
-    borderColor: '#8B0000',
-  },
-  bowsButtonTextContainer: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  bottomRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  bottomButton: {
-    flex: 1,
-    backgroundColor: '#111111',
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#8B0000',
-  },
-  bottomButtonText: {
-    color: '#8B0000',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 8,
-  },
-  bottomButtonSubtext: {
-    color: '#888888',
     fontSize: 11,
     marginTop: 2,
+    textAlign: 'center',
   },
 });
