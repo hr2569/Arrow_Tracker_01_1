@@ -161,7 +161,7 @@ export default function StatsScreen() {
 
   // Calculate aggregate stats
   const stats = useMemo(() => {
-    const allShots: { x: number; y: number; ring: number }[] = [];
+    const allShots: { x: number; y: number; rawX: number; rawY: number; ring: number }[] = [];
     let totalSessions = filteredSessions.length;
     let totalRounds = 0;
     let totalPoints = 0;
@@ -184,11 +184,11 @@ export default function StatsScreen() {
           const ring = shot.ring || 0;
           ringCounts[ring] = (ringCounts[ring] || 0) + 1;
           
-          // Calculate visual position based on ring value
+          // Store raw coordinates for multi-spot targets
           const rawX = shot.x ?? 0.5;
           const rawY = shot.y ?? 0.5;
           
-          // Calculate angle from original coordinates (to preserve direction)
+          // Calculate visual position based on ring value (for WA Standard distribution view)
           const offsetX = rawX - 0.5;
           const offsetY = rawY - 0.5;
           let angle = Math.atan2(offsetY, offsetX);
@@ -210,6 +210,8 @@ export default function StatsScreen() {
           allShots.push({
             x: Math.max(0.05, Math.min(0.95, visualX)),
             y: Math.max(0.05, Math.min(0.95, visualY)),
+            rawX: rawX,
+            rawY: rawY,
             ring: ring,
           });
         });
