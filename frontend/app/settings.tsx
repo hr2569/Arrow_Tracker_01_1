@@ -133,16 +133,16 @@ export default function SettingsScreen() {
                   </Text>
                 </View>
                 {theme === option.value && (
-                  <Ionicons name="checkmark-circle" size={24} color="#8B0000" />
+                  <Ionicons name="checkmark-circle" size={24} color={colors.accent} />
                 )}
               </TouchableOpacity>
             ))}
 
             <TouchableOpacity
-              style={styles.modalCloseButton}
+              style={[styles.modalCloseButton, { backgroundColor: colors.cardAlt }]}
               onPress={() => setShowThemeModal(false)}
             >
-              <Text style={styles.modalCloseButtonText}>Cancel</Text>
+              <Text style={[styles.modalCloseButtonText, { color: colors.textSecondary }]}>Cancel</Text>
             </TouchableOpacity>
           </Pressable>
         </Pressable>
