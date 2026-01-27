@@ -103,6 +103,12 @@ export default function ReportScreen() {
     return [...new Set(distances)];
   }, [sessions]);
 
+  // Get unique target types from sessions
+  const availableTargetTypes = useMemo(() => {
+    const types = sessions.map(s => s.target_type || 'wa_standard');
+    return [...new Set(types)];
+  }, [sessions]);
+
   // Update date range when period changes
   useEffect(() => {
     const now = new Date();
