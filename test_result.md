@@ -270,9 +270,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Session management APIs (CRUD)"
-    - "Target analysis with AI (corner detection)"
-    - "Arrow detection with AI"
+    - "Session management APIs (CRUD) - target_type field"
   stuck_tasks: 
     - "Target analysis with AI (corner detection)"
     - "Arrow detection with AI"
@@ -294,3 +292,5 @@ agent_communication:
     message: "Bug fixes applied for backlog items: 1) P0 - Arrow click detection improved in scoring.tsx: Changed from onPress to onPressIn for more responsive touch handling, added better coordinate validation, improved debug logging, and ensured proper layout measurement with timeout. 2) P1 - ESLint TypeScript parsing error fixed: Added @typescript-eslint/parser and @typescript-eslint/eslint-plugin to properly parse TypeScript syntax in .ts/.tsx files. ESLint now runs without 'interface reserved' errors when executed directly via npx eslint. 3) P2 - Redirect to home verified: summary.tsx already uses router.replace('/') after saving session which correctly redirects to home."
   - agent: "main"
     message: "P0 BUG FIX COMPLETE: Arrow click detection on scoring screen now working. Restructured the component to remove nested ScrollViews that were swallowing touch events on web. The target area is now wrapped directly in a Pressable component with onPress handler. Verified working via automated testing - clicks on target successfully place arrows at correct positions with accurate ring scoring."
+  - agent: "main"
+    message: "FEATURE: Target Type Integration - Added target_type field to backend Session model and API endpoints. Updated frontend summary.tsx to save targetType when creating sessions. Updated history.tsx with target type badge display (golden styling) and target type filter chips. Updated stats.tsx with target type filter. Please test: 1) POST /api/sessions with target_type parameter. 2) GET /api/sessions returns target_type. 3) PUT /api/sessions/{id} can update target_type."
