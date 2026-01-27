@@ -1,22 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useAppStore } from '../store/appStore';
+
+type ThemeType = 'dark' | 'light' | 'system';
+
+const themeOptions: { value: ThemeType; label: string; icon: string }[] = [
+  { value: 'light', label: 'Light', icon: 'sunny-outline' },
+  { value: 'dark', label: 'Dark', icon: 'moon-outline' },
+  { value: 'system', label: 'System', icon: 'phone-portrait-outline' },
+];
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { theme, setTheme } = useAppStore();
+  const [showThemeModal, setShowThemeModal] = useState(false);
+
+  const getThemeLabel = () => {
+    const option = themeOptions.find(o => o.value === theme);
+    return option ? option.label : 'Dark';
+  };
 
   const settingsItems = [
-    { icon: 'language-outline', title: 'Language', subtitle: 'English' },
-    { icon: 'moon-outline', title: 'Theme', subtitle: 'Dark' },
-    { icon: 'cloud-outline', title: 'Backup & Sync', subtitle: 'Data management' },
+    { 
+      icon: 'language-outline', 
+      title: 'Language', 
+      subtitle: 'English',
+      onPress: () => {} // TODO: Language selection
+    },
+    { 
+      icon: 'moon-outline', 
+      title: 'Theme', 
+      subtitle: getThemeLabel(),
+      onPress: () => setShowThemeModal(true)
+    },
+    { 
+      icon: 'cloud-outline', 
+      title: 'Backup & Sync', 
+      subtitle: 'Data management',
+      onPress: () => {} // TODO: Backup screen
+    },
   ];
 
   return (
@@ -34,7 +67,12 @@ export default function SettingsScreen() {
 
       <ScrollView contentContainerStyle={styles.content}>
         {settingsItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.settingsItem} activeOpacity={0.7}>
+          <TouchableOpacity 
+            key={index} 
+            style={styles.settingsItem} 
+            activeOpacity={0.7}
+            onPress={item.onPress}
+          >
             <View style={styles.settingsIconContainer}>
               <Ionicons name={item.icon as any} size={24} color="#8B0000" />
             </View>
@@ -50,6 +88,61 @@ export default function SettingsScreen() {
           <Text style={styles.versionText}>Archery Scorer v1.0.0</Text>
         </View>
       </ScrollView>
+
+      {/* Theme Selection Modal */}
+      <Modal
+        visible={showThemeModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowThemeModal(false)}
+      >
+        <Pressable 
+          style={styles.modalOverlay}
+          onPress={() => setShowThemeModal(false)}
+        >
+          <Pressable style={styles.modalContent} onPress={e => e.stopPropagation()}>
+            <Text style={styles.modalTitle}>Choose Theme</Text>
+            
+            {themeOptions.map((option) => (
+              <TouchableOpacity
+                key={option.value}
+                style={[
+                  styles.themeOption,
+                  theme === option.value && styles.themeOptionSelected
+                ]}
+                onPress={() => {
+                  setTheme(option.value);
+                  setShowThemeModal(false);
+                }}
+              >
+                <View style={styles.themeOptionLeft}>
+                  <Ionicons 
+                    name={option.icon as any} 
+                    size={24} 
+                    color={theme === option.value ? '#8B0000' : '#888'} 
+                  />
+                  <Text style={[
+                    styles.themeOptionText,
+                    theme === option.value && styles.themeOptionTextSelected
+                  ]}>
+                    {option.label}
+                  </Text>
+                </View>
+                {theme === option.value && (
+                  <Ionicons name="checkmark-circle" size={24} color="#8B0000" />
+                )}
+              </TouchableOpacity>
+            ))}
+
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowThemeModal(false)}
+            >
+              <Text style={styles.modalCloseButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -119,5 +212,65 @@ const styles = StyleSheet.create({
   versionText: {
     fontSize: 13,
     color: '#666',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    padding: 24,
+    width: '85%',
+    maxWidth: 340,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  themeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#222',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 10,
+  },
+  themeOptionSelected: {
+    backgroundColor: '#2a1a1a',
+    borderWidth: 1,
+    borderColor: '#8B0000',
+  },
+  themeOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  themeOptionText: {
+    fontSize: 16,
+    color: '#888',
+  },
+  themeOptionTextSelected: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  modalCloseButton: {
+    backgroundColor: '#333',
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  modalCloseButtonText: {
+    color: '#888',
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
