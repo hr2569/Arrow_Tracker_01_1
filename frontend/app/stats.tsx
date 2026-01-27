@@ -511,15 +511,76 @@ export default function StatsScreen() {
 
     const targetScale = 0.8;
     const targetSize = size * targetScale;
-    const spotSize = targetType === 'wa_standard' ? targetSize : size * 0.28;
+    
+    // Spot radii matching scoring screen
+    const vegasSpotRadius = 0.19;
+    const nfaaSpotRadius = 0.14;
+    const spotRadius = targetType === 'vegas_3spot' ? vegasSpotRadius : 
+                       targetType === 'nfaa_indoor' ? nfaaSpotRadius : 0.4;
+    const spotSize = spotRadius * 2 * size;
+
+    // Get spot centers in normalized coordinates (0-1) - MUST MATCH scoring.tsx
+    const getSpotCentersNormalized = () => {
+      if (targetType === 'vegas_3spot') {
+        return [
+          { x: 0.5, y: 0.28 },   // Top center
+          { x: 0.29, y: 0.72 },  // Bottom left
+          { x: 0.71, y: 0.72 },  // Bottom right
+        ];
+      } else if (targetType === 'nfaa_indoor') {
+        return [
+          { x: 0.5, y: 0.17 },   // Top
+          { x: 0.5, y: 0.5 },    // Middle
+          { x: 0.5, y: 0.83 },   // Bottom
+        ];
+      }
+      return [{ x: 0.5, y: 0.5 }];
+    };
+
+    const spotCentersNormalized = getSpotCentersNormalized();
+    const spotCenters = spotCentersNormalized.map(c => ({ x: c.x * size, y: c.y * size }));
+
+    // Find which spot a shot belongs to (closest spot)
+    const findClosestSpot = (shotX: number, shotY: number) => {
+      let closestIdx = 0;
+      let minDist = Infinity;
+      spotCentersNormalized.forEach((center, idx) => {
+        const dist = Math.sqrt(Math.pow(shotX - center.x, 2) + Math.pow(shotY - center.y, 2));
+        if (dist < minDist) {
+          minDist = dist;
+          closestIdx = idx;
+        }
+      });
+      return closestIdx;
+    };
+
+    // Transform shot coordinates for multi-spot targets
+    const transformedShots = shots.map(shot => {
+      if (targetType === 'wa_standard') {
+        return { x: shot.x, y: shot.y };
+      }
+      // For multi-spot targets, transform to position relative to the spot
+      const spotIdx = findClosestSpot(shot.x, shot.y);
+      const spotCenter = spotCentersNormalized[spotIdx];
+      const spotCenterPx = spotCenters[spotIdx];
+      
+      const offsetX = shot.x - spotCenter.x;
+      const offsetY = shot.y - spotCenter.y;
+      const scaleFactor = (spotSize / 2) / spotRadius;
+      
+      return {
+        x: (spotCenterPx.x + (offsetX * scaleFactor)) / size,
+        y: (spotCenterPx.y + (offsetY * scaleFactor)) / size,
+      };
+    });
     
     // Higher resolution grid for smoother heatmap
     const gridSize = 56;
     const cellSize = size / gridSize;
     const densityGrid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
     
-    // Calculate density for each grid cell
-    shots.forEach((shot) => {
+    // Calculate density for each grid cell using transformed shots
+    transformedShots.forEach((shot) => {
       const gridX = Math.floor(shot.x * gridSize);
       const gridY = Math.floor(shot.y * gridSize);
       
