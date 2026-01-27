@@ -4,28 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Path, Line } from 'react-native-svg';
-
-// Longbow - Traditional longbow shape
-const BowIcon = ({ size = 36, color = '#8B0000' }: { size?: number; color?: string }) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <Path
-      d="M6 1C3 4 2 8 2 12C2 16 3 20 6 23"
-      stroke={color}
-      strokeWidth={3}
-      strokeLinecap="round"
-      fill="none"
-    />
-    <Line x1="6" y1="1" x2="6" y2="23" stroke={color} strokeWidth={1} />
-    <Line x1="3" y1="12" x2="23" y2="12" stroke={color} strokeWidth={2} />
-    <Path d="M21 10L23 12L21 14" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-    <Path d="M5 10L3 12L5 14" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-  </Svg>
-);
 
 export default function HomeScreen() {
   const router = useRouter();
