@@ -1298,7 +1298,7 @@ export default function ReportScreen() {
           <Ionicons name="document-text" size={32} color="#8B0000" />
           <Text style={styles.reportTitle}>Performance Report</Text>
           <Text style={styles.reportDate}>{formatDateRange()}</Text>
-          {(selectedBow || selectedDistance) && (
+          {(selectedBow || selectedDistance || selectedTargetType) && (
             <View style={styles.filterBadge}>
               <Ionicons name="filter" size={14} color="#8B0000" />
               <Text style={styles.filterBadgeText}>{getFilterSummary()}</Text>
