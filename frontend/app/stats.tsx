@@ -84,9 +84,8 @@ export default function StatsScreen() {
   }, [sessions]);
 
   const availableTargetTypes = useMemo(() => {
-    const types = sessions
-      .filter(s => s.target_type)
-      .map(s => s.target_type as string);
+    // Include default 'wa_standard' for sessions without target_type
+    const types = sessions.map(s => s.target_type || 'wa_standard');
     return [...new Set(types)];
   }, [sessions]);
 
