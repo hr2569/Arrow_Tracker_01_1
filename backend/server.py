@@ -58,6 +58,7 @@ class Session(BaseModel):
     bow_id: Optional[str] = None
     bow_name: Optional[str] = None
     distance: Optional[str] = None
+    target_type: Optional[str] = "wa_standard"  # wa_standard, vegas_3spot, nfaa_indoor
     rounds: List[Round] = []
     total_score: int = 0
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -68,12 +69,14 @@ class CreateSessionRequest(BaseModel):
     bow_id: Optional[str] = None
     bow_name: Optional[str] = None
     distance: Optional[str] = None
+    target_type: Optional[str] = "wa_standard"
 
 class UpdateSessionRequest(BaseModel):
     name: Optional[str] = None
     bow_id: Optional[str] = None
     bow_name: Optional[str] = None
     distance: Optional[str] = None
+    target_type: Optional[str] = None
     created_at: Optional[str] = None  # ISO format date string
 
 # Bow model for equipment tracking
