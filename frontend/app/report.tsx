@@ -241,6 +241,7 @@ export default function ReportScreen() {
       if (bow) parts.push(bow.name);
     }
     if (selectedDistance) parts.push(selectedDistance);
+    if (selectedTargetType) parts.push(getTargetTypeName(selectedTargetType));
     return parts.length > 0 ? parts.join(' • ') : 'All Equipment';
   };
 
