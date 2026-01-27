@@ -126,7 +126,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
@@ -134,6 +134,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ All session CRUD operations tested successfully: CREATE session with name, GET all sessions, GET specific session by ID, ADD round with shots (enforces minimum 3 shots), DELETE session. Total score calculation working correctly (test score: 27 for 3 shots with rings 8,9,10)."
+      - working: "NA"
+        agent: "main"
+        comment: "Added target_type field to Session model, CreateSessionRequest, and UpdateSessionRequest. POST /api/sessions now accepts target_type parameter and stores it. GET /api/sessions returns target_type for each session. Updated frontend summary.tsx to pass targetType when saving sessions. Need to retest CRUD operations with target_type field."
 
   - task: "Target analysis with AI (corner detection)"
     implemented: true
