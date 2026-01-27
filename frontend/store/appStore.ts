@@ -101,7 +101,14 @@ export const TARGET_CONFIGS = {
   },
 };
 
+// Theme type
+type ThemeType = 'dark' | 'light' | 'system';
+
 interface AppState {
+  // Theme setting
+  theme: ThemeType;
+  setTheme: (theme: ThemeType) => void;
+
   // Target type for current session
   targetType: TargetType;
   setTargetType: (type: TargetType) => void;
