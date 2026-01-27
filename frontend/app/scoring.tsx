@@ -501,7 +501,7 @@ export default function ScoringScreen() {
                 {
                   left: arrow.x * TARGET_SIZE - 15,
                   top: arrow.y * TARGET_SIZE - 15,
-                  backgroundColor: RING_COLORS[Math.max(0, arrow.ring - 1)] || '#8B0000',
+                  backgroundColor: ringColors[Math.max(0, Math.min(arrow.ring - 1, ringColors.length - 1))] || '#8B0000',
                 },
                 selectedArrow === arrow.id && styles.selectedArrow,
                 !arrow.confirmed && styles.unconfirmedArrow,
