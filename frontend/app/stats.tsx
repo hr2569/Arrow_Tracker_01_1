@@ -409,9 +409,10 @@ export default function StatsScreen() {
     '#fff200',
   ];
 
-  // Aggregated Target Hit Map Component
-  const AggregatedTargetMap = ({ size = 280 }: { size?: number }) => {
+  // Aggregated Target Hit Map Component - supports all target types
+  const AggregatedTargetMap = ({ size = 280, displayTargetType }: { size?: number, displayTargetType?: string }) => {
     const shots = stats.allShots;
+    const targetType = displayTargetType || 'wa_standard';
     
     if (shots.length === 0) {
       return (
@@ -423,7 +424,148 @@ export default function StatsScreen() {
     }
 
     const targetScale = 0.8;
+    
+    // Spot radii matching scoring screen
+    const vegasSpotRadius = 0.19;
+    const nfaaSpotRadius = 0.14;
 
+    // Get spot centers in normalized coordinates (0-1) - MUST MATCH scoring.tsx
+    const getSpotCentersNormalized = () => {
+      if (targetType === 'vegas_3spot') {
+        return [
+          { x: 0.5, y: 0.28 },   // Top center
+          { x: 0.29, y: 0.72 },  // Bottom left
+          { x: 0.71, y: 0.72 },  // Bottom right
+        ];
+      } else if (targetType === 'nfaa_indoor') {
+        return [
+          { x: 0.5, y: 0.17 },   // Top
+          { x: 0.5, y: 0.5 },    // Middle
+          { x: 0.5, y: 0.83 },   // Bottom
+        ];
+      }
+      return [{ x: 0.5, y: 0.5 }];
+    };
+
+    const spotCentersNormalized = getSpotCentersNormalized();
+
+    // Single spot component for multi-spot targets
+    const SingleSpot = ({ centerX, centerY }: { centerX: number, centerY: number }) => {
+      const vegasSpotSize = size * 0.19 * 2;
+      const nfaaSpotSize = size * 0.14 * 2;
+      const currentSpotSize = targetType === 'vegas_3spot' ? vegasSpotSize : nfaaSpotSize;
+      const spotRadius = currentSpotSize / 2;
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            left: centerX - spotRadius,
+            top: centerY - spotRadius,
+            width: currentSpotSize,
+            height: currentSpotSize,
+          }}
+        >
+          <View style={[targetMapStyles.ring, {
+            width: currentSpotSize, height: currentSpotSize, borderRadius: currentSpotSize / 2,
+            backgroundColor: '#00a2e8', borderColor: '#0077b3', borderWidth: 1,
+          }]}>
+            <View style={[targetMapStyles.ring, {
+              width: currentSpotSize * 0.65, height: currentSpotSize * 0.65, borderRadius: currentSpotSize * 0.325,
+              backgroundColor: '#ed1c24', borderColor: '#b31217', borderWidth: 1,
+            }]}>
+              <View style={[targetMapStyles.ring, {
+                width: currentSpotSize * 0.35, height: currentSpotSize * 0.35, borderRadius: currentSpotSize * 0.175,
+                backgroundColor: '#fff200', borderColor: '#ccaa00', borderWidth: 1,
+              }]} />
+            </View>
+          </View>
+        </View>
+      );
+    };
+
+    // Get shot color based on score
+    const getShotColor = (ring: number) => {
+      if (ring >= 9) return '#FFD700';
+      if (ring >= 7) return '#FF6B6B';
+      if (ring >= 5) return '#4ECDC4';
+      if (ring >= 3) return '#45B7D1';
+      return '#888888';
+    };
+
+    // Render multi-spot target (Vegas or NFAA)
+    if (targetType !== 'wa_standard') {
+      const spotCenters = spotCentersNormalized.map(c => ({ x: c.x * size, y: c.y * size }));
+      const spotRadius = targetType === 'vegas_3spot' ? vegasSpotRadius : nfaaSpotRadius;
+      const spotSize = spotRadius * 2 * size;
+
+      // Find which spot a shot belongs to (closest spot)
+      const findClosestSpot = (shotX: number, shotY: number) => {
+        let closestIdx = 0;
+        let minDist = Infinity;
+        spotCentersNormalized.forEach((center, idx) => {
+          const dist = Math.sqrt(Math.pow(shotX - center.x, 2) + Math.pow(shotY - center.y, 2));
+          if (dist < minDist) {
+            minDist = dist;
+            closestIdx = idx;
+          }
+        });
+        return closestIdx;
+      };
+
+      // Transform shot coordinates for multi-spot targets
+      const transformedShots = shots.map(shot => {
+        const spotIdx = findClosestSpot(shot.x, shot.y);
+        const spotCenter = spotCentersNormalized[spotIdx];
+        const spotCenterPx = spotCenters[spotIdx];
+        
+        const offsetX = shot.x - spotCenter.x;
+        const offsetY = shot.y - spotCenter.y;
+        const scaleFactor = (spotSize / 2) / spotRadius;
+        
+        return {
+          x: (spotCenterPx.x + (offsetX * scaleFactor)) / size,
+          y: (spotCenterPx.y + (offsetY * scaleFactor)) / size,
+          ring: shot.ring,
+        };
+      });
+
+      return (
+        <View style={[targetMapStyles.container, { width: size, height: size }]}>
+          {/* Multi-spot target background */}
+          <View style={[targetMapStyles.multiSpotBackground, { width: size, height: size }]}>
+            {spotCenters.map((spot, idx) => (
+              <SingleSpot key={`spot-${idx}`} centerX={spot.x} centerY={spot.y} />
+            ))}
+          </View>
+
+          {/* Plot all shots */}
+          {transformedShots.map((shot, index) => {
+            const dotSize = 14;
+            const left = shot.x * size - dotSize / 2;
+            const top = shot.y * size - dotSize / 2;
+            
+            return (
+              <View
+                key={`shot-${index}`}
+                style={[
+                  targetMapStyles.shotDot,
+                  {
+                    left,
+                    top,
+                    width: dotSize,
+                    height: dotSize,
+                    borderRadius: dotSize / 2,
+                    backgroundColor: getShotColor(shot.ring),
+                  },
+                ]}
+              />
+            );
+          })}
+        </View>
+      );
+    }
+
+    // Render WA Standard single-spot target
     return (
       <View style={[targetMapStyles.container, { width: size, height: size }]}>
         {/* Target Background */}
@@ -482,12 +624,6 @@ export default function StatsScreen() {
           const left = shot.x * size - dotSize / 2;
           const top = shot.y * size - dotSize / 2;
           
-          // Color based on score - higher scores are more vibrant
-          const scoreColor = shot.ring >= 9 ? '#FFD700' : 
-                            shot.ring >= 7 ? '#FF6B6B' : 
-                            shot.ring >= 5 ? '#4ECDC4' : 
-                            shot.ring >= 3 ? '#45B7D1' : '#888888';
-          
           return (
             <View
               key={`shot-${index}`}
@@ -499,7 +635,7 @@ export default function StatsScreen() {
                   width: dotSize,
                   height: dotSize,
                   borderRadius: dotSize / 2,
-                  backgroundColor: scoreColor,
+                  backgroundColor: getShotColor(shot.ring),
                 },
               ]}
             />
