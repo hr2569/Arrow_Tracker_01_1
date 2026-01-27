@@ -97,14 +97,15 @@ export default function HistoryScreen() {
     return [...new Set(types)];
   }, [sessions]);
 
-  // Filter sessions by bow and distance
+  // Filter sessions by bow, distance, and target type
   const filteredSessions = useMemo(() => {
     return sessions.filter(session => {
       if (bowFilter && session.bow_name !== bowFilter) return false;
       if (distanceFilter && session.distance !== distanceFilter) return false;
+      if (targetTypeFilter && session.target_type !== targetTypeFilter) return false;
       return true;
     });
-  }, [sessions, bowFilter, distanceFilter]);
+  }, [sessions, bowFilter, distanceFilter, targetTypeFilter]);
 
   const fetchSessions = async () => {
     try {
