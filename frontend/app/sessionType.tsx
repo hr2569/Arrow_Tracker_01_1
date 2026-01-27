@@ -53,15 +53,15 @@ export default function SessionTypeScreen() {
 
           {/* Training Mode */}
           <TouchableOpacity
-            style={[styles.optionCard, styles.trainingCard]}
+            style={[styles.optionCard, styles.trainingCard, { backgroundColor: colors.card }]}
             onPress={selectTraining}
             activeOpacity={0.8}
           >
-            <View style={[styles.optionIconContainer, styles.trainingIconContainer]}>
+            <View style={[styles.optionIconContainer, styles.trainingIconContainer, { backgroundColor: colors.cardAlt }]}>
               <Ionicons name="fitness" size={48} color="#ff4444" />
             </View>
-            <Text style={styles.optionTitle}>Training</Text>
-            <Text style={styles.optionDescription}>
+            <Text style={[styles.optionTitle, { color: colors.text }]}>Training</Text>
+            <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
               Unlimited rounds • Unlimited arrows
             </Text>
             <View style={[styles.optionBadge, styles.trainingBadge]}>
@@ -71,9 +71,9 @@ export default function SessionTypeScreen() {
         </View>
 
         {/* Info */}
-        <View style={styles.infoContainer}>
-          <Ionicons name="information-circle" size={20} color="#a0a0a0" />
-          <Text style={styles.infoText}>
+        <View style={[styles.infoContainer, { backgroundColor: colors.card }]}>
+          <Ionicons name="information-circle" size={20} color={colors.textSecondary} />
+          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
             Competition mode follows standard archery scoring with 10 ends of 3 arrows.
             Training mode allows unlimited practice with no restrictions.
           </Text>
