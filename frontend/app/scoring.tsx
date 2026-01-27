@@ -227,22 +227,16 @@ export default function ScoringScreen() {
   };
 
   const handleTargetLayout = (event: any) => {
-    const { width, height } = event.nativeEvent.layout;
-    // Measure in window for absolute positioning - with a small delay to ensure layout is complete
-    setTimeout(() => {
-      if (targetRef.current) {
-        targetRef.current.measureInWindow((wx, wy, wwidth, wheight) => {
-          const layout = { 
-            x: wx ?? 0, 
-            y: wy ?? 0, 
-            width: wwidth || width || TARGET_SIZE, 
-            height: wheight || height || TARGET_SIZE 
-          };
-          console.log('Target layout measured:', layout);
-          setTargetLayout(layout);
-        });
-      }
-    }, 100);
+    const { x, y, width, height } = event.nativeEvent.layout;
+    // Store layout directly from the event
+    const layout = { 
+      x: x ?? 0, 
+      y: y ?? 0, 
+      width: width || TARGET_SIZE, 
+      height: height || TARGET_SIZE 
+    };
+    console.log('Target layout:', layout);
+    setTargetLayout(layout);
   };
 
   const handleArrowPress = (arrowId: string) => {
