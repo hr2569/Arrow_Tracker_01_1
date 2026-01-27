@@ -320,7 +320,7 @@ export default function ReportScreen() {
     const usedDistances = [...new Set(filteredSessions.filter(s => s.distance).map(s => s.distance))];
     const usedTargetTypes = [...new Set(filteredSessions.map(s => getTargetTypeName(s.target_type)))];
 
-    // Generate heatmap SVG for PDF - full page
+    // Generate heatmap SVG for PDF - full page with target type support
     const generateHeatmapSvg = () => {
       if (allShots.length === 0) {
         return `
@@ -333,6 +333,31 @@ export default function ReportScreen() {
       const size = 600;
       const targetScale = 0.9;
       const targetSize = size * targetScale;
+      const targetType = selectedTargetType || 'wa_standard';
+      
+      // Spot centers for multi-spot targets (normalized 0-1)
+      const getSpotCentersNormalized = () => {
+        if (targetType === 'vegas_3spot') {
+          return [
+            { x: 0.5, y: 0.28 },   // Top center
+            { x: 0.29, y: 0.72 },  // Bottom left
+            { x: 0.71, y: 0.72 },  // Bottom right
+          ];
+        } else if (targetType === 'nfaa_indoor') {
+          return [
+            { x: 0.5, y: 0.17 },   // Top
+            { x: 0.5, y: 0.5 },    // Middle
+            { x: 0.5, y: 0.83 },   // Bottom
+          ];
+        }
+        return [{ x: 0.5, y: 0.5 }];
+      };
+
+      const spotCenters = getSpotCentersNormalized();
+      const vegasSpotRadius = 0.19;
+      const nfaaSpotRadius = 0.14;
+      const spotRadius = targetType === 'vegas_3spot' ? vegasSpotRadius : nfaaSpotRadius;
+      const spotSizePx = spotRadius * 2 * size;
       
       // Grid for density calculation
       const gridSize = 60;
@@ -423,6 +448,38 @@ export default function ReportScreen() {
         });
       });
 
+      // Generate single spot SVG for multi-spot targets
+      const generateSpotSvg = (centerX: number, centerY: number, spotSize: number) => {
+        const outerR = spotSize / 2;
+        const middleR = outerR * 0.65;
+        const innerR = outerR * 0.35;
+        return `
+          <circle cx="${centerX}" cy="${centerY}" r="${outerR}" fill="#00a2e8" stroke="#0077b3" stroke-width="2" />
+          <circle cx="${centerX}" cy="${centerY}" r="${middleR}" fill="#ed1c24" stroke="#b31217" stroke-width="1" />
+          <circle cx="${centerX}" cy="${centerY}" r="${innerR}" fill="#fff200" stroke="#ccaa00" stroke-width="1" />
+        `;
+      };
+
+      // Render multi-spot target for Vegas and NFAA
+      if (targetType !== 'wa_standard') {
+        let spotsSvg = '';
+        spotCenters.forEach((center) => {
+          const cx = center.x * size;
+          const cy = center.y * size;
+          spotsSvg += generateSpotSvg(cx, cy, spotSizePx);
+        });
+
+        return `
+          <svg width="100%" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto; background: #1a1a1a;">
+            <!-- Multi-spot target backgrounds -->
+            ${spotsSvg}
+            <!-- Heatmap overlay -->
+            ${heatCircles}
+          </svg>
+        `;
+      }
+
+      // WA Standard single target
       // Target rings colors
       const ringColorsPdf = ['#f5f5f0', '#f5f5f0', '#2a2a2a', '#2a2a2a', '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24', '#fff200', '#fff200'];
       
