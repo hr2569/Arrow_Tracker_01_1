@@ -61,40 +61,43 @@ export const TARGET_CONFIGS = {
       { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
       { bg: '#fff200', border: '#ccaa00' },  // Ring 10 - Gold (X)
     ],
+    layout: 'single', // single target face
   },
   vegas_3spot: {
     name: 'Vegas 3-Spot',
-    description: 'Indoor target with 3 faces',
+    description: 'Indoor 3-spot triangle',
     rings: 5,
     maxScore: 10,
-    // X=10, 10, 9, 8, 7
-    scores: [7, 8, 9, 10, 10], // X-ring is also 10
+    // X=10, 10, 9, 8, 7 (outer blue scores 6)
+    scores: [6, 7, 8, 9, 10],
+    // Colors from outside to inside: Blue → Red → Gold
     colors: [
-      { bg: '#00a2e8', border: '#0077b3' },  // Ring 7 - Blue (outer)
-      { bg: '#00a2e8', border: '#0077b3' },  // Ring 8 - Blue
-      { bg: '#00a2e8', border: '#0077b3' },  // Ring 9 - Blue
-      { bg: '#fff200', border: '#ccaa00' },  // Ring 10 - Gold
-      { bg: '#fff200', border: '#ccaa00' },  // X-ring - Gold (center)
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 6 - Blue outer
+      { bg: '#ed1c24', border: '#b31217' },  // Ring 7 - Red
+      { bg: '#ed1c24', border: '#b31217' },  // Ring 8 - Red
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 10/X - Gold center
     ],
+    layout: 'triple_triangle', // 3 targets in triangle arrangement
     hasXRing: true,
-    isTriple: true,
   },
   nfaa_indoor: {
     name: 'NFAA Indoor',
-    description: '5-ring blue/white target',
+    description: '3-spot vertical strip',
     rings: 5,
     maxScore: 5,
-    // X=5, 5, 4, 3, 2 (outer white is 1 but usually off-target)
-    scores: [1, 2, 3, 4, 5],
+    // X=5, 5, 4, 4, 3 scoring
+    scores: [3, 4, 4, 5, 5],
+    // Colors from outside to inside: Blue → Red → Gold (similar to Vegas)
     colors: [
-      { bg: '#f5f5f0', border: '#333' },     // Ring 1 - White (outer)
-      { bg: '#f5f5f0', border: '#333' },     // Ring 2 - White
-      { bg: '#00a2e8', border: '#0077b3' },  // Ring 3 - Blue
-      { bg: '#00a2e8', border: '#0077b3' },  // Ring 4 - Blue
-      { bg: '#f5f5f0', border: '#333' },     // Ring 5/X - White (center)
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 3 - Blue outer
+      { bg: '#ed1c24', border: '#b31217' },  // Ring 4 - Red
+      { bg: '#ed1c24', border: '#b31217' },  // Ring 4 - Red
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 5 - Gold
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 5/X - Gold center
     ],
+    layout: 'triple_vertical', // 3 targets stacked vertically
     hasXRing: true,
-    isTriple: false,
   },
 };
 
