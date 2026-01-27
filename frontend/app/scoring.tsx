@@ -546,7 +546,15 @@ export default function ScoringScreen() {
                 </View>
               )}
 
-          {/* Arrow Markers - Outside Pressable so they don't block clicks */}
+          {/* Loading Overlay */}
+          {isDetecting && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color="#8B0000" />
+              <Text style={styles.loadingText}>Detecting arrows...</Text>
+            </View>
+          )}
+
+          {/* Arrow Markers rendered on top */}
           {arrows.map((arrow) => (
             <Pressable
               key={arrow.id}
@@ -573,16 +581,7 @@ export default function ScoringScreen() {
               </Text>
             </Pressable>
           ))}
-
-          {/* Loading Overlay */}
-          {isDetecting && (
-            <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color="#8B0000" />
-              <Text style={styles.loadingText}>Detecting arrows...</Text>
-            </View>
-          )}
-        </View>
-            </ScrollView>
+            </Pressable>
           </ScrollView>
         </View>
         
