@@ -34,7 +34,18 @@ interface Session {
   bow_name?: string;
   bow_id?: string;
   distance?: string;
+  target_type?: string;
 }
+
+// Helper function to get target type display name
+const getTargetTypeName = (type?: string): string => {
+  switch (type) {
+    case 'vegas_3spot': return 'Vegas 3-Spot';
+    case 'nfaa_indoor': return 'NFAA Indoor';
+    case 'wa_standard': 
+    default: return 'WA Standard';
+  }
+};
 
 interface Bow {
   id: string;
