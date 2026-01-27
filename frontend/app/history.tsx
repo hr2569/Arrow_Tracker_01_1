@@ -1253,34 +1253,6 @@ const styles = StyleSheet.create({
   tabButtonTextActive: {
     color: '#fff',
   },
-  statsTabContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-  },
-  goToStatsButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#111111',
-    borderRadius: 20,
-    padding: 40,
-    width: '100%',
-    borderWidth: 2,
-    borderColor: '#8B0000',
-  },
-  goToStatsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginTop: 16,
-  },
-  goToStatsSubtitle: {
-    fontSize: 14,
-    color: '#888888',
-    marginTop: 8,
-    textAlign: 'center',
-  },
   scrollContent: {
     padding: 20,
     paddingBottom: 100,
