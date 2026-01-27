@@ -599,27 +599,32 @@ export default function StatsScreen() {
 
     // Single spot component for multi-spot targets
     const SingleSpot = ({ centerX, centerY }: { centerX: number, centerY: number }) => {
-      const spotRadius = spotSize / 2;
+      // Spot sizes matching scoring screen (radius * 2 = diameter)
+      // Vegas: spotRadius = 0.19, NFAA: spotRadius = 0.14
+      const vegasSpotSize = size * 0.19 * 2;
+      const nfaaSpotSize = size * 0.14 * 2;
+      const currentSpotSize = targetType === 'vegas_3spot' ? vegasSpotSize : nfaaSpotSize;
+      const spotRadius = currentSpotSize / 2;
       return (
         <View
           style={{
             position: 'absolute',
             left: centerX - spotRadius,
             top: centerY - spotRadius,
-            width: spotSize,
-            height: spotSize,
+            width: currentSpotSize,
+            height: currentSpotSize,
           }}
         >
           <View style={[targetMapStyles.ring, {
-            width: spotSize, height: spotSize, borderRadius: spotSize / 2,
+            width: currentSpotSize, height: currentSpotSize, borderRadius: currentSpotSize / 2,
             backgroundColor: '#00a2e8', borderColor: '#0077b3', borderWidth: 1,
           }]}>
             <View style={[targetMapStyles.ring, {
-              width: spotSize * 0.65, height: spotSize * 0.65, borderRadius: spotSize * 0.325,
+              width: currentSpotSize * 0.65, height: currentSpotSize * 0.65, borderRadius: currentSpotSize * 0.325,
               backgroundColor: '#ed1c24', borderColor: '#b31217', borderWidth: 1,
             }]}>
               <View style={[targetMapStyles.ring, {
-                width: spotSize * 0.35, height: spotSize * 0.35, borderRadius: spotSize * 0.175,
+                width: currentSpotSize * 0.35, height: currentSpotSize * 0.35, borderRadius: currentSpotSize * 0.175,
                 backgroundColor: '#fff200', borderColor: '#ccaa00', borderWidth: 1,
               }]} />
             </View>
@@ -628,22 +633,21 @@ export default function StatsScreen() {
       );
     };
 
-    // Get spot centers based on target type
+    // Get spot centers - MUST MATCH scoring.tsx exactly (normalized 0-1 coordinates)
     const getSpotCenters = () => {
-      const center = size / 2;
       if (targetType === 'vegas_3spot') {
-        const spacing = size * 0.25;
+        // Vegas 3-Spot: 1 on top, 2 on bottom (inverted triangle) - matches scoring.tsx
         return [
-          { x: center, y: center - spacing * 0.6 },
-          { x: center - spacing, y: center + spacing * 0.6 },
-          { x: center + spacing, y: center + spacing * 0.6 },
+          { x: 0.5 * size, y: 0.28 * size },   // Top center
+          { x: 0.29 * size, y: 0.72 * size },  // Bottom left
+          { x: 0.71 * size, y: 0.72 * size },  // Bottom right
         ];
       } else if (targetType === 'nfaa_indoor') {
-        const spacing = size * 0.28;
+        // NFAA Indoor: 3 vertical spots - matches scoring.tsx
         return [
-          { x: center, y: center - spacing },
-          { x: center, y: center },
-          { x: center, y: center + spacing },
+          { x: 0.5 * size, y: 0.17 * size },   // Top
+          { x: 0.5 * size, y: 0.5 * size },    // Middle
+          { x: 0.5 * size, y: 0.83 * size },   // Bottom
         ];
       }
       return [];
