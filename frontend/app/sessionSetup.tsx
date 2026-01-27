@@ -204,6 +204,99 @@ export default function SessionSetupScreen() {
             </Text>
           </View>
 
+          {/* Target Type Selection */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Target Face</Text>
+            <View style={styles.targetTypesGrid}>
+              {/* WA Standard */}
+              <TouchableOpacity
+                style={[
+                  styles.targetTypeCard,
+                  selectedTargetType === 'wa_standard' && styles.targetTypeCardSelected,
+                ]}
+                onPress={() => setSelectedTargetType('wa_standard')}
+                activeOpacity={0.8}
+              >
+                <View style={styles.targetPreview}>
+                  <View style={[styles.targetRing, { backgroundColor: '#f5f5f0', width: 50, height: 50 }]}>
+                    <View style={[styles.targetRing, { backgroundColor: '#2a2a2a', width: 40, height: 40 }]}>
+                      <View style={[styles.targetRing, { backgroundColor: '#00a2e8', width: 30, height: 30 }]}>
+                        <View style={[styles.targetRing, { backgroundColor: '#ed1c24', width: 20, height: 20 }]}>
+                          <View style={[styles.targetRing, { backgroundColor: '#fff200', width: 10, height: 10 }]} />
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                <Text style={[styles.targetTypeName, selectedTargetType === 'wa_standard' && styles.targetTypeNameSelected]}>
+                  WA Standard
+                </Text>
+                <Text style={styles.targetTypeDesc}>10-ring, outdoor</Text>
+                {selectedTargetType === 'wa_standard' && (
+                  <View style={styles.targetCheckmark}>
+                    <Ionicons name="checkmark" size={14} color="#fff" />
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              {/* Vegas 3-Spot */}
+              <TouchableOpacity
+                style={[
+                  styles.targetTypeCard,
+                  selectedTargetType === 'vegas_3spot' && styles.targetTypeCardSelected,
+                ]}
+                onPress={() => setSelectedTargetType('vegas_3spot')}
+                activeOpacity={0.8}
+              >
+                <View style={styles.targetPreview}>
+                  <View style={styles.tripleTargetContainer}>
+                    {[0, 1, 2].map((i) => (
+                      <View key={i} style={[styles.miniTarget, { backgroundColor: '#00a2e8' }]}>
+                        <View style={[styles.miniTargetCenter, { backgroundColor: '#fff200' }]} />
+                      </View>
+                    ))}
+                  </View>
+                </View>
+                <Text style={[styles.targetTypeName, selectedTargetType === 'vegas_3spot' && styles.targetTypeNameSelected]}>
+                  Vegas 3-Spot
+                </Text>
+                <Text style={styles.targetTypeDesc}>Indoor, 3 faces</Text>
+                {selectedTargetType === 'vegas_3spot' && (
+                  <View style={styles.targetCheckmark}>
+                    <Ionicons name="checkmark" size={14} color="#fff" />
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              {/* NFAA Indoor */}
+              <TouchableOpacity
+                style={[
+                  styles.targetTypeCard,
+                  selectedTargetType === 'nfaa_indoor' && styles.targetTypeCardSelected,
+                ]}
+                onPress={() => setSelectedTargetType('nfaa_indoor')}
+                activeOpacity={0.8}
+              >
+                <View style={styles.targetPreview}>
+                  <View style={[styles.targetRing, { backgroundColor: '#f5f5f0', width: 50, height: 50 }]}>
+                    <View style={[styles.targetRing, { backgroundColor: '#00a2e8', width: 35, height: 35 }]}>
+                      <View style={[styles.targetRing, { backgroundColor: '#f5f5f0', width: 15, height: 15 }]} />
+                    </View>
+                  </View>
+                </View>
+                <Text style={[styles.targetTypeName, selectedTargetType === 'nfaa_indoor' && styles.targetTypeNameSelected]}>
+                  NFAA Indoor
+                </Text>
+                <Text style={styles.targetTypeDesc}>5-ring, blue/white</Text>
+                {selectedTargetType === 'nfaa_indoor' && (
+                  <View style={styles.targetCheckmark}>
+                    <Ionicons name="checkmark" size={14} color="#fff" />
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
           {/* Bow Selection */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
