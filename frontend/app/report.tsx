@@ -18,6 +18,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Svg, { Defs, RadialGradient, Stop, Circle, G } from 'react-native-svg';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import * as IntentLauncher from 'expo-intent-launcher';
+import { getContentUriAsync } from 'expo-file-system/legacy';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
