@@ -774,28 +774,24 @@ export default function HistoryScreen() {
                       </View>
 
                       {/* Bow & Distance & Target Type Info */}
-                      {(session.bow_name || session.distance || session.target_type) && (
-                        <View style={styles.sessionEquipment}>
-                          {session.target_type && (
-                            <View style={[styles.equipmentItem, styles.targetTypeBadge]}>
-                              <Ionicons name="disc-outline" size={14} color="#FFD700" />
-                              <Text style={[styles.equipmentText, styles.targetTypeText]}>{getTargetTypeName(session.target_type)}</Text>
-                            </View>
-                          )}
-                          {session.bow_name && (
-                            <View style={styles.equipmentItem}>
-                              <Ionicons name="fitness-outline" size={14} color="#8B0000" />
-                              <Text style={styles.equipmentText}>{session.bow_name}</Text>
-                            </View>
-                          )}
-                          {session.distance && (
-                            <View style={styles.equipmentItem}>
-                              <Ionicons name="locate-outline" size={14} color="#8B0000" />
-                              <Text style={styles.equipmentText}>{session.distance}</Text>
-                            </View>
-                          )}
+                      <View style={styles.sessionEquipment}>
+                        <View style={[styles.equipmentItem, styles.targetTypeBadge]}>
+                          <Ionicons name="disc-outline" size={14} color="#FFD700" />
+                          <Text style={[styles.equipmentText, styles.targetTypeText]}>{getTargetTypeName(session.target_type)}</Text>
                         </View>
-                      )}
+                        {session.bow_name && (
+                          <View style={styles.equipmentItem}>
+                            <Ionicons name="fitness-outline" size={14} color="#8B0000" />
+                            <Text style={styles.equipmentText}>{session.bow_name}</Text>
+                          </View>
+                        )}
+                        {session.distance && (
+                          <View style={styles.equipmentItem}>
+                            <Ionicons name="locate-outline" size={14} color="#8B0000" />
+                            <Text style={styles.equipmentText}>{session.distance}</Text>
+                          </View>
+                        )}
+                      </View>
 
                       <View style={styles.sessionMeta}>
                         <View style={styles.metaItem}>
