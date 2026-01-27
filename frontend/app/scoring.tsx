@@ -387,34 +387,23 @@ export default function ScoringScreen() {
       >
         {/* Target wrapper - centers the target */}
         <View style={styles.targetWrapper}>
-          {/* Two-directional scroll container for zoomed target */}
+          {/* Single scroll container for zoomed target - horizontal scroll only when zoomed */}
           <ScrollView 
             horizontal={true}
             contentContainerStyle={[
               styles.targetScrollContent,
-              { minHeight: zoomLevel > 1 ? TARGET_SIZE : undefined }
+              { minHeight: zoomLevel > 1 ? TARGET_SIZE + 40 : undefined }
             ]}
             showsHorizontalScrollIndicator={zoomLevel > 1}
-            nestedScrollEnabled={true}
             scrollEnabled={zoomLevel > 1}
           >
-            <ScrollView
-              contentContainerStyle={styles.targetVerticalScroll}
-              showsVerticalScrollIndicator={zoomLevel > 1}
-              nestedScrollEnabled={true}
-              scrollEnabled={zoomLevel > 1}
-            >
-            {/* Target Area */}
-            <View 
+            {/* Target Area - Pressable wraps the entire target for reliable touch capture */}
+            <Pressable
               ref={targetRef}
               style={[styles.targetContainer, { width: TARGET_SIZE, height: TARGET_SIZE }]}
               onLayout={handleTargetLayout}
+              onPress={handleTargetPress}
             >
-              {/* Transparent hit area on top */}
-              <Pressable
-                style={styles.targetHitArea}
-                onPressIn={handleTargetPress}
-              />
               {/* Background Image - Only show if NOT manual mode */}
               {!manualMode && currentImage ? (
                 <Image
