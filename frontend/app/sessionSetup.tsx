@@ -771,6 +771,35 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
   },
+  miniRing: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 100,
+    borderWidth: 0.5,
+    borderColor: '#333',
+  },
+  vegasTrianglePreview: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  vegasTopRow: {
+    flexDirection: 'row',
+    gap: 4,
+    marginBottom: 3,
+  },
+  vegasBottomRow: {
+    alignItems: 'center',
+  },
+  miniTargetVegas: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nfaaVerticalPreview: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 50,
+  },
   tripleTargetContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
