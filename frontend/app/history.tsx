@@ -101,7 +101,9 @@ export default function HistoryScreen() {
     return sessions.filter(session => {
       if (bowFilter && session.bow_name !== bowFilter) return false;
       if (distanceFilter && session.distance !== distanceFilter) return false;
-      if (targetTypeFilter && session.target_type !== targetTypeFilter) return false;
+      // Treat missing target_type as 'wa_standard'
+      const sessionTargetType = session.target_type || 'wa_standard';
+      if (targetTypeFilter && sessionTargetType !== targetTypeFilter) return false;
       return true;
     });
   }, [sessions, bowFilter, distanceFilter, targetTypeFilter]);
