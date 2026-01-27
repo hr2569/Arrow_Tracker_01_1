@@ -520,16 +520,9 @@ export default function HistoryScreen() {
 
     // Ring colors for WA Standard (10 rings)
     const waRingColors = [
-      '#f5f5f0', // 1-2: White
-      '#f5f5f0',
-      '#2a2a2a', // 3-4: Black
-      '#2a2a2a',
-      '#00a2e8', // 5-6: Blue
-      '#00a2e8',
-      '#ed1c24', // 7-8: Red
-      '#ed1c24',
-      '#fff200', // 9-10: Gold
-      '#fff200',
+      '#f5f5f0', '#f5f5f0', '#2a2a2a', '#2a2a2a',
+      '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24',
+      '#fff200', '#fff200',
     ];
 
     // Round colors for differentiating rounds
@@ -540,37 +533,55 @@ export default function HistoryScreen() {
 
     const targetScale = 0.8;
     
-    // Spot sizes matching scoring screen (radius * 2 = diameter)
-    // Vegas: spotRadius = 0.19, NFAA: spotRadius = 0.14
-    const vegasSpotSize = size * 0.19 * 2;  // 38% of container
-    const nfaaSpotSize = size * 0.14 * 2;   // 28% of container
-    const spotSize = targetType === 'vegas_3spot' ? vegasSpotSize : 
-                     targetType === 'nfaa_indoor' ? nfaaSpotSize : size * targetScale;
+    // Spot radii matching scoring screen
+    const vegasSpotRadius = 0.19;
+    const nfaaSpotRadius = 0.14;
+    const spotRadius = targetType === 'vegas_3spot' ? vegasSpotRadius : 
+                       targetType === 'nfaa_indoor' ? nfaaSpotRadius : 0.4;
+    const spotSize = spotRadius * 2 * size;
+
+    // Get spot centers in normalized coordinates (0-1) - MUST MATCH scoring.tsx
+    const getSpotCentersNormalized = () => {
+      if (targetType === 'vegas_3spot') {
+        return [
+          { x: 0.5, y: 0.28 },   // Top center
+          { x: 0.29, y: 0.72 },  // Bottom left
+          { x: 0.71, y: 0.72 },  // Bottom right
+        ];
+      } else if (targetType === 'nfaa_indoor') {
+        return [
+          { x: 0.5, y: 0.17 },   // Top
+          { x: 0.5, y: 0.5 },    // Middle
+          { x: 0.5, y: 0.83 },   // Bottom
+        ];
+      }
+      return [{ x: 0.5, y: 0.5 }];
+    };
+
+    const spotCentersNormalized = getSpotCentersNormalized();
+    const spotCenters = spotCentersNormalized.map(c => ({ x: c.x * size, y: c.y * size }));
 
     // Single spot component for multi-spot targets
     const SingleSpot = ({ centerX, centerY }: { centerX: number, centerY: number }) => {
-      const spotRadius = spotSize / 2;
+      const spotHalfSize = spotSize / 2;
       return (
         <View
           style={{
             position: 'absolute',
-            left: centerX - spotRadius,
-            top: centerY - spotRadius,
+            left: centerX - spotHalfSize,
+            top: centerY - spotHalfSize,
             width: spotSize,
             height: spotSize,
           }}
         >
-          {/* Blue ring (outer) */}
           <View style={[targetMapStyles.ring, {
             width: spotSize, height: spotSize, borderRadius: spotSize / 2,
             backgroundColor: '#00a2e8', borderColor: '#0077b3', borderWidth: 1,
           }]}>
-            {/* Red ring */}
             <View style={[targetMapStyles.ring, {
               width: spotSize * 0.65, height: spotSize * 0.65, borderRadius: spotSize * 0.325,
               backgroundColor: '#ed1c24', borderColor: '#b31217', borderWidth: 1,
             }]}>
-              {/* Gold ring (center) */}
               <View style={[targetMapStyles.ring, {
                 width: spotSize * 0.35, height: spotSize * 0.35, borderRadius: spotSize * 0.175,
                 backgroundColor: '#fff200', borderColor: '#ccaa00', borderWidth: 1,
@@ -581,27 +592,19 @@ export default function HistoryScreen() {
       );
     };
 
-    // Get spot centers - MUST MATCH scoring.tsx exactly (normalized 0-1 coordinates)
-    const getSpotCenters = () => {
-      if (targetType === 'vegas_3spot') {
-        // Vegas 3-Spot: 1 on top, 2 on bottom (inverted triangle) - matches scoring.tsx
-        return [
-          { x: 0.5 * size, y: 0.28 * size },   // Top center
-          { x: 0.29 * size, y: 0.72 * size },  // Bottom left
-          { x: 0.71 * size, y: 0.72 * size },  // Bottom right
-        ];
-      } else if (targetType === 'nfaa_indoor') {
-        // NFAA Indoor: 3 vertical spots - matches scoring.tsx
-        return [
-          { x: 0.5 * size, y: 0.17 * size },   // Top
-          { x: 0.5 * size, y: 0.5 * size },    // Middle
-          { x: 0.5 * size, y: 0.83 * size },   // Bottom
-        ];
-      }
-      return [{ x: size / 2, y: size / 2 }]; // WA Standard - single target
+    // Find which spot a shot belongs to (closest spot)
+    const findClosestSpot = (shotX: number, shotY: number) => {
+      let closestIdx = 0;
+      let minDist = Infinity;
+      spotCentersNormalized.forEach((center, idx) => {
+        const dist = Math.sqrt(Math.pow(shotX - center.x, 2) + Math.pow(shotY - center.y, 2));
+        if (dist < minDist) {
+          minDist = dist;
+          closestIdx = idx;
+        }
+      });
+      return closestIdx;
     };
-
-    const spotCenters = getSpotCenters();
 
     // Render WA Standard target
     if (targetType === 'wa_standard') {
@@ -656,6 +659,7 @@ export default function HistoryScreen() {
     }
 
     // Render Vegas 3-Spot or NFAA Indoor
+    // For multi-spot targets, we need to render shots RELATIVE to their target spot
     return (
       <View style={[targetMapStyles.container, { width: size, height: size }]}>
         {/* Draw the multi-spot target background */}
@@ -665,11 +669,28 @@ export default function HistoryScreen() {
           ))}
         </View>
 
-        {/* Plot shots - coordinates are already normalized to 0-1 from scoring screen */}
+        {/* Plot shots - position relative to their closest spot */}
         {shots.map((shot, index) => {
           const dotSize = 10;
-          const left = shot.x * size - dotSize / 2;
-          const top = shot.y * size - dotSize / 2;
+          
+          // Find which spot this shot belongs to
+          const spotIdx = findClosestSpot(shot.x, shot.y);
+          const spotCenter = spotCentersNormalized[spotIdx];
+          const spotCenterPx = spotCenters[spotIdx];
+          
+          // Calculate offset from spot center (in normalized coords)
+          const offsetX = shot.x - spotCenter.x;
+          const offsetY = shot.y - spotCenter.y;
+          
+          // Scale the offset to fit within the spot visualization
+          // The spot has radius spotRadius in normalized coords
+          // We want to map the offset proportionally within the visual spot
+          const scaleFactor = (spotSize / 2) / spotRadius;
+          
+          // Calculate final position: spot center + scaled offset
+          const left = spotCenterPx.x + (offsetX * scaleFactor) - dotSize / 2;
+          const top = spotCenterPx.y + (offsetY * scaleFactor) - dotSize / 2;
+          
           const roundColor = roundColors[shot.roundIndex % roundColors.length];
           return (
             <View
