@@ -468,7 +468,6 @@ export default function ReportScreen() {
           const cy = center.y * size;
           spotsSvg += generateSpotSvg(cx, cy, spotSizePx);
         });
-        console.log('[PDF Debug] Multi-spot SVG generated for:', targetType, 'with', spotCenters.length, 'spots, spotSize:', spotSizePx);
 
         return `
           <svg width="600" height="600" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
