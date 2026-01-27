@@ -101,6 +101,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
+  settingsButton: {
+    position: 'absolute',
+    top: 50,
+    right: 16,
+    zIndex: 10,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: '#111',
+  },
   content: {
     flex: 1,
     padding: 24,
