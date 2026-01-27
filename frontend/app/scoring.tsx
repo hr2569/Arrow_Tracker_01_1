@@ -454,9 +454,10 @@ export default function ScoringScreen() {
                     <View style={[styles.targetBackground, { width: TARGET_SIZE, height: TARGET_SIZE, borderRadius: TARGET_SIZE / 2 }]} />
                   )}
                   
-                  {/* Ring 1-2: White */}
-                  {[0, 1].map((i) => {
-                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
+                  {/* Dynamic ring rendering based on target type */}
+                  {targetConfig.colors.map((color, i) => {
+                    const numRings = targetConfig.colors.length;
+                    const ringSize = TARGET_SIZE * 0.95 * ((numRings - i) / numRings);
                     return (
                       <View
                         key={`ring-${i}`}
@@ -466,92 +467,8 @@ export default function ScoringScreen() {
                             width: ringSize,
                             height: ringSize,
                             borderRadius: ringSize / 2,
-                            backgroundColor: manualMode ? '#f5f5f0' : 'transparent',
-                            borderColor: manualMode ? '#333' : 'rgba(200,200,200,0.6)',
-                            borderWidth: manualMode ? 1 : 2,
-                          },
-                        ]}
-                      />
-                    );
-                  })}
-                  
-                  {/* Ring 3-4: Black */}
-                  {[2, 3].map((i) => {
-                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
-                    return (
-                      <View
-                        key={`ring-${i}`}
-                        style={[
-                          styles.ring,
-                          {
-                            width: ringSize,
-                            height: ringSize,
-                            borderRadius: ringSize / 2,
-                            backgroundColor: manualMode ? '#2a2a2a' : 'transparent',
-                            borderColor: manualMode ? '#555' : 'rgba(40,40,40,0.6)',
-                            borderWidth: manualMode ? 1 : 2,
-                          },
-                        ]}
-                      />
-                    );
-                  })}
-                  
-                  {/* Ring 5-6: Blue */}
-                  {[4, 5].map((i) => {
-                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
-                    return (
-                      <View
-                        key={`ring-${i}`}
-                        style={[
-                          styles.ring,
-                          {
-                            width: ringSize,
-                            height: ringSize,
-                            borderRadius: ringSize / 2,
-                            backgroundColor: manualMode ? '#00a2e8' : 'transparent',
-                            borderColor: manualMode ? '#0077b3' : 'rgba(65,105,225,0.6)',
-                            borderWidth: manualMode ? 1 : 2,
-                          },
-                        ]}
-                      />
-                    );
-                  })}
-                  
-                  {/* Ring 7-8: Red */}
-                  {[6, 7].map((i) => {
-                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
-                    return (
-                      <View
-                        key={`ring-${i}`}
-                        style={[
-                          styles.ring,
-                          {
-                            width: ringSize,
-                            height: ringSize,
-                            borderRadius: ringSize / 2,
-                            backgroundColor: manualMode ? '#ed1c24' : 'transparent',
-                            borderColor: manualMode ? '#b31217' : 'rgba(220,20,60,0.6)',
-                            borderWidth: manualMode ? 1 : 2,
-                          },
-                        ]}
-                      />
-                    );
-                  })}
-                  
-                  {/* Ring 9-10: Gold/Yellow */}
-                  {[8, 9].map((i) => {
-                    const ringSize = TARGET_SIZE * 0.95 * ((10 - i) / 10);
-                    return (
-                      <View
-                        key={`ring-${i}`}
-                        style={[
-                          styles.ring,
-                          {
-                            width: ringSize,
-                            height: ringSize,
-                            borderRadius: ringSize / 2,
-                            backgroundColor: manualMode ? '#fff200' : 'transparent',
-                            borderColor: manualMode ? '#ccaa00' : 'rgba(255,215,0,0.6)',
+                            backgroundColor: manualMode ? color.bg : 'transparent',
+                            borderColor: manualMode ? color.border : `${color.bg}99`,
                             borderWidth: manualMode ? 1 : 2,
                           },
                         ]}
