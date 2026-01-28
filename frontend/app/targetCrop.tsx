@@ -460,30 +460,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-  ringOverlayContainer: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  crosshair: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  crosshairH: {
-    position: 'absolute',
-    width: 20,
-    height: 2,
-    backgroundColor: '#8B0000',
-  },
-  crosshairV: {
-    position: 'absolute',
-    width: 2,
-    height: 20,
-    backgroundColor: '#8B0000',
-  },
   svgOverlay: {
     ...StyleSheet.absoluteFillObject,
     pointerEvents: 'none',
