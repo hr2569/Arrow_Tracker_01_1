@@ -189,7 +189,7 @@ export default function BowsScreen() {
       case 'recurve':
         return { type: 'image', value: recurveIcon };
       default:
-        return { type: 'ionicon', value: 'arrow-forward-outline' };
+        return { type: 'image', value: otherIcon };
     }
   };
 
