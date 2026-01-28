@@ -236,9 +236,23 @@ export default function ScoringScreen() {
     router.back();
   };
 
-  // Overlay scale adjustment
+  // Overlay adjustment functions
   const adjustScale = (delta: number) => {
     setOverlayScale(prev => Math.max(0.5, Math.min(1.0, prev + delta)));
+  };
+
+  const adjustOffsetX = (delta: number) => {
+    setOverlayOffsetX(prev => Math.max(-50, Math.min(50, prev + delta)));
+  };
+
+  const adjustOffsetY = (delta: number) => {
+    setOverlayOffsetY(prev => Math.max(-50, Math.min(50, prev + delta)));
+  };
+
+  const resetOverlay = () => {
+    setOverlayScale(0.85);
+    setOverlayOffsetX(0);
+    setOverlayOffsetY(0);
   };
 
   // The ring overlay size based on adjustable scale
