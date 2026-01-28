@@ -10,12 +10,14 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
+import { getBowIcon } from '../utils/bowIcons';
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
