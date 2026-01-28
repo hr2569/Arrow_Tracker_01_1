@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Alert,
-  ActivityIndicator,
   Dimensions,
-  Image,
   ScrollView,
   Pressable,
   TouchableOpacity,
@@ -20,8 +18,6 @@ import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 32, SCREEN_HEIGHT * 0.45);
 
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-
 // Competition mode constants
 const COMPETITION_ARROWS_PER_ROUND = 3;
 
@@ -30,95 +26,27 @@ interface Arrow {
   x: number;
   y: number;
   ring: number;
-  confidence?: number;
 }
 
 export default function ScoringScreen() {
   const router = useRouter();
   const { 
-    currentImage, 
-    capturedImage,
     setCurrentRound, 
-    manualMode, 
     sessionType, 
     currentRoundNumber, 
     targetType,
-    detectedArrows,
-    setDetectedArrows,
   } = useAppStore();
   
-  const [isDetecting, setIsDetecting] = useState(false);
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
   const [targetLayout, setTargetLayout] = useState<{ width: number; height: number } | null>(null);
-  const [showOverlay, setShowOverlay] = useState(true);
-  const [overlayScale, setOverlayScale] = useState(0.85); // Adjustable scale for ring overlay
-  const [overlayOffsetX, setOverlayOffsetX] = useState(0); // Horizontal offset in pixels
-  const [overlayOffsetY, setOverlayOffsetY] = useState(0); // Vertical offset in pixels
-
-  // Get the image to display (prefer currentImage, fallback to capturedImage)
-  const displayImage = currentImage || capturedImage;
 
   // Get target configuration
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
 
   // Session info
   const isCompetition = sessionType === 'competition';
-  const MAX_ROUNDS = 10;
-
-  // Initialize with detected arrows from AI if available
-  useEffect(() => {
-    if (detectedArrows && detectedArrows.length > 0 && arrows.length === 0) {
-      const initialArrows = detectedArrows.map((arrow, index) => ({
-        id: `arrow-${index}-${Date.now()}`,
-        x: arrow.x,
-        y: arrow.y,
-        ring: arrow.ring,
-        confidence: arrow.confidence,
-      }));
-      setArrows(initialArrows);
-    }
-  }, [detectedArrows]);
-
-  // Auto-detect arrows if in photo mode and no arrows yet
-  useEffect(() => {
-    if (!manualMode && displayImage && arrows.length === 0 && detectedArrows.length === 0) {
-      detectArrows();
-    }
-  }, [displayImage, manualMode]);
-
-  const detectArrows = async () => {
-    if (!displayImage) return;
-
-    setIsDetecting(true);
-    try {
-      const response = await fetch(`${API_URL}/api/detect-arrows`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_base64: displayImage }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.arrows && data.arrows.length > 0) {
-          const detectedList = data.arrows.map((arrow: any, index: number) => ({
-            id: `arrow-${index}-${Date.now()}`,
-            x: arrow.x,
-            y: arrow.y,
-            ring: arrow.ring,
-            confidence: arrow.confidence,
-          }));
-          setArrows(detectedList);
-          setDetectedArrows(data.arrows);
-        }
-      }
-    } catch (err) {
-      console.error('Arrow detection error:', err);
-    } finally {
-      setIsDetecting(false);
-    }
-  };
 
   const calculateRingFromPosition = (x: number, y: number): number => {
     // Calculate distance from center (0.5, 0.5)
@@ -158,7 +86,6 @@ export default function ScoringScreen() {
       x,
       y,
       ring,
-      confidence: 1.0,
     };
 
     setArrows(prev => [...prev, newArrow]);
