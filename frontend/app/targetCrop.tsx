@@ -243,46 +243,6 @@ export default function TargetCropScreen() {
       <View style={styles.instructionBar}>
         <Ionicons name="information-circle" size={20} color="#8B0000" />
         <Text style={styles.instructionText}>
-
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Align Target</Text>
-        <View style={styles.headerRight}>
-          <TouchableOpacity onPress={() => setShowRingOverlay(!showRingOverlay)} style={styles.overlayToggle}>
-            <Ionicons name={showRingOverlay ? "eye" : "eye-off"} size={22} color="#8B0000" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleRetryDetection} style={styles.retryButton}>
-            <Ionicons name="refresh" size={22} color="#8B0000" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Overlay Scale Control - only show when ring overlay is visible */}
-      {showRingOverlay && (
-        <View style={styles.scaleControl}>
-          <Text style={styles.scaleLabel}>Ring size:</Text>
-          <TouchableOpacity style={styles.scaleBtn} onPress={() => setOverlayScale(s => Math.max(0.5, s - 0.05))}>
-            <Ionicons name="remove" size={18} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.scaleValue}>{Math.round(overlayScale * 100)}%</Text>
-          <TouchableOpacity style={styles.scaleBtn} onPress={() => setOverlayScale(s => Math.min(1.0, s + 0.05))}>
-            <Ionicons name="add" size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Instructions */}
-      <View style={styles.instructionBar}>
-        <Ionicons name="information-circle" size={20} color="#8B0000" />
-        <Text style={styles.instructionText}>
           Drag corners to match the target paper edges
         </Text>
       </View>
@@ -305,29 +265,6 @@ export default function TargetCropScreen() {
           <View style={styles.noImage}>
             <Ionicons name="image-outline" size={64} color="#666" />
             <Text style={styles.noImageText}>No image captured</Text>
-          </View>
-        )}
-
-        {/* Ring Overlay - moves with corners */}
-        {showRingOverlay && !isDetecting && (
-          <View 
-            style={[
-              styles.ringOverlayContainer,
-              {
-                left: overlayTransform.centerX - (overlayTransform.scale * IMAGE_SIZE) / 2,
-                top: overlayTransform.centerY - (overlayTransform.scale * IMAGE_SIZE) / 2,
-                width: overlayTransform.scale * IMAGE_SIZE,
-                height: overlayTransform.scale * IMAGE_SIZE,
-              }
-            ]} 
-            pointerEvents="none"
-          >
-            {renderRingOverlay()}
-            {/* Center crosshair */}
-            <View style={styles.crosshair}>
-              <View style={styles.crosshairH} />
-              <View style={styles.crosshairV} />
-            </View>
           </View>
         )}
 
