@@ -101,8 +101,7 @@ export default function SessionSetupScreen() {
     setSessionDistance(`${distance}${distanceUnit}`);
     setTargetType(selectedTargetType);
     
-    // Always use manual scoring mode
-    setManualMode(true);
+    // Navigate to manual scoring screen
     router.push('/scoring');
   };
 
