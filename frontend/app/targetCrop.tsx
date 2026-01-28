@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   ringOverlayContainer: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
   },
