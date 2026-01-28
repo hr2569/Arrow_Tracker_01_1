@@ -215,6 +215,8 @@ export const useAppStore = create<AppState>((set) => ({
       currentRoundNumber: 1,
       sessionRounds: [],
       currentImage: null,
+      capturedImage: null,
+      detectedArrows: [],
       targetData: null,
       manualMode: false,
       currentRound: null,
