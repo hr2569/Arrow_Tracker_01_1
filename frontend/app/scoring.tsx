@@ -233,13 +233,20 @@ export default function ScoringScreen() {
     router.back();
   };
 
-  // Render ring overlay
+  // The perspective-cropped image should have the target filling ~90% of the frame
+  // We need to scale the ring overlay to match
+  const TARGET_SCALE = 0.92; // Target fills 92% of the cropped image
+  const RING_SIZE = BASE_TARGET_SIZE * TARGET_SCALE;
+
+  // Render ring overlay - sized to match the target in the cropped photo
   const renderRingOverlay = () => {
     const rings = targetConfig.rings;
     const ringElements = [];
     
     for (let i = 0; i < rings; i++) {
-      const size = BASE_TARGET_SIZE * (1 - (i * 0.09));
+      // Each ring is progressively smaller toward center
+      const ringRatio = (rings - i) / rings;
+      const size = RING_SIZE * ringRatio;
       const color = targetConfig.colors[i];
       ringElements.push(
         <View
@@ -250,8 +257,9 @@ export default function ScoringScreen() {
               width: size,
               height: size,
               borderRadius: size / 2,
-              borderColor: color?.border || '#333',
-              backgroundColor: showOverlay && !displayImage ? color?.bg : 'transparent',
+              borderColor: color?.border || 'rgba(255,255,255,0.5)',
+              borderWidth: 1,
+              backgroundColor: 'transparent',
             },
           ]}
         />
