@@ -405,7 +405,7 @@ If no target paper is detected:
         return {"success": False, "message": str(e)}
 
 async def detect_arrows(image_base64: str, target_center: dict, target_radius: float) -> dict:
-    """Use AI to detect arrow positions in the target image"""
+    """Use Gemini Vision AI to detect arrow positions in the target image"""
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
         
@@ -413,74 +413,70 @@ async def detect_arrows(image_base64: str, target_center: dict, target_radius: f
         if not api_key:
             return {"success": False, "message": "API key not configured"}
         
+        logger.info(f"Starting arrow detection with center={target_center}, radius={target_radius}")
+        
         chat = LlmChat(
             api_key=api_key,
             session_id=f"arrow-detection-{uuid.uuid4()}",
-            system_message=f"""You are an expert archery target scorer. You analyze images of archery targets with arrows and detect the EXACT POSITION where each arrow PIERCED THE PAPER (entry point).
+            system_message="""You are an expert archery arrow detector. Your ONLY task is to find arrows stuck in archery targets.
 
-CRITICAL SCORING RULE:
-- The score is determined by WHERE THE ARROW SHAFT ENTERS THE TARGET PAPER
-- DO NOT use the fletching (feathers/vanes) position - that's at the back of the arrow
-- DO NOT use the nock position - that's the very end
-- FIND the point where the arrow shaft pierces/enters the target face
-- If the arrow shaft touches a line between two rings, score the HIGHER ring value
+WHAT TO LOOK FOR:
+- Arrows appear as thin cylindrical shafts sticking out of the target
+- They usually have colorful fletching (feathers/vanes) at the back end
+- The arrow shaft enters the target paper at a specific point
+- Arrows can be at various angles depending on how they hit
 
-The target has 10 scoring rings with these colors (from outside to inside):
-- Rings 1-2: White (outermost)
-- Rings 3-4: Black
-- Rings 5-6: Blue
-- Rings 7-8: Red
-- Rings 9-10: Yellow/Gold (center bullseye, ring 10 is the innermost X-ring)
+COORDINATE SYSTEM:
+- Use normalized coordinates (0-1) where (0,0) is top-left and (1,1) is bottom-right
+- The CENTER of the target is approximately at (0.5, 0.5)
+- Report where the arrow ENTERS the target paper
 
-The target center is at approximately ({target_center.get('x', 0.5)}, {target_center.get('y', 0.5)}) in normalized coordinates.
-The target radius is approximately {target_radius} in normalized coordinates.
+SCORING RINGS (from outside to inside):
+- Ring 1-2: White/cream colored (outer edge)
+- Ring 3-4: Black
+- Ring 5-6: Blue  
+- Ring 7-8: Red
+- Ring 9-10: Yellow/Gold (center bullseye)
 
-For each arrow you detect:
-1. Identify the arrow by its fletching (feathers/vanes visible at the back)
-2. Trace the arrow shaft FORWARD toward the target to find where it ENTERS the paper
-3. Report the coordinates of the ENTRY POINT (not the fletching!)
-4. Determine which ring the entry point is in based on the colors
-5. Assign the correct score (1-10, with 10 being bullseye center)
-
-Respond ONLY in JSON format:
-{{
+OUTPUT FORMAT - Return ONLY valid JSON:
+{
   "detected": true,
+  "arrow_count": 3,
   "arrows": [
-    {{"x": 0.52, "y": 0.48, "ring": 9, "confidence": 0.9}},
-    {{"x": 0.45, "y": 0.55, "ring": 7, "confidence": 0.85}}
+    {"x": 0.48, "y": 0.52, "ring": 10, "confidence": 0.95},
+    {"x": 0.35, "y": 0.45, "ring": 7, "confidence": 0.88}
   ],
-  "message": "Detected 2 arrows"
-}}
+  "message": "Found 2 arrows"
+}
 
-If no arrows found:
-{{"detected": false, "arrows": [], "message": "No arrows detected"}}"""
-        ).with_model("openai", "gpt-4o")
+If NO arrows visible:
+{"detected": false, "arrow_count": 0, "arrows": [], "message": "No arrows found in image"}"""
+        ).with_model("gemini", "gemini-2.5-flash")
         
         # Clean base64 string
+        clean_base64 = image_base64
         if ',' in image_base64:
-            image_base64 = image_base64.split(',')[1]
+            clean_base64 = image_base64.split(',')[1]
         
-        # Create image content - use file_contents parameter (not image_contents)
-        image_content = ImageContent(image_base64=image_base64)
+        image_content = ImageContent(image_base64=clean_base64)
         
         user_message = UserMessage(
-            text=f"""Analyze this archery target image and detect all arrows.
+            text="""Look at this archery target image carefully and find ALL arrows.
 
-IMPORTANT: For each arrow, find the ENTRY POINT where the arrow shaft pierces the paper - NOT the fletching position!
+For EACH arrow you can see:
+1. Find where the arrow shaft enters/pierces the target paper
+2. Determine which colored ring that entry point is in
+3. Assign a score (1-10) based on the ring color
+4. Report the x,y coordinates (0-1 normalized)
 
-The target center is at ({target_center.get('x', 0.5)}, {target_center.get('y', 0.5)}) with radius {target_radius}.
+The target center is at approximately (0.5, 0.5).
 
-For each arrow:
-1. Locate the fletching (feathers) to identify the arrow
-2. Trace the shaft FORWARD to find where it enters the target
-3. Report that entry point's coordinates and which ring (1-10) it's in
-
-Ring colors: White=1-2, Black=3-4, Blue=5-6, Red=7-8, Yellow/Gold=9-10 (center)""",
+Be thorough - count every arrow visible, even partially visible ones. Return your findings as JSON.""",
             file_contents=[image_content]
         )
         
         response = await chat.send_message(user_message)
-        logger.info(f"Arrow detection response: {response}")
+        logger.info(f"Arrow detection raw response: {response}")
         
         # Parse JSON from response
         try:
@@ -493,14 +489,19 @@ Ring colors: White=1-2, Black=3-4, Blue=5-6, Red=7-8, Yellow/Gold=9-10 (center)"
                 response_text = response_text[:-3]
             
             result = json.loads(response_text.strip())
+            logger.info(f"Arrow detection parsed result: {result}")
+            
+            arrows = result.get('arrows', [])
+            arrow_count = result.get('arrow_count', len(arrows))
             
             return {
                 "success": True,
-                "arrows": result.get('arrows', []),
-                "message": result.get('message', 'Analysis complete')
+                "arrows": arrows,
+                "arrow_count": arrow_count,
+                "message": result.get('message', f'Detected {len(arrows)} arrows')
             }
         except json.JSONDecodeError as e:
-            logger.error(f"JSON parse error: {e}")
+            logger.error(f"Arrow detection JSON parse error: {e}, response: {response}")
             return {"success": False, "arrows": [], "message": f"Failed to parse AI response: {str(e)}"}
             
     except Exception as e:
