@@ -559,18 +559,16 @@ async def perspective_crop_endpoint(request: PerspectiveCropRequest):
 
 @api_router.post("/detect-arrows")
 async def detect_arrows_endpoint(request: ImageAnalysisRequest):
-    """Detect arrow positions in target image"""
-    # First analyze target to get center and radius
-    target_result = await analyze_target_corners(request.image_base64)
+    """Detect arrow positions in target image using Gemini Vision"""
+    logger.info("Starting detect-arrows endpoint")
     
-    if not target_result.get('success'):
-        return {"success": False, "arrows": [], "message": "Could not detect target in image"}
+    # Use default center/radius since image should already be cropped and centered
+    center = {"x": 0.5, "y": 0.5}
+    radius = 0.45
     
-    center = target_result.get('center', {"x": 0.5, "y": 0.5})
-    radius = target_result.get('radius', 0.4)
-    
-    # Now detect arrows
+    # Detect arrows directly
     result = await detect_arrows(request.image_base64, center, radius)
+    logger.info(f"Detect-arrows result: success={result.get('success')}, arrows={len(result.get('arrows', []))}")
     return result
 
 # Session Management Endpoints
