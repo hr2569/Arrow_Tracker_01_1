@@ -11,11 +11,15 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+
+// Import longbow icon
+const longbowIcon = require('../assets/images/longbow-icon.png');
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
