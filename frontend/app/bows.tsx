@@ -184,6 +184,8 @@ export default function BowsScreen() {
         return { type: 'ionicon', value: 'git-network-outline' };
       case 'longbow':
         return { type: 'image', value: longbowIcon };
+      case 'recurve':
+        return { type: 'image', value: recurveIcon };
       default:
         return { type: 'ionicon', value: 'arrow-forward-outline' };
     }
