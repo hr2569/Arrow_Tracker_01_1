@@ -157,21 +157,6 @@ export const useAppStore = create<AppState>((set) => ({
   })),
   clearSessionRounds: () => set({ sessionRounds: [] }),
 
-  currentImage: null,
-  setCurrentImage: (image) => set({ currentImage: image }),
-
-  capturedImage: null,
-  setCapturedImage: (image) => set({ capturedImage: image }),
-
-  detectedArrows: [],
-  setDetectedArrows: (arrows) => set({ detectedArrows: arrows }),
-
-  targetData: null,
-  setTargetData: (data) => set({ targetData: data }),
-
-  manualMode: false,
-  setManualMode: (mode) => set({ manualMode: mode }),
-
   currentRound: null,
   setCurrentRound: (round) => set({ currentRound: round }),
   clearCurrentRound: () => set({ currentRound: null }),
@@ -187,11 +172,6 @@ export const useAppStore = create<AppState>((set) => ({
       sessionDistance: '',
       currentRoundNumber: 1,
       sessionRounds: [],
-      currentImage: null,
-      capturedImage: null,
-      detectedArrows: [],
-      targetData: null,
-      manualMode: false,
       currentRound: null,
       currentSession: null,
     }),
