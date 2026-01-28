@@ -225,6 +225,34 @@ export default function TargetCropScreen() {
     y: corner.y * IMAGE_SIZE,
   });
 
+  // Render the ring overlay
+  const renderRingOverlay = () => {
+    const rings = targetConfig.rings;
+    const ringSize = IMAGE_SIZE * overlayScale;
+    const ringElements = [];
+    
+    for (let i = 0; i < rings; i++) {
+      const ringRatio = (rings - i) / rings;
+      const size = ringSize * ringRatio;
+      const color = targetConfig.colors[i];
+      ringElements.push(
+        <View
+          key={`ring-${i}`}
+          style={{
+            position: 'absolute',
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            borderWidth: 1.5,
+            borderColor: color?.border || 'rgba(255,255,255,0.6)',
+            backgroundColor: 'transparent',
+          }}
+        />
+      );
+    }
+    return ringElements;
+  };
+
   const cornerLabels = ['TL', 'TR', 'BR', 'BL'];
   const cornerColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'];
 
@@ -239,10 +267,29 @@ export default function TargetCropScreen() {
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Align Target</Text>
-        <TouchableOpacity onPress={handleRetryDetection} style={styles.retryButton}>
-          <Ionicons name="refresh" size={24} color="#8B0000" />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity onPress={() => setShowRingOverlay(!showRingOverlay)} style={styles.overlayToggle}>
+            <Ionicons name={showRingOverlay ? "eye" : "eye-off"} size={22} color="#8B0000" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleRetryDetection} style={styles.retryButton}>
+            <Ionicons name="refresh" size={22} color="#8B0000" />
+          </TouchableOpacity>
+        </View>
       </View>
+
+      {/* Overlay Scale Control - only show when ring overlay is visible */}
+      {showRingOverlay && (
+        <View style={styles.scaleControl}>
+          <Text style={styles.scaleLabel}>Ring size:</Text>
+          <TouchableOpacity style={styles.scaleBtn} onPress={() => setOverlayScale(s => Math.max(0.5, s - 0.05))}>
+            <Ionicons name="remove" size={18} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.scaleValue}>{Math.round(overlayScale * 100)}%</Text>
+          <TouchableOpacity style={styles.scaleBtn} onPress={() => setOverlayScale(s => Math.min(1.0, s + 0.05))}>
+            <Ionicons name="add" size={18} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Instructions */}
       <View style={styles.instructionBar}>
