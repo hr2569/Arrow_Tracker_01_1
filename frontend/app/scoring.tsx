@@ -522,6 +522,34 @@ const styles = StyleSheet.create({
   overlayToggle: {
     padding: 8,
   },
+  scaleControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#111',
+    gap: 12,
+  },
+  scaleLabel: {
+    fontSize: 12,
+    color: '#888',
+  },
+  scaleBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scaleValue: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#fff',
+    width: 45,
+    textAlign: 'center',
+  },
   scrollView: {
     flex: 1,
   },
