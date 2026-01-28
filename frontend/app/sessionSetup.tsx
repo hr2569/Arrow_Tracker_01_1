@@ -931,4 +931,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  scoringMethodContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  scoringMethodCard: {
+    flex: 1,
+    backgroundColor: '#111',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#222',
+    position: 'relative',
+  },
+  scoringMethodCardSelected: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
+  },
+  scoringMethodIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(139, 0, 0, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  scoringMethodIconSelected: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  scoringMethodTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  scoringMethodTitleSelected: {
+    color: '#fff',
+  },
+  scoringMethodDesc: {
+    fontSize: 12,
+    color: '#888',
+    textAlign: 'center',
+  },
 });
