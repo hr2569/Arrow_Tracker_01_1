@@ -299,8 +299,8 @@ export default function TargetCropScreen() {
               style={[
                 styles.cornerHandle,
                 {
-                  left: screenPos.x - 25,
-                  top: screenPos.y - 25,
+                  left: screenPos.x - 16,
+                  top: screenPos.y - 16,
                   backgroundColor: cornerColors[index],
                   borderColor: activeCorner === index ? '#fff' : 'transparent',
                 },
