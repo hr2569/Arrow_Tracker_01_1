@@ -518,6 +518,16 @@ async def health_check():
     return {"status": "healthy"}
 
 # Target Analysis Endpoints
+class DetectPaperCornersRequest(BaseModel):
+    image_base64: str
+    target_type: str = "wa_standard"
+
+@api_router.post("/detect-paper-corners")
+async def detect_paper_corners(request: DetectPaperCornersRequest):
+    """Detect the 4 corners of the paper target using Gemini Vision for perspective cropping"""
+    result = await detect_paper_corners_gemini(request.image_base64, request.target_type)
+    return result
+
 @api_router.post("/analyze-target")
 async def analyze_target(request: ImageAnalysisRequest):
     """Analyze image to detect target corners"""
