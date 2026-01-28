@@ -30,7 +30,7 @@ interface Corner {
 
 export default function TargetCropScreen() {
   const router = useRouter();
-  const { capturedImage, targetType, setCapturedImage } = useAppStore();
+  const { capturedImage, targetType, setCapturedImage, setCurrentImage } = useAppStore();
   
   const [isDetecting, setIsDetecting] = useState(true);
   const [isCropping, setIsCropping] = useState(false);
