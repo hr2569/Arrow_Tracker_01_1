@@ -575,33 +575,66 @@ const styles = StyleSheet.create({
   overlayToggle: {
     padding: 8,
   },
-  scaleControls: {
+  alignControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 8,
     paddingHorizontal: 16,
     backgroundColor: '#111',
-    gap: 12,
+    gap: 16,
   },
-  scaleLabel: {
+  controlRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  controlLabel: {
     fontSize: 12,
     color: '#888',
-  },
-  scaleBtn: {
     width: 32,
-    height: 32,
-    borderRadius: 16,
+  },
+  controlBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: '#333',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scaleValue: {
-    fontSize: 14,
+  controlValue: {
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#fff',
-    width: 45,
+    width: 40,
     textAlign: 'center',
+  },
+  dpadContainer: {
+    alignItems: 'center',
+    gap: 2,
+  },
+  dpadMiddle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  dpadBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 6,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dpadCenter: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#222',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#8B0000',
   },
   scrollView: {
     flex: 1,
