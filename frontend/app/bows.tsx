@@ -182,7 +182,7 @@ export default function BowsScreen() {
   const getBowIcon = (bowType: string): { type: 'ionicon' | 'image'; value: any } => {
     switch (bowType.toLowerCase()) {
       case 'compound':
-        return { type: 'ionicon', value: 'git-network-outline' };
+        return { type: 'image', value: compoundIcon };
       case 'longbow':
         return { type: 'image', value: longbowIcon };
       case 'recurve':
