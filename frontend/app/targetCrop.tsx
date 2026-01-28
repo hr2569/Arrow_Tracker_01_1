@@ -198,7 +198,10 @@ export default function TargetCropScreen() {
   };
 
   const handleSkipCrop = () => {
-    // Skip cropping and go directly to scoring
+    // Skip cropping - set currentImage from capturedImage and go to scoring
+    if (capturedImage) {
+      setCurrentImage(capturedImage);
+    }
     router.push('/scoring');
   };
 
