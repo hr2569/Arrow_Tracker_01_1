@@ -38,9 +38,6 @@ const BOW_TYPES = [
   'Recurve',
   'Compound',
   'Longbow',
-  'Barebow',
-  'Traditional',
-  'Olympic Recurve',
   'Other',
 ];
 
