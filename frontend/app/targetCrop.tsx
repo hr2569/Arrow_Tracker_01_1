@@ -320,7 +320,19 @@ export default function TargetCropScreen() {
           </View>
         )}
 
-        {/* SVG Overlay for lines */}
+        {/* Ring Overlay - to help align with target */}
+        {showRingOverlay && !isDetecting && (
+          <View style={styles.ringOverlayContainer} pointerEvents="none">
+            {renderRingOverlay()}
+            {/* Center crosshair */}
+            <View style={styles.crosshair}>
+              <View style={styles.crosshairH} />
+              <View style={styles.crosshairV} />
+            </View>
+          </View>
+        )}
+
+        {/* SVG Overlay for corner lines */}
         {!isDetecting && (
           <View style={styles.svgOverlay}>
             <Svg width={IMAGE_SIZE} height={IMAGE_SIZE}>
