@@ -216,7 +216,7 @@ export default function BowsScreen() {
     >
       <View style={styles.bowCardHeader}>
         <View style={styles.bowIconContainer}>
-          <Ionicons name={getBowIcon(bow.bow_type)} size={28} color="#8B0000" />
+          {renderBowIcon(bow.bow_type)}
         </View>
         <View style={styles.bowInfo}>
           <Text style={styles.bowName}>{bow.name}</Text>
