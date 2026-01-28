@@ -126,6 +126,18 @@ export default function RootLayout() {
             headerShown: false,
           }} 
         />
+        <Stack.Screen 
+          name="capture" 
+          options={{ 
+            headerShown: false,
+          }} 
+        />
+        <Stack.Screen 
+          name="alignment" 
+          options={{ 
+            headerShown: false,
+          }} 
+        />
       </Stack>
     </>
   );
