@@ -55,8 +55,7 @@ export default function AlignmentScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          image: capturedImage,
-          target_type: targetType,
+          image_base64: capturedImage,
         }),
       });
 
