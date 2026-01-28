@@ -542,6 +542,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
+  bowImage: {
+    width: 36,
+    height: 36,
+    tintColor: '#8B0000',
+  },
   bowInfo: {
     flex: 1,
   },
