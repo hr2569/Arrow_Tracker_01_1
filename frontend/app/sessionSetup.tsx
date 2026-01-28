@@ -42,7 +42,6 @@ export default function SessionSetupScreen() {
   const [distance, setDistance] = useState('');
   const [distanceUnit, setDistanceUnit] = useState<'m' | 'yd'>('m');
   const [selectedTargetType, setSelectedTargetType] = useState<TargetType>(targetType as TargetType);
-  const [scoringMethod, setScoringMethod] = useState<'photo' | 'manual'>('manual');
 
   const fetchBows = async () => {
     try {
