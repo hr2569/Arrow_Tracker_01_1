@@ -418,11 +418,7 @@ export default function SessionSetupScreen() {
                       styles.bowIconContainer,
                       selectedBowId === bow.id && styles.bowIconContainerSelected,
                     ]}>
-                      <Ionicons
-                        name={getBowIcon(bow.bow_type)}
-                        size={28}
-                        color={selectedBowId === bow.id ? '#fff' : '#8B0000'}
-                      />
+                      {renderBowIcon(bow.bow_type, selectedBowId === bow.id)}
                     </View>
                     <Text style={[
                       styles.bowName,
