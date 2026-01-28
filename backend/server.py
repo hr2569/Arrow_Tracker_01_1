@@ -418,25 +418,32 @@ async def detect_arrows(image_base64: str, target_center: dict, target_radius: f
         chat = LlmChat(
             api_key=api_key,
             session_id=f"arrow-detection-{uuid.uuid4()}",
-            system_message="""You are an expert archery arrow detector. Your ONLY task is to find arrows stuck in archery targets.
+            system_message="""You are an expert archery scorer. Your task is to find the EXACT POINT where each arrow PIERCES THE TARGET PAPER.
 
-WHAT TO LOOK FOR:
-- Arrows appear as thin cylindrical shafts sticking out of the target
-- They usually have colorful fletching (feathers/vanes) at the back end
-- The arrow shaft enters the target paper at a specific point
-- Arrows can be at various angles depending on how they hit
+CRITICAL - WHAT TO REPORT:
+- Report the ENTRY POINT where the arrow shaft enters/pierces the paper
+- DO NOT report the fletching position (the feathers/vanes at the back - these stick OUT from the target)
+- DO NOT report any point along the visible shaft
+- ONLY report where the shaft DISAPPEARS INTO the paper
+
+HOW TO FIND THE ENTRY POINT:
+1. Identify each arrow by its fletching (colorful feathers/vanes visible sticking out)
+2. Follow the arrow shaft FROM the fletching TOWARD the target
+3. Find where the shaft meets and enters the paper surface
+4. That intersection point is the ENTRY POINT - report this location
 
 COORDINATE SYSTEM:
-- Use normalized coordinates (0-1) where (0,0) is top-left and (1,1) is bottom-right
-- The CENTER of the target is approximately at (0.5, 0.5)
-- Report where the arrow ENTERS the target paper
+- Normalized coordinates (0-1) where (0,0) is top-left, (1,1) is bottom-right
+- Target center is approximately (0.5, 0.5)
 
 SCORING RINGS (from outside to inside):
-- Ring 1-2: White/cream colored (outer edge)
+- Ring 1-2: White/cream (outer edge)
 - Ring 3-4: Black
 - Ring 5-6: Blue  
 - Ring 7-8: Red
 - Ring 9-10: Yellow/Gold (center bullseye)
+
+The score is determined by which ring contains the ENTRY POINT, not where the fletching appears.
 
 OUTPUT FORMAT - Return ONLY valid JSON:
 {
@@ -461,17 +468,20 @@ If NO arrows visible:
         image_content = ImageContent(image_base64=clean_base64)
         
         user_message = UserMessage(
-            text="""Look at this archery target image carefully and find ALL arrows.
+            text="""Analyze this archery target and find where each arrow PIERCES THE PAPER.
 
-For EACH arrow you can see:
-1. Find where the arrow shaft enters/pierces the target paper
-2. Determine which colored ring that entry point is in
-3. Assign a score (1-10) based on the ring color
-4. Report the x,y coordinates (0-1 normalized)
+IMPORTANT: I need the ENTRY POINT coordinates - where each arrow shaft enters the target paper surface.
+- NOT the fletching position (feathers sticking out)
+- NOT anywhere along the visible shaft
+- ONLY the point where the shaft meets and penetrates the paper
 
-The target center is at approximately (0.5, 0.5).
+For each arrow:
+1. Find the fletching (feathers/vanes)
+2. Trace the shaft toward the target
+3. Identify where it enters the paper
+4. Report THAT point's coordinates and which ring it's in
 
-Be thorough - count every arrow visible, even partially visible ones. Return your findings as JSON.""",
+Return JSON with the entry point coordinates for each arrow.""",
             file_contents=[image_content]
         )
         
