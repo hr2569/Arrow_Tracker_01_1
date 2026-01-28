@@ -263,11 +263,20 @@ export default function ScoringScreen() {
     const rings = targetConfig.rings;
     const ringElements = [];
     
+    // Draw rings from largest (outermost) to smallest (innermost)
+    // Each ring needs a filled background since they're drawn on top of each other
     for (let i = 0; i < rings; i++) {
-      // Each ring is progressively smaller toward center
+      // Ring 1 is outermost (largest), Ring 10 is innermost (smallest)
+      const ringNumber = i + 1; // 1 to 10
       const ringRatio = (rings - i) / rings;
       const size = RING_SIZE * ringRatio;
       const color = targetConfig.colors[i];
+      
+      // Determine ring color based on score value
+      // White: 1-2, Black: 3-4, Blue: 5-6, Red: 7-8, Gold: 9-10
+      let fillColor = color?.bg || '#f5f5f0';
+      let borderCol = color?.border || '#333';
+      
       ringElements.push(
         <View
           key={`ring-${i}`}
@@ -277,9 +286,10 @@ export default function ScoringScreen() {
               width: size,
               height: size,
               borderRadius: size / 2,
-              borderColor: color?.border || 'rgba(255,255,255,0.6)',
+              borderColor: borderCol,
               borderWidth: 1.5,
-              backgroundColor: 'transparent',
+              backgroundColor: fillColor,
+              opacity: 0.7,
             },
           ]}
         />
