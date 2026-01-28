@@ -22,6 +22,7 @@ import { useFocusEffect } from '@react-navigation/native';
 const longbowIcon = require('../assets/images/longbow-icon.png');
 const recurveIcon = require('../assets/images/recurve-icon.png');
 const compoundIcon = require('../assets/images/compound-icon.png');
+const otherIcon = require('../assets/images/other-icon.png');
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
