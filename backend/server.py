@@ -99,30 +99,12 @@ class UpdateBowRequest(BaseModel):
     draw_length: Optional[float] = None
     notes: Optional[str] = None
 
-class ImageAnalysisRequest(BaseModel):
-    image_base64: str
-
-class TargetAnalysisResponse(BaseModel):
-    success: bool
-    corners: Optional[List[dict]] = None  # [{x, y}, ...] 4 corners
-    message: str = ""
-
-class ArrowDetectionResponse(BaseModel):
-    success: bool
-    arrows: List[dict] = []  # [{x, y, ring, confidence}, ...]
-    message: str = ""
-
 class AddRoundRequest(BaseModel):
     round_number: int
     shots: List[dict]  # [{x, y, ring}, ...]
 
 class UpdateRoundRequest(BaseModel):
     shots: List[dict]
-
-class PerspectiveCropRequest(BaseModel):
-    image_base64: str
-    corners: List[dict]  # [{x, y}, {x, y}, {x, y}, {x, y}] - TL, TR, BR, BL
-    output_size: int = 800  # Output image size (square)
 
 # ============== Image Processing Functions ==============
 
