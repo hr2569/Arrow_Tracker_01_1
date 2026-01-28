@@ -116,17 +116,18 @@ export default function SessionSetupScreen() {
     router.push('/bows');
   };
 
-  const getBowIcon = (bowType: string) => {
-    switch (bowType.toLowerCase()) {
-      case 'compound':
-        return 'git-network-outline';
-      case 'longbow':
-        return 'remove-outline';
-      case 'traditional':
-        return 'leaf-outline';
-      default:
-        return 'arrow-forward-outline';
-    }
+  const renderBowIcon = (bowType: string, isSelected: boolean) => {
+    const icon = getBowIcon(bowType);
+    return (
+      <Image 
+        source={icon.value} 
+        style={[
+          styles.bowIconImage,
+          isSelected && styles.bowIconImageSelected
+        ]} 
+        resizeMode="contain"
+      />
+    );
   };
 
   if (loading) {
