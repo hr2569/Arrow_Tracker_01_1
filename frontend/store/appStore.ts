@@ -187,6 +187,12 @@ export const useAppStore = create<AppState>((set) => ({
   currentImage: null,
   setCurrentImage: (image) => set({ currentImage: image }),
 
+  capturedImage: null,
+  setCapturedImage: (image) => set({ capturedImage: image }),
+
+  detectedArrows: [],
+  setDetectedArrows: (arrows) => set({ detectedArrows: arrows }),
+
   targetData: null,
   setTargetData: (data) => set({ targetData: data }),
 
