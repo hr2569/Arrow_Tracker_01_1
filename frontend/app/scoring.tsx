@@ -310,17 +310,41 @@ export default function ScoringScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Overlay Scale Controls - only show when overlay is visible and we have an image */}
+      {/* Overlay Alignment Controls - only show when overlay is visible and we have an image */}
       {showOverlay && displayImage && (
-        <View style={styles.scaleControls}>
-          <Text style={styles.scaleLabel}>Align rings:</Text>
-          <TouchableOpacity style={styles.scaleBtn} onPress={() => adjustScale(-0.05)}>
-            <Ionicons name="remove" size={20} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.scaleValue}>{Math.round(overlayScale * 100)}%</Text>
-          <TouchableOpacity style={styles.scaleBtn} onPress={() => adjustScale(0.05)}>
-            <Ionicons name="add" size={20} color="#fff" />
-          </TouchableOpacity>
+        <View style={styles.alignControls}>
+          {/* Scale control */}
+          <View style={styles.controlRow}>
+            <Text style={styles.controlLabel}>Size</Text>
+            <TouchableOpacity style={styles.controlBtn} onPress={() => adjustScale(-0.05)}>
+              <Ionicons name="remove" size={18} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.controlValue}>{Math.round(overlayScale * 100)}%</Text>
+            <TouchableOpacity style={styles.controlBtn} onPress={() => adjustScale(0.05)}>
+              <Ionicons name="add" size={18} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          
+          {/* Position controls - D-pad style */}
+          <View style={styles.dpadContainer}>
+            <TouchableOpacity style={styles.dpadBtn} onPress={() => adjustOffsetY(-5)}>
+              <Ionicons name="chevron-up" size={20} color="#fff" />
+            </TouchableOpacity>
+            <View style={styles.dpadMiddle}>
+              <TouchableOpacity style={styles.dpadBtn} onPress={() => adjustOffsetX(-5)}>
+                <Ionicons name="chevron-back" size={20} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dpadCenter} onPress={resetOverlay}>
+                <Ionicons name="refresh" size={16} color="#8B0000" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dpadBtn} onPress={() => adjustOffsetX(5)}>
+                <Ionicons name="chevron-forward" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={styles.dpadBtn} onPress={() => adjustOffsetY(5)}>
+              <Ionicons name="chevron-down" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
 
