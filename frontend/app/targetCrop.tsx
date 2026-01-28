@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
+import { useAppStore } from '../store/appStore';
 import Svg, { Line, Circle } from 'react-native-svg';
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -44,11 +44,6 @@ export default function TargetCropScreen() {
   const [confidence, setConfidence] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [detectionAttempted, setDetectionAttempted] = useState(false);
-  const [showRingOverlay, setShowRingOverlay] = useState(true);
-  const [overlayScale, setOverlayScale] = useState(0.85);
-  
-  // Get target config for ring overlay
-  const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   
   const imageLayoutRef = useRef<{ x: number; y: number; width: number; height: number }>({
     x: 0, y: 0, width: IMAGE_SIZE, height: IMAGE_SIZE
