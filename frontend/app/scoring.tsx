@@ -294,6 +294,20 @@ export default function ScoringScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Overlay Scale Controls - only show when overlay is visible and we have an image */}
+      {showOverlay && displayImage && (
+        <View style={styles.scaleControls}>
+          <Text style={styles.scaleLabel}>Align rings:</Text>
+          <TouchableOpacity style={styles.scaleBtn} onPress={() => adjustScale(-0.05)}>
+            <Ionicons name="remove" size={20} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.scaleValue}>{Math.round(overlayScale * 100)}%</Text>
+          <TouchableOpacity style={styles.scaleBtn} onPress={() => adjustScale(0.05)}>
+            <Ionicons name="add" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Target Area */}
         <View style={styles.targetWrapper}>
