@@ -53,6 +53,7 @@ export default function ScoringScreen() {
   const [showScorePicker, setShowScorePicker] = useState(false);
   const [targetLayout, setTargetLayout] = useState<{ width: number; height: number } | null>(null);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [overlayScale, setOverlayScale] = useState(0.85); // Adjustable scale for ring overlay
 
   // Get the image to display (prefer currentImage, fallback to capturedImage)
   const displayImage = currentImage || capturedImage;
