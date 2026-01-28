@@ -17,12 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-
-// Import bow icons
-const longbowIcon = require('../assets/images/longbow-icon.png');
-const recurveIcon = require('../assets/images/recurve-icon.png');
-const compoundIcon = require('../assets/images/compound-icon.png');
-const otherIcon = require('../assets/images/other-icon.png');
+import { getBowIcon } from '../utils/bowIcons';
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
