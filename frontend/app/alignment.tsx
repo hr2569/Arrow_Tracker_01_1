@@ -8,6 +8,8 @@ import {
   Alert,
   Image,
   ScrollView,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -35,6 +37,8 @@ export default function AlignmentScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [detectionResult, setDetectionResult] = useState<DetectedArrow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [editingArrowIndex, setEditingArrowIndex] = useState<number | null>(null);
+  const [showScorePicker, setShowScorePicker] = useState(false);
 
   useEffect(() => {
     if (capturedImage) {
@@ -81,6 +85,7 @@ export default function AlignmentScreen() {
 
   const handleUseResults = () => {
     if (detectionResult) {
+      setDetectedArrows(detectionResult);
       setManualMode(false);
       router.push('/scoring');
     }
@@ -95,6 +100,70 @@ export default function AlignmentScreen() {
     router.back();
   };
 
+  const handleEditArrow = (index: number) => {
+    setEditingArrowIndex(index);
+    setShowScorePicker(true);
+  };
+
+  const handleUpdateScore = (newScore: number) => {
+    if (editingArrowIndex !== null && detectionResult) {
+      const updatedResults = [...detectionResult];
+      updatedResults[editingArrowIndex] = {
+        ...updatedResults[editingArrowIndex],
+        ring: newScore,
+        confidence: 1.0, // User-confirmed
+      };
+      setDetectionResult(updatedResults);
+      setDetectedArrows(updatedResults);
+    }
+    setShowScorePicker(false);
+    setEditingArrowIndex(null);
+  };
+
+  const handleDeleteArrow = (index: number) => {
+    Alert.alert(
+      'Delete Arrow',
+      'Remove this arrow from the results?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            if (detectionResult) {
+              const updatedResults = detectionResult.filter((_, i) => i !== index);
+              setDetectionResult(updatedResults);
+              setDetectedArrows(updatedResults);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleAddArrow = () => {
+    const newArrow: DetectedArrow = {
+      x: 0.5,
+      y: 0.5,
+      ring: 10,
+      confidence: 1.0,
+    };
+    
+    if (detectionResult) {
+      const updatedResults = [...detectionResult, newArrow];
+      setDetectionResult(updatedResults);
+      setDetectedArrows(updatedResults);
+      // Open score picker for the new arrow
+      setEditingArrowIndex(updatedResults.length - 1);
+      setShowScorePicker(true);
+    } else {
+      setDetectionResult([newArrow]);
+      setDetectedArrows([newArrow]);
+      setEditingArrowIndex(0);
+      setShowScorePicker(true);
+    }
+  };
+
   const getTotalScore = () => {
     if (!detectionResult) return 0;
     return detectionResult.reduce((sum, arrow) => sum + arrow.ring, 0);
@@ -104,6 +173,21 @@ export default function AlignmentScreen() {
     if (!detectionResult || detectionResult.length === 0) return 0;
     const avg = detectionResult.reduce((sum, arrow) => sum + arrow.confidence, 0) / detectionResult.length;
     return Math.round(avg * 100);
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 9) return '#FFD700'; // Gold
+    if (score >= 7) return '#ed1c24'; // Red
+    if (score >= 5) return '#00a2e8'; // Blue
+    if (score >= 3) return '#2a2a2a'; // Black
+    return '#f5f5f0'; // White
+  };
+
+  const getScoreTextColor = (score: number) => {
+    if (score >= 9) return '#000'; // Dark text on gold
+    if (score >= 3 && score < 5) return '#fff'; // White on black
+    if (score < 3) return '#000'; // Dark on white
+    return '#fff'; // White on colored rings
   };
 
   return (
@@ -117,7 +201,9 @@ export default function AlignmentScreen() {
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Arrow Detection</Text>
-        <View style={styles.headerSpacer} />
+        <TouchableOpacity onPress={processImage} style={styles.refreshButton}>
+          <Ionicons name="refresh" size={24} color="#8B0000" />
+        </TouchableOpacity>
       </View>
 
       <ScrollView 
@@ -155,10 +241,13 @@ export default function AlignmentScreen() {
         {!isProcessing && detectionResult && (
           <View style={styles.resultsContainer}>
             <View style={styles.resultHeader}>
-              <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
-              <Text style={styles.resultTitle}>
-                {detectionResult.length} Arrow{detectionResult.length !== 1 ? 's' : ''} Detected
-              </Text>
+              <View style={styles.resultTitleRow}>
+                <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
+                <Text style={styles.resultTitle}>
+                  {detectionResult.length} Arrow{detectionResult.length !== 1 ? 's' : ''} Detected
+                </Text>
+              </View>
+              <Text style={styles.editHint}>Tap to edit scores</Text>
             </View>
 
             {/* Score Summary */}
@@ -174,28 +263,56 @@ export default function AlignmentScreen() {
               </View>
             </View>
 
-            {/* Individual Arrows */}
+            {/* Individual Arrows - Editable */}
             <View style={styles.arrowsList}>
               {detectionResult.map((arrow, index) => (
-                <View key={index} style={styles.arrowItem}>
-                  <View style={styles.arrowNumber}>
-                    <Text style={styles.arrowNumberText}>{index + 1}</Text>
-                  </View>
-                  <View style={styles.arrowInfo}>
-                    <Text style={styles.arrowRing}>Ring {arrow.ring}</Text>
-                    <Text style={styles.arrowConfidence}>
-                      {Math.round(arrow.confidence * 100)}% confidence
-                    </Text>
-                  </View>
-                  <View style={[
-                    styles.arrowScore,
-                    arrow.ring >= 9 && styles.arrowScoreGold,
-                    arrow.ring >= 7 && arrow.ring < 9 && styles.arrowScoreRed,
-                  ]}>
-                    <Text style={styles.arrowScoreText}>{arrow.ring}</Text>
-                  </View>
+                <View key={index} style={styles.arrowItemContainer}>
+                  <TouchableOpacity 
+                    style={styles.arrowItem}
+                    onPress={() => handleEditArrow(index)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.arrowNumber}>
+                      <Text style={styles.arrowNumberText}>{index + 1}</Text>
+                    </View>
+                    <View style={styles.arrowInfo}>
+                      <Text style={styles.arrowRing}>Ring {arrow.ring}</Text>
+                      <Text style={styles.arrowConfidence}>
+                        {arrow.confidence === 1.0 ? 'User confirmed' : `${Math.round(arrow.confidence * 100)}% confidence`}
+                      </Text>
+                    </View>
+                    <TouchableOpacity 
+                      style={[
+                        styles.arrowScore,
+                        { backgroundColor: getScoreColor(arrow.ring) }
+                      ]}
+                      onPress={() => handleEditArrow(index)}
+                    >
+                      <Text style={[styles.arrowScoreText, { color: getScoreTextColor(arrow.ring) }]}>
+                        {arrow.ring}
+                      </Text>
+                    </TouchableOpacity>
+                    <Ionicons name="chevron-forward" size={20} color="#666" style={styles.editIcon} />
+                  </TouchableOpacity>
+                  
+                  {/* Delete button */}
+                  <TouchableOpacity 
+                    style={styles.deleteButton}
+                    onPress={() => handleDeleteArrow(index)}
+                  >
+                    <Ionicons name="trash-outline" size={18} color="#FF6B6B" />
+                  </TouchableOpacity>
                 </View>
               ))}
+              
+              {/* Add Arrow Button */}
+              <TouchableOpacity 
+                style={styles.addArrowButton}
+                onPress={handleAddArrow}
+              >
+                <Ionicons name="add-circle-outline" size={24} color="#8B0000" />
+                <Text style={styles.addArrowText}>Add Missing Arrow</Text>
+              </TouchableOpacity>
             </View>
           </View>
         )}
@@ -206,13 +323,22 @@ export default function AlignmentScreen() {
             <Ionicons name="alert-circle" size={48} color="#FF6B6B" />
             <Text style={styles.errorTitle}>Detection Failed</Text>
             <Text style={styles.errorText}>{error}</Text>
+            
+            {/* Add arrow manually even on error */}
+            <TouchableOpacity 
+              style={styles.addArrowButtonError}
+              onPress={handleAddArrow}
+            >
+              <Ionicons name="add-circle-outline" size={24} color="#8B0000" />
+              <Text style={styles.addArrowText}>Add Arrows Manually</Text>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>
 
       {/* Action Buttons */}
       <View style={styles.footer}>
-        {detectionResult ? (
+        {detectionResult && detectionResult.length > 0 ? (
           <>
             <TouchableOpacity
               style={styles.secondaryButton}
@@ -250,6 +376,58 @@ export default function AlignmentScreen() {
           </>
         )}
       </View>
+
+      {/* Score Picker Modal */}
+      <Modal
+        visible={showScorePicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowScorePicker(false)}
+      >
+        <Pressable 
+          style={styles.modalOverlay}
+          onPress={() => setShowScorePicker(false)}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Score</Text>
+              <TouchableOpacity onPress={() => setShowScorePicker(false)}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.scoreGrid}>
+              {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((score) => (
+                <TouchableOpacity
+                  key={score}
+                  style={[
+                    styles.scoreOption,
+                    { backgroundColor: getScoreColor(score) },
+                    editingArrowIndex !== null && 
+                    detectionResult && 
+                    detectionResult[editingArrowIndex]?.ring === score && 
+                    styles.scoreOptionSelected
+                  ]}
+                  onPress={() => handleUpdateScore(score)}
+                >
+                  <Text style={[
+                    styles.scoreOptionText,
+                    { color: getScoreTextColor(score) }
+                  ]}>
+                    {score === 10 ? 'X' : score}
+                  </Text>
+                  <Text style={[
+                    styles.scoreOptionLabel,
+                    { color: getScoreTextColor(score), opacity: 0.7 }
+                  ]}>
+                    {score >= 9 ? 'Gold' : score >= 7 ? 'Red' : score >= 5 ? 'Blue' : score >= 3 ? 'Black' : 'White'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -276,8 +454,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  headerSpacer: {
-    width: 40,
+  refreshButton: {
+    padding: 8,
   },
   scrollView: {
     flex: 1,
@@ -330,15 +508,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resultHeader: {
+    marginBottom: 16,
+  },
+  resultTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
     gap: 8,
   },
   resultTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  editHint: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 4,
+    marginLeft: 32,
   },
   scoreSummary: {
     flexDirection: 'row',
@@ -369,7 +555,13 @@ const styles = StyleSheet.create({
   arrowsList: {
     gap: 8,
   },
+  arrowItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   arrowItem: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1a1a1a',
@@ -406,20 +598,53 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#333',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  arrowScoreGold: {
-    backgroundColor: '#FFD700',
-  },
-  arrowScoreRed: {
-    backgroundColor: '#8B0000',
   },
   arrowScoreText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
+  },
+  editIcon: {
+    marginLeft: 8,
+  },
+  deleteButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 107, 107, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addArrowButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(139, 0, 0, 0.15)',
+    borderRadius: 10,
+    padding: 14,
+    marginTop: 8,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#8B0000',
+    borderStyle: 'dashed',
+  },
+  addArrowButtonError: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(139, 0, 0, 0.15)',
+    borderRadius: 10,
+    padding: 14,
+    marginTop: 20,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#8B0000',
+  },
+  addArrowText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8B0000',
   },
   errorContainer: {
     backgroundColor: '#111',
@@ -477,5 +702,55 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#8B0000',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#111',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    paddingBottom: 40,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  scoreGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    justifyContent: 'center',
+  },
+  scoreOption: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  scoreOptionSelected: {
+    borderColor: '#fff',
+  },
+  scoreOptionText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  scoreOptionLabel: {
+    fontSize: 10,
+    marginTop: 2,
   },
 });
