@@ -40,7 +40,7 @@ export default function CaptureScreen() {
 
       if (photo?.base64) {
         setCapturedImage(`data:image/jpeg;base64,${photo.base64}`);
-        router.push('/alignment');
+        router.push('/targetCrop');
       } else {
         Alert.alert('Error', 'Failed to capture image. Please try again.');
       }
@@ -64,7 +64,7 @@ export default function CaptureScreen() {
 
       if (!result.canceled && result.assets[0]?.base64) {
         setCapturedImage(`data:image/jpeg;base64,${result.assets[0].base64}`);
-        router.push('/alignment');
+        router.push('/targetCrop');
       }
     } catch (error) {
       console.error('Error picking image:', error);
