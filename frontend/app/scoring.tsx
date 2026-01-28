@@ -176,8 +176,8 @@ export default function ScoringScreen() {
       const size = RING_SIZE * ringRatio;
       const color = targetConfig.colors[i];
       
-      let fillColor = color?.bg || '#f5f5f0';
-      let borderCol = color?.border || '#333';
+      const fillColor = color?.bg || '#f5f5f0';
+      const borderCol = color?.border || '#333';
       
       ringElements.push(
         <View
@@ -198,31 +198,12 @@ export default function ScoringScreen() {
     }
     return ringElements;
   };
-        <View
-          key={`ring-${i}`}
-          style={[
-            styles.ring,
-            {
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              borderColor: borderCol,
-              borderWidth: 1.5,
-              backgroundColor: fillColor,
-              opacity: 0.7,
-            },
-          ]}
-        />
-      );
-    }
-    return ringElements;
-  };
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleRetake}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
@@ -232,51 +213,8 @@ export default function ScoringScreen() {
             <Text style={styles.roundText}>Round {currentRoundNumber}</Text>
           </View>
         </View>
-        <TouchableOpacity 
-          style={styles.overlayToggle} 
-          onPress={() => setShowOverlay(!showOverlay)}
-        >
-          <Ionicons name={showOverlay ? "eye" : "eye-off"} size={24} color="#8B0000" />
-        </TouchableOpacity>
+        <View style={styles.headerRight} />
       </View>
-
-      {/* Overlay Alignment Controls - only show when overlay is visible and we have an image */}
-      {showOverlay && displayImage && (
-        <View style={styles.alignControls}>
-          {/* Scale control */}
-          <View style={styles.controlRow}>
-            <Text style={styles.controlLabel}>Size</Text>
-            <TouchableOpacity style={styles.controlBtn} onPress={() => adjustScale(-0.05)}>
-              <Ionicons name="remove" size={18} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.controlValue}>{Math.round(overlayScale * 100)}%</Text>
-            <TouchableOpacity style={styles.controlBtn} onPress={() => adjustScale(0.05)}>
-              <Ionicons name="add" size={18} color="#fff" />
-            </TouchableOpacity>
-          </View>
-          
-          {/* Position controls - D-pad style */}
-          <View style={styles.dpadContainer}>
-            <TouchableOpacity style={styles.dpadBtn} onPress={() => adjustOffsetY(-5)}>
-              <Ionicons name="chevron-up" size={20} color="#fff" />
-            </TouchableOpacity>
-            <View style={styles.dpadMiddle}>
-              <TouchableOpacity style={styles.dpadBtn} onPress={() => adjustOffsetX(-5)}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dpadCenter} onPress={resetOverlay}>
-                <Ionicons name="refresh" size={16} color="#8B0000" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dpadBtn} onPress={() => adjustOffsetX(5)}>
-                <Ionicons name="chevron-forward" size={20} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity style={styles.dpadBtn} onPress={() => adjustOffsetY(5)}>
-              <Ionicons name="chevron-down" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Target Area */}
@@ -286,40 +224,24 @@ export default function ScoringScreen() {
             onLayout={(e) => setTargetLayout({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
             onPress={handleTargetPress}
           >
-            {/* Background Image */}
-            {displayImage && (
-              <Image
-                source={{ uri: displayImage }}
-                style={[styles.targetImage, { width: BASE_TARGET_SIZE, height: BASE_TARGET_SIZE }]}
-                resizeMode="cover"
-                pointerEvents="none"
-              />
-            )}
-
-            {/* Ring Overlay - with position offset */}
-            {showOverlay && (
-              <View 
-                style={[
-                  styles.ringOverlay, 
-                  { 
-                    width: BASE_TARGET_SIZE, 
-                    height: BASE_TARGET_SIZE,
-                    transform: [
-                      { translateX: overlayOffsetX },
-                      { translateY: overlayOffsetY },
-                    ],
-                  }
-                ]} 
-                pointerEvents="none"
-              >
-                {renderRingOverlay()}
-                {/* Center crosshair */}
-                <View style={styles.crosshair}>
-                  <View style={styles.crosshairH} />
-                  <View style={styles.crosshairV} />
-                </View>
+            {/* Ring Overlay */}
+            <View 
+              style={[
+                styles.ringOverlay, 
+                { 
+                  width: BASE_TARGET_SIZE, 
+                  height: BASE_TARGET_SIZE,
+                }
+              ]} 
+              pointerEvents="none"
+            >
+              {renderRingOverlay()}
+              {/* Center crosshair */}
+              <View style={styles.crosshair}>
+                <View style={styles.crosshairH} />
+                <View style={styles.crosshairV} />
               </View>
-            )}
+            </View>
 
             {/* Arrow Markers */}
             {arrows.map((arrow, index) => (
@@ -340,14 +262,6 @@ export default function ScoringScreen() {
                 </Text>
               </TouchableOpacity>
             ))}
-
-            {/* Detection overlay */}
-            {isDetecting && (
-              <View style={styles.detectingOverlay}>
-                <ActivityIndicator size="large" color="#8B0000" />
-                <Text style={styles.detectingText}>Detecting arrows...</Text>
-              </View>
-            )}
           </Pressable>
           
           <Text style={styles.tapHint}>Tap target to add arrows</Text>
@@ -385,9 +299,7 @@ export default function ScoringScreen() {
                   </View>
                   <View style={styles.arrowDetails}>
                     <Text style={styles.arrowRingText}>Ring {arrow.ring}</Text>
-                    <Text style={styles.arrowConfText}>
-                      {arrow.confidence === 1.0 ? 'Manual' : `${Math.round((arrow.confidence || 0) * 100)}% AI`}
-                    </Text>
+                    <Text style={styles.arrowConfText}>Manual</Text>
                   </View>
                   <View style={[styles.arrowScoreBadge, { backgroundColor: getScoreColor(arrow.ring) }]}>
                     <Text style={[styles.arrowScoreText, { color: getScoreTextColor(arrow.ring) }]}>
@@ -402,19 +314,11 @@ export default function ScoringScreen() {
             ))}
           </View>
         )}
-
-        {/* Re-detect button for photo mode */}
-        {displayImage && (
-          <TouchableOpacity style={styles.redetectButton} onPress={detectArrows} disabled={isDetecting}>
-            <Ionicons name="refresh" size={20} color="#8B0000" />
-            <Text style={styles.redetectText}>Re-detect with AI</Text>
-          </TouchableOpacity>
-        )}
       </ScrollView>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.secondaryButton} onPress={handleRetake}>
+        <TouchableOpacity style={styles.secondaryButton} onPress={handleBack}>
           <Ionicons name="arrow-back" size={20} color="#8B0000" />
           <Text style={styles.secondaryButtonText}>Back</Text>
         </TouchableOpacity>
@@ -474,9 +378,14 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 8,
+    width: 40,
   },
   headerCenter: {
     alignItems: 'center',
+    flex: 1,
+  },
+  headerRight: {
+    width: 40,
   },
   headerTitle: {
     fontSize: 18,
@@ -502,70 +411,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#888',
   },
-  overlayToggle: {
-    padding: 8,
-  },
-  alignControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: '#111',
-    gap: 16,
-  },
-  controlRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  controlLabel: {
-    fontSize: 12,
-    color: '#888',
-    width: 32,
-  },
-  controlBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  controlValue: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#fff',
-    width: 40,
-    textAlign: 'center',
-  },
-  dpadContainer: {
-    alignItems: 'center',
-    gap: 2,
-  },
-  dpadMiddle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  dpadBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 6,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dpadCenter: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#222',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#8B0000',
-  },
   scrollView: {
     flex: 1,
   },
@@ -582,11 +427,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
-  targetImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-  },
   ringOverlay: {
     position: 'absolute',
     top: 0,
@@ -597,7 +437,6 @@ const styles = StyleSheet.create({
   ring: {
     position: 'absolute',
     borderWidth: 1.5,
-    opacity: 0.7,
   },
   crosshair: {
     position: 'absolute',
@@ -636,18 +475,6 @@ const styles = StyleSheet.create({
   arrowMarkerText: {
     fontSize: 11,
     fontWeight: 'bold',
-  },
-  detectingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 16,
-  },
-  detectingText: {
-    color: '#fff',
-    marginTop: 12,
-    fontSize: 16,
   },
   tapHint: {
     color: '#666',
@@ -751,23 +578,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  redetectButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(139, 0, 0, 0.15)',
-    borderRadius: 10,
-    padding: 12,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#8B0000',
-    borderStyle: 'dashed',
-  },
-  redetectText: {
-    fontSize: 14,
-    color: '#8B0000',
-    fontWeight: '600',
-  },
   footer: {
     flexDirection: 'row',
     padding: 16,
@@ -849,7 +659,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   scoreOptionText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
   },
 });
