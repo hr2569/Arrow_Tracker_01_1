@@ -540,7 +540,6 @@ const styles = StyleSheet.create({
   bowImage: {
     width: 36,
     height: 36,
-    tintColor: '#8B0000',
   },
   bowInfo: {
     flex: 1,
