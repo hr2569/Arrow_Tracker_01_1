@@ -87,7 +87,9 @@ export default function AlignmentScreen() {
   };
 
   const handleUseResults = () => {
-    if (detectionResult) {
+    if (detectionResult && capturedImage) {
+      // Make sure currentImage is set for the scoring screen
+      setCurrentImage(capturedImage);
       setDetectedArrows(detectionResult);
       setManualMode(false);
       router.push('/scoring');
@@ -95,6 +97,10 @@ export default function AlignmentScreen() {
   };
 
   const handleManualScoring = () => {
+    // Also set currentImage for manual scoring from photo
+    if (capturedImage) {
+      setCurrentImage(capturedImage);
+    }
     setManualMode(true);
     router.push('/scoring');
   };
