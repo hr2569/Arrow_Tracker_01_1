@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppStore } from '../store/appStore';
+import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 import Svg, { Line, Circle } from 'react-native-svg';
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
