@@ -366,9 +366,22 @@ export default function ScoringScreen() {
               />
             )}
 
-            {/* Ring Overlay */}
+            {/* Ring Overlay - with position offset */}
             {showOverlay && (
-              <View style={[styles.ringOverlay, { width: BASE_TARGET_SIZE, height: BASE_TARGET_SIZE }]} pointerEvents="none">
+              <View 
+                style={[
+                  styles.ringOverlay, 
+                  { 
+                    width: BASE_TARGET_SIZE, 
+                    height: BASE_TARGET_SIZE,
+                    transform: [
+                      { translateX: overlayOffsetX },
+                      { translateY: overlayOffsetY },
+                    ],
+                  }
+                ]} 
+                pointerEvents="none"
+              >
                 {renderRingOverlay()}
                 {/* Center crosshair */}
                 <View style={styles.crosshair}>
