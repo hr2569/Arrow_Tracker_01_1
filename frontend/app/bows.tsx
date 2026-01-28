@@ -180,17 +180,31 @@ export default function BowsScreen() {
     );
   };
 
-  const getBowIcon = (bowType: string) => {
+  const getBowIcon = (bowType: string): { type: 'ionicon' | 'image'; value: any } => {
     switch (bowType.toLowerCase()) {
       case 'compound':
-        return 'git-network-outline';
+        return { type: 'ionicon', value: 'git-network-outline' };
       case 'longbow':
-        return 'remove-outline';
+        return { type: 'image', value: longbowIcon };
       case 'traditional':
-        return 'leaf-outline';
+        return { type: 'ionicon', value: 'leaf-outline' };
       default:
-        return 'arrow-forward-outline';
+        return { type: 'ionicon', value: 'arrow-forward-outline' };
     }
+  };
+
+  const renderBowIcon = (bowType: string) => {
+    const icon = getBowIcon(bowType);
+    if (icon.type === 'image') {
+      return (
+        <Image 
+          source={icon.value} 
+          style={styles.bowImage} 
+          resizeMode="contain"
+        />
+      );
+    }
+    return <Ionicons name={icon.value as any} size={28} color="#8B0000" />;
   };
 
   const renderBowCard = (bow: Bow) => (
