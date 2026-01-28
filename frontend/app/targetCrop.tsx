@@ -225,10 +225,44 @@ export default function TargetCropScreen() {
     y: corner.y * IMAGE_SIZE,
   });
 
-  // Render the ring overlay
+  // Calculate overlay position and size from corners
+  const getOverlayTransform = () => {
+    // Calculate center of the quadrilateral (average of all 4 corners)
+    const centerX = (corners[0].x + corners[1].x + corners[2].x + corners[3].x) / 4;
+    const centerY = (corners[0].y + corners[1].y + corners[2].y + corners[3].y) / 4;
+    
+    // Calculate approximate width and height of the quadrilateral
+    const topWidth = Math.sqrt(
+      Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
+    );
+    const bottomWidth = Math.sqrt(
+      Math.pow(corners[2].x - corners[3].x, 2) + Math.pow(corners[2].y - corners[3].y, 2)
+    );
+    const leftHeight = Math.sqrt(
+      Math.pow(corners[3].x - corners[0].x, 2) + Math.pow(corners[3].y - corners[0].y, 2)
+    );
+    const rightHeight = Math.sqrt(
+      Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
+    );
+    
+    // Average width and height
+    const avgWidth = (topWidth + bottomWidth) / 2;
+    const avgHeight = (leftHeight + rightHeight) / 2;
+    const avgSize = (avgWidth + avgHeight) / 2;
+    
+    return {
+      centerX: centerX * IMAGE_SIZE,
+      centerY: centerY * IMAGE_SIZE,
+      scale: avgSize * overlayScale,
+    };
+  };
+
+  const overlayTransform = getOverlayTransform();
+
+  // Render the ring overlay - positioned based on corners
   const renderRingOverlay = () => {
     const rings = targetConfig.rings;
-    const ringSize = IMAGE_SIZE * overlayScale;
+    const ringSize = overlayTransform.scale * IMAGE_SIZE;
     const ringElements = [];
     
     for (let i = 0; i < rings; i++) {
