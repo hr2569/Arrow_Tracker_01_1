@@ -354,9 +354,20 @@ export default function TargetCropScreen() {
           </View>
         )}
 
-        {/* Ring Overlay - to help align with target */}
+        {/* Ring Overlay - moves with corners */}
         {showRingOverlay && !isDetecting && (
-          <View style={styles.ringOverlayContainer} pointerEvents="none">
+          <View 
+            style={[
+              styles.ringOverlayContainer,
+              {
+                left: overlayTransform.centerX - (overlayTransform.scale * IMAGE_SIZE) / 2,
+                top: overlayTransform.centerY - (overlayTransform.scale * IMAGE_SIZE) / 2,
+                width: overlayTransform.scale * IMAGE_SIZE,
+                height: overlayTransform.scale * IMAGE_SIZE,
+              }
+            ]} 
+            pointerEvents="none"
+          >
             {renderRingOverlay()}
             {/* Center crosshair */}
             <View style={styles.crosshair}>
