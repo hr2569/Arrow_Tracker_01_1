@@ -1,12 +1,5 @@
 import { create } from 'zustand';
 
-interface TargetData {
-  corners: any[];
-  center: { x: number; y: number };
-  radius: number;
-  confidence: number;
-}
-
 interface RoundData {
   shots: Array<{ x: number; y: number; ring: number }>;
   total: number;
