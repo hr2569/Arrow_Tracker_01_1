@@ -183,8 +183,8 @@ export default function TargetCropScreen() {
       if (data.success && data.cropped_image) {
         // Update the captured image with the cropped version
         setCapturedImage(data.cropped_image);
-        // Navigate to alignment screen for arrow detection
-        router.push('/alignment');
+        // Navigate directly to scoring screen (combined arrow detection + scoring)
+        router.push('/scoring');
       } else {
         Alert.alert('Error', data.message || 'Failed to crop image');
       }
@@ -197,8 +197,8 @@ export default function TargetCropScreen() {
   };
 
   const handleSkipCrop = () => {
-    // Skip cropping and go directly to alignment
-    router.push('/alignment');
+    // Skip cropping and go directly to scoring
+    router.push('/scoring');
   };
 
   const handleRetake = () => {
