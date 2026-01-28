@@ -101,14 +101,9 @@ export default function SessionSetupScreen() {
     setSessionDistance(`${distance}${distanceUnit}`);
     setTargetType(selectedTargetType);
     
-    // Navigate based on scoring method
-    if (scoringMethod === 'photo') {
-      setManualMode(false);
-      router.push('/capture');
-    } else {
-      setManualMode(true);
-      router.push('/scoring');
-    }
+    // Always use manual scoring mode
+    setManualMode(true);
+    router.push('/scoring');
   };
 
   const navigateToAddBow = () => {
