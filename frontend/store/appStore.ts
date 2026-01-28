@@ -121,26 +121,6 @@ interface AppState {
   addSessionRound: (round: SessionRoundData) => void;
   clearSessionRounds: () => void;
 
-  // Current image being processed
-  currentImage: string | null;
-  setCurrentImage: (image: string | null) => void;
-
-  // Captured image for AI detection
-  capturedImage: string | null;
-  setCapturedImage: (image: string | null) => void;
-
-  // Detected arrows from AI
-  detectedArrows: Array<{ x: number; y: number; ring: number; confidence: number }>;
-  setDetectedArrows: (arrows: Array<{ x: number; y: number; ring: number; confidence: number }>) => void;
-
-  // Target detection data
-  targetData: TargetData | null;
-  setTargetData: (data: TargetData | null) => void;
-
-  // Manual mode flag - skips AI detection
-  manualMode: boolean;
-  setManualMode: (mode: boolean) => void;
-
   // Current round data
   currentRound: RoundData | null;
   setCurrentRound: (round: RoundData | null) => void;
