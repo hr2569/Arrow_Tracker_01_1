@@ -56,7 +56,7 @@ fun SettingsScreen(
             
             // Version info
             Text(
-                text = "Archery Scorer v1.0.0",
+                text = "Archery Tracker v1.0.0",
                 fontSize = 13.sp,
                 color = DarkOnSurfaceVariant,
                 modifier = Modifier.align(Alignment.CenterHorizontally)

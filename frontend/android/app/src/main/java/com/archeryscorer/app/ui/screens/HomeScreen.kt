@@ -44,7 +44,7 @@ fun HomeScreen(
                     color = Color.White
                 )
                 Text(
-                    text = "Scorer",
+                    text = "Tracker",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = Primary

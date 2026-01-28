@@ -1,4 +1,4 @@
-# Archery Scorer - Native Android App
+# Archery Tracker - Native Android App
 
 ## Overview
 
