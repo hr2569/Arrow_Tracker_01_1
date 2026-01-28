@@ -684,6 +684,13 @@ const styles = StyleSheet.create({
   bowIconContainerSelected: {
     backgroundColor: '#8B0000',
   },
+  bowIconImage: {
+    width: 36,
+    height: 36,
+  },
+  bowIconImageSelected: {
+    tintColor: '#fff',
+  },
   bowName: {
     fontSize: 16,
     fontWeight: 'bold',
