@@ -63,14 +63,6 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
-          name="sessionType" 
-          options={{ 
-            title: 'New Session',
-            headerBackTitle: 'Back',
-            headerLeft: () => <HeaderBackButton />,
-          }} 
-        />
-        <Stack.Screen 
           name="scoring" 
           options={{ 
             title: 'Score Arrows',
