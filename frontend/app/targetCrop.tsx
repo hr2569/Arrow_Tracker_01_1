@@ -483,8 +483,44 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  overlayToggle: {
+    padding: 8,
+  },
   retryButton: {
     padding: 8,
+  },
+  scaleControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#111',
+    gap: 10,
+  },
+  scaleLabel: {
+    fontSize: 12,
+    color: '#888',
+  },
+  scaleBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scaleValue: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#fff',
+    width: 40,
+    textAlign: 'center',
   },
   instructionBar: {
     flexDirection: 'row',
@@ -523,6 +559,30 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: '#666',
+  },
+  ringOverlayContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  crosshair: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  crosshairH: {
+    position: 'absolute',
+    width: 20,
+    height: 2,
+    backgroundColor: '#8B0000',
+  },
+  crosshairV: {
+    position: 'absolute',
+    width: 2,
+    height: 20,
+    backgroundColor: '#8B0000',
   },
   svgOverlay: {
     ...StyleSheet.absoluteFillObject,
