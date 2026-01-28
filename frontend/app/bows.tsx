@@ -175,31 +175,15 @@ export default function BowsScreen() {
     );
   };
 
-  const getBowIcon = (bowType: string): { type: 'ionicon' | 'image'; value: any } => {
-    switch (bowType.toLowerCase()) {
-      case 'compound':
-        return { type: 'image', value: compoundIcon };
-      case 'longbow':
-        return { type: 'image', value: longbowIcon };
-      case 'recurve':
-        return { type: 'image', value: recurveIcon };
-      default:
-        return { type: 'image', value: otherIcon };
-    }
-  };
-
   const renderBowIcon = (bowType: string) => {
     const icon = getBowIcon(bowType);
-    if (icon.type === 'image') {
-      return (
-        <Image 
-          source={icon.value} 
-          style={styles.bowImage} 
-          resizeMode="contain"
-        />
-      );
-    }
-    return <Ionicons name={icon.value as any} size={28} color="#8B0000" />;
+    return (
+      <Image 
+        source={icon.value} 
+        style={styles.bowImage} 
+        resizeMode="contain"
+      />
+    );
   };
 
   const renderBowCard = (bow: Bow) => (
