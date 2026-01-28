@@ -9,786 +9,442 @@ import {
   Image,
   ScrollView,
   Pressable,
-  Platform,
+  TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
-import axios from 'axios';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.5);
-
-// Zoom levels
-const ZOOM_LEVELS = [1, 1.5, 2, 2.5];
+const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 32, SCREEN_HEIGHT * 0.45);
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Ring colors for WA Standard target (index 0 = ring 1, index 9 = ring 10)
-const RING_COLORS = [
-  '#e8e8e8', // 1 - White outer
-  '#e8e8e8', // 2 - White inner
-  '#2a2a2a', // 3 - Black outer
-  '#2a2a2a', // 4 - Black inner
-  '#4169E1', // 5 - Blue outer
-  '#4169E1', // 6 - Blue inner
-  '#DC143C', // 7 - Red outer
-  '#DC143C', // 8 - Red inner
-  '#FFD700', // 9 - Gold outer
-  '#FFD700', // 10 - Gold inner/center
-];
-
-// Ring colors for different target types
-const getTargetRingColors = (targetType: string): string[] => {
-  switch (targetType) {
-    case 'vegas_3spot':
-      return [
-        '#00a2e8', // 7 - Blue outer
-        '#00a2e8', // 8 - Blue
-        '#00a2e8', // 9 - Blue
-        '#FFD700', // 10 - Gold
-        '#FFD700', // X - Gold center
-      ];
-    case 'nfaa_indoor':
-      return [
-        '#f5f5f0', // 1 - White outer
-        '#f5f5f0', // 2 - White
-        '#00a2e8', // 3 - Blue
-        '#00a2e8', // 4 - Blue
-        '#f5f5f0', // 5/X - White center
-      ];
-    default: // wa_standard
-      return RING_COLORS;
-  }
-};
+// Competition mode constants
+const COMPETITION_ARROWS_PER_ROUND = 3;
 
 interface Arrow {
   id: string;
   x: number;
   y: number;
   ring: number;
-  confirmed: boolean;
+  confidence?: number;
 }
 
 export default function ScoringScreen() {
   const router = useRouter();
-  const { currentImage, targetData, setCurrentRound, manualMode, sessionType, currentRoundNumber, targetType } = useAppStore();
+  const { 
+    currentImage, 
+    capturedImage,
+    setCurrentRound, 
+    manualMode, 
+    sessionType, 
+    currentRoundNumber, 
+    targetType,
+    detectedArrows,
+    setDetectedArrows,
+  } = useAppStore();
+  
   const [isDetecting, setIsDetecting] = useState(false);
   const [arrows, setArrows] = useState<Arrow[]>([]);
-  const [selectedArrow, setSelectedArrow] = useState<string | null>(null);
-  const [showTargetOverlay, setShowTargetOverlay] = useState(!manualMode);
-  const [error, setError] = useState<string | null>(null);
-  const [targetLayout, setTargetLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
-  const [zoomIndex, setZoomIndex] = useState(0); // Index into ZOOM_LEVELS
-  const scrollViewRef = useRef<ScrollView>(null);
+  const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
+  const [showScorePicker, setShowScorePicker] = useState(false);
+  const [targetLayout, setTargetLayout] = useState<{ width: number; height: number } | null>(null);
+  const [showOverlay, setShowOverlay] = useState(true);
+
+  // Get the image to display (prefer currentImage, fallback to capturedImage)
+  const displayImage = currentImage || capturedImage;
 
   // Get target configuration
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
-  const ringColors = getTargetRingColors(targetType);
 
   // Session info
   const isCompetition = sessionType === 'competition';
   const MAX_ROUNDS = 10;
 
-  // Current zoom level and target size
-  const zoomLevel = ZOOM_LEVELS[zoomIndex];
-  const TARGET_SIZE = BASE_TARGET_SIZE * zoomLevel;
-
-  // Get center and radius from targetData or use defaults
-  const centerX = targetData?.center?.x ?? 0.5;
-  const centerY = targetData?.center?.y ?? 0.5;
-  const radius = targetData?.radius ?? 0.45;
-
+  // Initialize with detected arrows from AI if available
   useEffect(() => {
-    if (currentImage) {
-      // Only auto-detect arrows if not in manual mode
-      if (!manualMode) {
-        detectArrows();
-      }
-    } else if (!manualMode) {
-      // Only show error if not in manual mode (manual mode doesn't need an image)
-      setError('No image available. Please go back and capture an image.');
+    if (detectedArrows && detectedArrows.length > 0 && arrows.length === 0) {
+      const initialArrows = detectedArrows.map((arrow, index) => ({
+        id: `arrow-${index}-${Date.now()}`,
+        x: arrow.x,
+        y: arrow.y,
+        ring: arrow.ring,
+        confidence: arrow.confidence,
+      }));
+      setArrows(initialArrows);
     }
-  }, []);
+  }, [detectedArrows]);
+
+  // Auto-detect arrows if in photo mode and no arrows yet
+  useEffect(() => {
+    if (!manualMode && displayImage && arrows.length === 0 && detectedArrows.length === 0) {
+      detectArrows();
+    }
+  }, [displayImage, manualMode]);
 
   const detectArrows = async () => {
-    if (!currentImage) return;
+    if (!displayImage) return;
 
     setIsDetecting(true);
-    setError(null);
-    
     try {
-      const response = await axios.post(`${API_URL}/api/detect-arrows`, {
-        image_base64: currentImage,
+      const response = await fetch(`${API_URL}/api/detect-arrows`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_base64: displayImage }),
       });
 
-      if (response.data.success && response.data.arrows?.length > 0) {
-        const detectedArrows = response.data.arrows.map((arrow: any, index: number) => ({
-          id: `arrow-${index}`,
-          x: arrow.x,
-          y: arrow.y,
-          ring: arrow.ring || calculateRingFromPosition(arrow.x, arrow.y),
-          confirmed: false,
-        }));
-        setArrows(detectedArrows);
-      } else {
-        Alert.alert(
-          'No Arrows Detected',
-          'Tap on the target to mark arrow positions manually.',
-          [{ text: 'OK' }]
-        );
+      if (response.ok) {
+        const data = await response.json();
+        if (data.arrows && data.arrows.length > 0) {
+          const detectedList = data.arrows.map((arrow: any, index: number) => ({
+            id: `arrow-${index}-${Date.now()}`,
+            x: arrow.x,
+            y: arrow.y,
+            ring: arrow.ring,
+            confidence: arrow.confidence,
+          }));
+          setArrows(detectedList);
+          setDetectedArrows(data.arrows);
+        }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Arrow detection error:', err);
-      setError('Failed to detect arrows. You can add them manually.');
     } finally {
       setIsDetecting(false);
     }
   };
 
-  // Define spot centers for multi-spot targets (normalized 0-1 coordinates)
-  const getSpotCenters = () => {
-    if (targetConfig.layout === 'triple_triangle') {
-      // Vegas 3-Spot: 1 on top, 2 on bottom (inverted triangle)
-      // Spots are 42% of the target size, positioned within the square
-      return [
-        { x: 0.5, y: 0.28 },   // Top center
-        { x: 0.29, y: 0.72 },  // Bottom left
-        { x: 0.71, y: 0.72 },  // Bottom right
-      ];
-    } else if (targetConfig.layout === 'triple_vertical') {
-      // NFAA Indoor: 3 vertical spots
-      return [
-        { x: 0.5, y: 0.17 },   // Top
-        { x: 0.5, y: 0.5 },    // Middle
-        { x: 0.5, y: 0.83 },   // Bottom
-      ];
-    }
-    // Single target - use the center from targetData
-    return [{ x: centerX, y: centerY }];
-  };
-
-  // Spot radius relative to target size (each spot is roughly 42% of target for Vegas, 30% for NFAA)
-  const spotRadius = targetConfig.layout === 'triple_triangle' ? 0.19 
-    : targetConfig.layout === 'triple_vertical' ? 0.14 
-    : (radius > 0.1 ? radius : 0.45);
-
   const calculateRingFromPosition = (x: number, y: number): number => {
-    const spotCenters = getSpotCenters();
+    // Calculate distance from center (0.5, 0.5)
+    const dx = x - 0.5;
+    const dy = y - 0.5;
+    const distance = Math.sqrt(dx * dx + dy * dy);
     
-    // Find the closest spot center
-    let closestSpot = spotCenters[0];
-    let minDistance = Infinity;
+    // Map distance to ring (0.5 is edge of target)
+    const normalizedDist = distance / 0.45;
     
-    for (const spot of spotCenters) {
-      const dist = Math.sqrt((x - spot.x) ** 2 + (y - spot.y) ** 2);
-      if (dist < minDistance) {
-        minDistance = dist;
-        closestSpot = spot;
-      }
-    }
-    
-    // Calculate distance from closest spot center
-    const normalizedDistance = minDistance / spotRadius;
-    
-    // If outside the target radius, it's a miss
-    if (normalizedDistance > 1.15) return 0;
-    
-    // Get number of rings for this target type
-    const numRings = targetConfig.rings;
-    
-    // Calculate which ring based on distance (each ring is 1/numRings of the radius)
-    // ringFromCenter: 1 = innermost, numRings = outermost
-    const ringFromCenter = Math.ceil(normalizedDistance * numRings);
-    
-    // Convert to array index (0 = outermost ring, numRings-1 = center)
-    const ringIndex = numRings - ringFromCenter;
-    
-    // Clamp and return score
-    if (ringIndex >= numRings) return targetConfig.scores[numRings - 1]; // Dead center
-    if (ringIndex < 0) return 0; // Miss
-    
-    return targetConfig.scores[Math.max(0, Math.min(ringIndex, numRings - 1))];
+    if (normalizedDist > 1.1) return 0; // Miss
+    if (normalizedDist > 1.0) return 1;
+    if (normalizedDist > 0.9) return 2;
+    if (normalizedDist > 0.8) return 3;
+    if (normalizedDist > 0.7) return 4;
+    if (normalizedDist > 0.6) return 5;
+    if (normalizedDist > 0.5) return 6;
+    if (normalizedDist > 0.4) return 7;
+    if (normalizedDist > 0.3) return 8;
+    if (normalizedDist > 0.15) return 9;
+    return 10;
   };
-
-  // Competition mode arrow limit
-  const COMPETITION_ARROWS_PER_ROUND = 3;
-  const maxArrowsReached = isCompetition && arrows.length >= COMPETITION_ARROWS_PER_ROUND;
 
   const handleTargetPress = (event: any) => {
-    // Prevent default to ensure the event is captured
-    event.persist?.();
-    
-    // In competition mode, prevent adding more than 3 arrows
-    if (maxArrowsReached) {
-      Alert.alert(
-        'Arrow Limit Reached',
-        'Competition rounds are limited to 3 arrows. Finish this round to continue.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
+    if (!targetLayout) return;
 
-    // Get coordinates from the event - try multiple approaches
-    let x: number | undefined;
-    let y: number | undefined;
+    const { locationX, locationY } = event.nativeEvent;
     
-    const nativeEvent = event.nativeEvent;
+    // Normalize coordinates to 0-1 range
+    const x = Math.max(0, Math.min(1, locationX / targetLayout.width));
+    const y = Math.max(0, Math.min(1, locationY / targetLayout.height));
     
-    // Debug log to help diagnose issues
-    console.log('Touch event received:', {
-      locationX: nativeEvent.locationX,
-      locationY: nativeEvent.locationY,
-      pageX: nativeEvent.pageX,
-      pageY: nativeEvent.pageY,
-      offsetX: nativeEvent.offsetX,
-      offsetY: nativeEvent.offsetY,
-      targetLayout,
-      TARGET_SIZE,
-    });
+    const ring = calculateRingFromPosition(x, y);
     
-    // Method 1: Use locationX/locationY (most reliable on React Native)
-    if (typeof nativeEvent.locationX === 'number' && typeof nativeEvent.locationY === 'number') {
-      x = nativeEvent.locationX / TARGET_SIZE;
-      y = nativeEvent.locationY / TARGET_SIZE;
-      console.log('Using locationX/Y:', x, y);
-    }
-    // Method 2: Use offsetX/offsetY (works on web)
-    else if (typeof nativeEvent.offsetX === 'number' && typeof nativeEvent.offsetY === 'number') {
-      x = nativeEvent.offsetX / TARGET_SIZE;
-      y = nativeEvent.offsetY / TARGET_SIZE;
-      console.log('Using offsetX/Y:', x, y);
-    }
-    // Method 3: Fallback using pageX/pageY with measured layout
-    else if (targetLayout && typeof nativeEvent.pageX === 'number' && typeof nativeEvent.pageY === 'number') {
-      x = (nativeEvent.pageX - targetLayout.x) / targetLayout.width;
-      y = (nativeEvent.pageY - targetLayout.y) / targetLayout.height;
-      console.log('Using pageX/Y with layout:', x, y);
-    }
-    
-    // Validate coordinates
-    if (typeof x !== 'number' || typeof y !== 'number' || isNaN(x) || isNaN(y)) {
-      console.log('Could not determine valid click position');
-      Alert.alert('Touch Error', 'Could not register the touch. Please try again.');
-      return;
-    }
-
-    // Clamp values to valid range
-    const clampedX = Math.max(0, Math.min(1, x));
-    const clampedY = Math.max(0, Math.min(1, y));
-
-    console.log('Arrow placed at:', clampedX, clampedY);
-
-    const ring = calculateRingFromPosition(clampedX, clampedY);
-
     const newArrow: Arrow = {
       id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      x: clampedX,
-      y: clampedY,
+      x,
+      y,
       ring,
-      confirmed: true,
+      confidence: 1.0,
     };
 
     setArrows(prev => [...prev, newArrow]);
   };
 
-  const handleTargetLayout = (event: any) => {
-    const { x, y, width, height } = event.nativeEvent.layout;
-    // Store layout directly from the event
-    const layout = { 
-      x: x ?? 0, 
-      y: y ?? 0, 
-      width: width || TARGET_SIZE, 
-      height: height || TARGET_SIZE 
-    };
-    console.log('Target layout:', layout);
-    setTargetLayout(layout);
+  const handleEditArrow = (index: number) => {
+    setSelectedArrowIndex(index);
+    setShowScorePicker(true);
   };
 
-  const handleArrowPress = (arrowId: string) => {
-    setSelectedArrow(selectedArrow === arrowId ? null : arrowId);
-  };
-
-  const removeArrow = (arrowId: string) => {
-    setArrows(arrows.filter(a => a.id !== arrowId));
-    setSelectedArrow(null);
-  };
-
-  const confirmArrow = (arrowId: string) => {
-    setArrows(arrows.map(a => 
-      a.id === arrowId ? { ...a, confirmed: true } : a
-    ));
-    setSelectedArrow(null);
-  };
-
-  const confirmAllArrows = () => {
-    setArrows(arrows.map(a => ({ ...a, confirmed: true })));
-  };
-
-  const getTotalScore = () => {
-    return arrows.reduce((sum, arrow) => sum + arrow.ring, 0);
-  };
-
-  // Zoom controls
-  const zoomIn = () => {
-    if (zoomIndex < ZOOM_LEVELS.length - 1) {
-      setZoomIndex(zoomIndex + 1);
+  const handleUpdateScore = (newScore: number) => {
+    if (selectedArrowIndex !== null) {
+      const updated = [...arrows];
+      updated[selectedArrowIndex] = {
+        ...updated[selectedArrowIndex],
+        ring: newScore,
+        confidence: 1.0,
+      };
+      setArrows(updated);
     }
+    setShowScorePicker(false);
+    setSelectedArrowIndex(null);
   };
 
-  const zoomOut = () => {
-    if (zoomIndex > 0) {
-      setZoomIndex(zoomIndex - 1);
-    }
+  const handleDeleteArrow = (index: number) => {
+    setArrows(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const getTotalScore = () => arrows.reduce((sum, a) => sum + a.ring, 0);
+
+  const getScoreColor = (score: number) => {
+    if (score >= 9) return '#FFD700';
+    if (score >= 7) return '#ed1c24';
+    if (score >= 5) return '#00a2e8';
+    if (score >= 3) return '#2a2a2a';
+    return '#f5f5f0';
+  };
+
+  const getScoreTextColor = (score: number) => {
+    if (score >= 9) return '#000';
+    if (score >= 3 && score < 5) return '#fff';
+    if (score < 3) return '#000';
+    return '#fff';
   };
 
   const handleFinishRound = () => {
-    // Competition mode requires exactly 3 arrows per round
-    // Training mode has no restrictions
+    if (arrows.length === 0) {
+      Alert.alert('No Arrows', 'Please mark at least one arrow before finishing.');
+      return;
+    }
+
     if (isCompetition && arrows.length < COMPETITION_ARROWS_PER_ROUND) {
       Alert.alert(
-        `${COMPETITION_ARROWS_PER_ROUND} Arrows Required`,
-        `Competition rounds require ${COMPETITION_ARROWS_PER_ROUND} arrows. You have ${arrows.length} arrow(s) marked. Add more or confirm with ${COMPETITION_ARROWS_PER_ROUND - arrows.length} miss(es)?`,
+        'Add More Arrows?',
+        `Competition rounds typically have ${COMPETITION_ARROWS_PER_ROUND} arrows. Continue with ${arrows.length}?`,
         [
           { text: 'Add More', style: 'cancel' },
-          {
-            text: 'Confirm with Misses',
-            onPress: () => finishRound(true),
-          },
+          { text: 'Continue', onPress: finishRound },
         ]
       );
-    } else if (arrows.length === 0) {
-      Alert.alert(
-        'No Arrows',
-        'Please mark at least one arrow before finishing the round.',
-        [{ text: 'OK' }]
-      );
     } else {
-      finishRound(false);
+      finishRound();
     }
   };
 
-  const finishRound = (addMisses: boolean) => {
-    let finalArrows = [...arrows];
-    
-    // Only add misses for competition mode
-    if (addMisses && isCompetition) {
-      while (finalArrows.length < COMPETITION_ARROWS_PER_ROUND) {
-        finalArrows.push({
-          id: `miss-${Date.now()}-${finalArrows.length}`,
-          x: 0,
-          y: 0,
-          ring: 0,
-          confirmed: true,
-        });
-      }
-    }
-
+  const finishRound = () => {
     setCurrentRound({
-      shots: finalArrows.map(a => ({
-        x: a.x,
-        y: a.y,
-        ring: a.ring,
-      })),
-      total: finalArrows.reduce((sum, a) => sum + a.ring, 0),
+      shots: arrows.map(a => ({ x: a.x, y: a.y, ring: a.ring })),
+      total: getTotalScore(),
     });
-
     router.push('/summary');
   };
 
-  // Calculate overlay position and size
-  const overlaySize = TARGET_SIZE * radius * 2;
-  const overlayLeft = centerX * TARGET_SIZE - overlaySize / 2;
-  const overlayTop = centerY * TARGET_SIZE - overlaySize / 2;
+  const handleRetake = () => {
+    router.back();
+  };
+
+  // Render ring overlay
+  const renderRingOverlay = () => {
+    const rings = targetConfig.rings;
+    const ringElements = [];
+    
+    for (let i = 0; i < rings; i++) {
+      const size = BASE_TARGET_SIZE * (1 - (i * 0.09));
+      const color = targetConfig.colors[i];
+      ringElements.push(
+        <View
+          key={`ring-${i}`}
+          style={[
+            styles.ring,
+            {
+              width: size,
+              height: size,
+              borderRadius: size / 2,
+              borderColor: color?.border || '#333',
+              backgroundColor: showOverlay && !displayImage ? color?.bg : 'transparent',
+            },
+          ]}
+        />
+      );
+    }
+    return ringElements;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header with Round Info and Zoom Controls */}
-      <View style={styles.zoomControlsContainer}>
-        {/* Round Badge */}
-        <View style={[styles.roundBadge, isCompetition ? styles.competitionRoundBadge : styles.trainingRoundBadge]}>
-          <Ionicons 
-            name={isCompetition ? "trophy" : "fitness"} 
-            size={14} 
-            color={isCompetition ? "#FFD700" : "#ff4444"} 
-          />
-          <Text style={[styles.roundBadgeText, isCompetition ? styles.competitionRoundText : styles.trainingRoundText]}>
-            {isCompetition 
-              ? `Round ${currentRoundNumber}/${MAX_ROUNDS}`
-              : `Round ${currentRoundNumber}`
-            }
-          </Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={handleRetake}>
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>Score Arrows</Text>
+          <View style={[styles.roundBadge, isCompetition ? styles.competitionBadge : styles.trainingBadge]}>
+            <Ionicons name={isCompetition ? "trophy" : "fitness"} size={12} color={isCompetition ? "#FFD700" : "#ff4444"} />
+            <Text style={styles.roundText}>Round {currentRoundNumber}</Text>
+          </View>
         </View>
-        
-        <View style={styles.zoomControls}>
-          <Pressable
-            style={[styles.zoomButton, zoomIndex === 0 && styles.zoomButtonDisabled]}
-            onPress={zoomOut}
-            disabled={zoomIndex === 0}
-          >
-            <Ionicons name="remove" size={24} color={zoomIndex === 0 ? '#666' : '#fff'} />
-          </Pressable>
-          <Text style={styles.zoomText}>{Math.round(zoomLevel * 100)}%</Text>
-          <Pressable
-            style={[styles.zoomButton, zoomIndex === ZOOM_LEVELS.length - 1 && styles.zoomButtonDisabled]}
-            onPress={zoomIn}
-            disabled={zoomIndex === ZOOM_LEVELS.length - 1}
-          >
-            <Ionicons name="add" size={24} color={zoomIndex === ZOOM_LEVELS.length - 1 ? '#666' : '#fff'} />
-          </Pressable>
-        </View>
-        <Text style={styles.zoomHint}>Use +/- to zoom for precise placement</Text>
+        <TouchableOpacity 
+          style={styles.overlayToggle} 
+          onPress={() => setShowOverlay(!showOverlay)}
+        >
+          <Ionicons name={showOverlay ? "eye" : "eye-off"} size={24} color="#8B0000" />
+        </TouchableOpacity>
       </View>
 
-      <ScrollView 
-        ref={scrollViewRef}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={true}
-      >
-        {/* Target wrapper - centers the target */}
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {/* Target Area */}
         <View style={styles.targetWrapper}>
-          {/* Single scroll container for zoomed target - horizontal scroll only when zoomed */}
-          <ScrollView 
-            horizontal={true}
-            contentContainerStyle={[
-              styles.targetScrollContent,
-              { minHeight: zoomLevel > 1 ? TARGET_SIZE + 40 : undefined }
-            ]}
-            showsHorizontalScrollIndicator={zoomLevel > 1}
-            scrollEnabled={zoomLevel > 1}
+          <Pressable
+            style={[styles.targetContainer, { width: BASE_TARGET_SIZE, height: BASE_TARGET_SIZE }]}
+            onLayout={(e) => setTargetLayout({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
+            onPress={handleTargetPress}
           >
-            {/* Target Area - Pressable wraps the entire target for reliable touch capture */}
-            <Pressable
-              style={[styles.targetContainer, { width: TARGET_SIZE, height: TARGET_SIZE }]}
-              onLayout={handleTargetLayout}
-              onPress={handleTargetPress}
-            >
-              {/* Background Image - Only show if NOT manual mode */}
-              {!manualMode && currentImage ? (
-                <Image
-                  source={{ uri: currentImage }}
-                  style={[styles.targetImage, { width: TARGET_SIZE, height: TARGET_SIZE }]}
-                  resizeMode="cover"
-                  pointerEvents="none"
-                />
-              ) : null}
+            {/* Background Image */}
+            {displayImage && (
+              <Image
+                source={{ uri: displayImage }}
+                style={[styles.targetImage, { width: BASE_TARGET_SIZE, height: BASE_TARGET_SIZE }]}
+                resizeMode="cover"
+                pointerEvents="none"
+              />
+            )}
 
-              {/* Built-in Target Rings - Always show in manual mode, optional overlay otherwise */}
-              {(manualMode || showTargetOverlay) && (
-                <View 
-                  pointerEvents="none"
-                  style={[
-                    styles.targetOverlay,
-                    {
-                      width: TARGET_SIZE,
-                      height: TARGET_SIZE,
-                      left: 0,
-                      top: 0,
-                    },
-                  ]}
-                >
-                  {/* Render based on target layout type */}
-                  {targetConfig.layout === 'triple_triangle' ? (
-                    // Vegas 3-Spot: Inverted triangle arrangement (1 on top, 2 on bottom)
-                    <View style={styles.tripleTargetLayout}>
-                      {/* Top row - 1 target centered */}
-                      <View style={styles.tripleTopRow}>
-                        <View style={[styles.spotTarget, { width: TARGET_SIZE * 0.42, height: TARGET_SIZE * 0.42 }]}>
-                          {targetConfig.colors.map((color, i) => {
-                            const numRings = targetConfig.colors.length;
-                            const ringSize = TARGET_SIZE * 0.42 * 0.95 * ((numRings - i) / numRings);
-                            return (
-                              <View
-                                key={`ring-top-${i}`}
-                                style={[
-                                  styles.ring,
-                                  {
-                                    width: ringSize,
-                                    height: ringSize,
-                                    borderRadius: ringSize / 2,
-                                    backgroundColor: manualMode ? color.bg : 'transparent',
-                                    borderColor: manualMode ? color.border : `${color.bg}99`,
-                                    borderWidth: manualMode ? 1 : 1.5,
-                                  },
-                                ]}
-                              />
-                            );
-                          })}
-                          <View style={styles.centerMark}>
-                            <View style={[styles.centerLine, { width: 8 }]} />
-                            <View style={[styles.centerLine, styles.centerLineVertical, { height: 8 }]} />
-                          </View>
-                        </View>
-                      </View>
-                      {/* Bottom row - 2 targets */}
-                      <View style={styles.tripleBottomRow}>
-                        {[0, 1].map((spotIndex) => (
-                          <View key={`spot-${spotIndex}`} style={[styles.spotTarget, { width: TARGET_SIZE * 0.42, height: TARGET_SIZE * 0.42 }]}>
-                            {targetConfig.colors.map((color, i) => {
-                              const numRings = targetConfig.colors.length;
-                              const ringSize = TARGET_SIZE * 0.42 * 0.95 * ((numRings - i) / numRings);
-                              return (
-                                <View
-                                  key={`ring-${spotIndex}-${i}`}
-                                  style={[
-                                    styles.ring,
-                                    {
-                                      width: ringSize,
-                                      height: ringSize,
-                                      borderRadius: ringSize / 2,
-                                      backgroundColor: manualMode ? color.bg : 'transparent',
-                                      borderColor: manualMode ? color.border : `${color.bg}99`,
-                                      borderWidth: manualMode ? 1 : 1.5,
-                                    },
-                                  ]}
-                                />
-                              );
-                            })}
-                            <View style={styles.centerMark}>
-                              <View style={[styles.centerLine, { width: 8 }]} />
-                              <View style={[styles.centerLine, styles.centerLineVertical, { height: 8 }]} />
-                            </View>
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                  ) : targetConfig.layout === 'triple_vertical' ? (
-                    // NFAA Indoor: Vertical stack (3 targets in a column)
-                    <View style={styles.verticalTargetLayout}>
-                      {[0, 1, 2].map((spotIndex) => (
-                        <View key={`spot-${spotIndex}`} style={[styles.spotTarget, { width: TARGET_SIZE * 0.3, height: TARGET_SIZE * 0.3 }]}>
-                          {targetConfig.colors.map((color, i) => {
-                            const numRings = targetConfig.colors.length;
-                            const ringSize = TARGET_SIZE * 0.3 * 0.95 * ((numRings - i) / numRings);
-                            return (
-                              <View
-                                key={`ring-${spotIndex}-${i}`}
-                                style={[
-                                  styles.ring,
-                                  {
-                                    width: ringSize,
-                                    height: ringSize,
-                                    borderRadius: ringSize / 2,
-                                    backgroundColor: manualMode ? color.bg : 'transparent',
-                                    borderColor: manualMode ? color.border : `${color.bg}99`,
-                                    borderWidth: manualMode ? 1 : 1.5,
-                                  },
-                                ]}
-                              />
-                            );
-                          })}
-                          <View style={styles.centerMark}>
-                            <View style={[styles.centerLine, { width: 6 }]} />
-                            <View style={[styles.centerLine, styles.centerLineVertical, { height: 6 }]} />
-                          </View>
-                        </View>
-                      ))}
-                    </View>
-                  ) : (
-                    // Standard single target
-                    <>
-                      {/* White/Cream background for the target */}
-                      {manualMode && (
-                        <View style={[styles.targetBackground, { width: TARGET_SIZE, height: TARGET_SIZE, borderRadius: TARGET_SIZE / 2 }]} />
-                      )}
-                      
-                      {/* Dynamic ring rendering based on target type */}
-                      {targetConfig.colors.map((color, i) => {
-                        const numRings = targetConfig.colors.length;
-                        const ringSize = TARGET_SIZE * 0.95 * ((numRings - i) / numRings);
-                        return (
-                          <View
-                            key={`ring-${i}`}
-                            style={[
-                              styles.ring,
-                              {
-                                width: ringSize,
-                                height: ringSize,
-                                borderRadius: ringSize / 2,
-                                backgroundColor: manualMode ? color.bg : 'transparent',
-                                borderColor: manualMode ? color.border : `${color.bg}99`,
-                                borderWidth: manualMode ? 1 : 2,
-                              },
-                            ]}
-                          />
-                        );
-                      })}
-                      
-                      {/* Center X mark */}
-                      <View style={styles.centerMark}>
-                        <View style={styles.centerLine} />
-                        <View style={[styles.centerLine, styles.centerLineVertical]} />
-                      </View>
-                    </>
-                  )}
+            {/* Ring Overlay */}
+            {showOverlay && (
+              <View style={[styles.ringOverlay, { width: BASE_TARGET_SIZE, height: BASE_TARGET_SIZE }]} pointerEvents="none">
+                {renderRingOverlay()}
+                {/* Center crosshair */}
+                <View style={styles.crosshair}>
+                  <View style={styles.crosshairH} />
+                  <View style={styles.crosshairV} />
                 </View>
-              )}
+              </View>
+            )}
 
-          {/* Loading Overlay */}
-          {isDetecting && (
-            <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color="#8B0000" />
-              <Text style={styles.loadingText}>Detecting arrows...</Text>
-            </View>
-          )}
+            {/* Arrow Markers */}
+            {arrows.map((arrow, index) => (
+              <TouchableOpacity
+                key={arrow.id}
+                style={[
+                  styles.arrowMarker,
+                  {
+                    left: arrow.x * BASE_TARGET_SIZE - 12,
+                    top: arrow.y * BASE_TARGET_SIZE - 12,
+                    backgroundColor: getScoreColor(arrow.ring),
+                  },
+                ]}
+                onPress={() => handleEditArrow(index)}
+              >
+                <Text style={[styles.arrowMarkerText, { color: getScoreTextColor(arrow.ring) }]}>
+                  {arrow.ring === 10 ? 'X' : arrow.ring}
+                </Text>
+              </TouchableOpacity>
+            ))}
 
-          {/* Arrow Markers rendered on top */}
-          {arrows.map((arrow) => (
-            <Pressable
-              key={arrow.id}
-              style={[
-                styles.arrowMarker,
-                {
-                  left: arrow.x * TARGET_SIZE - 15,
-                  top: arrow.y * TARGET_SIZE - 15,
-                  backgroundColor: ringColors[Math.max(0, Math.min(arrow.ring - 1, ringColors.length - 1))] || '#8B0000',
-                },
-                selectedArrow === arrow.id && styles.selectedArrow,
-                !arrow.confirmed && styles.unconfirmedArrow,
-              ]}
-              onPress={(e) => {
-                e.stopPropagation();
-                handleArrowPress(arrow.id);
-              }}
-            >
-              <Text style={[
-                styles.arrowScore,
-                { color: arrow.ring >= 3 && arrow.ring <= 4 ? '#fff' : '#000' }
-              ]}>
-                {arrow.ring}
-              </Text>
-            </Pressable>
-          ))}
-            </Pressable>
-          </ScrollView>
+            {/* Detection overlay */}
+            {isDetecting && (
+              <View style={styles.detectingOverlay}>
+                <ActivityIndicator size="large" color="#8B0000" />
+                <Text style={styles.detectingText}>Detecting arrows...</Text>
+              </View>
+            )}
+          </Pressable>
+          
+          <Text style={styles.tapHint}>Tap target to add arrows</Text>
         </View>
-        
-        {/* Content below target - outside horizontal scroll */}
-        <View style={styles.contentBelowTarget}>
-
-        {/* Error Message */}
-        {error && (
-          <View style={styles.errorCard}>
-            <Ionicons name="warning" size={20} color="#ff6b6b" />
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
 
         {/* Score Summary */}
         <View style={styles.scoreSummary}>
-          <View style={styles.scoreHeader}>
-            <Text style={styles.scoreLabel}>Current Score</Text>
+          <View style={styles.scoreBox}>
             <Text style={styles.scoreValue}>{getTotalScore()}</Text>
+            <Text style={styles.scoreLabel}>Total</Text>
           </View>
-          <Text style={styles.arrowCount}>
-            {arrows.length} arrow{arrows.length !== 1 ? 's' : ''} marked
-            {isCompetition && (
-              arrows.length < COMPETITION_ARROWS_PER_ROUND 
-                ? ` (${COMPETITION_ARROWS_PER_ROUND - arrows.length} more needed)`
-                : ' ✓ Ready to finish'
-            )}
-          </Text>
+          <View style={styles.scoreDivider} />
+          <View style={styles.scoreBox}>
+            <Text style={styles.scoreValue}>{arrows.length}</Text>
+            <Text style={styles.scoreLabel}>Arrows</Text>
+          </View>
+          <View style={styles.scoreDivider} />
+          <View style={styles.scoreBox}>
+            <Text style={styles.scoreValue}>
+              {arrows.length > 0 ? (getTotalScore() / arrows.length).toFixed(1) : '0'}
+            </Text>
+            <Text style={styles.scoreLabel}>Avg</Text>
+          </View>
         </View>
 
         {/* Arrow List */}
         {arrows.length > 0 && (
           <View style={styles.arrowList}>
-            <View style={styles.listHeader}>
-              <Text style={styles.listTitle}>Arrows</Text>
-              {arrows.some(a => !a.confirmed) && (
-                <Pressable onPress={confirmAllArrows}>
-                  <Text style={styles.confirmAllText}>Confirm All</Text>
-                </Pressable>
-              )}
-            </View>
+            <Text style={styles.sectionTitle}>Arrows</Text>
             {arrows.map((arrow, index) => (
-              <View key={arrow.id} style={styles.arrowItem}>
-                <View style={styles.arrowInfo}>
-                  <Text style={styles.arrowNumber}>#{index + 1}</Text>
-                  <View
-                    style={[
-                      styles.ringIndicator,
-                      { backgroundColor: RING_COLORS[Math.max(0, arrow.ring - 1)] || '#666' },
-                    ]}
-                  />
-                  <Text style={styles.arrowRing}>{arrow.ring} pts</Text>
-                  {!arrow.confirmed && (
-                    <Text style={styles.unconfirmedLabel}>(unconfirmed)</Text>
-                  )}
-                </View>
-                <View style={styles.arrowActions}>
-                  {!arrow.confirmed && (
-                    <Pressable
-                      style={styles.confirmBtn}
-                      onPress={() => confirmArrow(arrow.id)}
-                    >
-                      <Ionicons name="checkmark" size={18} color="#4CAF50" />
-                    </Pressable>
-                  )}
-                  <Pressable
-                    style={styles.removeBtn}
-                    onPress={() => removeArrow(arrow.id)}
-                  >
-                    <Ionicons name="trash" size={18} color="#ff6b6b" />
-                  </Pressable>
-                </View>
+              <View key={arrow.id} style={styles.arrowRow}>
+                <TouchableOpacity style={styles.arrowInfo} onPress={() => handleEditArrow(index)}>
+                  <View style={styles.arrowNumber}>
+                    <Text style={styles.arrowNumberText}>{index + 1}</Text>
+                  </View>
+                  <View style={styles.arrowDetails}>
+                    <Text style={styles.arrowRingText}>Ring {arrow.ring}</Text>
+                    <Text style={styles.arrowConfText}>
+                      {arrow.confidence === 1.0 ? 'Manual' : `${Math.round((arrow.confidence || 0) * 100)}% AI`}
+                    </Text>
+                  </View>
+                  <View style={[styles.arrowScoreBadge, { backgroundColor: getScoreColor(arrow.ring) }]}>
+                    <Text style={[styles.arrowScoreText, { color: getScoreTextColor(arrow.ring) }]}>
+                      {arrow.ring === 10 ? 'X' : arrow.ring}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDeleteArrow(index)}>
+                  <Ionicons name="trash-outline" size={18} color="#FF6B6B" />
+                </TouchableOpacity>
               </View>
             ))}
           </View>
         )}
 
-        {/* Instructions */}
-        <View style={styles.instructions}>
-          <Ionicons name="information-circle" size={20} color="#888888" />
-          <Text style={styles.instructionText}>
-            {manualMode 
-              ? 'Tap on the target to place your arrows. Tap an arrow to select and edit.'
-              : 'Tap on the target to add arrows. Tap an arrow to select it.'}
-          </Text>
-        </View>
-
-        {/* Toggle Overlay - Only show if NOT manual mode (manual mode always shows rings) */}
-        {!manualMode && (
-          <Pressable
-            style={styles.toggleOverlay}
-            onPress={() => setShowTargetOverlay(!showTargetOverlay)}
-          >
-            <Ionicons
-              name={showTargetOverlay ? 'eye' : 'eye-off'}
-              size={20}
-              color="#8B0000"
-            />
-            <Text style={styles.toggleText}>
-              {showTargetOverlay ? 'Hide' : 'Show'} Ring Overlay
-            </Text>
-          </Pressable>
+        {/* Re-detect button for photo mode */}
+        {displayImage && (
+          <TouchableOpacity style={styles.redetectButton} onPress={detectArrows} disabled={isDetecting}>
+            <Ionicons name="refresh" size={20} color="#8B0000" />
+            <Text style={styles.redetectText}>Re-detect with AI</Text>
+          </TouchableOpacity>
         )}
-
-        {/* Re-detect Button - Only show if not in manual mode */}
-        {!manualMode && (
-          <Pressable
-            style={styles.redetectButton}
-            onPress={detectArrows}
-            disabled={isDetecting}
-          >
-            <Ionicons name="scan" size={20} color="#8B0000" />
-            <Text style={styles.redetectText}>Re-detect Arrows</Text>
-          </Pressable>
-        )}
-
-        {/* Action Buttons */}
-        <View style={styles.buttonContainer}>
-          <Pressable
-            style={styles.primaryButton}
-            onPress={handleFinishRound}
-          >
-            <Text style={styles.primaryButtonText}>Finish Round</Text>
-            <Ionicons name="checkmark-circle" size={20} color="#fff" />
-          </Pressable>
-        </View>
-        </View>
       </ScrollView>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.secondaryButton} onPress={handleRetake}>
+          <Ionicons name="arrow-back" size={20} color="#8B0000" />
+          <Text style={styles.secondaryButtonText}>Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.primaryButton, arrows.length === 0 && styles.buttonDisabled]} 
+          onPress={handleFinishRound}
+          disabled={arrows.length === 0}
+        >
+          <Ionicons name="checkmark" size={20} color="#fff" />
+          <Text style={styles.primaryButtonText}>Finish Round</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Score Picker Modal */}
+      <Modal visible={showScorePicker} transparent animationType="slide">
+        <Pressable style={styles.modalOverlay} onPress={() => setShowScorePicker(false)}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Score</Text>
+              <TouchableOpacity onPress={() => setShowScorePicker(false)}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.scoreGrid}>
+              {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((score) => (
+                <TouchableOpacity
+                  key={score}
+                  style={[styles.scoreOption, { backgroundColor: getScoreColor(score) }]}
+                  onPress={() => handleUpdateScore(score)}
+                >
+                  <Text style={[styles.scoreOptionText, { color: getScoreTextColor(score) }]}>
+                    {score === 10 ? 'X' : score}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -796,380 +452,334 @@ export default function ScoringScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#000',
   },
-  zoomControlsContainer: {
-    backgroundColor: '#111111',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#333333',
+    borderBottomColor: '#222',
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerCenter: {
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   roundBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    marginBottom: 10,
-    gap: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginTop: 4,
+    gap: 4,
   },
-  competitionRoundBadge: {
-    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+  competitionBadge: {
+    backgroundColor: 'rgba(255, 215, 0, 0.2)',
   },
-  trainingRoundBadge: {
-    backgroundColor: 'rgba(139, 0, 0, 0.3)',
+  trainingBadge: {
+    backgroundColor: 'rgba(255, 68, 68, 0.2)',
   },
-  roundBadgeText: {
-    fontSize: 14,
-    fontWeight: '600',
+  roundText: {
+    fontSize: 11,
+    color: '#888',
   },
-  competitionRoundText: {
-    color: '#FFD700',
+  overlayToggle: {
+    padding: 8,
   },
-  trainingRoundText: {
-    color: '#ff4444',
-  },
-  zoomControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  zoomButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#8B0000',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  zoomButtonDisabled: {
-    backgroundColor: '#333333',
-  },
-  zoomText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    minWidth: 60,
-    textAlign: 'center',
-  },
-  zoomHint: {
-    color: '#666',
-    fontSize: 12,
-    marginTop: 6,
+  scrollView: {
+    flex: 1,
   },
   scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    paddingBottom: 40,
+    padding: 16,
   },
   targetWrapper: {
     alignItems: 'center',
-    width: '100%',
-  },
-  targetScrollContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  contentBelowTarget: {
-    paddingHorizontal: 0,
-    paddingTop: 16,
+    marginBottom: 16,
   },
   targetContainer: {
-    backgroundColor: '#111111',
+    backgroundColor: '#111',
     borderRadius: 16,
-    alignSelf: 'center',
+    overflow: 'hidden',
     position: 'relative',
-    overflow: 'visible',
   },
   targetImage: {
     position: 'absolute',
+    top: 0,
+    left: 0,
   },
-  noImageContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noImageText: {
-    color: '#666',
-    marginTop: 8,
-  },
-  targetOverlay: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tripleTargetLayout: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tripleTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  tripleBottomRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  verticalTargetLayout: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-    paddingVertical: 10,
-  },
-  spotTarget: {
-    borderRadius: 1000,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f0',
-    overflow: 'hidden',
-  },
-  targetBackground: {
-    position: 'absolute',
-    backgroundColor: '#f5f5f0',
-  },
-  ring: {
-    position: 'absolute',
-    borderStyle: 'solid',
-  },
-  centerMark: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerLine: {
-    position: 'absolute',
-    width: 16,
-    height: 2,
-    backgroundColor: '#333',
-  },
-  centerLineVertical: {
-    transform: [{ rotate: '90deg' }],
-  },
-  centerDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#FFD700',
-    position: 'absolute',
-  },
-  arrowMarker: {
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  selectedArrow: {
-    borderColor: '#00ff00',
-    borderWidth: 3,
-    transform: [{ scale: 1.2 }],
-  },
-  unconfirmedArrow: {
-    opacity: 0.7,
-  },
-  arrowScore: {
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  loadingOverlay: {
+  ringOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 16,
-  },
-  loadingText: {
-    color: '#fff',
-    marginTop: 12,
-    fontSize: 16,
-  },
-  errorCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,107,107,0.1)',
-    borderRadius: 8,
-    padding: 12,
-    marginTop: 16,
-    gap: 8,
-  },
-  errorText: {
-    color: '#ff6b6b',
-    fontSize: 14,
-    flex: 1,
-  },
-  scoreSummary: {
-    backgroundColor: '#111111',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 20,
-  },
-  scoreHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  scoreLabel: {
-    color: '#888888',
-    fontSize: 16,
+  ring: {
+    position: 'absolute',
+    borderWidth: 1.5,
+    opacity: 0.7,
   },
-  scoreValue: {
-    color: '#8B0000',
-    fontSize: 36,
-    fontWeight: 'bold',
-  },
-  arrowCount: {
-    color: '#888888',
-    fontSize: 14,
-    marginTop: 8,
-  },
-  arrowList: {
-    backgroundColor: '#111111',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 16,
-  },
-  listHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  listTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  confirmAllText: {
-    color: '#4CAF50',
-    fontSize: 14,
-  },
-  arrowItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  arrowInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  arrowNumber: {
-    color: '#888888',
-    fontSize: 14,
-    marginRight: 12,
-    width: 30,
-  },
-  ringIndicator: {
+  crosshair: {
+    position: 'absolute',
     width: 20,
     height: 20,
-    borderRadius: 10,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#fff',
-  },
-  arrowRing: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  unconfirmedLabel: {
-    color: '#888888',
-    fontSize: 12,
-    marginLeft: 8,
-  },
-  arrowActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  confirmBtn: {
-    padding: 8,
-  },
-  removeBtn: {
-    padding: 8,
-  },
-  instructions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: '#111111',
-    borderRadius: 8,
-  },
-  instructionText: {
-    color: '#888888',
-    fontSize: 12,
-    marginLeft: 8,
-    flex: 1,
-  },
-  toggleOverlay: {
-    flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 12,
-    padding: 8,
+    alignItems: 'center',
   },
-  toggleText: {
+  crosshairH: {
+    position: 'absolute',
+    width: 20,
+    height: 2,
+    backgroundColor: '#8B0000',
+  },
+  crosshairV: {
+    position: 'absolute',
+    width: 2,
+    height: 20,
+    backgroundColor: '#8B0000',
+  },
+  arrowMarker: {
+    position: 'absolute',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  arrowMarkerText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  detectingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16,
+  },
+  detectingText: {
+    color: '#fff',
+    marginTop: 12,
+    fontSize: 16,
+  },
+  tapHint: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 8,
+  },
+  scoreSummary: {
+    flexDirection: 'row',
+    backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  scoreBox: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  scoreValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
     color: '#8B0000',
-    marginLeft: 8,
+  },
+  scoreLabel: {
+    fontSize: 11,
+    color: '#888',
+    marginTop: 2,
+  },
+  scoreDivider: {
+    width: 1,
+    backgroundColor: '#333',
+    marginHorizontal: 12,
+  },
+  arrowList: {
+    backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  sectionTitle: {
     fontSize: 14,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 12,
+  },
+  arrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  arrowInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 10,
+    padding: 10,
+  },
+  arrowNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  arrowNumberText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  arrowDetails: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  arrowRingText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  arrowConfText: {
+    fontSize: 11,
+    color: '#888',
+  },
+  arrowScoreBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  arrowScoreText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  deleteBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 107, 107, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   redetectButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    backgroundColor: 'rgba(139, 0, 0, 0.15)',
+    borderRadius: 10,
     padding: 12,
-    backgroundColor: '#111111',
-    borderRadius: 8,
+    gap: 8,
     borderWidth: 1,
     borderColor: '#8B0000',
+    borderStyle: 'dashed',
   },
   redetectText: {
-    color: '#8B0000',
-    marginLeft: 8,
     fontSize: 14,
+    color: '#8B0000',
+    fontWeight: '600',
   },
-  buttonContainer: {
+  footer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
+    padding: 16,
     gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#222',
   },
   primaryButton: {
-    flex: 1,
+    flex: 2,
     flexDirection: 'row',
-    backgroundColor: '#8B0000',
-    borderRadius: 12,
-    padding: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#8B0000',
+    paddingVertical: 14,
+    borderRadius: 12,
     gap: 8,
   },
   primaryButtonText: {
-    color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  secondaryButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#111',
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#8B0000',
+    gap: 6,
+  },
+  secondaryButtonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#8B0000',
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#111',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    paddingBottom: 40,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  scoreGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    justifyContent: 'center',
+  },
+  scoreOption: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  scoreOptionText: {
+    fontSize: 20,
     fontWeight: 'bold',
   },
 });
