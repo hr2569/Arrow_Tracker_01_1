@@ -102,7 +102,6 @@ export default function ScoringScreen() {
       updated[selectedArrowIndex] = {
         ...updated[selectedArrowIndex],
         ring: newScore,
-        confidence: 1.0,
       };
       setArrows(updated);
     }
@@ -159,52 +158,46 @@ export default function ScoringScreen() {
     router.push('/summary');
   };
 
-  const handleRetake = () => {
+  const handleBack = () => {
     router.back();
   };
 
-  // Overlay adjustment functions
-  const adjustScale = (delta: number) => {
-    setOverlayScale(prev => Math.max(0.5, Math.min(1.0, prev + delta)));
-  };
+  // The ring size for the target
+  const RING_SIZE = BASE_TARGET_SIZE;
 
-  const adjustOffsetX = (delta: number) => {
-    setOverlayOffsetX(prev => Math.max(-50, Math.min(50, prev + delta)));
-  };
-
-  const adjustOffsetY = (delta: number) => {
-    setOverlayOffsetY(prev => Math.max(-50, Math.min(50, prev + delta)));
-  };
-
-  const resetOverlay = () => {
-    setOverlayScale(0.85);
-    setOverlayOffsetX(0);
-    setOverlayOffsetY(0);
-  };
-
-  // The ring overlay size based on adjustable scale
-  const RING_SIZE = BASE_TARGET_SIZE * overlayScale;
-
-  // Render ring overlay - sized to match the target in the cropped photo
+  // Render ring overlay - creates a visual target
   const renderRingOverlay = () => {
     const rings = targetConfig.rings;
     const ringElements = [];
     
     // Draw rings from largest (outermost) to smallest (innermost)
-    // Each ring needs a filled background since they're drawn on top of each other
     for (let i = 0; i < rings; i++) {
-      // Ring 1 is outermost (largest), Ring 10 is innermost (smallest)
-      const ringNumber = i + 1; // 1 to 10
       const ringRatio = (rings - i) / rings;
       const size = RING_SIZE * ringRatio;
       const color = targetConfig.colors[i];
       
-      // Determine ring color based on score value
-      // White: 1-2, Black: 3-4, Blue: 5-6, Red: 7-8, Gold: 9-10
       let fillColor = color?.bg || '#f5f5f0';
       let borderCol = color?.border || '#333';
       
       ringElements.push(
+        <View
+          key={`ring-${i}`}
+          style={[
+            styles.ring,
+            {
+              width: size,
+              height: size,
+              borderRadius: size / 2,
+              borderColor: borderCol,
+              borderWidth: 1.5,
+              backgroundColor: fillColor,
+            },
+          ]}
+        />
+      );
+    }
+    return ringElements;
+  };
         <View
           key={`ring-${i}`}
           style={[
