@@ -31,7 +31,8 @@ export default function AlignmentScreen() {
     capturedImage, 
     targetType, 
     setDetectedArrows, 
-    setManualMode 
+    setManualMode,
+    setCurrentImage 
   } = useAppStore();
   
   const [isProcessing, setIsProcessing] = useState(false);
@@ -42,6 +43,8 @@ export default function AlignmentScreen() {
 
   useEffect(() => {
     if (capturedImage) {
+      // Also set currentImage so scoring screen can access it
+      setCurrentImage(capturedImage);
       processImage();
     }
   }, [capturedImage]);
