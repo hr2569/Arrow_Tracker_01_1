@@ -211,6 +211,106 @@ def perspective_crop(image_base64: str, corners: List[dict], output_size: int = 
 
 # ============== AI Analysis Functions ==============
 
+async def detect_paper_corners_gemini(image_base64: str, target_type: str = "wa_standard") -> dict:
+    """Use Gemini Vision to detect the 4 corners of the paper target for perspective cropping"""
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+        
+        api_key = os.environ.get('EMERGENT_LLM_KEY', '')
+        if not api_key:
+            return {"success": False, "message": "API key not configured"}
+        
+        # Get target type context
+        target_descriptions = {
+            "wa_standard": "a single circular archery target with concentric rings (white/black/blue/red/yellow from outside to center)",
+            "vegas_3spot": "three small circular targets arranged in a triangle pattern",
+            "nfaa_indoor": "three small circular targets arranged vertically in a strip"
+        }
+        target_desc = target_descriptions.get(target_type, target_descriptions["wa_standard"])
+        
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"corner-detection-{uuid.uuid4()}",
+            system_message=f"""You are an expert computer vision system specialized in detecting paper boundaries in images.
+
+Your task is to find the EXACT 4 CORNERS of the TARGET PAPER (not the target rings, but the actual paper/cardboard that the target is printed on).
+
+The target is {target_desc}.
+
+IMPORTANT INSTRUCTIONS:
+1. Look for the edges of the TARGET PAPER (usually white, beige, or off-white rectangular/square paper)
+2. The paper might be at an angle (perspective distortion) - that's expected
+3. Find the 4 corners where the paper edges meet
+4. Return normalized coordinates (0-1) where (0,0) is top-left and (1,1) is bottom-right of the IMAGE
+
+CORNER ORDER (critical for perspective transformation):
+- top_left: Upper-left corner of the paper
+- top_right: Upper-right corner of the paper  
+- bottom_right: Lower-right corner of the paper
+- bottom_left: Lower-left corner of the paper
+
+Respond ONLY in valid JSON format:
+{{
+  "detected": true,
+  "corners": [
+    {{"x": 0.15, "y": 0.10, "position": "top_left"}},
+    {{"x": 0.85, "y": 0.12, "position": "top_right"}},
+    {{"x": 0.88, "y": 0.90, "position": "bottom_right"}},
+    {{"x": 0.12, "y": 0.88, "position": "bottom_left"}}
+  ],
+  "confidence": 0.92,
+  "message": "Paper corners detected successfully"
+}}
+
+If you cannot detect the paper corners clearly:
+{{"detected": false, "corners": [], "confidence": 0, "message": "Could not detect paper boundaries"}}"""
+        ).with_model("gemini", "gemini-2.5-flash")
+        
+        # Clean base64 string
+        clean_base64 = image_base64
+        if ',' in image_base64:
+            clean_base64 = image_base64.split(',')[1]
+        
+        image_content = ImageContent(image_base64=clean_base64)
+        
+        user_message = UserMessage(
+            text=f"Detect the 4 corners of the paper target in this image. The target is {target_desc}. Return the corner coordinates in the specified JSON format.",
+            file_contents=[image_content]
+        )
+        
+        response = await chat.send_message(user_message)
+        logger.info(f"Gemini corner detection response: {response}")
+        
+        # Parse JSON from response
+        try:
+            response_text = response.strip()
+            if response_text.startswith('```json'):
+                response_text = response_text[7:]
+            if response_text.startswith('```'):
+                response_text = response_text[3:]
+            if response_text.endswith('```'):
+                response_text = response_text[:-3]
+            
+            result = json.loads(response_text.strip())
+            
+            if result.get('detected', False) and result.get('corners'):
+                return {
+                    "success": True,
+                    "corners": result.get('corners', []),
+                    "confidence": result.get('confidence', 0.8),
+                    "message": result.get('message', 'Corners detected')
+                }
+            else:
+                return {"success": False, "corners": [], "message": result.get('message', 'No corners detected')}
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON parse error: {e}, response: {response}")
+            return {"success": False, "corners": [], "message": f"Failed to parse AI response: {str(e)}"}
+            
+    except Exception as e:
+        logger.error(f"Corner detection error: {e}")
+        return {"success": False, "corners": [], "message": str(e)}
+
+
 async def analyze_target_corners(image_base64: str) -> dict:
     """Use AI to detect target corners in the image"""
     try:
