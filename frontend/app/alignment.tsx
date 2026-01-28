@@ -92,7 +92,8 @@ export default function AlignmentScreen() {
       setCurrentImage(capturedImage);
       setDetectedArrows(detectionResult);
       setManualMode(false);
-      router.push('/scoring');
+      // Go directly to the combined scoring screen
+      router.replace('/scoring');
     }
   };
 
@@ -102,7 +103,8 @@ export default function AlignmentScreen() {
       setCurrentImage(capturedImage);
     }
     setManualMode(true);
-    router.push('/scoring');
+    // Go directly to the combined scoring screen
+    router.replace('/scoring');
   };
 
   const handleRetake = () => {
