@@ -181,8 +181,9 @@ export default function TargetCropScreen() {
       const data = await response.json();
       
       if (data.success && data.cropped_image) {
-        // Update the captured image with the cropped version
+        // Update both capturedImage and currentImage with the cropped version
         setCapturedImage(data.cropped_image);
+        setCurrentImage(data.cropped_image);
         // Navigate directly to scoring screen (combined arrow detection + scoring)
         router.push('/scoring');
       } else {
