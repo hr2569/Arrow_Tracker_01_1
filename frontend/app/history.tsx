@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { LineChart } from 'react-native-chart-kit';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -155,6 +156,7 @@ interface GroupedSessions {
 
 export default function HistoryScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'history' | 'stats' | 'report'>('history');
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
