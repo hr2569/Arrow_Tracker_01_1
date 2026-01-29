@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 import { getBowIcon } from '../utils/bowIcons';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../i18n/LanguageContext';
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -35,7 +35,7 @@ type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
 
 export default function SessionSetupScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const { sessionType, setSelectedBow, setSessionDistance, targetType, setTargetType } = useAppStore();
   
   const [bows, setBows] = useState<Bow[]>([]);

@@ -18,7 +18,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { getBowIcon } from '../utils/bowIcons';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../i18n/LanguageContext';
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -42,7 +42,7 @@ const BOW_TYPES = [
 
 export default function BowsScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [bows, setBows] = useState<Bow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);

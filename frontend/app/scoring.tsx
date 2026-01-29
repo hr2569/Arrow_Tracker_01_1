@@ -15,7 +15,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 import { useLanguage } from '../i18n/LanguageContext';
-import { useTranslation } from 'react-i18next';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 32, SCREEN_HEIGHT * 0.45);
@@ -32,7 +31,7 @@ interface Arrow {
 
 export default function ScoringScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const { 
     setCurrentRound, 
     sessionType, 

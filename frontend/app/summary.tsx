@@ -15,7 +15,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../store/appStore';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../i18n/LanguageContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -38,7 +38,7 @@ const RING_COLORS = [
 
 export default function SummaryScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const { 
     currentRound, 
     currentSession, 
