@@ -11,10 +11,15 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import Constants from 'expo-constants';
+
+// Only import FileSystem on native platforms
+let FileSystem: any = null;
+if (Platform.OS !== 'web') {
+  FileSystem = require('expo-file-system/legacy');
+}
 
 const API_BASE = Constants.expoConfig?.extra?.backendUrl || 
   process.env.EXPO_PUBLIC_BACKEND_URL || 
@@ -25,8 +30,54 @@ export default function BackupScreen() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [lastBackup, setLastBackup] = useState<string | null>(null);
+  const isWeb = Platform.OS === 'web';
 
   const exportData = async () => {
+    if (isWeb) {
+      // Web fallback - download as file
+      try {
+        setIsExporting(true);
+        const [sessionsRes, bowsRes] = await Promise.all([
+          fetch(`${API_BASE}/api/sessions`),
+          fetch(`${API_BASE}/api/bows`),
+        ]);
+
+        if (!sessionsRes.ok || !bowsRes.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const sessions = await sessionsRes.json();
+        const bows = await bowsRes.json();
+
+        const backup = {
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          data: { sessions, bows },
+        };
+
+        // Create and download file on web
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `archery-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        setLastBackup(new Date().toLocaleString());
+        Alert.alert('Success', 'Backup file downloaded!');
+      } catch (error) {
+        console.error('Export error:', error);
+        Alert.alert('Error', 'Failed to export data.');
+      } finally {
+        setIsExporting(false);
+      }
+      return;
+    }
+
+    // Native (iOS/Android) export
     setIsExporting(true);
     try {
       // Fetch all data from the backend
