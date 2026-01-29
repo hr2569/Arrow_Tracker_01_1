@@ -136,21 +136,21 @@ export default function SummaryScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Score Summary Card */}
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Round Summary</Text>
+          <Text style={styles.summaryTitle}>{t('roundSummary')}</Text>
           
           {currentRound && (
             <>
               <View style={styles.scoreDisplay}>
                 <Text style={styles.roundLabel}>
-                  Round {sessionRounds.length}
+                  {t('round')} {sessionRounds.length}
                 </Text>
                 <Text style={styles.roundScore}>{currentRound.total}</Text>
-                <Text style={styles.pointsLabel}>points</Text>
+                <Text style={styles.pointsLabel}>{t('points')}</Text>
               </View>
 
               {/* Shot Breakdown */}
               <View style={styles.shotsBreakdown}>
-                <Text style={styles.breakdownTitle}>Shots</Text>
+                <Text style={styles.breakdownTitle}>{t('shots')}</Text>
                 <View style={styles.shotsList}>
                   {currentRound.shots.map((shot: any, index: number) => (
                     <View key={index} style={styles.shotItem}>
@@ -162,7 +162,7 @@ export default function SummaryScreen() {
                       />
                       <Text style={styles.shotNumber}>#{index + 1}</Text>
                       <Text style={styles.shotScore}>
-                        {shot.ring > 0 ? shot.ring : 'Miss'}
+                        {shot.ring > 0 ? shot.ring : t('miss')}
                       </Text>
                     </View>
                   ))}
@@ -174,14 +174,14 @@ export default function SummaryScreen() {
 
         {/* Score Table */}
         <View style={styles.scoreTableCard}>
-          <Text style={styles.scoreTableTitle}>Score Table</Text>
+          <Text style={styles.scoreTableTitle}>{t('scoreTable')}</Text>
           
           {/* Table Header */}
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, styles.roundColumn]}>Round</Text>
-            <Text style={[styles.tableHeaderCell, styles.arrowsColumn]}>Arrows</Text>
-            <Text style={[styles.tableHeaderCell, styles.scoreColumn]}>Score</Text>
-            <Text style={[styles.tableHeaderCell, styles.totalColumn]}>Total</Text>
+            <Text style={[styles.tableHeaderCell, styles.roundColumn]}>{t('round')}</Text>
+            <Text style={[styles.tableHeaderCell, styles.arrowsColumn]}>{t('arrows')}</Text>
+            <Text style={[styles.tableHeaderCell, styles.scoreColumn]}>{t('score')}</Text>
+            <Text style={[styles.tableHeaderCell, styles.totalColumn]}>{t('total')}</Text>
           </View>
           
           {/* Table Rows */}
@@ -252,7 +252,7 @@ export default function SummaryScreen() {
           
           {/* Table Footer - Grand Total */}
           <View style={styles.tableFooter}>
-            <Text style={[styles.tableFooterCell, styles.roundColumn]}>Total</Text>
+            <Text style={[styles.tableFooterCell, styles.roundColumn]}>{t('total')}</Text>
             <Text style={[styles.tableFooterCell, styles.arrowsColumn]}>
               {sessionRounds.reduce((sum, r) => sum + r.shots.length, 0)}
             </Text>
@@ -271,11 +271,11 @@ export default function SummaryScreen() {
             color={isCompetition ? "#FFD700" : "#ff4444"} 
           />
           <Text style={[styles.sessionTypeText, isCompetition ? styles.competitionText : styles.trainingText]}>
-            {isCompetition ? 'Competition' : 'Training'}
+            {isCompetition ? t('competition') : t('training')}
           </Text>
           {isCompetition && (
             <Text style={styles.roundProgress}>
-              Round {currentRoundNumber}/{MAX_COMPETITION_ROUNDS}
+              {t('round')} {currentRoundNumber}/{MAX_COMPETITION_ROUNDS}
             </Text>
           )}
         </View>
@@ -291,8 +291,8 @@ export default function SummaryScreen() {
               <Ionicons name="add-circle" size={24} color="#fff" />
               <Text style={styles.addRoundText}>
                 {isCompetition 
-                  ? `Add Round ${currentRoundNumber + 1} of ${MAX_COMPETITION_ROUNDS}`
-                  : 'Add Another Round'
+                  ? `${t('addRound')} ${currentRoundNumber + 1}/${MAX_COMPETITION_ROUNDS}`
+                  : t('addAnotherRound')
                 }
               </Text>
             </TouchableOpacity>
@@ -302,9 +302,9 @@ export default function SummaryScreen() {
           {isLastCompetitionRound && (
             <View style={styles.completionMessage}>
               <Ionicons name="trophy" size={32} color="#FFD700" />
-              <Text style={styles.completionTitle}>Competition Complete!</Text>
+              <Text style={styles.completionTitle}>{t('competitionComplete')}</Text>
               <Text style={styles.completionSubtitle}>
-                All {MAX_COMPETITION_ROUNDS} rounds finished
+                {t('allRoundsFinished').replace('{count}', String(MAX_COMPETITION_ROUNDS))}
               </Text>
             </View>
           )}
@@ -319,7 +319,7 @@ export default function SummaryScreen() {
             ) : (
               <>
                 <Ionicons name="checkmark-done" size={24} color="#8B0000" />
-                <Text style={styles.finishText}>Finish & Save Session</Text>
+                <Text style={styles.finishText}>{t('finishAndSave')}</Text>
               </>
             )}
           </TouchableOpacity>
@@ -328,25 +328,25 @@ export default function SummaryScreen() {
         {/* Quick Stats */}
         {currentRound && currentRound.shots.length > 0 && (
           <View style={styles.quickStats}>
-            <Text style={styles.quickStatsTitle}>Round Statistics</Text>
+            <Text style={styles.quickStatsTitle}>{t('roundStatistics')}</Text>
             <View style={styles.quickStatsGrid}>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
                   {Math.max(...currentRound.shots.map((s: any) => s.ring))}
                 </Text>
-                <Text style={styles.quickStatLabel}>Best Shot</Text>
+                <Text style={styles.quickStatLabel}>{t('bestShot')}</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
                   {Math.min(...currentRound.shots.filter((s: any) => s.ring > 0).map((s: any) => s.ring)) || '-'}
                 </Text>
-                <Text style={styles.quickStatLabel}>Worst Shot</Text>
+                <Text style={styles.quickStatLabel}>{t('worstShot')}</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
                   {currentRound.shots.filter((s: any) => s.ring >= 9).length}
                 </Text>
-                <Text style={styles.quickStatLabel}>Gold Hits</Text>
+                <Text style={styles.quickStatLabel}>{t('goldHits')}</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
