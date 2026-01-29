@@ -132,22 +132,48 @@ export default function BackupScreen() {
   const importData = async () => {
     setIsImporting(true);
     try {
-      // Pick a file
-      const result = await DocumentPicker.getDocumentAsync({
-        type: 'application/json',
-        copyToCacheDirectory: true,
-      });
+      let backup: any;
 
-      if (result.canceled) {
-        setIsImporting(false);
-        return;
+      if (isWeb) {
+        // Web fallback - use file input
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json,application/json';
+        
+        const fileContent = await new Promise<string>((resolve, reject) => {
+          input.onchange = async (e: any) => {
+            const file = e.target.files[0];
+            if (!file) {
+              reject(new Error('No file selected'));
+              return;
+            }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              resolve(event.target?.result as string);
+            };
+            reader.onerror = () => reject(new Error('Failed to read file'));
+            reader.readAsText(file);
+          };
+          input.click();
+        });
+        
+        backup = JSON.parse(fileContent);
+      } else {
+        // Native - use DocumentPicker
+        const result = await DocumentPicker.getDocumentAsync({
+          type: 'application/json',
+          copyToCacheDirectory: true,
+        });
+
+        if (result.canceled) {
+          setIsImporting(false);
+          return;
+        }
+
+        const file = result.assets[0];
+        const content = await FileSystem.readAsStringAsync(file.uri);
+        backup = JSON.parse(content);
       }
-
-      const file = result.assets[0];
-      
-      // Read file content
-      const content = await FileSystem.readAsStringAsync(file.uri);
-      const backup = JSON.parse(content);
 
       // Validate backup format
       if (!backup.version || !backup.data) {
