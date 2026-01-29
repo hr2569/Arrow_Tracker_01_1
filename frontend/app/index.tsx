@@ -94,6 +94,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
   },
+  backupButton: {
+    position: 'absolute',
+    top: 50,
+    right: 16,
+    zIndex: 10,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: '#1e1e1e',
+  },
   content: {
     flex: 1,
     justifyContent: 'center',
