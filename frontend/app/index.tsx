@@ -15,6 +15,15 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Backup Button - Top Right */}
+      <TouchableOpacity
+        style={styles.backupButton}
+        onPress={() => router.push('/backup')}
+        activeOpacity={0.7}
+      >
+        <Ionicons name="cloud-upload-outline" size={22} color="#888" />
+      </TouchableOpacity>
+
       <View style={styles.content}>
         {/* Hero Section */}
         <View style={styles.hero}>
