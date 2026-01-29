@@ -1,5 +1,5 @@
 pluginManagement {
-  // Node.js path - UPDATE THIS FOR YOUR SYSTEM
+  // Node.js path for Windows - UPDATE THIS FOR YOUR SYSTEM
   def nodeExecutable = "C:\\Program Files\\nodejs\\node.exe"
   
   def reactNativeGradlePlugin = new File(
@@ -25,6 +25,9 @@ plugins {
   id("expo-autolinking-settings")
 }
 
+// Set the node executable for autolinking
+def nodeExecutable = "C:\\Program Files\\nodejs\\node.exe"
+
 extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   if (System.getenv('EXPO_USE_COMMUNITY_AUTOLINKING') == '1') {
     ex.autolinkLibrariesFromCommand()
@@ -32,6 +35,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
     ex.autolinkLibrariesFromCommand(expoAutolinking.rnConfigCommand)
   }
 }
+
 expoAutolinking.useExpoModules()
 
 rootProject.name = 'Archery Scorer'
