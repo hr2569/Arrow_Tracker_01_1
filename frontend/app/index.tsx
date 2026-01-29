@@ -9,29 +9,18 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useLanguage } from '../i18n/LanguageContext';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Settings Button - Top Right */}
-      <TouchableOpacity
-        style={styles.settingsButton}
-        onPress={() => router.push('/settings')}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="settings-outline" size={24} color="#888" />
-      </TouchableOpacity>
-
       <View style={styles.content}>
         {/* Hero Section */}
         <View style={styles.hero}>
-          <Text style={styles.title}>{t('appTitle')}</Text>
+          <Text style={styles.title}>Archery Scorer</Text>
           <Text style={styles.subtitle}>
-            {t('appSubtitle')}
+            Track your shots and improve your aim
           </Text>
         </View>
 
@@ -45,9 +34,9 @@ export default function HomeScreen() {
             <View style={styles.buttonIconContainer}>
               <Ionicons name="add-circle" size={48} color="#fff" />
             </View>
-            <Text style={styles.primaryButtonText}>{t('newSession')}</Text>
+            <Text style={styles.primaryButtonText}>New Session</Text>
             <Text style={styles.buttonSubtext}>
-              {t('startScoring')}
+              Start scoring arrows
             </Text>
           </TouchableOpacity>
 
@@ -61,9 +50,9 @@ export default function HomeScreen() {
               <View style={styles.buttonIconContainerSmall}>
                 <Ionicons name="time" size={36} color="#8B0000" />
               </View>
-              <Text style={styles.secondaryButtonTextSmall}>{t('history')}</Text>
+              <Text style={styles.secondaryButtonTextSmall}>History</Text>
               <Text style={styles.buttonSubtextSecondarySmall}>
-                {t('sessionsStats')}
+                Sessions & Stats
               </Text>
             </TouchableOpacity>
 
@@ -79,9 +68,9 @@ export default function HomeScreen() {
                   resizeMode="contain"
                 />
               </View>
-              <Text style={styles.secondaryButtonTextSmall}>{t('bows')}</Text>
+              <Text style={styles.secondaryButtonTextSmall}>Bows</Text>
               <Text style={styles.buttonSubtextSecondarySmall}>
-                {t('equipment')}
+                Equipment
               </Text>
             </TouchableOpacity>
           </View>
@@ -95,15 +84,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#121212',
-  },
-  settingsButton: {
-    position: 'absolute',
-    top: 50,
-    right: 16,
-    zIndex: 10,
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: '#1e1e1e',
   },
   content: {
     flex: 1,
