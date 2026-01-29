@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import Svg, { Defs, RadialGradient, Stop, Circle, Rect, G } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -59,6 +60,7 @@ type ViewMode = 'distribution' | 'heatmap';
 
 export default function StatsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
