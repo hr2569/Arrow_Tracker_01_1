@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,15 +11,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import Constants from 'expo-constants';
-
-// Only import FileSystem on native platforms
-let FileSystem: any = null;
-if (Platform.OS !== 'web') {
-  FileSystem = require('expo-file-system/legacy');
-}
 
 const API_BASE = Constants.expoConfig?.extra?.backendUrl || 
   process.env.EXPO_PUBLIC_BACKEND_URL || 
@@ -30,54 +25,8 @@ export default function BackupScreen() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [lastBackup, setLastBackup] = useState<string | null>(null);
-  const isWeb = Platform.OS === 'web';
 
   const exportData = async () => {
-    if (isWeb) {
-      // Web fallback - download as file
-      try {
-        setIsExporting(true);
-        const [sessionsRes, bowsRes] = await Promise.all([
-          fetch(`${API_BASE}/api/sessions`),
-          fetch(`${API_BASE}/api/bows`),
-        ]);
-
-        if (!sessionsRes.ok || !bowsRes.ok) {
-          throw new Error('Failed to fetch data');
-        }
-
-        const sessions = await sessionsRes.json();
-        const bows = await bowsRes.json();
-
-        const backup = {
-          version: 1,
-          exportedAt: new Date().toISOString(),
-          data: { sessions, bows },
-        };
-
-        // Create and download file on web
-        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `archery-backup-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        setLastBackup(new Date().toLocaleString());
-        Alert.alert('Success', 'Backup file downloaded!');
-      } catch (error) {
-        console.error('Export error:', error);
-        Alert.alert('Error', 'Failed to export data.');
-      } finally {
-        setIsExporting(false);
-      }
-      return;
-    }
-
-    // Native (iOS/Android) export
     setIsExporting(true);
     try {
       // Fetch all data from the backend
@@ -132,48 +81,22 @@ export default function BackupScreen() {
   const importData = async () => {
     setIsImporting(true);
     try {
-      let backup: any;
+      // Pick a file
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'application/json',
+        copyToCacheDirectory: true,
+      });
 
-      if (isWeb) {
-        // Web fallback - use file input
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json,application/json';
-        
-        const fileContent = await new Promise<string>((resolve, reject) => {
-          input.onchange = async (e: any) => {
-            const file = e.target.files[0];
-            if (!file) {
-              reject(new Error('No file selected'));
-              return;
-            }
-            const reader = new FileReader();
-            reader.onload = (event) => {
-              resolve(event.target?.result as string);
-            };
-            reader.onerror = () => reject(new Error('Failed to read file'));
-            reader.readAsText(file);
-          };
-          input.click();
-        });
-        
-        backup = JSON.parse(fileContent);
-      } else {
-        // Native - use DocumentPicker
-        const result = await DocumentPicker.getDocumentAsync({
-          type: 'application/json',
-          copyToCacheDirectory: true,
-        });
-
-        if (result.canceled) {
-          setIsImporting(false);
-          return;
-        }
-
-        const file = result.assets[0];
-        const content = await FileSystem.readAsStringAsync(file.uri);
-        backup = JSON.parse(content);
+      if (result.canceled) {
+        setIsImporting(false);
+        return;
       }
+
+      const file = result.assets[0];
+      
+      // Read file content
+      const content = await FileSystem.readAsStringAsync(file.uri);
+      const backup = JSON.parse(content);
 
       // Validate backup format
       if (!backup.version || !backup.data) {
@@ -193,7 +116,6 @@ export default function BackupScreen() {
                 // Import bows first
                 if (backup.data.bows && backup.data.bows.length > 0) {
                   for (const bow of backup.data.bows) {
-                    // Remove the id so a new one is generated
                     const { id, ...bowData } = bow;
                     await fetch(`${API_BASE}/api/bows`, {
                       method: 'POST',
@@ -206,7 +128,6 @@ export default function BackupScreen() {
                 // Import sessions
                 if (backup.data.sessions && backup.data.sessions.length > 0) {
                   for (const session of backup.data.sessions) {
-                    // Remove the id so a new one is generated
                     const { id, ...sessionData } = session;
                     await fetch(`${API_BASE}/api/sessions`, {
                       method: 'POST',
