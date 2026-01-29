@@ -8,7 +8,12 @@
     "scheme": "archeryscorer",
     "userInterfaceStyle": "dark",
     "newArchEnabled": false,
-    "platforms": ["android"],
+    "platforms": ["android", "web"],
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
     "android": {
       "package": "com.archeryscorer.app",
       "versionCode": 1,
