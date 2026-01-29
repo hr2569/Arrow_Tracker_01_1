@@ -14,7 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
-import { useLanguage } from '../i18n/LanguageContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 32, SCREEN_HEIGHT * 0.45);
@@ -31,7 +30,6 @@ interface Arrow {
 
 export default function ScoringScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
   const { 
     setCurrentRound, 
     sessionType, 
@@ -134,17 +132,17 @@ export default function ScoringScreen() {
 
   const handleFinishRound = () => {
     if (arrows.length === 0) {
-      Alert.alert(t('noArrows'), t('pleaseMarkArrow'));
+      Alert.alert('No Arrows', 'Please mark at least one arrow before finishing.');
       return;
     }
 
     if (isCompetition && arrows.length < COMPETITION_ARROWS_PER_ROUND) {
       Alert.alert(
-        t('addMoreArrows'),
-        t('competitionArrowsMsg').replace('{count}', String(COMPETITION_ARROWS_PER_ROUND)).replace('{current}', String(arrows.length)),
+        'Add More Arrows?',
+        `Competition rounds typically have ${COMPETITION_ARROWS_PER_ROUND} arrows. Continue with ${arrows.length}?`,
         [
-          { text: t('addMore'), style: 'cancel' },
-          { text: t('continue'), onPress: finishRound },
+          { text: 'Add More', style: 'cancel' },
+          { text: 'Continue', onPress: finishRound },
         ]
       );
     } else {
@@ -209,10 +207,10 @@ export default function ScoringScreen() {
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>{t('scoreArrows')}</Text>
+          <Text style={styles.headerTitle}>Score Arrows</Text>
           <View style={[styles.roundBadge, isCompetition ? styles.competitionBadge : styles.trainingBadge]}>
             <Ionicons name={isCompetition ? "trophy" : "fitness"} size={12} color={isCompetition ? "#FFD700" : "#ff4444"} />
-            <Text style={styles.roundText}>{t('round')} {currentRoundNumber}</Text>
+            <Text style={styles.roundText}>Round {currentRoundNumber}</Text>
           </View>
         </View>
         <View style={styles.headerRight} />
@@ -266,33 +264,33 @@ export default function ScoringScreen() {
             ))}
           </Pressable>
           
-          <Text style={styles.tapHint}>{t('tapToAddArrows')}</Text>
+          <Text style={styles.tapHint}>Tap target to add arrows</Text>
         </View>
 
         {/* Score Summary */}
         <View style={styles.scoreSummary}>
           <View style={styles.scoreBox}>
             <Text style={styles.scoreValue}>{getTotalScore()}</Text>
-            <Text style={styles.scoreLabel}>{t('total')}</Text>
+            <Text style={styles.scoreLabel}>Total</Text>
           </View>
           <View style={styles.scoreDivider} />
           <View style={styles.scoreBox}>
             <Text style={styles.scoreValue}>{arrows.length}</Text>
-            <Text style={styles.scoreLabel}>{t('arrows')}</Text>
+            <Text style={styles.scoreLabel}>Arrows</Text>
           </View>
           <View style={styles.scoreDivider} />
           <View style={styles.scoreBox}>
             <Text style={styles.scoreValue}>
               {arrows.length > 0 ? (getTotalScore() / arrows.length).toFixed(1) : '0'}
             </Text>
-            <Text style={styles.scoreLabel}>{t('avg')}</Text>
+            <Text style={styles.scoreLabel}>Avg</Text>
           </View>
         </View>
 
         {/* Arrow List */}
         {arrows.length > 0 && (
           <View style={styles.arrowList}>
-            <Text style={styles.sectionTitle}>{t('arrows')}</Text>
+            <Text style={styles.sectionTitle}>Arrows</Text>
             {arrows.map((arrow, index) => (
               <View key={arrow.id} style={styles.arrowRow}>
                 <TouchableOpacity style={styles.arrowInfo} onPress={() => handleEditArrow(index)}>
@@ -300,8 +298,8 @@ export default function ScoringScreen() {
                     <Text style={styles.arrowNumberText}>{index + 1}</Text>
                   </View>
                   <View style={styles.arrowDetails}>
-                    <Text style={styles.arrowRingText}>{t('ring')} {arrow.ring}</Text>
-                    <Text style={styles.arrowConfText}>{t('manual')}</Text>
+                    <Text style={styles.arrowRingText}>Ring {arrow.ring}</Text>
+                    <Text style={styles.arrowConfText}>Manual</Text>
                   </View>
                   <View style={[styles.arrowScoreBadge, { backgroundColor: getScoreColor(arrow.ring) }]}>
                     <Text style={[styles.arrowScoreText, { color: getScoreTextColor(arrow.ring) }]}>
@@ -322,7 +320,7 @@ export default function ScoringScreen() {
       <View style={styles.footer}>
         <TouchableOpacity style={styles.secondaryButton} onPress={handleBack}>
           <Ionicons name="arrow-back" size={20} color="#8B0000" />
-          <Text style={styles.secondaryButtonText}>{t('back')}</Text>
+          <Text style={styles.secondaryButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={[styles.primaryButton, arrows.length === 0 && styles.buttonDisabled]} 
@@ -330,7 +328,7 @@ export default function ScoringScreen() {
           disabled={arrows.length === 0}
         >
           <Ionicons name="checkmark" size={20} color="#fff" />
-          <Text style={styles.primaryButtonText}>{t('finishRound')}</Text>
+          <Text style={styles.primaryButtonText}>Finish Round</Text>
         </TouchableOpacity>
       </View>
 
@@ -339,7 +337,7 @@ export default function ScoringScreen() {
         <Pressable style={styles.modalOverlay} onPress={() => setShowScorePicker(false)}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('selectScore')}</Text>
+              <Text style={styles.modalTitle}>Select Score</Text>
               <TouchableOpacity onPress={() => setShowScorePicker(false)}>
                 <Ionicons name="close" size={24} color="#fff" />
               </TouchableOpacity>
