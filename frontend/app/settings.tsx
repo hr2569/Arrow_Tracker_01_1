@@ -9,16 +9,19 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../i18n/LanguageContext';
+import { languageNames } from '../i18n/translations';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { language, t } = useLanguage();
 
   const settingsItems = [
     { 
       icon: 'language-outline', 
-      title: 'Language', 
-      subtitle: 'English',
-      onPress: () => {} // TODO: Language selection
+      title: t('language'), 
+      subtitle: languageNames[language],
+      onPress: () => router.push('/languageSelect')
     },
   ];
 
@@ -31,7 +34,7 @@ export default function SettingsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Settings</Text>
+        <Text style={styles.headerTitle}>{t('settings')}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
