@@ -35,6 +35,7 @@ type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
 
 export default function SessionSetupScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { sessionType, setSelectedBow, setSessionDistance, targetType, setTargetType } = useAppStore();
   
   const [bows, setBows] = useState<Bow[]>([]);
@@ -72,19 +73,19 @@ export default function SessionSetupScreen() {
   const handleStartSession = () => {
     // Validate bow selection
     if (!selectedBowId) {
-      Alert.alert('Select a Bow', 'Please select a bow before starting the session.');
+      Alert.alert(t('selectBow'), t('noBowsYet'));
       return;
     }
 
     // Validate distance
     if (!distance.trim()) {
-      Alert.alert('Enter Distance', 'Please enter the shooting distance.');
+      Alert.alert(t('shootingDistance'), t('enterDistance'));
       return;
     }
 
     const distanceNum = parseFloat(distance);
     if (isNaN(distanceNum) || distanceNum <= 0) {
-      Alert.alert('Invalid Distance', 'Please enter a valid distance.');
+      Alert.alert(t('error'), t('enterDistance'));
       return;
     }
 
@@ -129,7 +130,7 @@ export default function SessionSetupScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#8B0000" />
-          <Text style={styles.loadingText}>Loading...</Text>
+          <Text style={styles.loadingText}>{t('loading')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -146,7 +147,7 @@ export default function SessionSetupScreen() {
           >
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Session Setup</Text>
+          <Text style={styles.headerTitle}>{t('sessionSetup')}</Text>
           <View style={styles.headerSpacer} />
         </View>
 
@@ -154,16 +155,16 @@ export default function SessionSetupScreen() {
           <View style={styles.emptyIcon}>
             <Ionicons name="alert-circle-outline" size={64} color="#8B0000" />
           </View>
-          <Text style={styles.emptyTitle}>No Bows Found</Text>
+          <Text style={styles.emptyTitle}>{t('noBowsYet')}</Text>
           <Text style={styles.emptySubtitle}>
-            You need to add at least one bow before starting a session.
+            {t('noBowsMessage')}
           </Text>
           <TouchableOpacity
             style={styles.addBowButton}
             onPress={navigateToAddBow}
           >
             <Ionicons name="add" size={24} color="#fff" />
-            <Text style={styles.addBowButtonText}>Add Your First Bow</Text>
+            <Text style={styles.addBowButtonText}>{t('addYourFirstBow')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -184,7 +185,7 @@ export default function SessionSetupScreen() {
           >
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Session Setup</Text>
+          <Text style={styles.headerTitle}>{t('sessionSetup')}</Text>
           <View style={styles.headerSpacer} />
         </View>
 
@@ -195,7 +196,7 @@ export default function SessionSetupScreen() {
         >
           {/* Target Type Selection */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Target Face</Text>
+            <Text style={styles.sectionTitle}>{t('targetFace')}</Text>
             <View style={styles.targetTypesGrid}>
               {/* WA Standard */}
               <TouchableOpacity
@@ -218,9 +219,9 @@ export default function SessionSetupScreen() {
                   </View>
                 </View>
                 <Text style={[styles.targetTypeName, selectedTargetType === 'wa_standard' && styles.targetTypeNameSelected]}>
-                  WA Standard
+                  {t('waStandard')}
                 </Text>
-                <Text style={styles.targetTypeDesc}>10-ring, outdoor</Text>
+                <Text style={styles.targetTypeDesc}>{t('tenRingOutdoor')}</Text>
                 {selectedTargetType === 'wa_standard' && (
                   <View style={styles.targetCheckmark}>
                     <Ionicons name="checkmark" size={14} color="#fff" />
@@ -268,9 +269,9 @@ export default function SessionSetupScreen() {
                   </View>
                 </View>
                 <Text style={[styles.targetTypeName, selectedTargetType === 'vegas_3spot' && styles.targetTypeNameSelected]}>
-                  Vegas 3-Spot
+                  {t('vegas3Spot')}
                 </Text>
-                <Text style={styles.targetTypeDesc}>Indoor, triangle</Text>
+                <Text style={styles.targetTypeDesc}>{t('indoorTriangle')}</Text>
                 {selectedTargetType === 'vegas_3spot' && (
                   <View style={styles.targetCheckmark}>
                     <Ionicons name="checkmark" size={14} color="#fff" />
@@ -300,9 +301,9 @@ export default function SessionSetupScreen() {
                   </View>
                 </View>
                 <Text style={[styles.targetTypeName, selectedTargetType === 'nfaa_indoor' && styles.targetTypeNameSelected]}>
-                  NFAA Indoor
+                  {t('nfaaIndoor')}
                 </Text>
-                <Text style={styles.targetTypeDesc}>3-spot vertical</Text>
+                <Text style={styles.targetTypeDesc}>{t('threeSpotVertical')}</Text>
                 {selectedTargetType === 'nfaa_indoor' && (
                   <View style={styles.targetCheckmark}>
                     <Ionicons name="checkmark" size={14} color="#fff" />
@@ -315,9 +316,9 @@ export default function SessionSetupScreen() {
           {/* Bow Selection */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Select Bow</Text>
+              <Text style={styles.sectionTitle}>{t('selectBow')}</Text>
               <TouchableOpacity onPress={navigateToAddBow}>
-                <Text style={styles.manageLink}>Manage Bows</Text>
+                <Text style={styles.manageLink}>{t('manageBows')}</Text>
               </TouchableOpacity>
             </View>
             
@@ -362,14 +363,14 @@ export default function SessionSetupScreen() {
 
           {/* Distance Input */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Shooting Distance</Text>
+            <Text style={styles.sectionTitle}>{t('shootingDistance')}</Text>
             
             <View style={styles.distanceInputContainer}>
               <TextInput
                 style={styles.distanceInput}
                 value={distance}
                 onChangeText={setDistance}
-                placeholder="Enter distance"
+                placeholder={t('enterDistance')}
                 placeholderTextColor="#666"
                 keyboardType="decimal-pad"
               />
@@ -440,7 +441,7 @@ export default function SessionSetupScreen() {
             disabled={!selectedBowId || !distance}
           >
             <Ionicons name="play" size={24} color="#fff" />
-            <Text style={styles.startButtonText}>Start Session</Text>
+            <Text style={styles.startButtonText}>{t('startSession')}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
