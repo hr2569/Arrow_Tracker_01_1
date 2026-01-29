@@ -1,33 +1,13 @@
 pluginManagement {
-  // Get node executable path - checks common locations
-  def nodeExecutable = {
-    def nodePath = System.getenv("NODE_BINARY") ?: "node"
-    // Check if node is available
-    try {
-      def process = new ProcessBuilder(nodePath, "--version").start()
-      process.waitFor()
-      if (process.exitValue() == 0) {
-        return nodePath
-      }
-    } catch (Exception e) {
-      // Try common paths
-      def commonPaths = [
-        "/usr/local/bin/node",
-        "/usr/bin/node",
-        "/opt/homebrew/bin/node",
-        System.getProperty("user.home") + "/.nvm/versions/node/v20.19.0/bin/node",
-        System.getProperty("user.home") + "/.nvm/versions/node/v18.20.0/bin/node",
-        "C:\\Program Files\\nodejs\\node.exe"
-      ]
-      for (path in commonPaths) {
-        def file = new File(path)
-        if (file.exists()) {
-          return path
-        }
-      }
-    }
-    return nodePath
-  }()
+  // Read local.properties to get node executable path
+  def localPropertiesFile = new File(rootDir, "local.properties")
+  def localProperties = new Properties()
+  if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+  }
+  
+  // Get node executable - from local.properties or fall back to PATH
+  def nodeExecutable = localProperties.getProperty("node.executable", "node")
   
   def reactNativeGradlePlugin = new File(
     providers.exec {
