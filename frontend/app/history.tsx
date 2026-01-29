@@ -738,14 +738,14 @@ export default function HistoryScreen() {
           onPress={() => router.push('/stats')}
         >
           <Ionicons name="stats-chart-outline" size={18} color={activeTab === 'stats' ? '#fff' : '#888'} />
-          <Text style={[styles.tabButtonText, activeTab === 'stats' && styles.tabButtonTextActive]}>Stats</Text>
+          <Text style={[styles.tabButtonText, activeTab === 'stats' && styles.tabButtonTextActive]}>{t('stats')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'report' && styles.tabButtonActive]}
           onPress={() => router.push('/report')}
         >
           <Ionicons name="document-text-outline" size={18} color={activeTab === 'report' ? '#fff' : '#888'} />
-          <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>Report</Text>
+          <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>{t('report')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -788,13 +788,13 @@ export default function HistoryScreen() {
             {/* Target Type Filter */}
             {availableTargetTypes.length > 0 && (
               <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Target:</Text>
+                <Text style={styles.filterLabel}>{t('target')}:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
                   <TouchableOpacity
                     style={[styles.filterChip, !targetTypeFilter && styles.filterChipActive]}
                     onPress={() => setTargetTypeFilter(null)}
                   >
-                    <Text style={[styles.filterChipText, !targetTypeFilter && styles.filterChipTextActive]}>All</Text>
+                    <Text style={[styles.filterChipText, !targetTypeFilter && styles.filterChipTextActive]}>{t('all')}</Text>
                   </TouchableOpacity>
                   {availableTargetTypes.map((type) => (
                     <TouchableOpacity
@@ -812,13 +812,13 @@ export default function HistoryScreen() {
             {/* Bow Filter */}
             {availableBows.length > 0 && (
               <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Bow:</Text>
+                <Text style={styles.filterLabel}>{t('bow')}:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
                   <TouchableOpacity
                     style={[styles.filterChip, !bowFilter && styles.filterChipActive]}
                     onPress={() => setBowFilter(null)}
                   >
-                    <Text style={[styles.filterChipText, !bowFilter && styles.filterChipTextActive]}>All</Text>
+                    <Text style={[styles.filterChipText, !bowFilter && styles.filterChipTextActive]}>{t('all')}</Text>
                   </TouchableOpacity>
                   {availableBows.map((bow) => (
                     <TouchableOpacity
@@ -836,13 +836,13 @@ export default function HistoryScreen() {
             {/* Distance Filter */}
             {availableDistances.length > 0 && (
               <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Distance:</Text>
+                <Text style={styles.filterLabel}>{t('distance')}:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
                   <TouchableOpacity
                     style={[styles.filterChip, !distanceFilter && styles.filterChipActive]}
                     onPress={() => setDistanceFilter(null)}
                   >
-                    <Text style={[styles.filterChipText, !distanceFilter && styles.filterChipTextActive]}>All</Text>
+                    <Text style={[styles.filterChipText, !distanceFilter && styles.filterChipTextActive]}>{t('all')}</Text>
                   </TouchableOpacity>
                   {availableDistances.map((distance) => (
                     <TouchableOpacity
@@ -863,22 +863,22 @@ export default function HistoryScreen() {
         {sessions.length > 0 && (
           <View style={styles.overviewCard}>
             <Text style={styles.overviewTitle}>
-              {selectedPeriod === 'all' ? 'All Time Stats' : `Stats by ${selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)}`}
+              {selectedPeriod === 'all' ? t('allTimeStats') : `${t('stats')} - ${selectedPeriod}`}
             </Text>
             <View style={styles.overviewStats}>
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalSessions}</Text>
-                <Text style={styles.overviewLabel}>Sessions</Text>
+                <Text style={styles.overviewLabel}>{t('sessions')}</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalRounds}</Text>
-                <Text style={styles.overviewLabel}>Rounds</Text>
+                <Text style={styles.overviewLabel}>{t('rounds')}</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalPoints}</Text>
-                <Text style={styles.overviewLabel}>Total Pts</Text>
+                <Text style={styles.overviewLabel}>{t('totalPts')}</Text>
               </View>
             </View>
           </View>
@@ -888,16 +888,16 @@ export default function HistoryScreen() {
         {sessions.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="trophy-outline" size={64} color="#888888" />
-            <Text style={styles.emptyTitle}>No Sessions Yet</Text>
+            <Text style={styles.emptyTitle}>{t('noHistory')}</Text>
             <Text style={styles.emptyText}>
-              Start a new scoring session to track your progress!
+              {t('noHistoryMessage')}
             </Text>
             <TouchableOpacity
               style={styles.startButton}
               onPress={() => router.push('/capture')}
             >
               <Ionicons name="add" size={20} color="#fff" />
-              <Text style={styles.startButtonText}>Start Session</Text>
+              <Text style={styles.startButtonText}>{t('startSession')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -977,13 +977,13 @@ export default function HistoryScreen() {
                         <View style={styles.metaItem}>
                           <Ionicons name="layers" size={16} color="#888888" />
                           <Text style={styles.metaText}>
-                            {session.rounds?.length || 0} rounds
+                            {session.rounds?.length || 0} {t('rounds')}
                           </Text>
                         </View>
                         <View style={styles.metaItem}>
                           <Ionicons name="analytics" size={16} color="#888888" />
                           <Text style={styles.metaText}>
-                            Avg: {getAverageScore(session)}/round
+                            {t('avg')}: {getAverageScore(session)}/{t('round')}
                           </Text>
                         </View>
                       </View>
