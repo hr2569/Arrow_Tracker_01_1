@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 import { getBowIcon } from '../utils/bowIcons';
+import { useTranslation } from 'react-i18next';
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
