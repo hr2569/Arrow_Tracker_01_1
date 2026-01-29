@@ -9,9 +9,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -27,9 +29,9 @@ export default function HomeScreen() {
       <View style={styles.content}>
         {/* Hero Section */}
         <View style={styles.hero}>
-          <Text style={styles.title}>Archery Tracker</Text>
+          <Text style={styles.title}>{t('appTitle')}</Text>
           <Text style={styles.subtitle}>
-            Score your targets with precision
+            {t('appSubtitle')}
           </Text>
         </View>
 
@@ -43,9 +45,9 @@ export default function HomeScreen() {
             <View style={styles.buttonIconContainer}>
               <Ionicons name="add-circle" size={48} color="#fff" />
             </View>
-            <Text style={styles.primaryButtonText}>New Session</Text>
+            <Text style={styles.primaryButtonText}>{t('newSession')}</Text>
             <Text style={styles.buttonSubtext}>
-              Start scoring a new target
+              {t('startScoring')}
             </Text>
           </TouchableOpacity>
 
@@ -59,9 +61,9 @@ export default function HomeScreen() {
               <View style={styles.buttonIconContainerSmall}>
                 <Ionicons name="time" size={36} color="#8B0000" />
               </View>
-              <Text style={styles.secondaryButtonTextSmall}>History</Text>
+              <Text style={styles.secondaryButtonTextSmall}>{t('history')}</Text>
               <Text style={styles.buttonSubtextSecondarySmall}>
-                Sessions & Stats
+                {t('sessionsStats')}
               </Text>
             </TouchableOpacity>
 
@@ -77,9 +79,9 @@ export default function HomeScreen() {
                   resizeMode="contain"
                 />
               </View>
-              <Text style={styles.secondaryButtonTextSmall}>Bows</Text>
+              <Text style={styles.secondaryButtonTextSmall}>{t('bows')}</Text>
               <Text style={styles.buttonSubtextSecondarySmall}>
-                Equipment
+                {t('equipment')}
               </Text>
             </TouchableOpacity>
           </View>
