@@ -1,13 +1,6 @@
 pluginManagement {
-  // Read local.properties to get node executable path
-  def localPropertiesFile = new File(rootDir, "local.properties")
-  def localProperties = new Properties()
-  if (localPropertiesFile.exists()) {
-    localPropertiesFile.withInputStream { localProperties.load(it) }
-  }
-  
-  // Get node executable - from local.properties or fall back to PATH
-  def nodeExecutable = localProperties.getProperty("node.executable", "node")
+  // Node.js path - UPDATE THIS FOR YOUR SYSTEM
+  def nodeExecutable = "C:\\Program Files\\nodejs\\node.exe"
   
   def reactNativeGradlePlugin = new File(
     providers.exec {
