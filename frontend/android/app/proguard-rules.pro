@@ -7,8 +7,22 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# react-native-reanimated
--keep class com.swmansion.reanimated.** { *; }
--keep class com.facebook.react.turbomodule.** { *; }
+# Keep Compose classes
+-keep class androidx.compose.** { *; }
+-keepclassmembers class androidx.compose.** { *; }
 
-# Add any project specific keep options here:
+# Keep Retrofit
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class retrofit2.** { *; }
+-keepclassmembers class retrofit2.** { *; }
+
+# Keep Gson
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# Keep data classes
+-keep class com.archeryscorer.app.model.** { *; }
+-keep class com.archeryscorer.app.data.** { *; }
