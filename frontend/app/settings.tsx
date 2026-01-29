@@ -20,12 +20,6 @@ export default function SettingsScreen() {
       subtitle: 'English',
       onPress: () => {} // TODO: Language selection
     },
-    { 
-      icon: 'cloud-outline', 
-      title: 'Backup & Sync', 
-      subtitle: 'Data management',
-      onPress: () => {} // TODO: Backup screen
-    },
   ];
 
   return (
