@@ -18,7 +18,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { getBowIcon } from '../utils/bowIcons';
-import { useLanguage } from '../i18n/LanguageContext';
 
 const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -42,7 +41,6 @@ const BOW_TYPES = [
 
 export default function BowsScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
   const [bows, setBows] = useState<Bow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -104,7 +102,7 @@ export default function BowsScreen() {
 
   const handleSave = async () => {
     if (!formName.trim()) {
-      Alert.alert(t('error'), t('bowName'));
+      Alert.alert('Error', 'Please enter a bow name');
       return;
     }
 
@@ -138,11 +136,11 @@ export default function BowsScreen() {
         resetForm();
         fetchBows();
       } else {
-        Alert.alert(t('error'), t('error'));
+        Alert.alert('Error', 'Failed to save bow');
       }
     } catch (error) {
       console.error('Error saving bow:', error);
-      Alert.alert(t('error'), t('error'));
+      Alert.alert('Error', 'Failed to save bow');
     } finally {
       setSaving(false);
     }
@@ -150,12 +148,12 @@ export default function BowsScreen() {
 
   const handleDelete = (bow: Bow) => {
     Alert.alert(
-      t('deleteBow'),
-      t('deleteBowConfirm'),
+      'Delete Bow',
+      `Are you sure you want to delete "${bow.name}"?`,
       [
-        { text: t('cancel'), style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: t('delete'),
+          text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -165,11 +163,11 @@ export default function BowsScreen() {
               if (response.ok) {
                 fetchBows();
               } else {
-                Alert.alert(t('error'), t('error'));
+                Alert.alert('Error', 'Failed to delete bow');
               }
             } catch (error) {
               console.error('Error deleting bow:', error);
-              Alert.alert(t('error'), t('error'));
+              Alert.alert('Error', 'Failed to delete bow');
             }
           },
         },
@@ -244,7 +242,7 @@ export default function BowsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('myBows')}</Text>
+        <Text style={styles.headerTitle}>My Bows</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={openAddModal}
@@ -257,23 +255,23 @@ export default function BowsScreen() {
       {loading ? (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#8B0000" />
-          <Text style={styles.loadingText}>{t('loading')}</Text>
+          <Text style={styles.loadingText}>Loading bows...</Text>
         </View>
       ) : bows.length === 0 ? (
         <View style={styles.centerContainer}>
           <View style={styles.emptyIcon}>
             <Ionicons name="arrow-forward-outline" size={64} color="#333" />
           </View>
-          <Text style={styles.emptyTitle}>{t('noBowsYet')}</Text>
+          <Text style={styles.emptyTitle}>No Bows Yet</Text>
           <Text style={styles.emptySubtitle}>
-            {t('noBowsMessage')}
+            Add your first bow to track your equipment
           </Text>
           <TouchableOpacity
             style={styles.emptyAddButton}
             onPress={openAddModal}
           >
             <Ionicons name="add" size={24} color="#fff" />
-            <Text style={styles.emptyAddButtonText}>{t('addBow')}</Text>
+            <Text style={styles.emptyAddButtonText}>Add Bow</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -300,7 +298,7 @@ export default function BowsScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {editingBow ? t('editBow') : t('addBow')}
+                {editingBow ? 'Edit Bow' : 'Add New Bow'}
               </Text>
               <TouchableOpacity
                 style={styles.modalCloseButton}
@@ -312,17 +310,17 @@ export default function BowsScreen() {
 
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               {/* Bow Name */}
-              <Text style={styles.inputLabel}>{t('bowName')} *</Text>
+              <Text style={styles.inputLabel}>Bow Name *</Text>
               <TextInput
                 style={styles.textInput}
                 value={formName}
                 onChangeText={setFormName}
-                placeholder={t('bowName')}
+                placeholder="e.g., My Competition Bow"
                 placeholderTextColor="#666"
               />
 
               {/* Bow Type */}
-              <Text style={styles.inputLabel}>{t('bowType')}</Text>
+              <Text style={styles.inputLabel}>Bow Type</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => setShowTypePicker(!showTypePicker)}
@@ -363,7 +361,7 @@ export default function BowsScreen() {
               )}
 
               {/* Draw Weight */}
-              <Text style={styles.inputLabel}>{t('drawWeight')} ({t('lbs')})</Text>
+              <Text style={styles.inputLabel}>Draw Weight (lbs)</Text>
               <TextInput
                 style={styles.textInput}
                 value={formDrawWeight}
@@ -374,7 +372,7 @@ export default function BowsScreen() {
               />
 
               {/* Draw Length */}
-              <Text style={styles.inputLabel}>{t('drawLength')} ({t('inches')})</Text>
+              <Text style={styles.inputLabel}>Draw Length (inches)</Text>
               <TextInput
                 style={styles.textInput}
                 value={formDrawLength}
@@ -385,12 +383,12 @@ export default function BowsScreen() {
               />
 
               {/* Notes */}
-              <Text style={styles.inputLabel}>{t('notes')}</Text>
+              <Text style={styles.inputLabel}>Notes</Text>
               <TextInput
                 style={[styles.textInput, styles.textAreaInput]}
                 value={formNotes}
                 onChangeText={setFormNotes}
-                placeholder={t('notes')}
+                placeholder="Any additional notes about this bow..."
                 placeholderTextColor="#666"
                 multiline
                 numberOfLines={4}
@@ -410,7 +408,7 @@ export default function BowsScreen() {
                 <>
                   <Ionicons name="checkmark" size={24} color="#fff" />
                   <Text style={styles.saveButtonText}>
-                    {editingBow ? t('save') : t('save')}
+                    {editingBow ? 'Update Bow' : 'Save Bow'}
                   </Text>
                 </>
               )}
