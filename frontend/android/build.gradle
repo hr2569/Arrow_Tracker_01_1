@@ -16,8 +16,13 @@ allprojects {
   repositories {
     google()
     mavenCentral()
-    maven { url 'https://www.jitpack.io' }
+    maven { url = uri('https://www.jitpack.io') }
   }
+}
+
+// Suppress deprecation warnings for Gradle 9.0 compatibility
+tasks.withType(JavaCompile).configureEach {
+  options.compilerArgs << '-Xlint:-deprecation'
 }
 
 apply plugin: "expo-root-project"
