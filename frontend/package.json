@@ -7,7 +7,8 @@
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@expo/ngrok": "^4.1.3",
