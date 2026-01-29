@@ -3,7 +3,6 @@ import { Stack, useRouter, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LanguageProvider } from '../i18n/LanguageContext';
 
 function HeaderBackButton() {
   const router = useRouter();
@@ -39,7 +38,7 @@ function HeaderBackButton() {
 
 export default function RootLayout() {
   return (
-    <LanguageProvider>
+    <>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -114,19 +113,7 @@ export default function RootLayout() {
             headerShown: false,
           }} 
         />
-        <Stack.Screen 
-          name="settings" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="languageSelect" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
       </Stack>
-    </LanguageProvider>
+    </>
   );
 }
