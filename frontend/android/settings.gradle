@@ -1,11 +1,6 @@
 pluginManagement {
-  // Read gradle.properties for node path
-  def propsFile = new File(rootDir, "gradle.properties")
-  def props = new Properties()
-  if (propsFile.exists()) {
-    propsFile.withInputStream { props.load(it) }
-  }
-  def nodeExecutable = props.getProperty("NODEJS_EXECUTABLE", "node")
+  // WINDOWS: Hardcoded Node.js path
+  def nodeExecutable = "C:/Program Files/nodejs/node.exe"
   
   def reactNativeGradlePlugin = new File(
     providers.exec {
