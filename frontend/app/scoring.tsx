@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,10 @@ import {
   Alert,
   Dimensions,
   ScrollView,
-  Pressable,
   TouchableOpacity,
   Modal,
+  GestureResponderEvent,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -39,6 +40,7 @@ export default function ScoringScreen() {
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
+  const targetRefs = useRef<{ [key: number]: View | null }>({});
 
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   const isVegas = targetType === 'vegas_3spot';
@@ -48,69 +50,41 @@ export default function ScoringScreen() {
 
   // Calculate score based on distance from center
   const calculateScore = (normalizedX: number, normalizedY: number): number => {
-    // Calculate distance from center (center is at 0.5, 0.5)
     const dx = normalizedX - 0.5;
     const dy = normalizedY - 0.5;
     const distFromCenter = Math.sqrt(dx * dx + dy * dy);
     
-    // Max distance from center to edge is 0.5 (when target fills container)
-    // But our rings only go to about 0.475 of the container
-    const maxRingRadius = 0.475;
-    const normalizedDist = distFromCenter / maxRingRadius;
+    // The rings take up 95% of the target, so max ring radius is 0.475
+    const normalizedDist = distFromCenter / 0.475;
     
     if (targetType === 'wa_standard') {
-      // WA Standard: 10 rings
-      // Outer to inner: White(1-2), Black(3-4), Blue(5-6), Red(7-8), Gold(9-10)
-      if (normalizedDist > 1.0) return 0;   // Miss
-      if (normalizedDist > 0.9) return 1;   // White outer
-      if (normalizedDist > 0.8) return 2;   // White inner
-      if (normalizedDist > 0.7) return 3;   // Black outer
-      if (normalizedDist > 0.6) return 4;   // Black inner
-      if (normalizedDist > 0.5) return 5;   // Blue outer
-      if (normalizedDist > 0.4) return 6;   // Blue inner
-      if (normalizedDist > 0.3) return 7;   // Red outer
-      if (normalizedDist > 0.2) return 8;   // Red inner
-      if (normalizedDist > 0.1) return 9;   // Gold outer
-      return 10; // Gold center (X)
+      if (normalizedDist > 1.0) return 0;
+      if (normalizedDist > 0.9) return 1;
+      if (normalizedDist > 0.8) return 2;
+      if (normalizedDist > 0.7) return 3;
+      if (normalizedDist > 0.6) return 4;
+      if (normalizedDist > 0.5) return 5;
+      if (normalizedDist > 0.4) return 6;
+      if (normalizedDist > 0.3) return 7;
+      if (normalizedDist > 0.2) return 8;
+      if (normalizedDist > 0.1) return 9;
+      return 10;
     } else {
-      // Vegas 3-Spot and NFAA Indoor: 5 rings (6-10)
-      // Outer to inner: Blue(6), Red(7-8), Gold(9-10)
-      if (normalizedDist > 1.0) return 0;   // Miss
-      if (normalizedDist > 0.8) return 6;   // Blue
-      if (normalizedDist > 0.6) return 7;   // Red outer
-      if (normalizedDist > 0.4) return 8;   // Red inner
-      if (normalizedDist > 0.2) return 9;   // Gold outer
-      return 10; // Gold center (X)
+      if (normalizedDist > 1.0) return 0;
+      if (normalizedDist > 0.8) return 6;
+      if (normalizedDist > 0.6) return 7;
+      if (normalizedDist > 0.4) return 8;
+      if (normalizedDist > 0.2) return 9;
+      return 10;
     }
   };
 
-  const handleTargetPress = (event: any, targetIndex: number = 0, targetSize: number) => {
-    // For web, we need to calculate position relative to the target element
-    const target = event.currentTarget || event.target;
-    const rect = target?.getBoundingClientRect?.();
-    
-    let x, y;
-    
-    if (rect && event.nativeEvent.pageX !== undefined) {
-      // Web: calculate relative to element using pageX/pageY
-      x = event.nativeEvent.pageX - rect.left;
-      y = event.nativeEvent.pageY - rect.top;
-    } else if (event.nativeEvent.locationX !== undefined) {
-      // Native (iOS/Android)
-      x = event.nativeEvent.locationX;
-      y = event.nativeEvent.locationY;
-    } else if (event.nativeEvent.offsetX !== undefined) {
-      // Web fallback
-      x = event.nativeEvent.offsetX;
-      y = event.nativeEvent.offsetY;
-    } else {
-      x = targetSize / 2;
-      y = targetSize / 2;
-    }
+  const handleTargetPress = (event: GestureResponderEvent, targetIndex: number, targetSize: number) => {
+    const { locationX, locationY } = event.nativeEvent;
     
     // Normalize to 0-1 range
-    const normalizedX = Math.max(0, Math.min(1, x / targetSize));
-    const normalizedY = Math.max(0, Math.min(1, y / targetSize));
+    const normalizedX = Math.max(0, Math.min(1, locationX / targetSize));
+    const normalizedY = Math.max(0, Math.min(1, locationY / targetSize));
     
     const score = calculateScore(normalizedX, normalizedY);
     
@@ -213,6 +187,7 @@ export default function ScoringScreen() {
             borderWidth: 1,
             borderColor: color?.border || '#333',
           }}
+          pointerEvents="none"
         />
       );
     }
@@ -222,8 +197,9 @@ export default function ScoringScreen() {
       : arrows;
 
     return (
-      <Pressable
+      <TouchableOpacity
         key={`target-${targetIndex}`}
+        activeOpacity={1}
         style={{
           width: size,
           height: size,
@@ -237,7 +213,7 @@ export default function ScoringScreen() {
       >
         {ringElements}
         
-        <View style={{ position: 'absolute', width: 8, height: 8, borderRadius: 4, backgroundColor: '#000' }} />
+        <View style={{ position: 'absolute', width: 8, height: 8, borderRadius: 4, backgroundColor: '#000' }} pointerEvents="none" />
 
         {targetArrows.map((arrow) => {
           const globalIndex = arrows.findIndex(a => a.id === arrow.id);
@@ -260,7 +236,7 @@ export default function ScoringScreen() {
             </TouchableOpacity>
           );
         })}
-      </Pressable>
+      </TouchableOpacity>
     );
   };
 
