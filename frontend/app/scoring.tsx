@@ -380,8 +380,9 @@ export default function ScoringScreen() {
             horizontal={true}
             showsHorizontalScrollIndicator={zoomLevel > 1}
             scrollEnabled={zoomLevel > 1}
+            bounces={false}
             contentContainerStyle={{
-              minWidth: zoomLevel > 1 ? SCREEN_WIDTH * zoomLevel : '100%',
+              width: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : '100%',
               alignItems: 'center',
               justifyContent: 'center',
             }}
@@ -390,11 +391,11 @@ export default function ScoringScreen() {
               showsVerticalScrollIndicator={zoomLevel > 1}
               scrollEnabled={zoomLevel > 1}
               nestedScrollEnabled={true}
+              bounces={false}
               contentContainerStyle={{
-                minHeight: zoomLevel > 1 ? 350 * zoomLevel : 'auto',
+                height: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : 'auto',
                 alignItems: 'center',
                 justifyContent: 'center',
-                paddingVertical: zoomLevel > 1 ? 50 * zoomLevel : 10,
               }}
             >
               <View style={[styles.targetWrapper, { transform: [{ scale: zoomLevel }] }]}>
