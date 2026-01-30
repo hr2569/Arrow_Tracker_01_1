@@ -383,29 +383,66 @@ export default function ScoringScreen() {
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {/* Zoom Controls */}
+        <View style={styles.zoomControls}>
+          <TouchableOpacity 
+            style={styles.zoomButton} 
+            onPress={() => {
+              const newScale = Math.min(scale.value + 0.5, 3);
+              scale.value = withSpring(newScale);
+              savedScale.value = newScale;
+            }}
+          >
+            <Ionicons name="add" size={20} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.zoomButton} 
+            onPress={() => {
+              const newScale = Math.max(scale.value - 0.5, 1);
+              scale.value = withSpring(newScale);
+              savedScale.value = newScale;
+              if (newScale === 1) {
+                translateX.value = withSpring(0);
+                translateY.value = withSpring(0);
+                savedTranslateX.value = 0;
+                savedTranslateY.value = 0;
+              }
+            }}
+          >
+            <Ionicons name="remove" size={20} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.zoomButton} onPress={resetZoom}>
+            <Ionicons name="scan-outline" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.targetWrapper}>
-          {isVegas ? (
-            <View style={styles.triangleContainer}>
-              <View style={styles.triangleTop}>
-                {renderTargetFace(0, SMALL_TARGET_SIZE)}
-              </View>
-              <View style={styles.triangleBottom}>
-                {renderTargetFace(1, SMALL_TARGET_SIZE)}
-                <View style={{ width: 20 }} />
-                {renderTargetFace(2, SMALL_TARGET_SIZE)}
-              </View>
-            </View>
-          ) : isNFAA ? (
-            <View style={styles.verticalContainer}>
-              {renderTargetFace(0, SMALL_TARGET_SIZE)}
-              <View style={{ height: 12 }} />
-              {renderTargetFace(1, SMALL_TARGET_SIZE)}
-              <View style={{ height: 12 }} />
-              {renderTargetFace(2, SMALL_TARGET_SIZE)}
-            </View>
-          ) : (
-            renderTargetFace(0, BASE_TARGET_SIZE)
-          )}
+          <GestureDetector gesture={composedGesture}>
+            <Animated.View style={[styles.zoomableContainer, animatedTargetStyle]}>
+              {isVegas ? (
+                <View style={styles.triangleContainer}>
+                  <View style={styles.triangleTop}>
+                    {renderTargetFace(0, SMALL_TARGET_SIZE)}
+                  </View>
+                  <View style={styles.triangleBottom}>
+                    {renderTargetFace(1, SMALL_TARGET_SIZE)}
+                    <View style={{ width: 20 }} />
+                    {renderTargetFace(2, SMALL_TARGET_SIZE)}
+                  </View>
+                </View>
+              ) : isNFAA ? (
+                <View style={styles.verticalContainer}>
+                  {renderTargetFace(0, SMALL_TARGET_SIZE)}
+                  <View style={{ height: 12 }} />
+                  {renderTargetFace(1, SMALL_TARGET_SIZE)}
+                  <View style={{ height: 12 }} />
+                  {renderTargetFace(2, SMALL_TARGET_SIZE)}
+                </View>
+              ) : (
+                renderTargetFace(0, BASE_TARGET_SIZE)
+              )}
+            </Animated.View>
+          </GestureDetector>
         </View>
 
         <View style={styles.arrowList}>
