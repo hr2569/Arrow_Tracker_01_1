@@ -16,7 +16,7 @@ export const createBackup = async (): Promise<{ success: boolean; error?: string
     const backup = {
       version: '1.0',
       exportedAt: new Date().toISOString(),
-      appName: 'Archery Scorer',
+      appName: 'Arrow Tracker',
       data: {
         sessions: data.sessions,
         bows: data.bows,

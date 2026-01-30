@@ -27,7 +27,7 @@ export default function HomeScreen() {
       <View style={styles.content}>
         {/* Hero Section */}
         <View style={styles.hero}>
-          <Text style={styles.title}>Archery Scorer</Text>
+          <Text style={styles.title}>Arrow Tracker</Text>
           <Text style={styles.subtitle}>
             Track your shots and improve your aim
           </Text>

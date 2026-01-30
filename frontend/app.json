@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Archery Scorer",
-    "slug": "archery-scorer",
+    "name": "Arrow Tracker",
+    "slug": "arrow-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "archeryscorer",
+    "scheme": "arrowtracker",
     "userInterfaceStyle": "dark",
     "newArchEnabled": false,
     "platforms": ["android", "web"],
@@ -15,7 +15,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "android": {
-      "package": "com.archeryscorer.app",
+      "package": "com.arrowtracker.app",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",

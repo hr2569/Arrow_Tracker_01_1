@@ -58,7 +58,7 @@ export default function RootLayout() {
         <Stack.Screen 
           name="index" 
           options={{ 
-            title: 'Archery Scorer',
+            title: 'Arrow Tracker',
             headerShown: true,
             headerLeft: () => null, // No back button on home
           }} 
