@@ -17,13 +17,14 @@ import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 32, SCREEN_HEIGHT * 0.45);
+const SMALL_TARGET_SIZE = (SCREEN_WIDTH - 80) / 3;
 
 interface Arrow {
   id: string;
   x: number;
   y: number;
-  ring: number;
-  targetIndex?: number; // For multi-target layouts
+  score: number;
+  targetIndex?: number;
 }
 
 export default function ScoringScreen() {
@@ -38,57 +39,64 @@ export default function ScoringScreen() {
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
-  const [selectedTargetIndex, setSelectedTargetIndex] = useState(0);
 
   // Get target configuration
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
-  const isMultiTarget = targetConfig.layout === 'triple_vertical' || targetConfig.layout === 'triple_triangle';
+  const isVegas = targetType === 'vegas_3spot';
+  const isNFAA = targetType === 'nfaa_indoor';
+  const isMultiTarget = isVegas || isNFAA;
 
-  // Session info
   const isCompetition = sessionType === 'competition';
 
-  // Calculate score from ring position based on target type
-  const calculateScoreFromRing = (ringIndex: number): number => {
-    const scores = targetConfig.scores;
-    if (ringIndex < 0) return 0; // Miss
-    if (ringIndex >= scores.length) return scores[scores.length - 1];
-    return scores[ringIndex];
-  };
-
-  const calculateRingFromPosition = (x: number, y: number): number => {
-    // Calculate distance from center (0.5, 0.5)
+  // Calculate score based on tap position
+  const calculateScore = (x: number, y: number): number => {
     const dx = x - 0.5;
     const dy = y - 0.5;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
-    const rings = targetConfig.rings;
+    // Normalize distance (0 = center, 0.5 = edge)
+    const maxRadius = 0.5;
+    const normalizedDist = distance / maxRadius;
     
-    // Map distance to ring index (0 = outermost visible ring)
-    const normalizedDist = distance / 0.45;
-    
-    if (normalizedDist > 1.1) return -1; // Miss
-    
-    // Calculate which ring was hit (0 = outermost, rings-1 = innermost)
-    const ringIndex = Math.floor((1 - normalizedDist) * rings);
-    return Math.max(0, Math.min(rings - 1, ringIndex));
+    if (targetType === 'wa_standard') {
+      // WA Standard: 10 rings, scores 1-10
+      // Each ring is 1/10 of the radius
+      if (normalizedDist > 1.0) return 0; // Miss
+      if (normalizedDist > 0.9) return 1;  // White outer
+      if (normalizedDist > 0.8) return 2;  // White inner
+      if (normalizedDist > 0.7) return 3;  // Black outer
+      if (normalizedDist > 0.6) return 4;  // Black inner
+      if (normalizedDist > 0.5) return 5;  // Blue outer
+      if (normalizedDist > 0.4) return 6;  // Blue inner
+      if (normalizedDist > 0.3) return 7;  // Red outer
+      if (normalizedDist > 0.2) return 8;  // Red inner
+      if (normalizedDist > 0.1) return 9;  // Gold outer
+      return 10; // Gold inner (X)
+    } else {
+      // Vegas 3-Spot and NFAA Indoor: 5 rings, scores 6-10
+      if (normalizedDist > 1.0) return 0;  // Miss
+      if (normalizedDist > 0.8) return 6;  // Blue
+      if (normalizedDist > 0.6) return 7;  // Red outer
+      if (normalizedDist > 0.4) return 8;  // Red inner
+      if (normalizedDist > 0.2) return 9;  // Gold outer
+      return 10; // Gold inner (X)
+    }
   };
 
-  const handleTargetPress = (event: any, targetIndex: number = 0) => {
+  const handleTargetPress = (event: any, targetIndex: number = 0, targetSize: number) => {
     const { locationX, locationY } = event.nativeEvent;
-    const targetSize = isMultiTarget ? (SCREEN_WIDTH - 48) / 3 : BASE_TARGET_SIZE;
     
     // Normalize coordinates to 0-1 range
     const x = Math.max(0, Math.min(1, locationX / targetSize));
     const y = Math.max(0, Math.min(1, locationY / targetSize));
     
-    const ringIndex = calculateRingFromPosition(x, y);
-    const score = ringIndex >= 0 ? calculateScoreFromRing(ringIndex) : 0;
+    const score = calculateScore(x, y);
     
     const newArrow: Arrow = {
       id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       x,
       y,
-      ring: score,
+      score,
       targetIndex: isMultiTarget ? targetIndex : undefined,
     };
 
@@ -105,7 +113,7 @@ export default function ScoringScreen() {
       const updated = [...arrows];
       updated[selectedArrowIndex] = {
         ...updated[selectedArrowIndex],
-        ring: newScore,
+        score: newScore,
       };
       setArrows(updated);
     }
@@ -115,17 +123,19 @@ export default function ScoringScreen() {
 
   const handleDeleteArrow = (index: number) => {
     setArrows(prev => prev.filter((_, i) => i !== index));
+    setShowScorePicker(false);
+    setSelectedArrowIndex(null);
   };
 
-  const getTotalScore = () => arrows.reduce((sum, a) => sum + a.ring, 0);
+  const getTotalScore = () => arrows.reduce((sum, a) => sum + a.score, 0);
 
   const getScoreColor = (score: number) => {
-    if (score >= 9) return '#FFD700';
-    if (score >= 7) return '#ed1c24';
-    if (score >= 5) return '#00a2e8';
-    if (score >= 3) return '#2a2a2a';
-    if (score >= 1) return '#f5f5f0';
-    return '#888';
+    if (score >= 9) return '#FFD700';  // Gold
+    if (score >= 7) return '#ed1c24';  // Red
+    if (score >= 5) return '#00a2e8';  // Blue
+    if (score >= 3) return '#2a2a2a';  // Black
+    if (score >= 1) return '#f5f5f0';  // White
+    return '#888';  // Miss
   };
 
   const getScoreTextColor = (score: number) => {
@@ -143,12 +153,8 @@ export default function ScoringScreen() {
       return;
     }
 
-    finishRound();
-  };
-
-  const finishRound = () => {
     setCurrentRound({
-      shots: arrows.map(a => ({ x: a.x, y: a.y, ring: a.ring })),
+      shots: arrows.map(a => ({ x: a.x, y: a.y, ring: a.score })),
       total: getTotalScore(),
     });
     router.push('/summary');
@@ -158,44 +164,39 @@ export default function ScoringScreen() {
     router.back();
   };
 
-  // Get available scores for the picker based on target type
+  // Get available scores for the picker
   const getAvailableScores = (): number[] => {
     if (targetType === 'wa_standard') {
       return [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
     } else {
-      // Vegas and NFAA: 10, 9, 8, 7, 6, 0 (miss)
       return [10, 9, 8, 7, 6, 0];
     }
   };
 
   // Render a single target face
-  const renderTargetFace = (targetIndex: number = 0, size: number = BASE_TARGET_SIZE) => {
+  const renderTargetFace = (targetIndex: number, size: number) => {
     const rings = targetConfig.rings;
+    const colors = targetConfig.colors;
     const ringElements = [];
     
-    // Draw rings from largest (outermost) to smallest (innermost)
+    // Draw rings from largest to smallest
     for (let i = 0; i < rings; i++) {
       const ringRatio = (rings - i) / rings;
-      const ringSize = size * ringRatio;
-      const color = targetConfig.colors[i];
-      
-      const fillColor = color?.bg || '#f5f5f0';
-      const borderCol = color?.border || '#333';
+      const ringSize = size * ringRatio * 0.95;
+      const color = colors[i];
       
       ringElements.push(
         <View
           key={`ring-${targetIndex}-${i}`}
-          style={[
-            styles.ring,
-            {
-              width: ringSize,
-              height: ringSize,
-              borderRadius: ringSize / 2,
-              borderColor: borderCol,
-              borderWidth: 1,
-              backgroundColor: fillColor,
-            },
-          ]}
+          style={{
+            position: 'absolute',
+            width: ringSize,
+            height: ringSize,
+            borderRadius: ringSize / 2,
+            backgroundColor: color?.bg || '#f5f5f0',
+            borderWidth: 1,
+            borderColor: color?.border || '#333',
+          }}
         />
       );
     }
@@ -208,17 +209,27 @@ export default function ScoringScreen() {
     return (
       <Pressable
         key={`target-${targetIndex}`}
-        style={[styles.targetContainer, { width: size, height: size }]}
-        onPress={(e) => handleTargetPress(e, targetIndex)}
+        style={{
+          width: size,
+          height: size,
+          backgroundColor: '#1a1a1a',
+          borderRadius: 8,
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+        onPress={(e) => handleTargetPress(e, targetIndex, size)}
       >
-        <View style={[styles.ringOverlay, { width: size, height: size }]} pointerEvents="none">
-          {ringElements}
-          {/* Center dot */}
-          <View style={[styles.centerDot, { width: size * 0.05, height: size * 0.05, borderRadius: size * 0.025 }]} />
+        {/* Rings */}
+        {ringElements}
+        
+        {/* Center X mark */}
+        <View style={styles.centerMark}>
+          <Text style={styles.centerMarkText}>X</Text>
         </View>
 
         {/* Arrow Markers */}
-        {targetArrows.map((arrow, index) => {
+        {targetArrows.map((arrow) => {
           const globalIndex = arrows.findIndex(a => a.id === arrow.id);
           return (
             <TouchableOpacity
@@ -226,17 +237,15 @@ export default function ScoringScreen() {
               style={[
                 styles.arrowMarker,
                 {
-                  left: arrow.x * size - 10,
-                  top: arrow.y * size - 10,
-                  backgroundColor: getScoreColor(arrow.ring),
-                  width: 20,
-                  height: 20,
+                  left: arrow.x * size - 12,
+                  top: arrow.y * size - 12,
+                  backgroundColor: getScoreColor(arrow.score),
                 },
               ]}
               onPress={() => handleEditArrow(globalIndex)}
             >
-              <Text style={[styles.arrowMarkerText, { color: getScoreTextColor(arrow.ring), fontSize: 10 }]}>
-                {arrow.ring === 10 ? 'X' : arrow.ring}
+              <Text style={[styles.arrowMarkerText, { color: getScoreTextColor(arrow.score) }]}>
+                {arrow.score === 10 ? 'X' : arrow.score === 0 ? 'M' : arrow.score}
               </Text>
             </TouchableOpacity>
           );
@@ -265,18 +274,29 @@ export default function ScoringScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Target Area */}
         <View style={styles.targetWrapper}>
-          {isMultiTarget ? (
-            // Render 3 targets for Vegas/NFAA
-            <View style={styles.multiTargetContainer}>
+          {isVegas ? (
+            // Vegas 3-Spot: Triangle arrangement (1 top, 2 bottom)
+            <View style={styles.triangleContainer}>
+              <View style={styles.triangleTop}>
+                {renderTargetFace(0, SMALL_TARGET_SIZE)}
+              </View>
+              <View style={styles.triangleBottom}>
+                {renderTargetFace(1, SMALL_TARGET_SIZE)}
+                <View style={{ width: 16 }} />
+                {renderTargetFace(2, SMALL_TARGET_SIZE)}
+              </View>
+            </View>
+          ) : isNFAA ? (
+            // NFAA Indoor: Vertical stack (3 targets)
+            <View style={styles.verticalContainer}>
               {[0, 1, 2].map((index) => (
-                <View key={index} style={styles.smallTargetWrapper}>
-                  {renderTargetFace(index, (SCREEN_WIDTH - 64) / 3)}
-                  <Text style={styles.targetLabel}>Target {index + 1}</Text>
+                <View key={index} style={styles.verticalTargetWrapper}>
+                  {renderTargetFace(index, SMALL_TARGET_SIZE)}
                 </View>
               ))}
             </View>
           ) : (
-            // Render single target for WA Standard
+            // WA Standard: Single large target
             renderTargetFace(0, BASE_TARGET_SIZE)
           )}
         </View>
@@ -293,15 +313,15 @@ export default function ScoringScreen() {
               {arrows.map((arrow, index) => (
                 <TouchableOpacity
                   key={arrow.id}
-                  style={[styles.arrowItem, { backgroundColor: getScoreColor(arrow.ring) }]}
+                  style={[styles.arrowItem, { backgroundColor: getScoreColor(arrow.score) }]}
                   onPress={() => handleEditArrow(index)}
                   onLongPress={() => handleDeleteArrow(index)}
                 >
-                  <Text style={[styles.arrowScore, { color: getScoreTextColor(arrow.ring) }]}>
-                    {arrow.ring === 10 ? 'X' : arrow.ring}
+                  <Text style={[styles.arrowScore, { color: getScoreTextColor(arrow.score) }]}>
+                    {arrow.score === 10 ? 'X' : arrow.score === 0 ? 'M' : arrow.score}
                   </Text>
                   {isMultiTarget && arrow.targetIndex !== undefined && (
-                    <Text style={[styles.arrowTarget, { color: getScoreTextColor(arrow.ring) }]}>
+                    <Text style={[styles.arrowTargetLabel, { color: getScoreTextColor(arrow.score) }]}>
                       T{arrow.targetIndex + 1}
                     </Text>
                   )}
@@ -344,8 +364,6 @@ export default function ScoringScreen() {
                 if (selectedArrowIndex !== null) {
                   handleDeleteArrow(selectedArrowIndex);
                 }
-                setShowScorePicker(false);
-                setSelectedArrowIndex(null);
               }}
             >
               <Ionicons name="trash" size={20} color="#fff" />
@@ -414,51 +432,56 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+    paddingBottom: 32,
   },
   targetWrapper: {
     alignItems: 'center',
     marginBottom: 20,
   },
-  multiTargetContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  smallTargetWrapper: {
+  // Triangle arrangement for Vegas 3-Spot
+  triangleContainer: {
     alignItems: 'center',
   },
-  targetLabel: {
-    color: '#888',
-    fontSize: 11,
-    marginTop: 4,
+  triangleTop: {
+    marginBottom: 12,
   },
-  targetContainer: {
-    position: 'relative',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 8,
-    overflow: 'hidden',
+  triangleBottom: {
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
-  ringOverlay: {
+  // Vertical arrangement for NFAA Indoor
+  verticalContainer: {
+    alignItems: 'center',
+  },
+  verticalTargetWrapper: {
+    marginBottom: 12,
+  },
+  centerMark: {
     position: 'absolute',
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0,0,0,0.5)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ring: {
-    position: 'absolute',
-  },
-  centerDot: {
-    position: 'absolute',
-    backgroundColor: '#FFD700',
+  centerMarkText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   arrowMarker: {
     position: 'absolute',
-    borderRadius: 10,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#000',
   },
   arrowMarkerText: {
+    fontSize: 11,
     fontWeight: 'bold',
   },
   arrowList: {
@@ -489,19 +512,19 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   arrowItem: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#333',
   },
   arrowScore: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
   },
-  arrowTarget: {
+  arrowTargetLabel: {
     fontSize: 8,
     marginTop: -2,
   },
@@ -526,7 +549,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: 'rgba(0,0,0,0.85)',
     alignItems: 'center',
     justifyContent: 'center',
   },
