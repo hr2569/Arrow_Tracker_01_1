@@ -18,9 +18,6 @@ import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 32, SCREEN_HEIGHT * 0.45);
 
-// Competition mode constants
-const COMPETITION_ARROWS_PER_ROUND = 3;
-
 interface Arrow {
   id: string;
   x: number;
