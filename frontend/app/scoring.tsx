@@ -42,6 +42,67 @@ export default function ScoringScreen() {
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
 
+  // Zoom state
+  const scale = useSharedValue(1);
+  const savedScale = useSharedValue(1);
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const savedTranslateX = useSharedValue(0);
+  const savedTranslateY = useSharedValue(0);
+
+  // Pinch gesture for zoom
+  const pinchGesture = Gesture.Pinch()
+    .onUpdate((event) => {
+      scale.value = Math.min(Math.max(savedScale.value * event.scale, 1), 3);
+    })
+    .onEnd(() => {
+      savedScale.value = scale.value;
+      // Reset to 1 if very close
+      if (scale.value < 1.1) {
+        scale.value = withSpring(1);
+        savedScale.value = 1;
+        translateX.value = withSpring(0);
+        translateY.value = withSpring(0);
+        savedTranslateX.value = 0;
+        savedTranslateY.value = 0;
+      }
+    });
+
+  // Pan gesture for moving when zoomed
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      if (scale.value > 1) {
+        translateX.value = savedTranslateX.value + event.translationX;
+        translateY.value = savedTranslateY.value + event.translationY;
+      }
+    })
+    .onEnd(() => {
+      savedTranslateX.value = translateX.value;
+      savedTranslateY.value = translateY.value;
+    });
+
+  // Combine gestures
+  const composedGesture = Gesture.Simultaneous(pinchGesture, panGesture);
+
+  // Animated style for zoom
+  const animatedTargetStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { scale: scale.value },
+    ],
+  }));
+
+  // Reset zoom function
+  const resetZoom = () => {
+    scale.value = withSpring(1);
+    savedScale.value = 1;
+    translateX.value = withSpring(0);
+    translateY.value = withSpring(0);
+    savedTranslateX.value = 0;
+    savedTranslateY.value = 0;
+  };
+
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   const isVegas = targetType === 'vegas_3spot';
   const isNFAA = targetType === 'nfaa_indoor';
