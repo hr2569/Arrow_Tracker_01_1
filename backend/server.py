@@ -1,7 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
@@ -9,14 +8,25 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import uuid
 from datetime import datetime
+import json
+import firebase_admin
+from firebase_admin import credentials, firestore
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# Firebase initialization
+firebase_creds = os.environ.get('FIREBASE_CREDENTIALS')
+if firebase_creds:
+    cred_dict = json.loads(firebase_creds)
+    cred = credentials.Certificate(cred_dict)
+    firebase_admin.initialize_app(cred)
+else:
+    # For local development with service account file
+    cred = credentials.Certificate(ROOT_DIR / 'firebase-credentials.json')
+    firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -35,9 +45,9 @@ logger = logging.getLogger(__name__)
 
 class Shot(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    x: float  # Normalized position (0-1) from center
-    y: float  # Normalized position (0-1) from center
-    ring: int  # 1-10 points
+    x: float
+    y: float
+    ring: int
     confirmed: bool = False
 
 class Round(BaseModel):
@@ -53,7 +63,7 @@ class Session(BaseModel):
     bow_id: Optional[str] = None
     bow_name: Optional[str] = None
     distance: Optional[str] = None
-    target_type: Optional[str] = "wa_standard"  # wa_standard, vegas_3spot, nfaa_indoor
+    target_type: Optional[str] = "wa_standard"
     rounds: List[Round] = []
     total_score: int = 0
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -72,15 +82,14 @@ class UpdateSessionRequest(BaseModel):
     bow_name: Optional[str] = None
     distance: Optional[str] = None
     target_type: Optional[str] = None
-    created_at: Optional[str] = None  # ISO format date string
+    created_at: Optional[str] = None
 
-# Bow model for equipment tracking
 class Bow(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
-    bow_type: str  # recurve, compound, longbow, barebow, etc.
-    draw_weight: Optional[float] = None  # in pounds
-    draw_length: Optional[float] = None  # in inches
+    bow_type: str
+    draw_weight: Optional[float] = None
+    draw_length: Optional[float] = None
     notes: Optional[str] = ""
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -101,7 +110,7 @@ class UpdateBowRequest(BaseModel):
 
 class AddRoundRequest(BaseModel):
     round_number: int
-    shots: List[dict]  # [{x, y, ring}, ...]
+    shots: List[dict]
 
 class UpdateRoundRequest(BaseModel):
     shots: List[dict]
@@ -128,40 +137,44 @@ async def create_session(request: CreateSessionRequest):
         target_type=request.target_type or "wa_standard"
     )
     session_dict = session.dict()
-    # Convert datetime to ISO string for JSON serialization
     session_dict['created_at'] = session_dict['created_at'].isoformat()
     session_dict['updated_at'] = session_dict['updated_at'].isoformat()
-    await db.sessions.insert_one(session_dict)
-    # Remove MongoDB _id from response
-    session_dict.pop('_id', None)
+    
+    # Convert rounds' created_at to string
+    for round_data in session_dict['rounds']:
+        if isinstance(round_data.get('created_at'), datetime):
+            round_data['created_at'] = round_data['created_at'].isoformat()
+    
+    db.collection('sessions').document(session.id).set(session_dict)
     return session_dict
 
 @api_router.get("/sessions")
 async def get_sessions():
     """Get all scoring sessions"""
-    sessions = await db.sessions.find().sort("created_at", -1).to_list(100)
-    # Remove MongoDB _id from response
-    for session in sessions:
-        session.pop('_id', None)
+    sessions_ref = db.collection('sessions').order_by('created_at', direction=firestore.Query.DESCENDING).limit(100)
+    sessions = []
+    for doc in sessions_ref.stream():
+        sessions.append(doc.to_dict())
     return sessions
 
 @api_router.get("/sessions/{session_id}")
 async def get_session(session_id: str):
     """Get a specific session"""
-    session = await db.sessions.find_one({"id": session_id})
-    if not session:
+    doc = db.collection('sessions').document(session_id).get()
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Session not found")
-    session.pop('_id', None)
-    return session
+    return doc.to_dict()
 
 @api_router.post("/sessions/{session_id}/rounds")
 async def add_round(session_id: str, request: AddRoundRequest):
     """Add a round to a session"""
-    session = await db.sessions.find_one({"id": session_id})
-    if not session:
+    doc_ref = db.collection('sessions').document(session_id)
+    doc = doc_ref.get()
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    # Create shots with proper scoring
+    session = doc.to_dict()
+    
     shots = []
     round_total = 0
     for shot_data in request.shots:
@@ -174,7 +187,6 @@ async def add_round(session_id: str, request: AddRoundRequest):
         shots.append(shot)
         round_total += shot.ring
     
-    # Ensure minimum 3 shots per round (add 0-score shots if needed)
     while len(shots) < 3:
         shots.append(Shot(x=0, y=0, ring=0, confirmed=True))
     
@@ -184,7 +196,6 @@ async def add_round(session_id: str, request: AddRoundRequest):
         total_score=round_total
     )
     
-    # Update session
     new_round_dict = new_round.dict()
     new_round_dict['created_at'] = new_round_dict['created_at'].isoformat()
     
@@ -192,22 +203,19 @@ async def add_round(session_id: str, request: AddRoundRequest):
     session['total_score'] = sum(r['total_score'] for r in session['rounds'])
     session['updated_at'] = datetime.utcnow().isoformat()
     
-    await db.sessions.update_one(
-        {"id": session_id},
-        {"$set": session}
-    )
-    
-    session.pop('_id', None)
+    doc_ref.set(session)
     return session
 
 @api_router.put("/sessions/{session_id}/rounds/{round_id}")
 async def update_round(session_id: str, round_id: str, request: UpdateRoundRequest):
     """Update a specific round"""
-    session = await db.sessions.find_one({"id": session_id})
-    if not session:
+    doc_ref = db.collection('sessions').document(session_id)
+    doc = doc_ref.get()
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    # Find and update the round
+    session = doc.to_dict()
+    
     round_found = False
     for i, round_data in enumerate(session['rounds']):
         if round_data['id'] == round_id:
@@ -224,7 +232,6 @@ async def update_round(session_id: str, round_id: str, request: UpdateRoundReque
                 shots.append(shot)
                 round_total += shot.ring
             
-            # Ensure minimum 3 shots
             while len(shots) < 3:
                 shots.append(Shot(x=0, y=0, ring=0, confirmed=True))
             
@@ -235,62 +242,53 @@ async def update_round(session_id: str, round_id: str, request: UpdateRoundReque
     if not round_found:
         raise HTTPException(status_code=404, detail="Round not found")
     
-    # Recalculate total
     session['total_score'] = sum(r['total_score'] for r in session['rounds'])
     session['updated_at'] = datetime.utcnow().isoformat()
     
-    await db.sessions.update_one(
-        {"id": session_id},
-        {"$set": session}
-    )
-    
-    session.pop('_id', None)
+    doc_ref.set(session)
     return session
 
 @api_router.delete("/sessions/{session_id}")
 async def delete_session(session_id: str):
     """Delete a session"""
-    result = await db.sessions.delete_one({"id": session_id})
-    if result.deleted_count == 0:
+    doc_ref = db.collection('sessions').document(session_id)
+    doc = doc_ref.get()
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Session not found")
+    doc_ref.delete()
     return {"message": "Session deleted"}
 
 @api_router.put("/sessions/{session_id}")
 async def update_session(session_id: str, request: UpdateSessionRequest):
-    """Update a session's details including date"""
-    session = await db.sessions.find_one({"id": session_id})
-    if not session:
+    """Update a session's details"""
+    doc_ref = db.collection('sessions').document(session_id)
+    doc = doc_ref.get()
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    update_data = {}
+    session = doc.to_dict()
+    
     if request.name is not None:
-        update_data['name'] = request.name
+        session['name'] = request.name
     if request.bow_id is not None:
-        update_data['bow_id'] = request.bow_id
+        session['bow_id'] = request.bow_id
     if request.bow_name is not None:
-        update_data['bow_name'] = request.bow_name
+        session['bow_name'] = request.bow_name
     if request.distance is not None:
-        update_data['distance'] = request.distance
+        session['distance'] = request.distance
     if request.target_type is not None:
-        update_data['target_type'] = request.target_type
+        session['target_type'] = request.target_type
     if request.created_at is not None:
-        # Parse ISO format date string
         try:
             parsed_date = datetime.fromisoformat(request.created_at.replace('Z', '+00:00'))
-            update_data['created_at'] = parsed_date.isoformat()
+            session['created_at'] = parsed_date.isoformat()
         except ValueError as e:
             raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
     
-    update_data['updated_at'] = datetime.utcnow().isoformat()
+    session['updated_at'] = datetime.utcnow().isoformat()
     
-    await db.sessions.update_one(
-        {"id": session_id},
-        {"$set": update_data}
-    )
-    
-    updated_session = await db.sessions.find_one({"id": session_id})
-    updated_session.pop('_id', None)
-    return updated_session
+    doc_ref.set(session)
+    return session
 
 # ============== Bow Management Endpoints ==============
 
@@ -307,63 +305,61 @@ async def create_bow(request: CreateBowRequest):
     bow_dict = bow.dict()
     bow_dict['created_at'] = bow_dict['created_at'].isoformat()
     bow_dict['updated_at'] = bow_dict['updated_at'].isoformat()
-    await db.bows.insert_one(bow_dict)
-    bow_dict.pop('_id', None)
+    
+    db.collection('bows').document(bow.id).set(bow_dict)
     return bow_dict
 
 @api_router.get("/bows")
 async def get_bows():
     """Get all bows"""
-    bows = await db.bows.find().sort("created_at", -1).to_list(100)
-    for bow in bows:
-        bow.pop('_id', None)
+    bows_ref = db.collection('bows').order_by('created_at', direction=firestore.Query.DESCENDING).limit(100)
+    bows = []
+    for doc in bows_ref.stream():
+        bows.append(doc.to_dict())
     return bows
 
 @api_router.get("/bows/{bow_id}")
 async def get_bow(bow_id: str):
     """Get a specific bow"""
-    bow = await db.bows.find_one({"id": bow_id})
-    if not bow:
+    doc = db.collection('bows').document(bow_id).get()
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Bow not found")
-    bow.pop('_id', None)
-    return bow
+    return doc.to_dict()
 
 @api_router.put("/bows/{bow_id}")
 async def update_bow(bow_id: str, request: UpdateBowRequest):
     """Update a bow"""
-    bow = await db.bows.find_one({"id": bow_id})
-    if not bow:
+    doc_ref = db.collection('bows').document(bow_id)
+    doc = doc_ref.get()
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Bow not found")
     
-    update_data = {}
+    bow = doc.to_dict()
+    
     if request.name is not None:
-        update_data['name'] = request.name
+        bow['name'] = request.name
     if request.bow_type is not None:
-        update_data['bow_type'] = request.bow_type
+        bow['bow_type'] = request.bow_type
     if request.draw_weight is not None:
-        update_data['draw_weight'] = request.draw_weight
+        bow['draw_weight'] = request.draw_weight
     if request.draw_length is not None:
-        update_data['draw_length'] = request.draw_length
+        bow['draw_length'] = request.draw_length
     if request.notes is not None:
-        update_data['notes'] = request.notes
+        bow['notes'] = request.notes
     
-    update_data['updated_at'] = datetime.utcnow().isoformat()
+    bow['updated_at'] = datetime.utcnow().isoformat()
     
-    await db.bows.update_one(
-        {"id": bow_id},
-        {"$set": update_data}
-    )
-    
-    updated_bow = await db.bows.find_one({"id": bow_id})
-    updated_bow.pop('_id', None)
-    return updated_bow
+    doc_ref.set(bow)
+    return bow
 
 @api_router.delete("/bows/{bow_id}")
 async def delete_bow(bow_id: str):
     """Delete a bow"""
-    result = await db.bows.delete_one({"id": bow_id})
-    if result.deleted_count == 0:
+    doc_ref = db.collection('bows').document(bow_id)
+    doc = doc_ref.get()
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Bow not found")
+    doc_ref.delete()
     return {"message": "Bow deleted"}
 
 # Include the router in the main app
@@ -376,7 +372,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
