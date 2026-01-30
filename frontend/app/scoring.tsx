@@ -8,7 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
-  Platform,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -74,15 +74,15 @@ export default function ScoringScreen() {
     }
   };
 
-  const handleTargetPress = (event: any, targetIndex: number, targetSize: number) => {
-    const nativeEvent = event.nativeEvent;
+  const handleTargetTouch = (event: any, targetIndex: number, targetSize: number) => {
+    const { locationX, locationY } = event.nativeEvent;
     
-    let x = targetSize / 2;
-    let y = targetSize / 2;
+    let x = locationX;
+    let y = locationY;
     
-    if (nativeEvent.locationX !== undefined) {
-      x = nativeEvent.locationX;
-      y = nativeEvent.locationY;
+    if (x === undefined || y === undefined) {
+      x = targetSize / 2;
+      y = targetSize / 2;
     }
     
     const normalizedX = Math.max(0, Math.min(1, x / targetSize));
@@ -193,50 +193,57 @@ export default function ScoringScreen() {
       : arrows;
 
     return (
-      <TouchableOpacity
-        key={`target-${targetIndex}`}
-        activeOpacity={1}
+      <View
+        key={`target-wrapper-${targetIndex}`}
         style={{
           width: size,
           height: size,
-          backgroundColor: '#1a1a1a',
           borderRadius: size / 2,
-          alignItems: 'center',
-          justifyContent: 'center',
           overflow: 'hidden',
         }}
-        onPress={(e) => handleTargetPress(e, targetIndex, size)}
       >
-        {ringElements}
-        
-        {/* Center + mark */}
-        <View style={styles.centerMark} pointerEvents="none">
-          <View style={styles.centerHorizontal} />
-          <View style={styles.centerVertical} />
-        </View>
+        <Pressable
+          style={{
+            width: size,
+            height: size,
+            backgroundColor: '#1a1a1a',
+            borderRadius: size / 2,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onPressIn={(e) => handleTargetTouch(e, targetIndex, size)}
+        >
+          {ringElements}
+          
+          {/* Center + mark */}
+          <View style={styles.centerMark} pointerEvents="none">
+            <View style={styles.centerHorizontal} />
+            <View style={styles.centerVertical} />
+          </View>
 
-        {targetArrows.map((arrow) => {
-          const globalIndex = arrows.findIndex(a => a.id === arrow.id);
-          return (
-            <TouchableOpacity
-              key={arrow.id}
-              style={[
-                styles.arrowMarker,
-                {
-                  left: arrow.x * size - 12,
-                  top: arrow.y * size - 12,
-                  backgroundColor: getScoreColor(arrow.score),
-                },
-              ]}
-              onPress={() => handleEditArrow(globalIndex)}
-            >
-              <Text style={[styles.arrowMarkerText, { color: getScoreTextColor(arrow.score) }]}>
-                {arrow.score === 10 ? 'X' : arrow.score === 0 ? 'M' : arrow.score}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </TouchableOpacity>
+          {targetArrows.map((arrow) => {
+            const globalIndex = arrows.findIndex(a => a.id === arrow.id);
+            return (
+              <TouchableOpacity
+                key={arrow.id}
+                style={[
+                  styles.arrowMarker,
+                  {
+                    left: arrow.x * size - 12,
+                    top: arrow.y * size - 12,
+                    backgroundColor: getScoreColor(arrow.score),
+                  },
+                ]}
+                onPress={() => handleEditArrow(globalIndex)}
+              >
+                <Text style={[styles.arrowMarkerText, { color: getScoreTextColor(arrow.score) }]}>
+                  {arrow.score === 10 ? 'X' : arrow.score === 0 ? 'M' : arrow.score}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </Pressable>
+      </View>
     );
   };
 
