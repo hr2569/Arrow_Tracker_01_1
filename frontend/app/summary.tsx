@@ -7,16 +7,13 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  Platform,
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../store/appStore';
-import axios from 'axios';
-
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+import { createSession, addRoundToSession } from '../utils/localStorage';
 
 // Max rounds for competition mode
 const MAX_COMPETITION_ROUNDS = 10;
@@ -39,8 +36,6 @@ export default function SummaryScreen() {
   const router = useRouter();
   const { 
     currentRound, 
-    currentSession, 
-    setCurrentSession, 
     clearCurrentRound, 
     clearAll,
     sessionType,
@@ -78,20 +73,18 @@ export default function SummaryScreen() {
   const handleSaveSession = async () => {
     setIsSaving(true);
     try {
-      // Create session with bow, distance, and target type
-      const sessionResponse = await axios.post(`${API_URL}/api/sessions`, {
+      // Create session with bow, distance, and target type using local storage
+      const session = await createSession({
         name: `Session ${new Date().toLocaleDateString()}`,
-        bow_id: selectedBow?.id || null,
-        bow_name: selectedBow?.name || null,
-        distance: sessionDistance || null,
+        bow_id: selectedBow?.id || undefined,
+        bow_name: selectedBow?.name || undefined,
+        distance: sessionDistance || undefined,
         target_type: targetType || 'wa_standard',
       });
 
-      const sessionId = sessionResponse.data.id;
-
       // Add all rounds to session
       for (const round of sessionRounds) {
-        await axios.post(`${API_URL}/api/sessions/${sessionId}/rounds`, {
+        await addRoundToSession(session.id, {
           round_number: round.roundNumber,
           shots: round.shots,
         });
@@ -111,7 +104,7 @@ export default function SummaryScreen() {
   const handleAddRound = () => {
     clearCurrentRound();
     incrementRoundNumber();
-    router.push('/capture');
+    router.push('/scoring');
   };
 
   const handleFinishSession = () => {
@@ -134,21 +127,21 @@ export default function SummaryScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Score Summary Card */}
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>{t('roundSummary')}</Text>
+          <Text style={styles.summaryTitle}>Round Summary</Text>
           
           {currentRound && (
             <>
               <View style={styles.scoreDisplay}>
                 <Text style={styles.roundLabel}>
-                  {t('round')} {sessionRounds.length}
+                  Round {sessionRounds.length}
                 </Text>
                 <Text style={styles.roundScore}>{currentRound.total}</Text>
-                <Text style={styles.pointsLabel}>{t('points')}</Text>
+                <Text style={styles.pointsLabel}>points</Text>
               </View>
 
               {/* Shot Breakdown */}
               <View style={styles.shotsBreakdown}>
-                <Text style={styles.breakdownTitle}>{t('shots')}</Text>
+                <Text style={styles.breakdownTitle}>Shots</Text>
                 <View style={styles.shotsList}>
                   {currentRound.shots.map((shot: any, index: number) => (
                     <View key={index} style={styles.shotItem}>
@@ -160,7 +153,7 @@ export default function SummaryScreen() {
                       />
                       <Text style={styles.shotNumber}>#{index + 1}</Text>
                       <Text style={styles.shotScore}>
-                        {shot.ring > 0 ? shot.ring : t('miss')}
+                        {shot.ring > 0 ? shot.ring : 'M'}
                       </Text>
                     </View>
                   ))}
@@ -172,14 +165,14 @@ export default function SummaryScreen() {
 
         {/* Score Table */}
         <View style={styles.scoreTableCard}>
-          <Text style={styles.scoreTableTitle}>{t('scoreTable')}</Text>
+          <Text style={styles.scoreTableTitle}>Score Table</Text>
           
           {/* Table Header */}
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, styles.roundColumn]}>{t('round')}</Text>
-            <Text style={[styles.tableHeaderCell, styles.arrowsColumn]}>{t('arrows')}</Text>
-            <Text style={[styles.tableHeaderCell, styles.scoreColumn]}>{t('score')}</Text>
-            <Text style={[styles.tableHeaderCell, styles.totalColumn]}>{t('total')}</Text>
+            <Text style={[styles.tableHeaderCell, styles.roundColumn]}>Round</Text>
+            <Text style={[styles.tableHeaderCell, styles.arrowsColumn]}>Arrows</Text>
+            <Text style={[styles.tableHeaderCell, styles.scoreColumn]}>Score</Text>
+            <Text style={[styles.tableHeaderCell, styles.totalColumn]}>Total</Text>
           </View>
           
           {/* Table Rows */}
@@ -250,7 +243,7 @@ export default function SummaryScreen() {
           
           {/* Table Footer - Grand Total */}
           <View style={styles.tableFooter}>
-            <Text style={[styles.tableFooterCell, styles.roundColumn]}>{t('total')}</Text>
+            <Text style={[styles.tableFooterCell, styles.roundColumn]}>Total</Text>
             <Text style={[styles.tableFooterCell, styles.arrowsColumn]}>
               {sessionRounds.reduce((sum, r) => sum + r.shots.length, 0)}
             </Text>
@@ -269,11 +262,11 @@ export default function SummaryScreen() {
             color={isCompetition ? "#FFD700" : "#ff4444"} 
           />
           <Text style={[styles.sessionTypeText, isCompetition ? styles.competitionText : styles.trainingText]}>
-            {isCompetition ? t('competition') : t('training')}
+            {isCompetition ? 'Competition' : 'Training'}
           </Text>
           {isCompetition && (
             <Text style={styles.roundProgress}>
-              {t('round')} {currentRoundNumber}/{MAX_COMPETITION_ROUNDS}
+              Round {currentRoundNumber}/{MAX_COMPETITION_ROUNDS}
             </Text>
           )}
         </View>
@@ -289,8 +282,8 @@ export default function SummaryScreen() {
               <Ionicons name="add-circle" size={24} color="#fff" />
               <Text style={styles.addRoundText}>
                 {isCompetition 
-                  ? `${t('addRound')} ${currentRoundNumber + 1}/${MAX_COMPETITION_ROUNDS}`
-                  : t('addAnotherRound')
+                  ? `Add Round ${currentRoundNumber + 1}/${MAX_COMPETITION_ROUNDS}`
+                  : 'Add Another Round'
                 }
               </Text>
             </TouchableOpacity>
@@ -300,9 +293,9 @@ export default function SummaryScreen() {
           {isLastCompetitionRound && (
             <View style={styles.completionMessage}>
               <Ionicons name="trophy" size={32} color="#FFD700" />
-              <Text style={styles.completionTitle}>{t('competitionComplete')}</Text>
+              <Text style={styles.completionTitle}>Competition Complete!</Text>
               <Text style={styles.completionSubtitle}>
-                {t('allRoundsFinished').replace('{count}', String(MAX_COMPETITION_ROUNDS))}
+                All {MAX_COMPETITION_ROUNDS} rounds finished
               </Text>
             </View>
           )}
@@ -317,7 +310,7 @@ export default function SummaryScreen() {
             ) : (
               <>
                 <Ionicons name="checkmark-done" size={24} color="#8B0000" />
-                <Text style={styles.finishText}>{t('finishAndSave')}</Text>
+                <Text style={styles.finishText}>Finish & Save</Text>
               </>
             )}
           </TouchableOpacity>
@@ -326,25 +319,25 @@ export default function SummaryScreen() {
         {/* Quick Stats */}
         {currentRound && currentRound.shots.length > 0 && (
           <View style={styles.quickStats}>
-            <Text style={styles.quickStatsTitle}>{t('roundStatistics')}</Text>
+            <Text style={styles.quickStatsTitle}>Round Statistics</Text>
             <View style={styles.quickStatsGrid}>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
                   {Math.max(...currentRound.shots.map((s: any) => s.ring))}
                 </Text>
-                <Text style={styles.quickStatLabel}>{t('bestShot')}</Text>
+                <Text style={styles.quickStatLabel}>Best Shot</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
                   {Math.min(...currentRound.shots.filter((s: any) => s.ring > 0).map((s: any) => s.ring)) || '-'}
                 </Text>
-                <Text style={styles.quickStatLabel}>{t('worstShot')}</Text>
+                <Text style={styles.quickStatLabel}>Worst Shot</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
                   {currentRound.shots.filter((s: any) => s.ring >= 9).length}
                 </Text>
-                <Text style={styles.quickStatLabel}>{t('goldHits')}</Text>
+                <Text style={styles.quickStatLabel}>Gold Hits</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
@@ -584,67 +577,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  sessionCard: {
-    backgroundColor: '#111111',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-  },
-  sessionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 16,
-  },
-  sessionStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#8B0000',
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#888888',
-    marginTop: 4,
-  },
-  statDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#333333',
-  },
-  previousRounds: {
-    marginTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#333333',
-    paddingTop: 16,
-  },
-  previousTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#888888',
-    marginBottom: 12,
-  },
-  previousRoundItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-  },
-  previousRoundNumber: {
-    color: '#fff',
-    fontSize: 14,
-  },
-  previousRoundScore: {
-    color: '#8B0000',
-    fontSize: 14,
-    fontWeight: '600',
   },
   actionsContainer: {
     marginBottom: 16,

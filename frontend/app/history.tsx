@@ -17,27 +17,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import axios from 'axios';
 import { LineChart } from 'react-native-chart-kit';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { getSessions, updateSession, deleteSession, Session } from '../utils/localStorage';
 
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const CHART_WIDTH = SCREEN_WIDTH - 72; // Account for padding
+const CHART_WIDTH = SCREEN_WIDTH - 72;
 
 type TimePeriod = 'day' | 'week' | 'month' | 'year' | 'all';
-
-interface Session {
-  id: string;
-  name: string;
-  total_score: number;
-  rounds: any[];
-  created_at: string;
-  bow_name?: string;
-  bow_id?: string;
-  distance?: string;
-  target_type?: string;
-}
 
 // Helper function to get target type display name
 const getTargetTypeName = (type?: string): string => {
@@ -55,7 +42,6 @@ const MiniTargetFace = ({ targetType, size = 44 }: { targetType?: string, size?:
   const miniSize = size * 0.35;
   
   if (type === 'vegas_3spot') {
-    // Inverted triangle: 1 on top, 2 on bottom
     return (
       <View style={[miniTargetStyles.container, { width: size, height: size }]}>
         <View style={miniTargetStyles.vegasTriangle}>
@@ -84,7 +70,6 @@ const MiniTargetFace = ({ targetType, size = 44 }: { targetType?: string, size?:
   }
   
   if (type === 'nfaa_indoor') {
-    // Vertical stack: 3 targets
     const nfaaSize = miniSize * 0.85;
     return (
       <View style={[miniTargetStyles.container, { width: size, height: size }]}>
@@ -101,7 +86,7 @@ const MiniTargetFace = ({ targetType, size = 44 }: { targetType?: string, size?:
     );
   }
   
-  // WA Standard - single target with all rings
+  // WA Standard
   const waSize = size * 0.9;
   return (
     <View style={[miniTargetStyles.container, { width: size, height: size }]}>
@@ -189,17 +174,15 @@ export default function HistoryScreen() {
   }, [sessions]);
 
   const availableTargetTypes = useMemo(() => {
-    // Include default 'wa_standard' for sessions without target_type
     const types = sessions.map(s => s.target_type || 'wa_standard');
     return [...new Set(types)];
   }, [sessions]);
 
-  // Filter sessions by bow, distance, and target type
+  // Filter sessions
   const filteredSessions = useMemo(() => {
     return sessions.filter(session => {
       if (bowFilter && session.bow_name !== bowFilter) return false;
       if (distanceFilter && session.distance !== distanceFilter) return false;
-      // Treat missing target_type as 'wa_standard'
       const sessionTargetType = session.target_type || 'wa_standard';
       if (targetTypeFilter && sessionTargetType !== targetTypeFilter) return false;
       return true;
@@ -208,8 +191,8 @@ export default function HistoryScreen() {
 
   const fetchSessions = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/sessions`);
-      setSessions(response.data);
+      const data = await getSessions();
+      setSessions(data);
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
@@ -224,7 +207,6 @@ export default function HistoryScreen() {
 
   // Group sessions by selected time period
   const groupedSessions = useMemo(() => {
-    const now = new Date();
     const groups: { [key: string]: Session[] } = {};
 
     filteredSessions.forEach((session) => {
@@ -241,7 +223,6 @@ export default function HistoryScreen() {
           });
           break;
         case 'week':
-          // Get the start of the week (Sunday)
           const weekStart = new Date(sessionDate);
           weekStart.setDate(sessionDate.getDate() - sessionDate.getDay());
           const weekEnd = new Date(weekStart);
@@ -269,7 +250,6 @@ export default function HistoryScreen() {
       groups[groupKey].push(session);
     });
 
-    // Convert to array and sort by most recent first
     const result: GroupedSessions[] = Object.entries(groups).map(([label, sessionList]) => ({
       label,
       sessions: sessionList.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
@@ -277,7 +257,6 @@ export default function HistoryScreen() {
       totalRounds: sessionList.reduce((sum, s) => sum + (s.rounds?.length || 0), 0),
     }));
 
-    // Sort groups by most recent session in each group
     return result.sort((a, b) => {
       const aDate = new Date(a.sessions[0]?.created_at || 0).getTime();
       const bDate = new Date(b.sessions[0]?.created_at || 0).getTime();
@@ -303,37 +282,21 @@ export default function HistoryScreen() {
   const handleDeleteSession = (sessionId: string) => {
     const performDelete = async () => {
       try {
-        await axios.delete(`${API_URL}/api/sessions/${sessionId}`);
+        await deleteSession(sessionId);
         setSessions(sessions.filter(s => s.id !== sessionId));
       } catch (err) {
-        if (Platform.OS === 'web') {
-          window.alert('Failed to delete session');
-        } else {
-          Alert.alert('Error', 'Failed to delete session');
-        }
+        Alert.alert('Error', 'Failed to delete session');
       }
     };
 
-    if (Platform.OS === 'web') {
-      // Use browser confirm for web
-      if (window.confirm('Are you sure you want to delete this session?')) {
-        performDelete();
-      }
-    } else {
-      // Use native Alert for mobile
-      Alert.alert(
-        'Delete Session',
-        'Are you sure you want to delete this session?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Delete',
-            style: 'destructive',
-            onPress: performDelete,
-          },
-        ]
-      );
-    }
+    Alert.alert(
+      'Delete Session',
+      'Are you sure you want to delete this session?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: performDelete },
+      ]
+    );
   };
 
   const formatDate = (dateString: string) => {
@@ -365,7 +328,6 @@ export default function HistoryScreen() {
       setShowDatePicker(false);
     }
     if (selectedDate) {
-      // Keep the time from the current editDate, just update the date
       const newDate = new Date(editDate);
       newDate.setFullYear(selectedDate.getFullYear());
       newDate.setMonth(selectedDate.getMonth());
@@ -379,7 +341,6 @@ export default function HistoryScreen() {
       setShowTimePicker(false);
     }
     if (selectedTime) {
-      // Keep the date, just update the time
       const newDate = new Date(editDate);
       newDate.setHours(selectedTime.getHours());
       newDate.setMinutes(selectedTime.getMinutes());
@@ -392,24 +353,21 @@ export default function HistoryScreen() {
     
     setIsSaving(true);
     try {
-      const response = await axios.put(`${API_URL}/api/sessions/${editingSession.id}`, {
+      const updated = await updateSession(editingSession.id, {
         name: editName,
         created_at: editDate.toISOString(),
       });
       
-      // Update the session in the local state
-      setSessions(sessions.map(s => 
-        s.id === editingSession.id ? response.data : s
-      ));
+      if (updated) {
+        setSessions(sessions.map(s => 
+          s.id === editingSession.id ? updated : s
+        ));
+      }
       
       closeEditModal();
     } catch (err) {
       console.error('Save error:', err);
-      if (Platform.OS === 'web') {
-        window.alert('Failed to save changes');
-      } else {
-        Alert.alert('Error', 'Failed to save changes');
-      }
+      Alert.alert('Error', 'Failed to save changes');
     } finally {
       setIsSaving(false);
     }
@@ -424,7 +382,7 @@ export default function HistoryScreen() {
     setExpandedSession(expandedSession === sessionId ? null : sessionId);
   };
 
-  // Chart configuration for line chart
+  // Chart configuration
   const chartConfig = {
     backgroundColor: '#111111',
     backgroundGradientFrom: '#111111',
@@ -462,253 +420,6 @@ export default function HistoryScreen() {
     };
   };
 
-  // Get all shots from a session for target visualization
-  // Position shots based on their RING VALUE (the actual score) while preserving angle from coordinates
-  const getAllShots = (session: Session) => {
-    if (!session.rounds || session.rounds.length === 0) {
-      return [];
-    }
-    
-    const shots: { x: number; y: number; ring: number; roundIndex: number }[] = [];
-    
-    session.rounds.forEach((round, roundIndex) => {
-      round.shots?.forEach((shot: any) => {
-        // IMPORTANT: Preserve original coordinates from scoring screen
-        // These are normalized (0-1) positions where the user actually clicked
-        shots.push({
-          x: shot.x ?? 0.5,
-          y: shot.y ?? 0.5,
-          ring: shot.ring || 0,
-          roundIndex,
-        });
-      });
-    });
-    
-    return shots;
-  };
-
-  // Target Hit Map Component
-  const TargetHitMap = ({ session, size = 200 }: { session: Session; size?: number }) => {
-    const shots = getAllShots(session);
-    const targetType = session.target_type || 'wa_standard';
-    
-    if (shots.length === 0) {
-      return null;
-    }
-
-    // Ring colors for WA Standard (10 rings)
-    const waRingColors = [
-      '#f5f5f0', '#f5f5f0', '#2a2a2a', '#2a2a2a',
-      '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24',
-      '#fff200', '#fff200',
-    ];
-
-    // Round colors for differentiating rounds
-    const roundColors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-      '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-    ];
-
-    const targetScale = 0.8;
-    
-    // Spot radii matching scoring screen
-    const vegasSpotRadius = 0.19;
-    const nfaaSpotRadius = 0.14;
-    const spotRadius = targetType === 'vegas_3spot' ? vegasSpotRadius : 
-                       targetType === 'nfaa_indoor' ? nfaaSpotRadius : 0.4;
-    const spotSize = spotRadius * 2 * size;
-
-    // Get spot centers in normalized coordinates (0-1) - MUST MATCH scoring.tsx
-    const getSpotCentersNormalized = () => {
-      if (targetType === 'vegas_3spot') {
-        return [
-          { x: 0.5, y: 0.28 },   // Top center
-          { x: 0.29, y: 0.72 },  // Bottom left
-          { x: 0.71, y: 0.72 },  // Bottom right
-        ];
-      } else if (targetType === 'nfaa_indoor') {
-        return [
-          { x: 0.5, y: 0.17 },   // Top
-          { x: 0.5, y: 0.5 },    // Middle
-          { x: 0.5, y: 0.83 },   // Bottom
-        ];
-      }
-      return [{ x: 0.5, y: 0.5 }];
-    };
-
-    const spotCentersNormalized = getSpotCentersNormalized();
-    const spotCenters = spotCentersNormalized.map(c => ({ x: c.x * size, y: c.y * size }));
-
-    // Single spot component for multi-spot targets
-    const SingleSpot = ({ centerX, centerY }: { centerX: number, centerY: number }) => {
-      const spotHalfSize = spotSize / 2;
-      return (
-        <View
-          style={{
-            position: 'absolute',
-            left: centerX - spotHalfSize,
-            top: centerY - spotHalfSize,
-            width: spotSize,
-            height: spotSize,
-          }}
-        >
-          <View style={[targetMapStyles.ring, {
-            width: spotSize, height: spotSize, borderRadius: spotSize / 2,
-            backgroundColor: '#00a2e8', borderColor: '#0077b3', borderWidth: 1,
-          }]}>
-            <View style={[targetMapStyles.ring, {
-              width: spotSize * 0.65, height: spotSize * 0.65, borderRadius: spotSize * 0.325,
-              backgroundColor: '#ed1c24', borderColor: '#b31217', borderWidth: 1,
-            }]}>
-              <View style={[targetMapStyles.ring, {
-                width: spotSize * 0.35, height: spotSize * 0.35, borderRadius: spotSize * 0.175,
-                backgroundColor: '#fff200', borderColor: '#ccaa00', borderWidth: 1,
-              }]} />
-            </View>
-          </View>
-        </View>
-      );
-    };
-
-    // Find which spot a shot belongs to (closest spot)
-    const findClosestSpot = (shotX: number, shotY: number) => {
-      let closestIdx = 0;
-      let minDist = Infinity;
-      spotCentersNormalized.forEach((center, idx) => {
-        const dist = Math.sqrt(Math.pow(shotX - center.x, 2) + Math.pow(shotY - center.y, 2));
-        if (dist < minDist) {
-          minDist = dist;
-          closestIdx = idx;
-        }
-      });
-      return closestIdx;
-    };
-
-    // Render WA Standard target
-    if (targetType === 'wa_standard') {
-      return (
-        <View style={[targetMapStyles.container, { width: size, height: size }]}>
-          <View style={[targetMapStyles.targetBackground, { width: size * targetScale, height: size * targetScale, borderRadius: (size * targetScale) / 2 }]}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ringNum) => {
-              const diameterPercent = (11 - ringNum) / 10;
-              const ringSize = size * targetScale * diameterPercent;
-              const bgColor = waRingColors[ringNum - 1];
-              return (
-                <View
-                  key={`ring-${ringNum}`}
-                  style={[
-                    targetMapStyles.ring,
-                    {
-                      width: ringSize, height: ringSize, borderRadius: ringSize / 2,
-                      backgroundColor: bgColor,
-                      borderColor: ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00',
-                      borderWidth: 1,
-                    },
-                  ]}
-                />
-              );
-            })}
-            <View style={targetMapStyles.centerMark}>
-              <View style={targetMapStyles.centerLine} />
-              <View style={[targetMapStyles.centerLine, { transform: [{ rotate: '90deg' }] }]} />
-            </View>
-          </View>
-
-          {/* Plot shots */}
-          {shots.map((shot, index) => {
-            const dotSize = 12;
-            const left = shot.x * size - dotSize / 2;
-            const top = shot.y * size - dotSize / 2;
-            const roundColor = roundColors[shot.roundIndex % roundColors.length];
-            return (
-              <View
-                key={`shot-${index}`}
-                style={[
-                  targetMapStyles.shotDot,
-                  { left, top, width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: roundColor },
-                ]}
-              >
-                <Text style={targetMapStyles.shotLabel}>{shot.ring}</Text>
-              </View>
-            );
-          })}
-        </View>
-      );
-    }
-
-    // Render Vegas 3-Spot or NFAA Indoor
-    // For multi-spot targets, we need to render shots RELATIVE to their target spot
-    return (
-      <View style={[targetMapStyles.container, { width: size, height: size }]}>
-        {/* Draw the multi-spot target background */}
-        <View style={[targetMapStyles.multiSpotBackground, { width: size, height: size, position: 'absolute', left: 0, top: 0 }]}>
-          {spotCenters.map((spot, idx) => (
-            <SingleSpot key={`spot-${idx}`} centerX={spot.x} centerY={spot.y} />
-          ))}
-        </View>
-
-        {/* Plot shots - position relative to their closest spot */}
-        {shots.map((shot, index) => {
-          const dotSize = 10;
-          
-          // Find which spot this shot belongs to
-          const spotIdx = findClosestSpot(shot.x, shot.y);
-          const spotCenter = spotCentersNormalized[spotIdx];
-          const spotCenterPx = spotCenters[spotIdx];
-          
-          // Calculate offset from spot center (in normalized coords)
-          const offsetX = shot.x - spotCenter.x;
-          const offsetY = shot.y - spotCenter.y;
-          
-          // Scale the offset to fit within the spot visualization
-          // The spot has radius spotRadius in normalized coords
-          // We want to map the offset proportionally within the visual spot
-          const scaleFactor = (spotSize / 2) / spotRadius;
-          
-          // Calculate final position: spot center + scaled offset
-          const left = spotCenterPx.x + (offsetX * scaleFactor) - dotSize / 2;
-          const top = spotCenterPx.y + (offsetY * scaleFactor) - dotSize / 2;
-          
-          const roundColor = roundColors[shot.roundIndex % roundColors.length];
-          return (
-            <View
-              key={`shot-${index}`}
-              style={[
-                targetMapStyles.shotDot,
-                { left, top, width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: roundColor },
-              ]}
-            >
-              <Text style={[targetMapStyles.shotLabel, { fontSize: 6 }]}>{shot.ring}</Text>
-            </View>
-          );
-        })}
-      </View>
-    );
-  };
-
-  // Legend for round colors
-  const RoundLegend = ({ session }: { session: Session }) => {
-    if (!session.rounds || session.rounds.length <= 1) {
-      return null;
-    }
-
-    const roundColors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-      '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-    ];
-
-    return (
-      <View style={targetMapStyles.legendContainer}>
-        {session.rounds.map((round, index) => (
-          <View key={index} style={targetMapStyles.legendItem}>
-            <View style={[targetMapStyles.legendDot, { backgroundColor: roundColors[index % roundColors.length] }]} />
-            <Text style={targetMapStyles.legendText}>R{index + 1}</Text>
-          </View>
-        ))}
-      </View>
-    );
-  };
-
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -736,14 +447,14 @@ export default function HistoryScreen() {
           onPress={() => router.push('/stats')}
         >
           <Ionicons name="stats-chart-outline" size={18} color={activeTab === 'stats' ? '#fff' : '#888'} />
-          <Text style={[styles.tabButtonText, activeTab === 'stats' && styles.tabButtonTextActive]}>{t('stats')}</Text>
+          <Text style={[styles.tabButtonText, activeTab === 'stats' && styles.tabButtonTextActive]}>Stats</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'report' && styles.tabButtonActive]}
           onPress={() => router.push('/report')}
         >
           <Ionicons name="document-text-outline" size={18} color={activeTab === 'report' ? '#fff' : '#888'} />
-          <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>{t('report')}</Text>
+          <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>Report</Text>
         </TouchableOpacity>
       </View>
 
@@ -783,16 +494,15 @@ export default function HistoryScreen() {
         {/* Filter Buttons */}
         {(availableBows.length > 0 || availableDistances.length > 0 || availableTargetTypes.length > 0) && (
           <View style={styles.filterSection}>
-            {/* Target Type Filter */}
             {availableTargetTypes.length > 0 && (
               <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>{t('target')}:</Text>
+                <Text style={styles.filterLabel}>Target:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
                   <TouchableOpacity
                     style={[styles.filterChip, !targetTypeFilter && styles.filterChipActive]}
                     onPress={() => setTargetTypeFilter(null)}
                   >
-                    <Text style={[styles.filterChipText, !targetTypeFilter && styles.filterChipTextActive]}>{t('all')}</Text>
+                    <Text style={[styles.filterChipText, !targetTypeFilter && styles.filterChipTextActive]}>All</Text>
                   </TouchableOpacity>
                   {availableTargetTypes.map((type) => (
                     <TouchableOpacity
@@ -807,16 +517,15 @@ export default function HistoryScreen() {
               </View>
             )}
             
-            {/* Bow Filter */}
             {availableBows.length > 0 && (
               <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>{t('bow')}:</Text>
+                <Text style={styles.filterLabel}>Bow:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
                   <TouchableOpacity
                     style={[styles.filterChip, !bowFilter && styles.filterChipActive]}
                     onPress={() => setBowFilter(null)}
                   >
-                    <Text style={[styles.filterChipText, !bowFilter && styles.filterChipTextActive]}>{t('all')}</Text>
+                    <Text style={[styles.filterChipText, !bowFilter && styles.filterChipTextActive]}>All</Text>
                   </TouchableOpacity>
                   {availableBows.map((bow) => (
                     <TouchableOpacity
@@ -831,16 +540,15 @@ export default function HistoryScreen() {
               </View>
             )}
             
-            {/* Distance Filter */}
             {availableDistances.length > 0 && (
               <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>{t('distance')}:</Text>
+                <Text style={styles.filterLabel}>Distance:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
                   <TouchableOpacity
                     style={[styles.filterChip, !distanceFilter && styles.filterChipActive]}
                     onPress={() => setDistanceFilter(null)}
                   >
-                    <Text style={[styles.filterChipText, !distanceFilter && styles.filterChipTextActive]}>{t('all')}</Text>
+                    <Text style={[styles.filterChipText, !distanceFilter && styles.filterChipTextActive]}>All</Text>
                   </TouchableOpacity>
                   {availableDistances.map((distance) => (
                     <TouchableOpacity
@@ -861,22 +569,22 @@ export default function HistoryScreen() {
         {sessions.length > 0 && (
           <View style={styles.overviewCard}>
             <Text style={styles.overviewTitle}>
-              {selectedPeriod === 'all' ? t('allTimeStats') : `${t('stats')} - ${selectedPeriod}`}
+              {selectedPeriod === 'all' ? 'All Time Stats' : `Stats - ${selectedPeriod}`}
             </Text>
             <View style={styles.overviewStats}>
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalSessions}</Text>
-                <Text style={styles.overviewLabel}>{t('sessions')}</Text>
+                <Text style={styles.overviewLabel}>Sessions</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalRounds}</Text>
-                <Text style={styles.overviewLabel}>{t('rounds')}</Text>
+                <Text style={styles.overviewLabel}>Rounds</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalPoints}</Text>
-                <Text style={styles.overviewLabel}>{t('totalPts')}</Text>
+                <Text style={styles.overviewLabel}>Total Pts</Text>
               </View>
             </View>
           </View>
@@ -886,23 +594,22 @@ export default function HistoryScreen() {
         {sessions.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="trophy-outline" size={64} color="#888888" />
-            <Text style={styles.emptyTitle}>{t('noHistory')}</Text>
+            <Text style={styles.emptyTitle}>No History Yet</Text>
             <Text style={styles.emptyText}>
-              {t('noHistoryMessage')}
+              Complete scoring sessions to see your history here.
             </Text>
             <TouchableOpacity
               style={styles.startButton}
-              onPress={() => router.push('/capture')}
+              onPress={() => router.push('/sessionSetup')}
             >
               <Ionicons name="add" size={20} color="#fff" />
-              <Text style={styles.startButtonText}>{t('startSession')}</Text>
+              <Text style={styles.startButtonText}>Start Session</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.sessionsList}>
             {groupedSessions.map((group) => (
               <View key={group.label} style={styles.groupContainer}>
-                {/* Group Header */}
                 <View style={styles.groupHeader}>
                   <View style={styles.groupTitleRow}>
                     <Ionicons 
@@ -919,7 +626,6 @@ export default function HistoryScreen() {
                   </View>
                 </View>
 
-                {/* Sessions in Group */}
                 {group.sessions.map((session) => (
                   <View key={session.id} style={styles.sessionCard}>
                     <Pressable
@@ -927,7 +633,6 @@ export default function HistoryScreen() {
                       style={styles.sessionCardPressable}
                     >
                       <View style={styles.sessionHeader}>
-                        {/* Target Face Visual */}
                         <View style={styles.targetFaceContainer}>
                           <MiniTargetFace targetType={session.target_type} size={48} />
                         </View>
@@ -953,7 +658,6 @@ export default function HistoryScreen() {
                         </View>
                       </View>
 
-                      {/* Bow & Distance Info */}
                       {(session.bow_name || session.distance) && (
                         <View style={styles.sessionEquipment}>
                           {session.bow_name && (
@@ -975,19 +679,18 @@ export default function HistoryScreen() {
                         <View style={styles.metaItem}>
                           <Ionicons name="layers" size={16} color="#888888" />
                           <Text style={styles.metaText}>
-                            {session.rounds?.length || 0} {t('rounds')}
+                            {session.rounds?.length || 0} rounds
                           </Text>
                         </View>
                         <View style={styles.metaItem}>
                           <Ionicons name="analytics" size={16} color="#888888" />
                           <Text style={styles.metaText}>
-                            {t('avg')}: {getAverageScore(session)}/{t('round')}
+                            Avg: {getAverageScore(session)}/round
                           </Text>
                         </View>
                       </View>
                     </Pressable>
                     
-                    {/* Delete button outside the main pressable area */}
                     <Pressable
                       style={styles.deleteBtn}
                       onPress={(e) => {
@@ -999,23 +702,10 @@ export default function HistoryScreen() {
                       <Ionicons name="trash" size={18} color="#ff6b6b" />
                     </Pressable>
 
-                    {/* Expanded Details */}
                     {expandedSession === session.id && session.rounds && (
                       <View style={styles.expandedContent}>
                         <View style={styles.expandedDivider} />
                         
-                        {/* Target Hit Map - Visual distribution of all hits */}
-                        <View style={styles.chartSection}>
-                          <Text style={styles.chartTitle}>
-                            <Ionicons name="locate" size={16} color="#8B0000" /> Shot Distribution
-                          </Text>
-                          <View style={styles.targetMapWrapper}>
-                            <TargetHitMap session={session} size={240} />
-                          </View>
-                          <RoundLegend session={session} />
-                        </View>
-
-                        {/* Score by Round Chart */}
                         {getRoundChartData(session) && session.rounds.length > 1 && (
                           <View style={styles.chartSection}>
                             <Text style={styles.chartTitle}>
@@ -1078,7 +768,7 @@ export default function HistoryScreen() {
       {/* FAB */}
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => router.push('/capture')}
+        onPress={() => router.push('/sessionSetup')}
       >
         <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
@@ -1099,7 +789,6 @@ export default function HistoryScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Session Name */}
             <View style={styles.modalField}>
               <Text style={styles.modalLabel}>Session Name</Text>
               <TextInput
@@ -1111,28 +800,14 @@ export default function HistoryScreen() {
               />
             </View>
 
-            {/* Date */}
             <View style={styles.modalField}>
               <Text style={styles.modalLabel}>Date</Text>
               {Platform.OS === 'web' ? (
-                <input
-                  type="date"
+                <TextInput
+                  style={styles.modalInput}
                   value={editDate.toISOString().split('T')[0]}
-                  onChange={(e) => {
-                    const newDate = new Date(e.target.value);
-                    newDate.setHours(editDate.getHours());
-                    newDate.setMinutes(editDate.getMinutes());
-                    setEditDate(newDate);
-                  }}
-                  style={{
-                    backgroundColor: '#1a1a1a',
-                    color: '#ffffff',
-                    border: '1px solid #333333',
-                    borderRadius: 8,
-                    padding: 12,
-                    fontSize: 16,
-                    width: '100%',
-                  }}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor="#555555"
                 />
               ) : (
                 <>
@@ -1157,29 +832,14 @@ export default function HistoryScreen() {
               )}
             </View>
 
-            {/* Time */}
             <View style={styles.modalField}>
               <Text style={styles.modalLabel}>Time</Text>
               {Platform.OS === 'web' ? (
-                <input
-                  type="time"
+                <TextInput
+                  style={styles.modalInput}
                   value={`${editDate.getHours().toString().padStart(2, '0')}:${editDate.getMinutes().toString().padStart(2, '0')}`}
-                  onChange={(e) => {
-                    const [hours, minutes] = e.target.value.split(':');
-                    const newDate = new Date(editDate);
-                    newDate.setHours(parseInt(hours));
-                    newDate.setMinutes(parseInt(minutes));
-                    setEditDate(newDate);
-                  }}
-                  style={{
-                    backgroundColor: '#1a1a1a',
-                    color: '#ffffff',
-                    border: '1px solid #333333',
-                    borderRadius: 8,
-                    padding: 12,
-                    fontSize: 16,
-                    width: '100%',
-                  }}
+                  placeholder="HH:MM"
+                  placeholderTextColor="#555555"
                 />
               ) : (
                 <>
@@ -1204,7 +864,6 @@ export default function HistoryScreen() {
               )}
             </View>
 
-            {/* Save Button */}
             <TouchableOpacity
               style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
               onPress={saveSessionEdit}
@@ -1517,14 +1176,6 @@ const styles = StyleSheet.create({
     color: '#8B0000',
     fontWeight: '500',
   },
-  targetTypeBadge: {
-    backgroundColor: 'rgba(255, 215, 0, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.3)',
-  },
-  targetTypeText: {
-    color: '#FFD700',
-  },
   deleteBtn: {
     position: 'absolute',
     top: 16,
@@ -1554,11 +1205,6 @@ const styles = StyleSheet.create({
   chart: {
     borderRadius: 12,
     marginLeft: -8,
-  },
-  targetMapWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 8,
   },
   roundsTitle: {
     fontSize: 14,
@@ -1700,93 +1346,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-  },
-});
-
-// Styles for the Target Hit Map component
-const targetMapStyles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  targetBackground: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f0',
-  },
-  multiSpotBackground: {
-    position: 'relative',
-    backgroundColor: 'rgba(30, 30, 30, 0.3)',
-    borderRadius: 8,
-  },
-  ring: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerMark: {
-    position: 'absolute',
-    width: 16,
-    height: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerLine: {
-    position: 'absolute',
-    width: 12,
-    height: 2,
-    backgroundColor: '#333',
-  },
-  ringLabelsContainer: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  },
-  ringLabel: {
-    position: 'absolute',
-    backgroundColor: 'transparent',
-  },
-  ringLabelText: {
-    color: '#666',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  shotDot: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#000000',
-    opacity: 0.6,
-  },
-  shotLabel: {
-    color: '#fff',
-    fontSize: 8,
-    fontWeight: 'bold',
-  },
-  legendContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginTop: 12,
-    gap: 12,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#fff',
-  },
-  legendText: {
-    color: '#888888',
-    fontSize: 12,
   },
 });
