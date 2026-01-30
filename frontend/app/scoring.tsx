@@ -74,20 +74,49 @@ export default function ScoringScreen() {
     }
   };
 
-  const handleTargetTouch = (event: any, targetIndex: number, targetSize: number) => {
-    const { locationX, locationY } = event.nativeEvent;
-    
-    let x = locationX;
-    let y = locationY;
-    
-    if (x === undefined || y === undefined) {
-      x = targetSize / 2;
-      y = targetSize / 2;
+  // Store refs for each target to get their positions
+  const targetRefs = useRef<{ [key: number]: View | null }>({});
+
+  const handleTargetClick = useCallback((event: any, targetIndex: number, targetSize: number) => {
+    // For web, use nativeEvent.offsetX/offsetY or clientX/clientY
+    // For native, use locationX/locationY
+    let x: number;
+    let y: number;
+
+    if (Platform.OS === 'web') {
+      // On web, try offsetX/Y first (relative to clicked element)
+      const nativeEvent = event.nativeEvent || event;
+      if (typeof nativeEvent.offsetX === 'number' && typeof nativeEvent.offsetY === 'number') {
+        x = nativeEvent.offsetX;
+        y = nativeEvent.offsetY;
+      } else if (typeof nativeEvent.clientX === 'number' && typeof nativeEvent.clientY === 'number') {
+        // Fallback to clientX/Y and calculate relative position
+        const rect = event.target?.getBoundingClientRect?.();
+        if (rect) {
+          x = nativeEvent.clientX - rect.left;
+          y = nativeEvent.clientY - rect.top;
+        } else {
+          // Default to center if we can't get position
+          x = targetSize / 2;
+          y = targetSize / 2;
+        }
+      } else {
+        x = targetSize / 2;
+        y = targetSize / 2;
+      }
+    } else {
+      // Native: use locationX/locationY
+      const { locationX, locationY } = event.nativeEvent || {};
+      x = locationX ?? targetSize / 2;
+      y = locationY ?? targetSize / 2;
     }
     
+    // Clamp and normalize coordinates
     const normalizedX = Math.max(0, Math.min(1, x / targetSize));
     const normalizedY = Math.max(0, Math.min(1, y / targetSize));
     const score = calculateScore(normalizedX, normalizedY);
+    
+    console.log(`Arrow placed: x=${x.toFixed(1)}, y=${y.toFixed(1)}, normalized=(${normalizedX.toFixed(2)}, ${normalizedY.toFixed(2)}), score=${score}`);
     
     const newArrow: Arrow = {
       id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -98,7 +127,7 @@ export default function ScoringScreen() {
     };
 
     setArrows(prev => [...prev, newArrow]);
-  };
+  }, [isMultiTarget, calculateScore]);
 
   const handleEditArrow = (index: number) => {
     setSelectedArrowIndex(index);
