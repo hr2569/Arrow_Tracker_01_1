@@ -50,7 +50,6 @@ export default function SummaryScreen() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const isCompetition = sessionType === 'competition';
-  const isLastCompetitionRound = isCompetition && currentRoundNumber >= MAX_COMPETITION_ROUNDS;
 
   useEffect(() => {
     // Add current round to session rounds if it exists and hasn't been added yet
