@@ -80,25 +80,36 @@ export default function ScoringScreen() {
   };
 
   const handleTargetPress = (event: GestureResponderEvent, targetIndex: number, targetSize: number) => {
-    // For web, the nativeEvent contains the DOM event
     const nativeEvent = event.nativeEvent as any;
     
-    let x = 0, y = 0;
+    let x = targetSize / 2;
+    let y = targetSize / 2;
     
-    // Check if this is a web DOM event
-    if (nativeEvent.target && typeof nativeEvent.target.getBoundingClientRect === 'function') {
-      // Web: use clientX/clientY relative to element bounds
-      const rect = nativeEvent.target.getBoundingClientRect();
-      x = (nativeEvent.clientX || nativeEvent.pageX) - rect.left;
-      y = (nativeEvent.clientY || nativeEvent.pageY) - rect.top;
-    } else if (typeof nativeEvent.locationX === 'number') {
-      // Native mobile
-      x = nativeEvent.locationX;
-      y = nativeEvent.locationY;
+    // React Native Web wraps the DOM event
+    // The actual DOM coordinates are in different properties depending on the RN Web version
+    if (Platform.OS === 'web') {
+      // Web: try to get coordinates from the original DOM event
+      const domEvent = nativeEvent;
+      if (domEvent.nativeEvent) {
+        // Sometimes it's nested
+        const innerEvent = domEvent.nativeEvent;
+        if (innerEvent.offsetX !== undefined) {
+          x = innerEvent.offsetX;
+          y = innerEvent.offsetY;
+        }
+      } else if (domEvent.offsetX !== undefined) {
+        x = domEvent.offsetX;
+        y = domEvent.offsetY;
+      } else if (domEvent.layerX !== undefined) {
+        x = domEvent.layerX;
+        y = domEvent.layerY;
+      }
     } else {
-      // Fallback
-      x = targetSize / 2;
-      y = targetSize / 2;
+      // Native iOS/Android
+      if (nativeEvent.locationX !== undefined) {
+        x = nativeEvent.locationX;
+        y = nativeEvent.locationY;
+      }
     }
     
     // Normalize to 0-1 range
