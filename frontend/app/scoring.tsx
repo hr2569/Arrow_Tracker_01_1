@@ -16,8 +16,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 32, SCREEN_HEIGHT * 0.45);
-const SMALL_TARGET_SIZE = (SCREEN_WIDTH - 80) / 3;
+const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.4);
+const SMALL_TARGET_SIZE = Math.min((SCREEN_WIDTH - 60) / 3, 110);
 
 interface Arrow {
   id: string;
@@ -40,62 +40,67 @@ export default function ScoringScreen() {
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
 
-  // Get target configuration
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   const isVegas = targetType === 'vegas_3spot';
   const isNFAA = targetType === 'nfaa_indoor';
   const isMultiTarget = isVegas || isNFAA;
-
   const isCompetition = sessionType === 'competition';
 
-  // Calculate score based on tap position
-  const calculateScore = (x: number, y: number): number => {
-    const dx = x - 0.5;
-    const dy = y - 0.5;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+  // Calculate score based on distance from center
+  const calculateScore = (normalizedX: number, normalizedY: number): number => {
+    // Calculate distance from center (center is at 0.5, 0.5)
+    const dx = normalizedX - 0.5;
+    const dy = normalizedY - 0.5;
+    const distFromCenter = Math.sqrt(dx * dx + dy * dy);
     
-    // Normalize distance (0 = center, 0.5 = edge)
-    const maxRadius = 0.5;
-    const normalizedDist = distance / maxRadius;
+    // Max distance from center to edge is 0.5 (when target fills container)
+    // But our rings only go to about 0.475 of the container
+    const maxRingRadius = 0.475;
+    const normalizedDist = distFromCenter / maxRingRadius;
     
     if (targetType === 'wa_standard') {
-      // WA Standard: 10 rings, scores 1-10
-      // Each ring is 1/10 of the radius
-      if (normalizedDist > 1.0) return 0; // Miss
-      if (normalizedDist > 0.9) return 1;  // White outer
-      if (normalizedDist > 0.8) return 2;  // White inner
-      if (normalizedDist > 0.7) return 3;  // Black outer
-      if (normalizedDist > 0.6) return 4;  // Black inner
-      if (normalizedDist > 0.5) return 5;  // Blue outer
-      if (normalizedDist > 0.4) return 6;  // Blue inner
-      if (normalizedDist > 0.3) return 7;  // Red outer
-      if (normalizedDist > 0.2) return 8;  // Red inner
-      if (normalizedDist > 0.1) return 9;  // Gold outer
-      return 10; // Gold inner (X)
+      // WA Standard: 10 rings
+      // Outer to inner: White(1-2), Black(3-4), Blue(5-6), Red(7-8), Gold(9-10)
+      if (normalizedDist > 1.0) return 0;   // Miss
+      if (normalizedDist > 0.9) return 1;   // White outer
+      if (normalizedDist > 0.8) return 2;   // White inner
+      if (normalizedDist > 0.7) return 3;   // Black outer
+      if (normalizedDist > 0.6) return 4;   // Black inner
+      if (normalizedDist > 0.5) return 5;   // Blue outer
+      if (normalizedDist > 0.4) return 6;   // Blue inner
+      if (normalizedDist > 0.3) return 7;   // Red outer
+      if (normalizedDist > 0.2) return 8;   // Red inner
+      if (normalizedDist > 0.1) return 9;   // Gold outer
+      return 10; // Gold center (X)
     } else {
-      // Vegas 3-Spot and NFAA Indoor: 5 rings, scores 6-10
-      if (normalizedDist > 1.0) return 0;  // Miss
-      if (normalizedDist > 0.8) return 6;  // Blue
-      if (normalizedDist > 0.6) return 7;  // Red outer
-      if (normalizedDist > 0.4) return 8;  // Red inner
-      if (normalizedDist > 0.2) return 9;  // Gold outer
-      return 10; // Gold inner (X)
+      // Vegas 3-Spot and NFAA Indoor: 5 rings (6-10)
+      // Outer to inner: Blue(6), Red(7-8), Gold(9-10)
+      if (normalizedDist > 1.0) return 0;   // Miss
+      if (normalizedDist > 0.8) return 6;   // Blue
+      if (normalizedDist > 0.6) return 7;   // Red outer
+      if (normalizedDist > 0.4) return 8;   // Red inner
+      if (normalizedDist > 0.2) return 9;   // Gold outer
+      return 10; // Gold center (X)
     }
   };
 
   const handleTargetPress = (event: any, targetIndex: number = 0, targetSize: number) => {
     const { locationX, locationY } = event.nativeEvent;
     
-    // Normalize coordinates to 0-1 range
-    const x = Math.max(0, Math.min(1, locationX / targetSize));
-    const y = Math.max(0, Math.min(1, locationY / targetSize));
+    // Normalize to 0-1 range where 0.5,0.5 is center
+    const x = locationX / targetSize;
+    const y = locationY / targetSize;
     
-    const score = calculateScore(x, y);
+    // Clamp values
+    const clampedX = Math.max(0, Math.min(1, x));
+    const clampedY = Math.max(0, Math.min(1, y));
+    
+    const score = calculateScore(clampedX, clampedY);
     
     const newArrow: Arrow = {
       id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      x,
-      y,
+      x: clampedX,
+      y: clampedY,
       score,
       targetIndex: isMultiTarget ? targetIndex : undefined,
     };
@@ -130,12 +135,12 @@ export default function ScoringScreen() {
   const getTotalScore = () => arrows.reduce((sum, a) => sum + a.score, 0);
 
   const getScoreColor = (score: number) => {
-    if (score >= 9) return '#FFD700';  // Gold
-    if (score >= 7) return '#ed1c24';  // Red
-    if (score >= 5) return '#00a2e8';  // Blue
-    if (score >= 3) return '#2a2a2a';  // Black
-    if (score >= 1) return '#f5f5f0';  // White
-    return '#888';  // Miss
+    if (score >= 9) return '#FFD700';
+    if (score >= 7) return '#ed1c24';
+    if (score >= 5) return '#00a2e8';
+    if (score >= 3) return '#2a2a2a';
+    if (score >= 1) return '#f5f5f0';
+    return '#666';
   };
 
   const getScoreTextColor = (score: number) => {
@@ -160,11 +165,6 @@ export default function ScoringScreen() {
     router.push('/summary');
   };
 
-  const handleBack = () => {
-    router.back();
-  };
-
-  // Get available scores for the picker
   const getAvailableScores = (): number[] => {
     if (targetType === 'wa_standard') {
       return [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
@@ -179,7 +179,6 @@ export default function ScoringScreen() {
     const colors = targetConfig.colors;
     const ringElements = [];
     
-    // Draw rings from largest to smallest
     for (let i = 0; i < rings; i++) {
       const ringRatio = (rings - i) / rings;
       const ringSize = size * ringRatio * 0.95;
@@ -201,7 +200,6 @@ export default function ScoringScreen() {
       );
     }
 
-    // Get arrows for this target
     const targetArrows = isMultiTarget 
       ? arrows.filter(a => a.targetIndex === targetIndex)
       : arrows;
@@ -213,22 +211,17 @@ export default function ScoringScreen() {
           width: size,
           height: size,
           backgroundColor: '#1a1a1a',
-          borderRadius: 8,
+          borderRadius: size / 2,
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
         }}
         onPress={(e) => handleTargetPress(e, targetIndex, size)}
       >
-        {/* Rings */}
         {ringElements}
         
-        {/* Center X mark */}
-        <View style={styles.centerMark}>
-          <Text style={styles.centerMarkText}>X</Text>
-        </View>
+        <View style={{ position: 'absolute', width: 8, height: 8, borderRadius: 4, backgroundColor: '#000' }} />
 
-        {/* Arrow Markers */}
         {targetArrows.map((arrow) => {
           const globalIndex = arrows.findIndex(a => a.id === arrow.id);
           return (
@@ -255,11 +248,11 @@ export default function ScoringScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={28} color="#fff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>{targetConfig.name}</Text>
@@ -268,35 +261,32 @@ export default function ScoringScreen() {
             <Text style={styles.roundText}>Round {currentRoundNumber}</Text>
           </View>
         </View>
-        <View style={styles.headerRight} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Target Area */}
         <View style={styles.targetWrapper}>
           {isVegas ? (
-            // Vegas 3-Spot: Triangle arrangement (1 top, 2 bottom)
             <View style={styles.triangleContainer}>
               <View style={styles.triangleTop}>
                 {renderTargetFace(0, SMALL_TARGET_SIZE)}
               </View>
               <View style={styles.triangleBottom}>
                 {renderTargetFace(1, SMALL_TARGET_SIZE)}
-                <View style={{ width: 16 }} />
+                <View style={{ width: 20 }} />
                 {renderTargetFace(2, SMALL_TARGET_SIZE)}
               </View>
             </View>
           ) : isNFAA ? (
-            // NFAA Indoor: Vertical stack (3 targets)
             <View style={styles.verticalContainer}>
-              {[0, 1, 2].map((index) => (
-                <View key={index} style={styles.verticalTargetWrapper}>
-                  {renderTargetFace(index, SMALL_TARGET_SIZE)}
-                </View>
-              ))}
+              {renderTargetFace(0, SMALL_TARGET_SIZE)}
+              <View style={{ height: 12 }} />
+              {renderTargetFace(1, SMALL_TARGET_SIZE)}
+              <View style={{ height: 12 }} />
+              {renderTargetFace(2, SMALL_TARGET_SIZE)}
             </View>
           ) : (
-            // WA Standard: Single large target
             renderTargetFace(0, BASE_TARGET_SIZE)
           )}
         </View>
@@ -358,14 +348,7 @@ export default function ScoringScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-            <TouchableOpacity 
-              style={styles.deleteButton}
-              onPress={() => {
-                if (selectedArrowIndex !== null) {
-                  handleDeleteArrow(selectedArrowIndex);
-                }
-              }}
-            >
+            <TouchableOpacity style={styles.deleteButton} onPress={() => selectedArrowIndex !== null && handleDeleteArrow(selectedArrowIndex)}>
               <Ionicons name="trash" size={20} color="#fff" />
               <Text style={styles.deleteButtonText}>Delete Arrow</Text>
             </TouchableOpacity>
@@ -387,13 +370,16 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#222',
   },
   backButton: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerCenter: {
     flex: 1,
@@ -403,9 +389,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  headerRight: {
-    width: 40,
   },
   roundBadge: {
     flexDirection: 'row',
@@ -438,37 +421,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  // Triangle arrangement for Vegas 3-Spot
   triangleContainer: {
     alignItems: 'center',
   },
   triangleTop: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   triangleBottom: {
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  // Vertical arrangement for NFAA Indoor
   verticalContainer: {
     alignItems: 'center',
-  },
-  verticalTargetWrapper: {
-    marginBottom: 12,
-  },
-  centerMark: {
-    position: 'absolute',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerMarkText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: 'bold',
   },
   arrowMarker: {
     position: 'absolute',
@@ -481,7 +445,7 @@ const styles = StyleSheet.create({
     borderColor: '#000',
   },
   arrowMarkerText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
   },
   arrowList: {
@@ -512,16 +476,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   arrowItem: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: '#333',
   },
   arrowScore: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   arrowTargetLabel: {
@@ -580,7 +544,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#333',
+    borderColor: '#444',
   },
   scoreButtonText: {
     fontSize: 18,
