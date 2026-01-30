@@ -16,9 +16,6 @@ import { useAppStore } from '../store/appStore';
 import { createSession, addRoundToSession } from '../utils/localStorage';
 import { createBackup } from '../utils/googleDriveBackup';
 
-// Max rounds for competition mode
-const MAX_COMPETITION_ROUNDS = 10;
-
 // Ring colors for FITA target
 const RING_COLORS = [
   '#f0f0f0', // 1 - White outer
