@@ -14,8 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
-import { PinchGestureHandler, PinchGestureHandlerGestureEvent, State } from 'react-native-gesture-handler';
-import Animated, { useAnimatedGestureHandler, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.4);
@@ -42,33 +40,11 @@ export default function ScoringScreen() {
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
 
-  // Pinch zoom state
-  const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
-
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   const isVegas = targetType === 'vegas_3spot';
   const isNFAA = targetType === 'nfaa_indoor';
   const isMultiTarget = isVegas || isNFAA;
   const isCompetition = sessionType === 'competition';
-
-  // Pinch gesture handler
-  const onPinchGestureEvent = useAnimatedGestureHandler<PinchGestureHandlerGestureEvent>({
-    onActive: (event) => {
-      scale.value = Math.min(Math.max(savedScale.value * event.scale, 1), 3);
-    },
-    onEnd: () => {
-      savedScale.value = scale.value;
-      if (scale.value < 1.1) {
-        scale.value = withSpring(1);
-        savedScale.value = 1;
-      }
-    },
-  });
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
 
   const calculateScore = useCallback((normalizedX: number, normalizedY: number): number => {
     const dx = normalizedX - 0.5;
@@ -361,14 +337,8 @@ export default function ScoringScreen() {
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.zoomHint}>Pinch to zoom target</Text>
-        
         <View style={styles.targetWrapper}>
-          <PinchGestureHandler onGestureEvent={onPinchGestureEvent}>
-            <Animated.View style={[styles.zoomableTarget, animatedStyle]}>
-              {renderTargetContent()}
-            </Animated.View>
-          </PinchGestureHandler>
+          {renderTargetContent()}
         </View>
 
         <View style={styles.arrowList}>
@@ -451,9 +421,7 @@ const styles = StyleSheet.create({
   roundText: { color: '#fff', fontSize: 12, fontWeight: '600' },
   scrollView: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 32 },
-  zoomHint: { color: '#666', fontSize: 12, textAlign: 'center', marginBottom: 8 },
-  targetWrapper: { alignItems: 'center', marginBottom: 20, overflow: 'visible' },
-  zoomableTarget: { alignItems: 'center', justifyContent: 'center' },
+  targetWrapper: { alignItems: 'center', marginBottom: 20 },
   triangleContainer: { alignItems: 'center' },
   triangleTop: { marginBottom: 16 },
   triangleBottom: { flexDirection: 'row', justifyContent: 'center' },
