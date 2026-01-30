@@ -380,7 +380,9 @@ export default function ScoringScreen() {
             horizontal={true}
             showsHorizontalScrollIndicator={zoomLevel > 1}
             scrollEnabled={zoomLevel > 1}
-            bounces={false}
+            bounces={true}
+            decelerationRate="fast"
+            scrollEventThrottle={16}
             contentContainerStyle={{
               width: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : '100%',
               alignItems: 'center',
@@ -391,7 +393,9 @@ export default function ScoringScreen() {
               showsVerticalScrollIndicator={zoomLevel > 1}
               scrollEnabled={zoomLevel > 1}
               nestedScrollEnabled={true}
-              bounces={false}
+              bounces={true}
+              decelerationRate="fast"
+              scrollEventThrottle={16}
               contentContainerStyle={{
                 height: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : 'auto',
                 alignItems: 'center',
