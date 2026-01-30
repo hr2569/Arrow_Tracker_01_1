@@ -80,21 +80,23 @@ export default function ScoringScreen() {
   };
 
   const handleTargetPress = (event: GestureResponderEvent, targetIndex: number, targetSize: number) => {
-    // Try multiple sources for coordinates
+    // For web, the nativeEvent contains the DOM event
     const nativeEvent = event.nativeEvent as any;
     
     let x = 0, y = 0;
     
-    // On web, locationX/Y may be undefined or wrong
-    // Try offsetX/offsetY first (more reliable on web)
-    if (typeof nativeEvent.offsetX === 'number' && typeof nativeEvent.offsetY === 'number') {
-      x = nativeEvent.offsetX;
-      y = nativeEvent.offsetY;
-    } else if (typeof nativeEvent.locationX === 'number' && typeof nativeEvent.locationY === 'number') {
+    // Check if this is a web DOM event
+    if (nativeEvent.target && typeof nativeEvent.target.getBoundingClientRect === 'function') {
+      // Web: use clientX/clientY relative to element bounds
+      const rect = nativeEvent.target.getBoundingClientRect();
+      x = (nativeEvent.clientX || nativeEvent.pageX) - rect.left;
+      y = (nativeEvent.clientY || nativeEvent.pageY) - rect.top;
+    } else if (typeof nativeEvent.locationX === 'number') {
+      // Native mobile
       x = nativeEvent.locationX;
       y = nativeEvent.locationY;
     } else {
-      // Fallback: use center
+      // Fallback
       x = targetSize / 2;
       y = targetSize / 2;
     }
