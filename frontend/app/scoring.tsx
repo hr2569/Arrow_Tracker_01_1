@@ -136,18 +136,7 @@ export default function ScoringScreen() {
       return;
     }
 
-    if (isCompetition && arrows.length < COMPETITION_ARROWS_PER_ROUND) {
-      Alert.alert(
-        'Add More Arrows?',
-        `Competition rounds typically have ${COMPETITION_ARROWS_PER_ROUND} arrows. Continue with ${arrows.length}?`,
-        [
-          { text: 'Add More', style: 'cancel' },
-          { text: 'Continue', onPress: finishRound },
-        ]
-      );
-    } else {
-      finishRound();
-    }
+    finishRound();
   };
 
   const finishRound = () => {
