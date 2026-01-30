@@ -14,6 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
+import { PinchGestureHandler, PinchGestureHandlerGestureEvent, State } from 'react-native-gesture-handler';
+import Animated, { useAnimatedGestureHandler, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.4);
@@ -39,13 +41,34 @@ export default function ScoringScreen() {
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
+
+  // Pinch zoom state
+  const scale = useSharedValue(1);
+  const savedScale = useSharedValue(1);
 
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   const isVegas = targetType === 'vegas_3spot';
   const isNFAA = targetType === 'nfaa_indoor';
   const isMultiTarget = isVegas || isNFAA;
   const isCompetition = sessionType === 'competition';
+
+  // Pinch gesture handler
+  const onPinchGestureEvent = useAnimatedGestureHandler<PinchGestureHandlerGestureEvent>({
+    onActive: (event) => {
+      scale.value = Math.min(Math.max(savedScale.value * event.scale, 1), 3);
+    },
+    onEnd: () => {
+      savedScale.value = scale.value;
+      if (scale.value < 1.1) {
+        scale.value = withSpring(1);
+        savedScale.value = 1;
+      }
+    },
+  });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   const calculateScore = useCallback((normalizedX: number, normalizedY: number): number => {
     const dx = normalizedX - 0.5;
@@ -75,29 +98,23 @@ export default function ScoringScreen() {
     }
   }, [targetType]);
 
-  // Store refs for each target to get their positions
   const targetRefs = useRef<{ [key: number]: View | null }>({});
 
   const handleTargetClick = useCallback((event: any, targetIndex: number, targetSize: number) => {
-    // For web, use nativeEvent.offsetX/offsetY or clientX/clientY
-    // For native, use locationX/locationY
     let x: number;
     let y: number;
 
     if (Platform.OS === 'web') {
-      // On web, try offsetX/Y first (relative to clicked element)
       const nativeEvent = event.nativeEvent || event;
       if (typeof nativeEvent.offsetX === 'number' && typeof nativeEvent.offsetY === 'number') {
         x = nativeEvent.offsetX;
         y = nativeEvent.offsetY;
       } else if (typeof nativeEvent.clientX === 'number' && typeof nativeEvent.clientY === 'number') {
-        // Fallback to clientX/Y and calculate relative position
         const rect = event.target?.getBoundingClientRect?.();
         if (rect) {
           x = nativeEvent.clientX - rect.left;
           y = nativeEvent.clientY - rect.top;
         } else {
-          // Default to center if we can't get position
           x = targetSize / 2;
           y = targetSize / 2;
         }
@@ -106,13 +123,11 @@ export default function ScoringScreen() {
         y = targetSize / 2;
       }
     } else {
-      // Native: use locationX/locationY
       const { locationX, locationY } = event.nativeEvent || {};
       x = locationX ?? targetSize / 2;
       y = locationY ?? targetSize / 2;
     }
     
-    // Clamp and normalize coordinates
     const normalizedX = Math.max(0, Math.min(1, x / targetSize));
     const normalizedY = Math.max(0, Math.min(1, y / targetSize));
     const score = calculateScore(normalizedX, normalizedY);
@@ -222,16 +237,13 @@ export default function ScoringScreen() {
       ? arrows.filter(a => a.targetIndex === targetIndex)
       : arrows;
 
-    // Use a div with onClick for web, TouchableOpacity for native
     const TargetContainer = Platform.OS === 'web' ? View : TouchableOpacity;
     
     const handleClick = (e: any) => {
-      // Prevent event bubbling
       e.stopPropagation?.();
       handleTargetClick(e, targetIndex, size);
     };
 
-    // For web, we attach onClick directly via props spread
     const webProps = Platform.OS === 'web' ? {
       onClick: handleClick,
       style: {
@@ -272,7 +284,6 @@ export default function ScoringScreen() {
         <TargetContainer {...webProps} {...nativeProps}>
           {ringElements}
           
-          {/* Center + mark */}
           <View style={styles.centerMark} pointerEvents="none">
             <View style={styles.centerHorizontal} />
             <View style={styles.centerVertical} />
@@ -304,6 +315,35 @@ export default function ScoringScreen() {
     );
   };
 
+  const renderTargetContent = () => {
+    if (isVegas) {
+      return (
+        <View style={styles.triangleContainer}>
+          <View style={styles.triangleTop}>
+            {renderTargetFace(0, SMALL_TARGET_SIZE)}
+          </View>
+          <View style={styles.triangleBottom}>
+            {renderTargetFace(1, SMALL_TARGET_SIZE)}
+            <View style={{ width: 20 }} />
+            {renderTargetFace(2, SMALL_TARGET_SIZE)}
+          </View>
+        </View>
+      );
+    } else if (isNFAA) {
+      return (
+        <View style={styles.verticalContainer}>
+          {renderTargetFace(0, SMALL_TARGET_SIZE)}
+          <View style={{ height: 12 }} />
+          {renderTargetFace(1, SMALL_TARGET_SIZE)}
+          <View style={{ height: 12 }} />
+          {renderTargetFace(2, SMALL_TARGET_SIZE)}
+        </View>
+      );
+    } else {
+      return renderTargetFace(0, BASE_TARGET_SIZE);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
@@ -321,64 +361,15 @@ export default function ScoringScreen() {
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {/* Zoom Controls */}
-        <View style={styles.zoomControls}>
-          <TouchableOpacity 
-            style={styles.zoomButton} 
-            onPress={() => setZoomLevel(prev => Math.min(prev + 0.5, 3))}
-          >
-            <Ionicons name="add" size={20} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.zoomText}>{Math.round(zoomLevel * 100)}%</Text>
-          <TouchableOpacity 
-            style={styles.zoomButton} 
-            onPress={() => setZoomLevel(prev => Math.max(prev - 0.5, 1))}
-          >
-            <Ionicons name="remove" size={20} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.zoomButton} 
-            onPress={() => setZoomLevel(1)}
-          >
-            <Ionicons name="scan-outline" size={20} color="#fff" />
-          </TouchableOpacity>
+        <Text style={styles.zoomHint}>Pinch to zoom target</Text>
+        
+        <View style={styles.targetWrapper}>
+          <PinchGestureHandler onGestureEvent={onPinchGestureEvent}>
+            <Animated.View style={[styles.zoomableTarget, animatedStyle]}>
+              {renderTargetContent()}
+            </Animated.View>
+          </PinchGestureHandler>
         </View>
-
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalScrollContent}
-        >
-          <ScrollView 
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.verticalScrollContent}
-          >
-            <View style={[styles.targetWrapper, { transform: [{ scale: zoomLevel }] }]}>
-              {isVegas ? (
-                <View style={styles.triangleContainer}>
-                  <View style={styles.triangleTop}>
-                    {renderTargetFace(0, SMALL_TARGET_SIZE)}
-                  </View>
-                  <View style={styles.triangleBottom}>
-                    {renderTargetFace(1, SMALL_TARGET_SIZE)}
-                    <View style={{ width: 20 }} />
-                    {renderTargetFace(2, SMALL_TARGET_SIZE)}
-                  </View>
-                </View>
-              ) : isNFAA ? (
-                <View style={styles.verticalContainer}>
-                  {renderTargetFace(0, SMALL_TARGET_SIZE)}
-                  <View style={{ height: 12 }} />
-                  {renderTargetFace(1, SMALL_TARGET_SIZE)}
-                  <View style={{ height: 12 }} />
-                  {renderTargetFace(2, SMALL_TARGET_SIZE)}
-                </View>
-              ) : (
-                renderTargetFace(0, BASE_TARGET_SIZE)
-              )}
-            </View>
-          </ScrollView>
-        </ScrollView>
 
         <View style={styles.arrowList}>
           <View style={styles.arrowListHeader}>
@@ -460,12 +451,9 @@ const styles = StyleSheet.create({
   roundText: { color: '#fff', fontSize: 12, fontWeight: '600' },
   scrollView: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 32 },
-  zoomControls: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 12, marginBottom: 12 },
-  zoomButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#333', alignItems: 'center', justifyContent: 'center' },
-  zoomText: { color: '#fff', fontSize: 14, fontWeight: '600', minWidth: 50, textAlign: 'center' },
-  horizontalScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', minWidth: '100%' },
-  verticalScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center' },
-  targetWrapper: { alignItems: 'center', marginBottom: 20 },
+  zoomHint: { color: '#666', fontSize: 12, textAlign: 'center', marginBottom: 8 },
+  targetWrapper: { alignItems: 'center', marginBottom: 20, overflow: 'visible' },
+  zoomableTarget: { alignItems: 'center', justifyContent: 'center' },
   triangleContainer: { alignItems: 'center' },
   triangleTop: { marginBottom: 16 },
   triangleBottom: { flexDirection: 'row', justifyContent: 'center' },
