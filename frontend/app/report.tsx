@@ -265,7 +265,7 @@ export default function ReportScreen() {
       } else {
         await Share.share({
           message: reportText,
-          title: 'Archery Report',
+          title: 'Arrow Tracker Report',
         });
       }
     } catch (error) {
@@ -507,7 +507,7 @@ export default function ReportScreen() {
       <html>
         <head>
           <meta charset="utf-8">
-          <title>Archery Report</title>
+          <title>Arrow Tracker Report</title>
           <style>
             @page {
               size: A4;
@@ -670,7 +670,7 @@ export default function ReportScreen() {
           <!-- Page 1: Overview & Stats -->
           <div class="page">
             <div class="header">
-              <h1>Archery Performance Report</h1>
+              <h1>Arrow Tracker Performance Report</h1>
               <p style="font-size: 16px;">${formatDateRange()}</p>
               <p style="font-size: 12px; color: #666;">Generated ${new Date().toLocaleDateString()}</p>
               <div class="equipment-info">
@@ -759,7 +759,7 @@ export default function ReportScreen() {
               ${ringDistributionRows}
             </table>
             <div class="footer">
-              <p>Archery Scoring App - ${new Date().getFullYear()}</p>
+              <p>Arrow Tracker - ${new Date().getFullYear()}</p>
             </div>
           </div>
           ` : ''}
