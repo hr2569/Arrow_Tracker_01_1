@@ -23,18 +23,6 @@ import { getSessions, getBows, Session, Bow } from '../utils/localStorage';
 
 type ReportPeriod = 'week' | 'month' | 'year' | 'custom' | 'all';
 
-interface Session {
-  id: string;
-  name: string;
-  total_score: number;
-  rounds: any[];
-  created_at: string;
-  bow_name?: string;
-  bow_id?: string;
-  distance?: string;
-  target_type?: string;
-}
-
 // Helper function to get target type display name
 const getTargetTypeName = (type?: string): string => {
   switch (type) {
@@ -44,12 +32,6 @@ const getTargetTypeName = (type?: string): string => {
     default: return 'WA Standard';
   }
 };
-
-interface Bow {
-  id: string;
-  name: string;
-  bow_type: string;
-}
 
 export default function ReportScreen() {
   const router = useRouter();
