@@ -417,6 +417,62 @@ export default function StatsScreen() {
           <RingDistribution />
         </View>
 
+        {/* Shot Heatmap */}
+        {stats.totalArrows > 0 && (
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>
+              <Ionicons name="locate" size={18} color="#8B0000" /> Shot Distribution ({getTargetTypeName(targetTypeFilter)})
+            </Text>
+            <View style={styles.heatmapContainer}>
+              <Svg width={SCREEN_WIDTH - 80} height={SCREEN_WIDTH - 80} viewBox="0 0 200 200">
+                {/* Target rings background */}
+                <G>
+                  {/* Outer rings - White */}
+                  <Circle cx="100" cy="100" r="95" fill="#f5f5f0" stroke="#333" strokeWidth="0.5" />
+                  <Circle cx="100" cy="100" r="85.5" fill="#f5f5f0" stroke="#333" strokeWidth="0.5" />
+                  {/* Black rings */}
+                  <Circle cx="100" cy="100" r="76" fill="#2a2a2a" stroke="#555" strokeWidth="0.5" />
+                  <Circle cx="100" cy="100" r="66.5" fill="#2a2a2a" stroke="#555" strokeWidth="0.5" />
+                  {/* Blue rings */}
+                  <Circle cx="100" cy="100" r="57" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
+                  <Circle cx="100" cy="100" r="47.5" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
+                  {/* Red rings */}
+                  <Circle cx="100" cy="100" r="38" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
+                  <Circle cx="100" cy="100" r="28.5" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
+                  {/* Gold rings */}
+                  <Circle cx="100" cy="100" r="19" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
+                  <Circle cx="100" cy="100" r="9.5" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
+                </G>
+                
+                {/* Shot markers */}
+                {stats.allShots.map((shot, index) => {
+                  // Use raw x,y coordinates for heatmap display
+                  const cx = shot.rawX * 200;
+                  const cy = shot.rawY * 200;
+                  const fillColor = shot.ring >= 9 ? 'rgba(255, 0, 0, 0.7)' : 
+                                   shot.ring >= 7 ? 'rgba(255, 100, 100, 0.7)' : 
+                                   shot.ring >= 5 ? 'rgba(255, 150, 150, 0.7)' : 
+                                   'rgba(255, 200, 200, 0.6)';
+                  return (
+                    <Circle
+                      key={`shot-${index}`}
+                      cx={cx}
+                      cy={cy}
+                      r={4}
+                      fill={fillColor}
+                      stroke="rgba(0,0,0,0.5)"
+                      strokeWidth={0.5}
+                    />
+                  );
+                })}
+              </Svg>
+            </View>
+            <Text style={styles.heatmapLabel}>
+              {stats.totalArrows} arrows shown • Filtered by {getTargetTypeName(targetTypeFilter)}
+            </Text>
+          </View>
+        )}
+
         {/* Empty State */}
         {stats.totalArrows === 0 && (
           <View style={styles.emptyState}>
