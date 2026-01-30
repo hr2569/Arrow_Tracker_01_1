@@ -375,18 +375,27 @@ export default function ScoringScreen() {
           )}
         </View>
 
-        <View style={[styles.zoomContainer, { height: zoomLevel > 1 ? 400 : undefined }]}>
+        <View style={[styles.zoomContainer, { height: zoomLevel > 1 ? 350 : undefined }]}>
           <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
+            horizontal={true}
+            showsHorizontalScrollIndicator={zoomLevel > 1}
             scrollEnabled={zoomLevel > 1}
-            contentContainerStyle={styles.horizontalScrollContent}
+            contentContainerStyle={{
+              minWidth: zoomLevel > 1 ? SCREEN_WIDTH * zoomLevel : SCREEN_WIDTH - 32,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
             <ScrollView 
-              showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={zoomLevel > 1}
               scrollEnabled={zoomLevel > 1}
               nestedScrollEnabled={true}
-              contentContainerStyle={styles.verticalScrollContent}
+              contentContainerStyle={{
+                minHeight: zoomLevel > 1 ? 350 * zoomLevel : undefined,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingVertical: zoomLevel > 1 ? 50 * zoomLevel : 0,
+              }}
             >
               <View style={[styles.targetWrapper, { transform: [{ scale: zoomLevel }] }]}>
                 {renderTargetContent()}
