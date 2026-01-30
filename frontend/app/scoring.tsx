@@ -85,22 +85,35 @@ export default function ScoringScreen() {
   };
 
   const handleTargetPress = (event: any, targetIndex: number = 0, targetSize: number) => {
-    const { locationX, locationY } = event.nativeEvent;
+    // Get coordinates - handle both web and native
+    let x, y;
     
-    // Normalize to 0-1 range where 0.5,0.5 is center
-    const x = locationX / targetSize;
-    const y = locationY / targetSize;
+    if (event.nativeEvent.locationX !== undefined) {
+      // Native (iOS/Android)
+      x = event.nativeEvent.locationX;
+      y = event.nativeEvent.locationY;
+    } else if (event.nativeEvent.offsetX !== undefined) {
+      // Web fallback
+      x = event.nativeEvent.offsetX;
+      y = event.nativeEvent.offsetY;
+    } else {
+      // Last fallback - use layerX/layerY
+      x = event.nativeEvent.layerX || 0;
+      y = event.nativeEvent.layerY || 0;
+    }
     
-    // Clamp values
-    const clampedX = Math.max(0, Math.min(1, x));
-    const clampedY = Math.max(0, Math.min(1, y));
+    // Normalize to 0-1 range
+    const normalizedX = Math.max(0, Math.min(1, x / targetSize));
+    const normalizedY = Math.max(0, Math.min(1, y / targetSize));
     
-    const score = calculateScore(clampedX, clampedY);
+    const score = calculateScore(normalizedX, normalizedY);
+    
+    console.log('Target press:', { x, y, targetSize, normalizedX, normalizedY, score });
     
     const newArrow: Arrow = {
       id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      x: clampedX,
-      y: clampedY,
+      x: normalizedX,
+      y: normalizedY,
       score,
       targetIndex: isMultiTarget ? targetIndex : undefined,
     };
