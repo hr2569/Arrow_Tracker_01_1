@@ -66,9 +66,7 @@ export default function RootLayout() {
         <Stack.Screen 
           name="scoring" 
           options={{ 
-            title: 'Score Arrows',
-            headerBackTitle: 'Back',
-            headerLeft: () => <HeaderBackButton />,
+            headerShown: false,
           }} 
         />
         <Stack.Screen 
