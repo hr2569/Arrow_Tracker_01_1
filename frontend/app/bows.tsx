@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,6 @@ import {
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,19 +17,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { getBowIcon } from '../utils/bowIcons';
-
-const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-
-interface Bow {
-  id: string;
-  name: string;
-  bow_type: string;
-  draw_weight: number | null;
-  draw_length: number | null;
-  notes: string;
-  created_at: string;
-  updated_at: string;
-}
+import { getBows, createBow, updateBow, deleteBow, Bow } from '../utils/localStorage';
 
 const BOW_TYPES = [
   'Recurve',
@@ -58,11 +45,8 @@ export default function BowsScreen() {
   const fetchBows = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE}/api/bows`);
-      if (response.ok) {
-        const data = await response.json();
-        setBows(data);
-      }
+      const data = await getBows();
+      setBows(data);
     } catch (error) {
       console.error('Error fetching bows:', error);
     } finally {
@@ -111,33 +95,20 @@ export default function BowsScreen() {
       const bowData = {
         name: formName.trim(),
         bow_type: formType,
-        draw_weight: formDrawWeight ? parseFloat(formDrawWeight) : null,
-        draw_length: formDrawLength ? parseFloat(formDrawLength) : null,
+        draw_weight: formDrawWeight ? parseFloat(formDrawWeight) : undefined,
+        draw_length: formDrawLength ? parseFloat(formDrawLength) : undefined,
         notes: formNotes.trim(),
       };
 
-      let response;
       if (editingBow) {
-        response = await fetch(`${API_BASE}/api/bows/${editingBow.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bowData),
-        });
+        await updateBow(editingBow.id, bowData);
       } else {
-        response = await fetch(`${API_BASE}/api/bows`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bowData),
-        });
+        await createBow(bowData);
       }
 
-      if (response.ok) {
-        setModalVisible(false);
-        resetForm();
-        fetchBows();
-      } else {
-        Alert.alert('Error', 'Failed to save bow');
-      }
+      setModalVisible(false);
+      resetForm();
+      fetchBows();
     } catch (error) {
       console.error('Error saving bow:', error);
       Alert.alert('Error', 'Failed to save bow');
@@ -157,14 +128,8 @@ export default function BowsScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await fetch(`${API_BASE}/api/bows/${bow.id}`, {
-                method: 'DELETE',
-              });
-              if (response.ok) {
-                fetchBows();
-              } else {
-                Alert.alert('Error', 'Failed to delete bow');
-              }
+              await deleteBow(bow.id);
+              fetchBows();
             } catch (error) {
               console.error('Error deleting bow:', error);
               Alert.alert('Error', 'Failed to delete bow');

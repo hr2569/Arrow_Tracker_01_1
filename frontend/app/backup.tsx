@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,153 +6,88 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
-import * as DocumentPicker from 'expo-document-picker';
-import Constants from 'expo-constants';
-
-const API_BASE = Constants.expoConfig?.extra?.backendUrl || 
-  process.env.EXPO_PUBLIC_BACKEND_URL || 
-  '';
+import { createBackup, restoreBackup } from '../utils/googleDriveBackup';
+import { getLastBackupDate, getSessions, getBows } from '../utils/localStorage';
 
 export default function BackupScreen() {
   const router = useRouter();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [lastBackup, setLastBackup] = useState<string | null>(null);
+  const [dataStats, setDataStats] = useState({ sessions: 0, bows: 0 });
 
-  const exportData = async () => {
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    const [sessions, bows, lastDate] = await Promise.all([
+      getSessions(),
+      getBows(),
+      getLastBackupDate(),
+    ]);
+    setDataStats({ sessions: sessions.length, bows: bows.length });
+    if (lastDate) {
+      setLastBackup(new Date(lastDate).toLocaleString());
+    }
+  };
+
+  const handleExport = async () => {
     setIsExporting(true);
     try {
-      // Fetch all data from the backend
-      const [sessionsRes, bowsRes] = await Promise.all([
-        fetch(`${API_BASE}/api/sessions`),
-        fetch(`${API_BASE}/api/bows`),
-      ]);
-
-      if (!sessionsRes.ok || !bowsRes.ok) {
-        throw new Error('Failed to fetch data');
-      }
-
-      const sessions = await sessionsRes.json();
-      const bows = await bowsRes.json();
-
-      // Create backup object
-      const backup = {
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        data: {
-          sessions,
-          bows,
-        },
-      };
-
-      // Create file
-      const fileName = `archery-backup-${new Date().toISOString().split('T')[0]}.json`;
-      const filePath = `${FileSystem.cacheDirectory}${fileName}`;
-      
-      await FileSystem.writeAsStringAsync(filePath, JSON.stringify(backup, null, 2));
-
-      // Share the file
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(filePath, {
-          mimeType: 'application/json',
-          dialogTitle: 'Save Archery Backup',
-          UTI: 'public.json',
-        });
-        setLastBackup(new Date().toLocaleString());
-        Alert.alert('Success', 'Backup file ready to save or share!');
+      const result = await createBackup();
+      if (result.success) {
+        await loadStats();
+        Alert.alert('Success', 'Backup file ready to save!');
       } else {
-        Alert.alert('Error', 'Sharing is not available on this device');
+        Alert.alert('Error', result.error || 'Failed to create backup');
       }
     } catch (error) {
-      console.error('Export error:', error);
       Alert.alert('Error', 'Failed to export data. Please try again.');
     } finally {
       setIsExporting(false);
     }
   };
 
-  const importData = async () => {
+  const handleImport = async () => {
     setIsImporting(true);
     try {
-      // Pick a file
-      const result = await DocumentPicker.getDocumentAsync({
-        type: 'application/json',
-        copyToCacheDirectory: true,
-      });
-
+      const result = await restoreBackup();
+      
       if (result.canceled) {
         setIsImporting(false);
         return;
       }
-
-      const file = result.assets[0];
       
-      // Read file content
-      const content = await FileSystem.readAsStringAsync(file.uri);
-      const backup = JSON.parse(content);
-
-      // Validate backup format
-      if (!backup.version || !backup.data) {
-        throw new Error('Invalid backup file format');
+      if (result.success) {
+        await loadStats();
+        Alert.alert(
+          'Success',
+          `Restored ${result.sessionsCount} sessions and ${result.bowsCount} bows!`
+        );
+      } else {
+        Alert.alert('Error', result.error || 'Failed to restore backup');
       }
-
-      // Confirm import
-      Alert.alert(
-        'Import Backup',
-        `This backup contains ${backup.data.sessions?.length || 0} sessions and ${backup.data.bows?.length || 0} bows.\n\nThis will ADD to your existing data. Continue?`,
-        [
-          { text: 'Cancel', style: 'cancel', onPress: () => setIsImporting(false) },
-          {
-            text: 'Import',
-            onPress: async () => {
-              try {
-                // Import bows first
-                if (backup.data.bows && backup.data.bows.length > 0) {
-                  for (const bow of backup.data.bows) {
-                    const { id, ...bowData } = bow;
-                    await fetch(`${API_BASE}/api/bows`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(bowData),
-                    });
-                  }
-                }
-
-                // Import sessions
-                if (backup.data.sessions && backup.data.sessions.length > 0) {
-                  for (const session of backup.data.sessions) {
-                    const { id, ...sessionData } = session;
-                    await fetch(`${API_BASE}/api/sessions`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(sessionData),
-                    });
-                  }
-                }
-
-                Alert.alert('Success', 'Data imported successfully!');
-              } catch (err) {
-                console.error('Import error:', err);
-                Alert.alert('Error', 'Failed to import some data. Please try again.');
-              } finally {
-                setIsImporting(false);
-              }
-            },
-          },
-        ]
-      );
     } catch (error) {
-      console.error('Import error:', error);
-      Alert.alert('Error', 'Failed to read backup file. Make sure it\'s a valid backup.');
+      Alert.alert('Error', 'Failed to import backup. Please try again.');
+    } finally {
       setIsImporting(false);
     }
+  };
+
+  const confirmImport = () => {
+    Alert.alert(
+      'Import Backup',
+      'This will REPLACE all your current data. Are you sure you want to continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Import', style: 'destructive', onPress: handleImport },
+      ]
+    );
   };
 
   return (
@@ -170,23 +105,39 @@ export default function BackupScreen() {
       </View>
 
       <View style={styles.content}>
+        {/* Data Stats Card */}
+        <View style={styles.statsCard}>
+          <Text style={styles.statsTitle}>Your Data</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{dataStats.sessions}</Text>
+              <Text style={styles.statLabel}>Sessions</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{dataStats.bows}</Text>
+              <Text style={styles.statLabel}>Bows</Text>
+            </View>
+          </View>
+        </View>
+
         {/* Info Card */}
         <View style={styles.infoCard}>
           <Ionicons name="information-circle" size={24} color="#4a90d9" />
           <Text style={styles.infoText}>
-            Export your data to save it safely. You can share the backup file via email, save to cloud storage, or transfer to another device.
+            All data is stored locally on your device. Export backups regularly to keep your data safe. Save to Google Drive, email, or any cloud storage.
           </Text>
         </View>
 
         {/* Export Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Export Data</Text>
+          <Text style={styles.sectionTitle}>Export Backup</Text>
           <Text style={styles.sectionDesc}>
             Save all your sessions and bow profiles to a file
           </Text>
           <TouchableOpacity
             style={[styles.actionButton, styles.exportButton]}
-            onPress={exportData}
+            onPress={handleExport}
             disabled={isExporting}
           >
             {isExporting ? (
@@ -194,7 +145,7 @@ export default function BackupScreen() {
             ) : (
               <>
                 <Ionicons name="cloud-upload" size={24} color="#fff" />
-                <Text style={styles.actionButtonText}>Export Backup</Text>
+                <Text style={styles.actionButtonText}>Export to File</Text>
               </>
             )}
           </TouchableOpacity>
@@ -205,13 +156,13 @@ export default function BackupScreen() {
 
         {/* Import Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Import Data</Text>
+          <Text style={styles.sectionTitle}>Restore Backup</Text>
           <Text style={styles.sectionDesc}>
             Restore from a previously exported backup file
           </Text>
           <TouchableOpacity
             style={[styles.actionButton, styles.importButton]}
-            onPress={importData}
+            onPress={confirmImport}
             disabled={isImporting}
           >
             {isImporting ? (
@@ -219,7 +170,7 @@ export default function BackupScreen() {
             ) : (
               <>
                 <Ionicons name="cloud-download" size={24} color="#8B0000" />
-                <Text style={styles.importButtonText}>Import Backup</Text>
+                <Text style={styles.importButtonText}>Import from File</Text>
               </>
             )}
           </TouchableOpacity>
@@ -239,6 +190,10 @@ export default function BackupScreen() {
           <View style={styles.tipItem}>
             <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
             <Text style={styles.tipText}>Email yourself a backup for safekeeping</Text>
+          </View>
+          <View style={styles.tipItem}>
+            <Ionicons name="warning" size={16} color="#FFC107" />
+            <Text style={styles.tipText}>Import will replace all current data</Text>
           </View>
         </View>
       </View>
@@ -274,6 +229,43 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 16,
+  },
+  statsCard: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  statsTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#888',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statItem: {
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  statValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#8B0000',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 4,
+  },
+  statDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: '#333',
   },
   infoCard: {
     flexDirection: 'row',

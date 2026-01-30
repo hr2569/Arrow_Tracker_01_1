@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,6 @@ import {
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,17 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 import { getBowIcon } from '../utils/bowIcons';
-
-const API_BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-
-interface Bow {
-  id: string;
-  name: string;
-  bow_type: string;
-  draw_weight: number | null;
-  draw_length: number | null;
-  notes: string;
-}
+import { getBows, Bow } from '../utils/localStorage';
 
 type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
 
@@ -46,14 +35,11 @@ export default function SessionSetupScreen() {
   const fetchBows = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE}/api/bows`);
-      if (response.ok) {
-        const data = await response.json();
-        setBows(data);
-        // Auto-select if only one bow exists
-        if (data.length === 1) {
-          setSelectedBowId(data[0].id);
-        }
+      const data = await getBows();
+      setBows(data);
+      // Auto-select if only one bow exists
+      if (data.length === 1) {
+        setSelectedBowId(data[0].id);
       }
     } catch (error) {
       console.error('Error fetching bows:', error);
@@ -237,7 +223,6 @@ export default function SessionSetupScreen() {
                 activeOpacity={0.8}
               >
                 <View style={styles.targetPreview}>
-                  {/* Inverted triangle: 1 on top, 2 on bottom */}
                   <View style={styles.vegasTrianglePreview}>
                     <View style={styles.vegasTopRow}>
                       <View style={[styles.miniTargetVegas]}>
@@ -287,7 +272,6 @@ export default function SessionSetupScreen() {
                 activeOpacity={0.8}
               >
                 <View style={styles.targetPreview}>
-                  {/* Vertical stack: 3 targets */}
                   <View style={styles.nfaaVerticalPreview}>
                     {[0, 1, 2].map((i) => (
                       <View key={i} style={[styles.miniRing, { backgroundColor: '#00a2e8', width: 14, height: 14 }]}>
@@ -527,28 +511,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-  },
-  sessionTypeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#111',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    alignSelf: 'center',
-    marginBottom: 24,
-    gap: 8,
-  },
-  sessionTypeText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  competitionText: {
-    color: '#FFD700',
-  },
-  trainingText: {
-    color: '#ff4444',
   },
   section: {
     marginBottom: 24,
@@ -792,27 +754,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     height: 50,
-  },
-  tripleTargetContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 3,
-  },
-  miniTarget: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#0077b3',
-  },
-  miniTargetCenter: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
   },
   targetTypeName: {
     fontSize: 11,
