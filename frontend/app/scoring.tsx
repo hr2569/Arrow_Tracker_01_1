@@ -23,6 +23,7 @@ interface Arrow {
   x: number;
   y: number;
   ring: number;
+  targetIndex?: number; // For multi-target layouts
 }
 
 export default function ScoringScreen() {
@@ -37,13 +38,22 @@ export default function ScoringScreen() {
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
-  const [targetLayout, setTargetLayout] = useState<{ width: number; height: number } | null>(null);
+  const [selectedTargetIndex, setSelectedTargetIndex] = useState(0);
 
   // Get target configuration
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
+  const isMultiTarget = targetConfig.layout === 'triple_vertical' || targetConfig.layout === 'triple_triangle';
 
   // Session info
   const isCompetition = sessionType === 'competition';
+
+  // Calculate score from ring position based on target type
+  const calculateScoreFromRing = (ringIndex: number): number => {
+    const scores = targetConfig.scores;
+    if (ringIndex < 0) return 0; // Miss
+    if (ringIndex >= scores.length) return scores[scores.length - 1];
+    return scores[ringIndex];
+  };
 
   const calculateRingFromPosition = (x: number, y: number): number => {
     // Calculate distance from center (0.5, 0.5)
@@ -51,38 +61,35 @@ export default function ScoringScreen() {
     const dy = y - 0.5;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
-    // Map distance to ring (0.5 is edge of target)
+    const rings = targetConfig.rings;
+    
+    // Map distance to ring index (0 = outermost visible ring)
     const normalizedDist = distance / 0.45;
     
-    if (normalizedDist > 1.1) return 0; // Miss
-    if (normalizedDist > 1.0) return 1;
-    if (normalizedDist > 0.9) return 2;
-    if (normalizedDist > 0.8) return 3;
-    if (normalizedDist > 0.7) return 4;
-    if (normalizedDist > 0.6) return 5;
-    if (normalizedDist > 0.5) return 6;
-    if (normalizedDist > 0.4) return 7;
-    if (normalizedDist > 0.3) return 8;
-    if (normalizedDist > 0.15) return 9;
-    return 10;
+    if (normalizedDist > 1.1) return -1; // Miss
+    
+    // Calculate which ring was hit (0 = outermost, rings-1 = innermost)
+    const ringIndex = Math.floor((1 - normalizedDist) * rings);
+    return Math.max(0, Math.min(rings - 1, ringIndex));
   };
 
-  const handleTargetPress = (event: any) => {
-    if (!targetLayout) return;
-
+  const handleTargetPress = (event: any, targetIndex: number = 0) => {
     const { locationX, locationY } = event.nativeEvent;
+    const targetSize = isMultiTarget ? (SCREEN_WIDTH - 48) / 3 : BASE_TARGET_SIZE;
     
     // Normalize coordinates to 0-1 range
-    const x = Math.max(0, Math.min(1, locationX / targetLayout.width));
-    const y = Math.max(0, Math.min(1, locationY / targetLayout.height));
+    const x = Math.max(0, Math.min(1, locationX / targetSize));
+    const y = Math.max(0, Math.min(1, locationY / targetSize));
     
-    const ring = calculateRingFromPosition(x, y);
+    const ringIndex = calculateRingFromPosition(x, y);
+    const score = ringIndex >= 0 ? calculateScoreFromRing(ringIndex) : 0;
     
     const newArrow: Arrow = {
       id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       x,
       y,
-      ring,
+      ring: score,
+      targetIndex: isMultiTarget ? targetIndex : undefined,
     };
 
     setArrows(prev => [...prev, newArrow]);
@@ -117,13 +124,16 @@ export default function ScoringScreen() {
     if (score >= 7) return '#ed1c24';
     if (score >= 5) return '#00a2e8';
     if (score >= 3) return '#2a2a2a';
-    return '#f5f5f0';
+    if (score >= 1) return '#f5f5f0';
+    return '#888';
   };
 
   const getScoreTextColor = (score: number) => {
     if (score >= 9) return '#000';
-    if (score >= 3 && score < 5) return '#fff';
-    if (score < 3) return '#000';
+    if (score >= 7) return '#fff';
+    if (score >= 5) return '#fff';
+    if (score >= 3) return '#fff';
+    if (score >= 1) return '#000';
     return '#fff';
   };
 
@@ -148,18 +158,25 @@ export default function ScoringScreen() {
     router.back();
   };
 
-  // The ring size for the target
-  const RING_SIZE = BASE_TARGET_SIZE;
+  // Get available scores for the picker based on target type
+  const getAvailableScores = (): number[] => {
+    if (targetType === 'wa_standard') {
+      return [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+    } else {
+      // Vegas and NFAA: 10, 9, 8, 7, 6, 0 (miss)
+      return [10, 9, 8, 7, 6, 0];
+    }
+  };
 
-  // Render ring overlay - creates a visual target
-  const renderRingOverlay = () => {
+  // Render a single target face
+  const renderTargetFace = (targetIndex: number = 0, size: number = BASE_TARGET_SIZE) => {
     const rings = targetConfig.rings;
     const ringElements = [];
     
     // Draw rings from largest (outermost) to smallest (innermost)
     for (let i = 0; i < rings; i++) {
       const ringRatio = (rings - i) / rings;
-      const size = RING_SIZE * ringRatio;
+      const ringSize = size * ringRatio;
       const color = targetConfig.colors[i];
       
       const fillColor = color?.bg || '#f5f5f0';
@@ -167,22 +184,65 @@ export default function ScoringScreen() {
       
       ringElements.push(
         <View
-          key={`ring-${i}`}
+          key={`ring-${targetIndex}-${i}`}
           style={[
             styles.ring,
             {
-              width: size,
-              height: size,
-              borderRadius: size / 2,
+              width: ringSize,
+              height: ringSize,
+              borderRadius: ringSize / 2,
               borderColor: borderCol,
-              borderWidth: 1.5,
+              borderWidth: 1,
               backgroundColor: fillColor,
             },
           ]}
         />
       );
     }
-    return ringElements;
+
+    // Get arrows for this target
+    const targetArrows = isMultiTarget 
+      ? arrows.filter(a => a.targetIndex === targetIndex)
+      : arrows;
+
+    return (
+      <Pressable
+        key={`target-${targetIndex}`}
+        style={[styles.targetContainer, { width: size, height: size }]}
+        onPress={(e) => handleTargetPress(e, targetIndex)}
+      >
+        <View style={[styles.ringOverlay, { width: size, height: size }]} pointerEvents="none">
+          {ringElements}
+          {/* Center dot */}
+          <View style={[styles.centerDot, { width: size * 0.05, height: size * 0.05, borderRadius: size * 0.025 }]} />
+        </View>
+
+        {/* Arrow Markers */}
+        {targetArrows.map((arrow, index) => {
+          const globalIndex = arrows.findIndex(a => a.id === arrow.id);
+          return (
+            <TouchableOpacity
+              key={arrow.id}
+              style={[
+                styles.arrowMarker,
+                {
+                  left: arrow.x * size - 10,
+                  top: arrow.y * size - 10,
+                  backgroundColor: getScoreColor(arrow.ring),
+                  width: 20,
+                  height: 20,
+                },
+              ]}
+              onPress={() => handleEditArrow(globalIndex)}
+            >
+              <Text style={[styles.arrowMarkerText, { color: getScoreTextColor(arrow.ring), fontSize: 10 }]}>
+                {arrow.ring === 10 ? 'X' : arrow.ring}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </Pressable>
+    );
   };
 
   return (
@@ -193,7 +253,7 @@ export default function ScoringScreen() {
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Score Arrows</Text>
+          <Text style={styles.headerTitle}>{targetConfig.name}</Text>
           <View style={[styles.roundBadge, isCompetition ? styles.competitionBadge : styles.trainingBadge]}>
             <Ionicons name={isCompetition ? "trophy" : "fitness"} size={12} color={isCompetition ? "#FFD700" : "#ff4444"} />
             <Text style={styles.roundText}>Round {currentRoundNumber}</Text>
@@ -205,144 +265,97 @@ export default function ScoringScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Target Area */}
         <View style={styles.targetWrapper}>
-          <Pressable
-            style={[styles.targetContainer, { width: BASE_TARGET_SIZE, height: BASE_TARGET_SIZE }]}
-            onLayout={(e) => setTargetLayout({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
-            onPress={handleTargetPress}
-          >
-            {/* Ring Overlay */}
-            <View 
-              style={[
-                styles.ringOverlay, 
-                { 
-                  width: BASE_TARGET_SIZE, 
-                  height: BASE_TARGET_SIZE,
-                }
-              ]} 
-              pointerEvents="none"
-            >
-              {renderRingOverlay()}
-              {/* Center crosshair */}
-              <View style={styles.crosshair}>
-                <View style={styles.crosshairH} />
-                <View style={styles.crosshairV} />
-              </View>
+          {isMultiTarget ? (
+            // Render 3 targets for Vegas/NFAA
+            <View style={styles.multiTargetContainer}>
+              {[0, 1, 2].map((index) => (
+                <View key={index} style={styles.smallTargetWrapper}>
+                  {renderTargetFace(index, (SCREEN_WIDTH - 64) / 3)}
+                  <Text style={styles.targetLabel}>Target {index + 1}</Text>
+                </View>
+              ))}
             </View>
-
-            {/* Arrow Markers */}
-            {arrows.map((arrow, index) => (
-              <TouchableOpacity
-                key={arrow.id}
-                style={[
-                  styles.arrowMarker,
-                  {
-                    left: arrow.x * BASE_TARGET_SIZE - 12,
-                    top: arrow.y * BASE_TARGET_SIZE - 12,
-                    backgroundColor: getScoreColor(arrow.ring),
-                  },
-                ]}
-                onPress={() => handleEditArrow(index)}
-              >
-                <Text style={[styles.arrowMarkerText, { color: getScoreTextColor(arrow.ring) }]}>
-                  {arrow.ring === 10 ? 'X' : arrow.ring}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </Pressable>
-          
-          <Text style={styles.tapHint}>Tap target to add arrows</Text>
-        </View>
-
-        {/* Score Summary */}
-        <View style={styles.scoreSummary}>
-          <View style={styles.scoreBox}>
-            <Text style={styles.scoreValue}>{getTotalScore()}</Text>
-            <Text style={styles.scoreLabel}>Total</Text>
-          </View>
-          <View style={styles.scoreDivider} />
-          <View style={styles.scoreBox}>
-            <Text style={styles.scoreValue}>{arrows.length}</Text>
-            <Text style={styles.scoreLabel}>Arrows</Text>
-          </View>
-          <View style={styles.scoreDivider} />
-          <View style={styles.scoreBox}>
-            <Text style={styles.scoreValue}>
-              {arrows.length > 0 ? (getTotalScore() / arrows.length).toFixed(1) : '0'}
-            </Text>
-            <Text style={styles.scoreLabel}>Avg</Text>
-          </View>
+          ) : (
+            // Render single target for WA Standard
+            renderTargetFace(0, BASE_TARGET_SIZE)
+          )}
         </View>
 
         {/* Arrow List */}
-        {arrows.length > 0 && (
-          <View style={styles.arrowList}>
-            <Text style={styles.sectionTitle}>Arrows</Text>
-            {arrows.map((arrow, index) => (
-              <View key={arrow.id} style={styles.arrowRow}>
-                <TouchableOpacity style={styles.arrowInfo} onPress={() => handleEditArrow(index)}>
-                  <View style={styles.arrowNumber}>
-                    <Text style={styles.arrowNumberText}>{index + 1}</Text>
-                  </View>
-                  <View style={styles.arrowDetails}>
-                    <Text style={styles.arrowRingText}>Ring {arrow.ring}</Text>
-                    <Text style={styles.arrowConfText}>Manual</Text>
-                  </View>
-                  <View style={[styles.arrowScoreBadge, { backgroundColor: getScoreColor(arrow.ring) }]}>
-                    <Text style={[styles.arrowScoreText, { color: getScoreTextColor(arrow.ring) }]}>
-                      {arrow.ring === 10 ? 'X' : arrow.ring}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDeleteArrow(index)}>
-                  <Ionicons name="trash-outline" size={18} color="#FF6B6B" />
-                </TouchableOpacity>
-              </View>
-            ))}
+        <View style={styles.arrowList}>
+          <View style={styles.arrowListHeader}>
+            <Text style={styles.arrowListTitle}>Arrows ({arrows.length})</Text>
+            <Text style={styles.totalScore}>Total: {getTotalScore()}</Text>
           </View>
-        )}
+          
+          {arrows.length > 0 ? (
+            <View style={styles.arrowGrid}>
+              {arrows.map((arrow, index) => (
+                <TouchableOpacity
+                  key={arrow.id}
+                  style={[styles.arrowItem, { backgroundColor: getScoreColor(arrow.ring) }]}
+                  onPress={() => handleEditArrow(index)}
+                  onLongPress={() => handleDeleteArrow(index)}
+                >
+                  <Text style={[styles.arrowScore, { color: getScoreTextColor(arrow.ring) }]}>
+                    {arrow.ring === 10 ? 'X' : arrow.ring}
+                  </Text>
+                  {isMultiTarget && arrow.targetIndex !== undefined && (
+                    <Text style={[styles.arrowTarget, { color: getScoreTextColor(arrow.ring) }]}>
+                      T{arrow.targetIndex + 1}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.noArrowsText}>Tap on target to mark arrows</Text>
+          )}
+        </View>
+
+        {/* Finish Round Button */}
+        <TouchableOpacity style={styles.finishButton} onPress={handleFinishRound}>
+          <Ionicons name="checkmark-circle" size={24} color="#fff" />
+          <Text style={styles.finishButtonText}>Finish Round</Text>
+        </TouchableOpacity>
       </ScrollView>
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.secondaryButton} onPress={handleBack}>
-          <Ionicons name="arrow-back" size={20} color="#8B0000" />
-          <Text style={styles.secondaryButtonText}>Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.primaryButton, arrows.length === 0 && styles.buttonDisabled]} 
-          onPress={handleFinishRound}
-          disabled={arrows.length === 0}
-        >
-          <Ionicons name="checkmark" size={20} color="#fff" />
-          <Text style={styles.primaryButtonText}>Finish Round</Text>
-        </TouchableOpacity>
-      </View>
-
       {/* Score Picker Modal */}
-      <Modal visible={showScorePicker} transparent animationType="slide">
-        <Pressable style={styles.modalOverlay} onPress={() => setShowScorePicker(false)}>
+      <Modal visible={showScorePicker} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Score</Text>
-              <TouchableOpacity onPress={() => setShowScorePicker(false)}>
-                <Ionicons name="close" size={24} color="#fff" />
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.modalTitle}>Edit Score</Text>
             <View style={styles.scoreGrid}>
-              {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((score) => (
+              {getAvailableScores().map((score) => (
                 <TouchableOpacity
                   key={score}
-                  style={[styles.scoreOption, { backgroundColor: getScoreColor(score) }]}
+                  style={[styles.scoreButton, { backgroundColor: getScoreColor(score) }]}
                   onPress={() => handleUpdateScore(score)}
                 >
-                  <Text style={[styles.scoreOptionText, { color: getScoreTextColor(score) }]}>
-                    {score === 10 ? 'X' : score}
+                  <Text style={[styles.scoreButtonText, { color: getScoreTextColor(score) }]}>
+                    {score === 10 ? 'X' : score === 0 ? 'M' : score}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
+            <TouchableOpacity 
+              style={styles.deleteButton}
+              onPress={() => {
+                if (selectedArrowIndex !== null) {
+                  handleDeleteArrow(selectedArrowIndex);
+                }
+                setShowScorePicker(false);
+                setSelectedArrowIndex(null);
+              }}
+            >
+              <Ionicons name="trash" size={20} color="#fff" />
+              <Text style={styles.deleteButtonText}>Delete Arrow</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setShowScorePicker(false)}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
-        </Pressable>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -356,7 +369,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -364,26 +376,25 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 8,
-    width: 40,
   },
   headerCenter: {
-    alignItems: 'center',
     flex: 1,
-  },
-  headerRight: {
-    width: 40,
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
   },
+  headerRight: {
+    width: 40,
+  },
   roundBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
     marginTop: 4,
     gap: 4,
   },
@@ -394,8 +405,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 68, 68, 0.2)',
   },
   roundText: {
-    fontSize: 11,
-    color: '#888',
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   scrollView: {
     flex: 1,
@@ -405,93 +417,49 @@ const styles = StyleSheet.create({
   },
   targetWrapper: {
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
+  },
+  multiTargetContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  smallTargetWrapper: {
+    alignItems: 'center',
+  },
+  targetLabel: {
+    color: '#888',
+    fontSize: 11,
+    marginTop: 4,
   },
   targetContainer: {
-    backgroundColor: '#111',
-    borderRadius: 16,
-    overflow: 'hidden',
     position: 'relative',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   ringOverlay: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   ring: {
     position: 'absolute',
-    borderWidth: 1.5,
   },
-  crosshair: {
+  centerDot: {
     position: 'absolute',
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  crosshairH: {
-    position: 'absolute',
-    width: 20,
-    height: 2,
-    backgroundColor: '#8B0000',
-  },
-  crosshairV: {
-    position: 'absolute',
-    width: 2,
-    height: 20,
-    backgroundColor: '#8B0000',
+    backgroundColor: '#FFD700',
   },
   arrowMarker: {
     position: 'absolute',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
+    borderRadius: 10,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 3,
-    elevation: 5,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#000',
   },
   arrowMarkerText: {
-    fontSize: 11,
     fontWeight: 'bold',
-  },
-  tapHint: {
-    color: '#666',
-    fontSize: 12,
-    marginTop: 8,
-  },
-  scoreSummary: {
-    flexDirection: 'row',
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  scoreBox: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  scoreValue: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#8B0000',
-  },
-  scoreLabel: {
-    fontSize: 11,
-    color: '#888',
-    marginTop: 2,
-  },
-  scoreDivider: {
-    width: 1,
-    backgroundColor: '#333',
-    marginHorizontal: 12,
   },
   arrowList: {
     backgroundColor: '#111',
@@ -499,153 +467,123 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#fff',
+  arrowListHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 12,
   },
-  arrowRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 8,
-  },
-  arrowInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 10,
-    padding: 10,
-  },
-  arrowNumber: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arrowNumberText: {
-    fontSize: 12,
-    fontWeight: 'bold',
+  arrowListTitle: {
     color: '#fff',
-  },
-  arrowDetails: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  arrowRingText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  arrowConfText: {
-    fontSize: 11,
-    color: '#888',
-  },
-  arrowScoreBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arrowScoreText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  deleteBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 107, 107, 0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#222',
-  },
-  primaryButton: {
-    flex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#8B0000',
-    paddingVertical: 14,
-    borderRadius: 12,
-    gap: 8,
-  },
-  primaryButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '600',
   },
-  secondaryButton: {
-    flex: 1,
+  totalScore: {
+    color: '#FFD700',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  arrowGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  arrowItem: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#111',
-    paddingVertical: 14,
-    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#8B0000',
-    gap: 6,
+    borderColor: '#333',
   },
-  secondaryButtonText: {
+  arrowScore: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#8B0000',
   },
-  buttonDisabled: {
-    opacity: 0.5,
+  arrowTarget: {
+    fontSize: 8,
+    marginTop: -2,
+  },
+  noArrowsText: {
+    color: '#666',
+    textAlign: 'center',
+    paddingVertical: 20,
+  },
+  finishButton: {
+    flexDirection: 'row',
+    backgroundColor: '#8B0000',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  finishButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalContent: {
-    backgroundColor: '#111',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
-    paddingBottom: 40,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 16,
+    padding: 24,
+    width: SCREEN_WIDTH - 48,
   },
   modalTitle: {
+    color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   scoreGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: 10,
-    justifyContent: 'center',
+    marginBottom: 20,
   },
-  scoreOption: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
+  scoreButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: '#333',
   },
-  scoreOptionText: {
-    fontSize: 24,
+  scoreButtonText: {
+    fontSize: 18,
     fontWeight: 'bold',
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    backgroundColor: '#8B0000',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  cancelButton: {
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#888',
+    fontSize: 16,
   },
 });
