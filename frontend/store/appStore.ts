@@ -136,7 +136,7 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  targetType: 'nfaa_indoor',
+  targetType: 'wa_standard',
   setTargetType: (type) => set({ targetType: type }),
 
   sessionType: 'training',
