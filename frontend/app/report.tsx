@@ -62,12 +62,12 @@ export default function ReportScreen() {
 
   const fetchData = async () => {
     try {
-      const [sessionsRes, bowsRes] = await Promise.all([
-        axios.get(`${API_URL}/api/sessions`),
-        axios.get(`${API_URL}/api/bows`),
+      const [sessionsData, bowsData] = await Promise.all([
+        getSessions(),
+        getBows(),
       ]);
-      setSessions(sessionsRes.data);
-      setBows(bowsRes.data);
+      setSessions(sessionsData);
+      setBows(bowsData);
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
