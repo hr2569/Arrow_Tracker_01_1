@@ -811,7 +811,7 @@ export default function ReportScreen() {
         console.log('PDF generated at:', uri);
         
         // Get content URI for Android
-        const contentUri = await getContentUriAsync(uri);
+        const contentUri = await FileSystem.getContentUriAsync(uri);
         console.log('Content URI:', contentUri);
         
         // Try to open directly in Google Drive
