@@ -85,10 +85,17 @@ export default function ScoringScreen() {
   };
 
   const handleTargetPress = (event: any, targetIndex: number = 0, targetSize: number) => {
-    // Get coordinates - handle both web and native
+    // For web, we need to calculate position relative to the target element
+    const target = event.currentTarget || event.target;
+    const rect = target?.getBoundingClientRect?.();
+    
     let x, y;
     
-    if (event.nativeEvent.locationX !== undefined) {
+    if (rect && event.nativeEvent.pageX !== undefined) {
+      // Web: calculate relative to element using pageX/pageY
+      x = event.nativeEvent.pageX - rect.left;
+      y = event.nativeEvent.pageY - rect.top;
+    } else if (event.nativeEvent.locationX !== undefined) {
       // Native (iOS/Android)
       x = event.nativeEvent.locationX;
       y = event.nativeEvent.locationY;
@@ -97,9 +104,8 @@ export default function ScoringScreen() {
       x = event.nativeEvent.offsetX;
       y = event.nativeEvent.offsetY;
     } else {
-      // Last fallback - use layerX/layerY
-      x = event.nativeEvent.layerX || 0;
-      y = event.nativeEvent.layerY || 0;
+      x = targetSize / 2;
+      y = targetSize / 2;
     }
     
     // Normalize to 0-1 range
@@ -107,8 +113,6 @@ export default function ScoringScreen() {
     const normalizedY = Math.max(0, Math.min(1, y / targetSize));
     
     const score = calculateScore(normalizedX, normalizedY);
-    
-    console.log('Target press:', { x, y, targetSize, normalizedX, normalizedY, score });
     
     const newArrow: Arrow = {
       id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
