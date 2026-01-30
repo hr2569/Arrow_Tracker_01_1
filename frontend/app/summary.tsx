@@ -86,9 +86,6 @@ export default function SummaryScreen() {
         });
       }
 
-      // Auto-backup to Google Drive after saving session
-      await createBackup();
-
       // Clear all data and go to main screen
       clearAll();
       router.replace('/');
