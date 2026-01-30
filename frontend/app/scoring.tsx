@@ -46,7 +46,7 @@ export default function ScoringScreen() {
   const isMultiTarget = isVegas || isNFAA;
   const isCompetition = sessionType === 'competition';
 
-  const calculateScore = (normalizedX: number, normalizedY: number): number => {
+  const calculateScore = useCallback((normalizedX: number, normalizedY: number): number => {
     const dx = normalizedX - 0.5;
     const dy = normalizedY - 0.5;
     const distFromCenter = Math.sqrt(dx * dx + dy * dy);
@@ -72,7 +72,7 @@ export default function ScoringScreen() {
       if (normalizedDist > 0.2) return 9;
       return 10;
     }
-  };
+  }, [targetType]);
 
   // Store refs for each target to get their positions
   const targetRefs = useRef<{ [key: number]: View | null }>({});
