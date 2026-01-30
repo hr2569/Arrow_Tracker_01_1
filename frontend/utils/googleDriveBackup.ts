@@ -25,7 +25,7 @@ export const createBackup = async (): Promise<{ success: boolean; error?: string
     
     // Create file name with date
     const dateStr = new Date().toISOString().split('T')[0];
-    const fileName = `archery-backup-${dateStr}.json`;
+    const fileName = `arrow-tracker-backup-${dateStr}.json`;
     const filePath = `${FileSystem.cacheDirectory}${fileName}`;
     
     // Write to file
@@ -40,7 +40,7 @@ export const createBackup = async (): Promise<{ success: boolean; error?: string
     // Open native share sheet
     await Sharing.shareAsync(filePath, {
       mimeType: 'application/json',
-      dialogTitle: 'Save Archery Backup',
+      dialogTitle: 'Save Arrow Tracker Backup',
       UTI: 'public.json',
     });
     
