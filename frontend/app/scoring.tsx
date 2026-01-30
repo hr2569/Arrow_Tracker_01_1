@@ -221,6 +221,43 @@ export default function ScoringScreen() {
       ? arrows.filter(a => a.targetIndex === targetIndex)
       : arrows;
 
+    // Use a div with onClick for web, TouchableOpacity for native
+    const TargetContainer = Platform.OS === 'web' ? View : TouchableOpacity;
+    
+    const handleClick = (e: any) => {
+      // Prevent event bubbling
+      e.stopPropagation?.();
+      handleTargetClick(e, targetIndex, size);
+    };
+
+    // For web, we attach onClick directly via props spread
+    const webProps = Platform.OS === 'web' ? {
+      onClick: handleClick,
+      style: {
+        width: size,
+        height: size,
+        backgroundColor: '#1a1a1a',
+        borderRadius: size / 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'crosshair',
+        position: 'relative' as const,
+      }
+    } : {};
+
+    const nativeProps = Platform.OS !== 'web' ? {
+      onPress: (e: any) => handleTargetClick(e, targetIndex, size),
+      activeOpacity: 0.9,
+      style: {
+        width: size,
+        height: size,
+        backgroundColor: '#1a1a1a',
+        borderRadius: size / 2,
+        alignItems: 'center' as const,
+        justifyContent: 'center' as const,
+      }
+    } : {};
+
     return (
       <View
         key={`target-wrapper-${targetIndex}`}
@@ -231,17 +268,7 @@ export default function ScoringScreen() {
           overflow: 'hidden',
         }}
       >
-        <Pressable
-          style={{
-            width: size,
-            height: size,
-            backgroundColor: '#1a1a1a',
-            borderRadius: size / 2,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onPressIn={(e) => handleTargetTouch(e, targetIndex, size)}
-        >
+        <TargetContainer {...webProps} {...nativeProps}>
           {ringElements}
           
           {/* Center + mark */}
@@ -271,7 +298,7 @@ export default function ScoringScreen() {
               </TouchableOpacity>
             );
           })}
-        </Pressable>
+        </TargetContainer>
       </View>
     );
   };
