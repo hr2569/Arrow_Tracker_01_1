@@ -277,16 +277,23 @@ export default function ScoringScreen() {
               <TouchableOpacity
                 key={arrow.id}
                 style={[
-                  styles.arrowMarker,
                   {
-                    left: arrow.x * size - 12,
-                    top: arrow.y * size - 12,
+                    position: 'absolute',
+                    width: markerSize,
+                    height: markerSize,
+                    borderRadius: markerSize / 2,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: markerBorderWidth,
+                    borderColor: '#000',
+                    left: arrow.x * size - markerSize / 2,
+                    top: arrow.y * size - markerSize / 2,
                     backgroundColor: getScoreColor(arrow.score),
                   },
                 ]}
                 onPress={() => handleEditArrow(globalIndex)}
               >
-                <Text style={[styles.arrowMarkerText, { color: getScoreTextColor(arrow.score) }]}>
+                <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
                   {arrow.score === 10 ? 'X' : arrow.score === 0 ? 'M' : arrow.score}
                 </Text>
               </TouchableOpacity>
