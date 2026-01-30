@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../store/appStore';
 import { createSession, addRoundToSession } from '../utils/localStorage';
+import { createBackup } from '../utils/googleDriveBackup';
 
 // Max rounds for competition mode
 const MAX_COMPETITION_ROUNDS = 10;
