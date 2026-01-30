@@ -338,9 +338,40 @@ export default function ScoringScreen() {
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.targetWrapper}>
-          {renderTargetContent()}
+        {/* Zoom Controls */}
+        <View style={styles.zoomControls}>
+          <TouchableOpacity 
+            style={styles.zoomButton} 
+            onPress={() => setZoomLevel(prev => Math.min(prev + 0.5, 3))}
+          >
+            <Ionicons name="add" size={20} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.zoomText}>{Math.round(zoomLevel * 100)}%</Text>
+          <TouchableOpacity 
+            style={styles.zoomButton} 
+            onPress={() => setZoomLevel(prev => Math.max(prev - 0.5, 1))}
+          >
+            <Ionicons name="remove" size={20} color="#fff" />
+          </TouchableOpacity>
+          {zoomLevel > 1 && (
+            <TouchableOpacity 
+              style={styles.zoomButton} 
+              onPress={() => setZoomLevel(1)}
+            >
+              <Ionicons name="contract-outline" size={20} color="#fff" />
+            </TouchableOpacity>
+          )}
         </View>
+
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.zoomScrollContent}
+        >
+          <View style={[styles.targetWrapper, { transform: [{ scale: zoomLevel }] }]}>
+            {renderTargetContent()}
+          </View>
+        </ScrollView>
 
         <View style={styles.arrowList}>
           <View style={styles.arrowListHeader}>
