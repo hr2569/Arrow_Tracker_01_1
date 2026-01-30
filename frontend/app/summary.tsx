@@ -14,7 +14,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../store/appStore';
 import { createSession, addRoundToSession } from '../utils/localStorage';
-import { createBackup } from '../utils/googleDriveBackup';
 
 // Ring colors for FITA target
 const RING_COLORS = [
