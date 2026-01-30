@@ -710,4 +710,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
   },
+  heatmapContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 16,
+    backgroundColor: '#0a0a0a',
+    borderRadius: 12,
+    padding: 8,
+  },
+  heatmapLabel: {
+    color: '#888888',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 8,
+  },
 });
