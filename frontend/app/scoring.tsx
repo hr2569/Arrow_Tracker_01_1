@@ -325,38 +325,35 @@ export default function ScoringScreen() {
         <View style={styles.zoomControls}>
           <TouchableOpacity 
             style={styles.zoomButton} 
-            onPress={() => {
-              const newScale = Math.min(scale.value + 0.5, 3);
-              scale.value = withSpring(newScale);
-              savedScale.value = newScale;
-            }}
+            onPress={() => setZoomLevel(prev => Math.min(prev + 0.5, 3))}
           >
             <Ionicons name="add" size={20} color="#fff" />
           </TouchableOpacity>
+          <Text style={styles.zoomText}>{Math.round(zoomLevel * 100)}%</Text>
           <TouchableOpacity 
             style={styles.zoomButton} 
-            onPress={() => {
-              const newScale = Math.max(scale.value - 0.5, 1);
-              scale.value = withSpring(newScale);
-              savedScale.value = newScale;
-              if (newScale === 1) {
-                translateX.value = withSpring(0);
-                translateY.value = withSpring(0);
-                savedTranslateX.value = 0;
-                savedTranslateY.value = 0;
-              }
-            }}
+            onPress={() => setZoomLevel(prev => Math.max(prev - 0.5, 1))}
           >
             <Ionicons name="remove" size={20} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.zoomButton} onPress={resetZoom}>
+          <TouchableOpacity 
+            style={styles.zoomButton} 
+            onPress={() => setZoomLevel(1)}
+          >
             <Ionicons name="scan-outline" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.targetWrapper}>
-          <GestureDetector gesture={composedGesture}>
-            <Animated.View style={[styles.zoomableContainer, animatedTargetStyle]}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.horizontalScrollContent}
+        >
+          <ScrollView 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.verticalScrollContent}
+          >
+            <View style={[styles.targetWrapper, { transform: [{ scale: zoomLevel }] }]}>
               {isVegas ? (
                 <View style={styles.triangleContainer}>
                   <View style={styles.triangleTop}>
@@ -379,9 +376,9 @@ export default function ScoringScreen() {
               ) : (
                 renderTargetFace(0, BASE_TARGET_SIZE)
               )}
-            </Animated.View>
-          </GestureDetector>
-        </View>
+            </View>
+          </ScrollView>
+        </ScrollView>
 
         <View style={styles.arrowList}>
           <View style={styles.arrowListHeader}>
