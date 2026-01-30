@@ -39,9 +39,10 @@ export const TARGET_CONFIGS = {
     description: '10-ring World Archery target',
     rings: 10,
     maxScore: 10,
-    // Ring scores from outside to inside
+    // Ring scores from outside to inside (ring 1 = outermost, ring 10 = innermost)
     scores: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     // Ring colors from outside to inside (2 rings per color zone)
+    // White: 1-2, Black: 3-4, Blue: 5-6, Red: 7-8, Gold: 9-10
     colors: [
       { bg: '#f5f5f0', border: '#333' },     // Ring 1 - White
       { bg: '#f5f5f0', border: '#333' },     // Ring 2 - White
@@ -54,24 +55,24 @@ export const TARGET_CONFIGS = {
       { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
       { bg: '#fff200', border: '#ccaa00' },  // Ring 10 - Gold (X)
     ],
-    layout: 'single', // single target face
+    layout: 'single',
   },
   vegas_3spot: {
     name: 'Vegas 3-Spot',
     description: 'Indoor 3-spot triangle',
     rings: 5,
     maxScore: 10,
-    // X=10, 10, 9, 8, 7 (outer blue scores 6)
+    // Scores: Blue=6, Red outer=7, Red inner=8, Gold outer=9, Gold center=10
     scores: [6, 7, 8, 9, 10],
     // Colors from outside to inside: Blue → Red → Gold
     colors: [
-      { bg: '#00a2e8', border: '#0077b3' },  // Ring 6 - Blue outer
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 6 - Blue
       { bg: '#ed1c24', border: '#b31217' },  // Ring 7 - Red
       { bg: '#ed1c24', border: '#b31217' },  // Ring 8 - Red
       { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
       { bg: '#fff200', border: '#ccaa00' },  // Ring 10/X - Gold center
     ],
-    layout: 'triple_triangle', // 3 targets in triangle arrangement
+    layout: 'triple_vertical',
     hasXRing: true,
   },
   nfaa_indoor: {
@@ -79,17 +80,17 @@ export const TARGET_CONFIGS = {
     description: '3-spot vertical strip',
     rings: 5,
     maxScore: 10,
-    // Same scoring as Vegas: Gold 10/9, Red 8/7, Blue 6
+    // Same scoring: Blue=6, Red=7-8, Gold=9-10
     scores: [6, 7, 8, 9, 10],
     // Colors from outside to inside: Blue → Red → Gold
     colors: [
-      { bg: '#00a2e8', border: '#0077b3' },  // Ring 6 - Blue outer
+      { bg: '#00a2e8', border: '#0077b3' },  // Ring 6 - Blue
       { bg: '#ed1c24', border: '#b31217' },  // Ring 7 - Red
       { bg: '#ed1c24', border: '#b31217' },  // Ring 8 - Red
       { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
       { bg: '#fff200', border: '#ccaa00' },  // Ring 10/X - Gold center
     ],
-    layout: 'triple_vertical', // 3 targets stacked vertically
+    layout: 'triple_vertical',
     hasXRing: true,
   },
 };
