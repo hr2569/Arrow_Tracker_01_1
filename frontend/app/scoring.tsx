@@ -188,6 +188,11 @@ export default function ScoringScreen() {
     const colors = targetConfig.colors;
     const ringElements = [];
     
+    // Scale marker size inversely to zoom so they appear proportional
+    const markerSize = 24 / zoomLevel;
+    const markerFontSize = 10 / zoomLevel;
+    const markerBorderWidth = 2 / zoomLevel;
+    
     for (let i = 0; i < rings; i++) {
       const ringRatio = (rings - i) / rings;
       const ringSize = size * ringRatio * 0.95;
