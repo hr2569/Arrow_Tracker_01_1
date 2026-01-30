@@ -2,6 +2,12 @@
   "expo": {
     "name": "Arrow Tracker",
     "slug": "arrow-tracker",
+    "owner": "hr2569",
+    "extra": {
+      "eas": {
+        "projectId": "b4062224-2894-434d-805f-21efd4c841d7"
+      }
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
