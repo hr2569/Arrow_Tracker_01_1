@@ -205,18 +205,6 @@ export default function SummaryScreen() {
               </View>
             );
           })}
-                    {round.shots.length}
-                  </Text>
-                  <Text style={[styles.tableCell, styles.scoreColumn]}>
-                    {round.total}
-                  </Text>
-                  <Text style={[styles.tableCell, styles.totalColumn]}>
-                    {runningTotal}
-                  </Text>
-                </View>
-              );
-            })
-          )}
           
           {/* Table Footer - Grand Total */}
           <View style={styles.tableFooter}>
@@ -241,41 +229,21 @@ export default function SummaryScreen() {
           <Text style={[styles.sessionTypeText, isCompetition ? styles.competitionText : styles.trainingText]}>
             {isCompetition ? 'Competition' : 'Training'}
           </Text>
-          {isCompetition && (
-            <Text style={styles.roundProgress}>
-              Round {currentRoundNumber}/{MAX_COMPETITION_ROUNDS}
-            </Text>
-          )}
+          <Text style={styles.roundProgress}>
+            Round {currentRoundNumber}
+          </Text>
         </View>
 
         {/* Action Buttons */}
         <View style={styles.actionsContainer}>
-          {/* Show Add Round button only if not last competition round */}
-          {!isLastCompetitionRound && (
-            <TouchableOpacity
-              style={styles.addRoundButton}
-              onPress={handleAddRound}
-            >
-              <Ionicons name="add-circle" size={24} color="#fff" />
-              <Text style={styles.addRoundText}>
-                {isCompetition 
-                  ? `Add Round ${currentRoundNumber + 1}/${MAX_COMPETITION_ROUNDS}`
-                  : 'Add Another Round'
-                }
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          {/* Show completion message for competition */}
-          {isLastCompetitionRound && (
-            <View style={styles.completionMessage}>
-              <Ionicons name="trophy" size={32} color="#FFD700" />
-              <Text style={styles.completionTitle}>Competition Complete!</Text>
-              <Text style={styles.completionSubtitle}>
-                All {MAX_COMPETITION_ROUNDS} rounds finished
-              </Text>
-            </View>
-          )}
+          {/* Add Round button - always available */}
+          <TouchableOpacity
+            style={styles.addRoundButton}
+            onPress={handleAddRound}
+          >
+            <Ionicons name="add-circle" size={24} color="#fff" />
+            <Text style={styles.addRoundText}>Add Another Round</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.finishButton}
