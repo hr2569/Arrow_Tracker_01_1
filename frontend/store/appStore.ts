@@ -26,7 +26,7 @@ interface BowData {
   draw_length: number | null;
 }
 
-// Session type: 'competition' (10 rounds max) or 'training' (unlimited)
+// Session type: 'competition' or 'training'
 type SessionType = 'competition' | 'training';
 
 // Target type definitions
