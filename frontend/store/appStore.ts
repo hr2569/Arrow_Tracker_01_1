@@ -136,7 +136,7 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  targetType: 'vegas_3spot',
+  targetType: 'wa_standard',
   setTargetType: (type) => set({ targetType: type }),
 
   sessionType: 'training',
