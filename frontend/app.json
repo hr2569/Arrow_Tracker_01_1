@@ -3,6 +3,9 @@
     "name": "Arrow Tracker",
     "slug": "arrow-tracker",
     "owner": "hr2569",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "extra": {
       "eas": {
         "projectId": "b4062224-2894-434d-805f-21efd4c841d7"
