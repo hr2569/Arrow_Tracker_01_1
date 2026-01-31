@@ -92,8 +92,8 @@ export default function CompetitionSetupScreen() {
   };
 
   const handleStartCompetition = async () => {
-    if (participants.length === 0) {
-      Alert.alert('No Archers', 'Please add at least one archer.');
+    if (!newParticipantName.trim()) {
+      Alert.alert('Name Required', 'Please enter your name.');
       return;
     }
 
@@ -103,16 +103,18 @@ export default function CompetitionSetupScreen() {
     }
 
     try {
+      const bow = bows.find(b => b.id === newParticipantBowId);
+      
       const competition = await createCompetition({
         name: competitionName || `Competition ${new Date().toLocaleDateString()}`,
         targetType: selectedTargetType,
         distance: `${distance}${distanceUnit}`,
         mode: 'local',
-        participants: participants.map(p => ({
-          name: p.name,
-          bowId: p.bowId,
-          bowName: p.bowName,
-        })),
+        participants: [{
+          name: newParticipantName.trim(),
+          bowId: newParticipantBowId || undefined,
+          bowName: bow?.name,
+        }],
       });
 
       await setActiveCompetition(competition.id);
