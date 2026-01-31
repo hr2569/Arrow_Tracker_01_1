@@ -1250,57 +1250,74 @@ export default function ReportScreen() {
         });
       });
       
+      // Define 5 rings with proper colors (same as PDF) - from outside to inside
+      const ringDefinitions = [
+        { radiusPercent: 1.0, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 1 - outer blue (6/7)
+        { radiusPercent: 0.8, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 2 - blue (8)
+        { radiusPercent: 0.6, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 3 - red (9)
+        { radiusPercent: 0.4, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 4 - red (10)
+        { radiusPercent: 0.2, fill: '#fff200', strokeColor: '#907000' },    // Ring 5 - yellow (X)
+      ];
+      
+      const centerPos = singleSpotSize / 2;
+      
       return (
         <View style={[heatmapStyles.container, { width: size, height: size }]}>
-          {/* Single spot target centered */}
+          {/* Single spot target centered with proper rings */}
           <View style={{ width: singleSpotSize, height: singleSpotSize }}>
-            {/* Spot background rings */}
-            <View style={[heatmapStyles.ring, {
-              width: singleSpotSize, height: singleSpotSize, borderRadius: singleSpotSize / 2,
-              backgroundColor: '#00a2e8', borderColor: '#0077b3', borderWidth: 2,
-            }]}>
-              <View style={[heatmapStyles.ring, {
-                width: singleSpotSize * 0.65, height: singleSpotSize * 0.65, borderRadius: singleSpotSize * 0.325,
-                backgroundColor: '#ed1c24', borderColor: '#b31217', borderWidth: 1.5,
-              }]}>
-                <View style={[heatmapStyles.ring, {
-                  width: singleSpotSize * 0.35, height: singleSpotSize * 0.35, borderRadius: singleSpotSize * 0.175,
-                  backgroundColor: '#fff200', borderColor: '#ccaa00', borderWidth: 1,
-                }]} />
-              </View>
-            </View>
-            
-            {/* Heatmap overlay using spot-specific cells */}
-            <View style={[StyleSheet.absoluteFill, { borderRadius: singleSpotSize / 2, overflow: 'hidden' }]}>
-              <Svg width={singleSpotSize} height={singleSpotSize}>
-                <Defs>
-                  {spotHeatmapCells.map((cell, index) => (
-                    <RadialGradient
-                      key={`grad-multi-${index}`}
-                      id={`heatGradMulti-${targetType}-${index}`}
-                      cx="50%"
-                      cy="50%"
-                      rx="50%"
-                      ry="50%"
-                    >
-                      <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
-                      <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
-                    </RadialGradient>
-                  ))}
-                </Defs>
-                <G>
-                  {spotHeatmapCells.map((cell, index) => (
-                    <Circle
-                      key={`heat-multi-${index}`}
-                      cx={cell.x + spotCellSize / 2}
-                      cy={cell.y + spotCellSize / 2}
-                      r={spotCellSize * 1.8}
-                      fill={`url(#heatGradMulti-${targetType}-${index})`}
-                    />
-                  ))}
-                </G>
-              </Svg>
-            </View>
+            <Svg width={singleSpotSize} height={singleSpotSize}>
+              {/* Ring backgrounds (from outside to inside) */}
+              {ringDefinitions.map((ring, i) => (
+                <Circle
+                  key={`ring-bg-${i}`}
+                  cx={centerPos}
+                  cy={centerPos}
+                  r={centerPos * ring.radiusPercent}
+                  fill={ring.fill}
+                />
+              ))}
+              
+              {/* Heatmap overlay */}
+              <Defs>
+                {spotHeatmapCells.map((cell, index) => (
+                  <RadialGradient
+                    key={`grad-multi-${index}`}
+                    id={`heatGradMulti-${targetType}-${index}`}
+                    cx="50%"
+                    cy="50%"
+                    rx="50%"
+                    ry="50%"
+                  >
+                    <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
+                    <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
+                  </RadialGradient>
+                ))}
+              </Defs>
+              <G>
+                {spotHeatmapCells.map((cell, index) => (
+                  <Circle
+                    key={`heat-multi-${index}`}
+                    cx={cell.x + spotCellSize / 2}
+                    cy={cell.y + spotCellSize / 2}
+                    r={spotCellSize * 1.8}
+                    fill={`url(#heatGradMulti-${targetType}-${index})`}
+                  />
+                ))}
+              </G>
+              
+              {/* Ring separator lines (on top of heatmap) */}
+              {ringDefinitions.map((ring, i) => (
+                <Circle
+                  key={`ring-line-${i}`}
+                  cx={centerPos}
+                  cy={centerPos}
+                  r={centerPos * ring.radiusPercent}
+                  fill="none"
+                  stroke={ring.strokeColor}
+                  strokeWidth={1.5}
+                />
+              ))}
+            </Svg>
           </View>
         </View>
       );
