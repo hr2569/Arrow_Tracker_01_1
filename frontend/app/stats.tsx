@@ -822,4 +822,54 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
+  targetTypeStats: {
+    gap: 12,
+  },
+  targetTypeRow: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 16,
+  },
+  targetTypeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    paddingBottom: 8,
+  },
+  targetTypeName: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  targetTypeAvg: {
+    color: '#8B0000',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  targetTypeDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  targetTypeStat: {
+    alignItems: 'center',
+  },
+  targetTypeValue: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  targetTypeLabel: {
+    color: '#888',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  noDataText: {
+    color: '#666',
+    fontSize: 14,
+    textAlign: 'center',
+    padding: 20,
+  },
 });
