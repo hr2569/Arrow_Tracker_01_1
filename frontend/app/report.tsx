@@ -352,8 +352,8 @@ export default function ReportScreen() {
     const usedTargetTypes = [...new Set(filteredSessions.map(s => getTargetTypeName(s.target_type)))];
 
     // Generate heatmap SVG for PDF - full page with target type support
-    const generateHeatmapSvg = () => {
-      if (allShots.length === 0) {
+    const generateHeatmapSvg = (targetType: string, shots: { x: number; y: number; ring: number }[]) => {
+      if (shots.length === 0) {
         return `
           <div style="width: 100%; height: 500px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid #ddd;">
             <span style="color: #666; font-size: 18px;">No shots in this period</span>
@@ -364,7 +364,6 @@ export default function ReportScreen() {
       const size = 600;
       const targetScale = 0.9;
       const targetSize = size * targetScale;
-      const targetType = selectedTargetType || 'wa_standard';
       
       // Spot centers for multi-spot targets (normalized 0-1)
       const getSpotCentersNormalized = () => {
