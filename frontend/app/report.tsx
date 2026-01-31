@@ -1116,7 +1116,7 @@ export default function ReportScreen() {
     };
     
     // Higher resolution grid for smoother heatmap
-    const gridSize = 56;
+    const gridSize = 70;  // Increased for smoother appearance
     const cellSize = size / gridSize;
     const densityGrid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
     
@@ -1126,7 +1126,7 @@ export default function ReportScreen() {
       const gridY = Math.floor(shot.y * gridSize);
       
       // Larger blur radius for smoother gradients
-      const blurRadius = 6;
+      const blurRadius = 8;  // Increased for smoother blending
       for (let dx = -blurRadius; dx <= blurRadius; dx++) {
         for (let dy = -blurRadius; dy <= blurRadius; dy++) {
           const nx = gridX + dx;
@@ -1134,7 +1134,7 @@ export default function ReportScreen() {
           if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
             const distance = Math.sqrt(dx * dx + dy * dy);
             // Smoother gaussian falloff
-            const weight = Math.exp(-distance * distance / 8);
+            const weight = Math.exp(-distance * distance / 14);  // Gentler falloff
             densityGrid[ny][nx] += weight;
           }
         }
