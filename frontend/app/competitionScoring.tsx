@@ -210,8 +210,6 @@ export default function CompetitionScoringScreen() {
 
               if (updatedCompetition.status === 'completed') {
                 router.replace('/competitionSummary');
-              } else if (competition.mode === 'pass_and_play') {
-                setShowPassDevice(true);
               }
             }
           },
