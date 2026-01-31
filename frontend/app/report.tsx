@@ -491,91 +491,85 @@ export default function ReportScreen() {
       };
 
       // Render multi-spot target for Vegas and NFAA
-      // For multi-spot targets, shots are stored relative to individual spots (0-1)
-      // So we render heatmaps on each spot using those coordinates
+      // For multi-spot targets, show a SINGLE large target face with the heatmap
+      // This is cleaner than showing the full multi-spot layout
       if (targetType !== 'wa_standard') {
-        // Generate heatmap circles for each spot
-        const generateSpotHeatmap = (spotCenterX: number, spotCenterY: number, spotSize: number) => {
-          const spotGridSize = 30;
-          const spotCellSize = spotSize / spotGridSize;
-          const spotDensityGrid: number[][] = [];
+        const singleSpotSize = size * 0.85;
+        const centerPos = size / 2;
+        
+        // Generate heatmap circles for the single spot
+        const spotGridSize = 40;
+        const spotCellSize = singleSpotSize / spotGridSize;
+        const spotDensityGrid: number[][] = [];
+        
+        for (let i = 0; i < spotGridSize; i++) {
+          spotDensityGrid[i] = [];
+          for (let j = 0; j < spotGridSize; j++) {
+            spotDensityGrid[i][j] = 0;
+          }
+        }
+        
+        shots.forEach((shot) => {
+          const gridX = Math.floor(shot.x * spotGridSize);
+          const gridY = Math.floor(shot.y * spotGridSize);
           
-          for (let i = 0; i < spotGridSize; i++) {
-            spotDensityGrid[i] = [];
-            for (let j = 0; j < spotGridSize; j++) {
-              spotDensityGrid[i][j] = 0;
+          const blurRadius = 5;
+          for (let dx = -blurRadius; dx <= blurRadius; dx++) {
+            for (let dy = -blurRadius; dy <= blurRadius; dy++) {
+              const nx = gridX + dx;
+              const ny = gridY + dy;
+              if (nx >= 0 && nx < spotGridSize && ny >= 0 && ny < spotGridSize) {
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const weight = Math.exp(-distance * distance / 5);
+                spotDensityGrid[ny][nx] += weight;
+              }
             }
           }
-          
-          // Calculate density using shot coordinates (relative to spot 0-1)
-          shots.forEach((shot) => {
-            const gridX = Math.floor(shot.x * spotGridSize);
-            const gridY = Math.floor(shot.y * spotGridSize);
-            
-            const blurRadius = 4;
-            for (let dx = -blurRadius; dx <= blurRadius; dx++) {
-              for (let dy = -blurRadius; dy <= blurRadius; dy++) {
-                const nx = gridX + dx;
-                const ny = gridY + dy;
-                if (nx >= 0 && nx < spotGridSize && ny >= 0 && ny < spotGridSize) {
-                  const distance = Math.sqrt(dx * dx + dy * dy);
-                  const weight = Math.exp(-distance * distance / 4);
-                  spotDensityGrid[ny][nx] += weight;
-                }
+        });
+        
+        let spotMaxDensity = 0;
+        spotDensityGrid.forEach(row => {
+          row.forEach(val => {
+            if (val > spotMaxDensity) spotMaxDensity = val;
+          });
+        });
+        
+        let singleSpotHeatCircles = '';
+        const spotLeft = centerPos - singleSpotSize / 2;
+        const spotTop = centerPos - singleSpotSize / 2;
+        
+        spotDensityGrid.forEach((row, y) => {
+          row.forEach((density, x) => {
+            if (density > 0) {
+              const normalizedDensity = spotMaxDensity > 0 ? density / spotMaxDensity : 0;
+              const color = getHeatColor(normalizedDensity);
+              if (color) {
+                const cx = spotLeft + x * spotCellSize + spotCellSize / 2;
+                const cy = spotTop + y * spotCellSize + spotCellSize / 2;
+                const r = spotCellSize * 1.5;
+                singleSpotHeatCircles += `
+                  <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha * normalizedDensity})" />
+                `;
               }
             }
           });
-          
-          let spotMaxDensity = 0;
-          spotDensityGrid.forEach(row => {
-            row.forEach(val => {
-              if (val > spotMaxDensity) spotMaxDensity = val;
-            });
-          });
-          
-          // Generate heat circles for this spot
-          let spotHeatCircles = '';
-          const spotLeft = spotCenterX - spotSize / 2;
-          const spotTop = spotCenterY - spotSize / 2;
-          
-          spotDensityGrid.forEach((row, y) => {
-            row.forEach((density, x) => {
-              if (density > 0) {
-                const normalizedDensity = spotMaxDensity > 0 ? density / spotMaxDensity : 0;
-                const color = getHeatColor(normalizedDensity);
-                if (color) {
-                  const cx = spotLeft + x * spotCellSize + spotCellSize / 2;
-                  const cy = spotTop + y * spotCellSize + spotCellSize / 2;
-                  const r = spotCellSize * 1.5;
-                  spotHeatCircles += `
-                    <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha * normalizedDensity})" />
-                  `;
-                }
-              }
-            });
-          });
-          
-          return spotHeatCircles;
-        };
-        
-        let spotsSvg = '';
-        let allSpotHeatmaps = '';
-        
-        spotCenters.forEach((center) => {
-          const cx = center.x * size;
-          const cy = center.y * size;
-          spotsSvg += generateSpotSvg(cx, cy, spotSizePx);
-          allSpotHeatmaps += generateSpotHeatmap(cx, cy, spotSizePx);
         });
+        
+        // Generate single spot target
+        const outerR = singleSpotSize / 2;
+        const middleR = outerR * 0.65;
+        const innerR = outerR * 0.35;
 
         return `
           <svg width="600" height="600" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
-            <!-- Dark background -->
-            <rect width="${size}" height="${size}" fill="#1a1a1a" />
-            <!-- Multi-spot target backgrounds -->
-            ${spotsSvg}
-            <!-- Heatmap overlay on each spot -->
-            ${allSpotHeatmaps}
+            <!-- Background -->
+            <rect width="${size}" height="${size}" fill="#f5f5f5" />
+            <!-- Single spot target -->
+            <circle cx="${centerPos}" cy="${centerPos}" r="${outerR}" fill="#00a2e8" stroke="#0077b3" stroke-width="3" />
+            <circle cx="${centerPos}" cy="${centerPos}" r="${middleR}" fill="#ed1c24" stroke="#b31217" stroke-width="2" />
+            <circle cx="${centerPos}" cy="${centerPos}" r="${innerR}" fill="#fff200" stroke="#ccaa00" stroke-width="1" />
+            <!-- Heatmap overlay -->
+            ${singleSpotHeatCircles}
           </svg>
         `;
       }
