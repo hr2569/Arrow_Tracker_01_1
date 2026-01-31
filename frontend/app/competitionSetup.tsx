@@ -809,4 +809,48 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
+  addBowCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+    borderStyle: 'dashed',
+    gap: 8,
+  },
+  addBowCardText: {
+    color: '#FFD700',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  bowsRowInline: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingVertical: 8,
+  },
+  bowOptionInline: {
+    alignItems: 'center',
+    backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 16,
+    minWidth: 90,
+    borderWidth: 2,
+    borderColor: '#222',
+  },
+  bowOptionInlineSelected: {
+    borderColor: '#FFD700',
+    backgroundColor: '#1a1500',
+  },
+  bowOptionTextInline: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 6,
+    textAlign: 'center',
+  },
+  bowOptionTextInlineSelected: {
+    color: '#FFD700',
+  },
 });
