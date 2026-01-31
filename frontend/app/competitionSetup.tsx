@@ -381,24 +381,24 @@ export default function CompetitionSetupScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Add Participant Modal */}
+        {/* Add Archer Modal */}
         <Modal visible={showAddParticipant} transparent animationType="slide">
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Add Participant</Text>
+                <Text style={styles.modalTitle}>Add Archer</Text>
                 <TouchableOpacity onPress={() => setShowAddParticipant(false)}>
                   <Ionicons name="close" size={24} color="#fff" />
                 </TouchableOpacity>
               </View>
 
               <View style={styles.modalBody}>
-                <Text style={styles.inputLabel}>Name *</Text>
+                <Text style={styles.inputLabel}>Archer's Name *</Text>
                 <TextInput
                   style={styles.modalInput}
                   value={newParticipantName}
                   onChangeText={setNewParticipantName}
-                  placeholder="Enter participant name"
+                  placeholder="Enter archer's name"
                   placeholderTextColor="#666"
                   autoFocus
                 />
