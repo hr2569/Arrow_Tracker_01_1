@@ -654,6 +654,58 @@ export default function CompetitionScoringScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Round Result Modal */}
+      <Modal visible={showRoundResult} transparent animationType="fade">
+        <View style={styles.roundResultOverlay}>
+          <View style={styles.roundResultContent}>
+            <View style={styles.roundResultHeader}>
+              <Ionicons name="checkmark-circle" size={48} color="#4CAF50" />
+              <Text style={styles.roundResultTitle}>Round Complete!</Text>
+            </View>
+            
+            {lastRoundResult && (
+              <>
+                <Text style={styles.roundResultArcher}>{lastRoundResult.archerName}</Text>
+                <Text style={styles.roundResultRound}>Round {lastRoundResult.roundNumber}</Text>
+                
+                <View style={styles.roundResultScores}>
+                  {lastRoundResult.shots.map((shot, idx) => (
+                    <View 
+                      key={idx} 
+                      style={[styles.roundResultScoreBadge, { backgroundColor: getScoreColor(shot) }]}
+                    >
+                      <Text style={[styles.roundResultScoreText, { color: getScoreTextColor(shot) }]}>
+                        {shot === 10 ? 'X' : shot === 0 ? 'M' : shot}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+                
+                <View style={styles.roundResultTotal}>
+                  <Text style={styles.roundResultTotalLabel}>Round Total</Text>
+                  <Text style={styles.roundResultTotalValue}>{lastRoundResult.total}</Text>
+                </View>
+              </>
+            )}
+
+            <View style={styles.roundResultNext}>
+              <Text style={styles.roundResultNextLabel}>Next Up</Text>
+              <Text style={styles.roundResultNextArcher}>
+                {competition?.participants[competition.currentParticipantIndex]?.name}
+              </Text>
+              <Text style={styles.roundResultNextRound}>Round {competition?.currentRound}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.roundResultButton}
+              onPress={() => setShowRoundResult(false)}
+            >
+              <Text style={styles.roundResultButtonText}>Continue</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
