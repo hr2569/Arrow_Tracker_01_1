@@ -1627,18 +1627,25 @@ export default function ReportScreen() {
           </View>
         )}
 
-        {/* Heatmap Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
-            <Ionicons name="flame" size={18} color="#8B0000" /> Shot Distribution Heatmap
-          </Text>
-          <Text style={styles.heatmapSubtitle}>
-            {allShots.length} arrows from {reportStats.totalSessions} session{reportStats.totalSessions !== 1 ? 's' : ''}
-          </Text>
-          <View style={styles.heatmapContainer}>
-            <HeatmapTargetMap size={280} displayTargetType={selectedTargetType || undefined} />
-          </View>
-        </View>
+        {/* Heatmap Cards - One per target type with data */}
+        {['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map((targetType) => {
+          const shotsForType = shotsByTargetType[targetType] || [];
+          if (shotsForType.length === 0) return null;
+          
+          return (
+            <View key={`heatmap-${targetType}`} style={styles.card}>
+              <Text style={styles.cardTitle}>
+                <Ionicons name="flame" size={18} color="#8B0000" /> {getTargetTypeName(targetType)} Heatmap
+              </Text>
+              <Text style={styles.heatmapSubtitle}>
+                {shotsForType.length} arrows
+              </Text>
+              <View style={styles.heatmapContainer}>
+                <HeatmapTargetMap size={280} displayTargetType={targetType} shots={shotsForType} />
+              </View>
+            </View>
+          );
+        })}
 
         {/* Score Distribution */}
         {reportStats.totalArrows > 0 && (
