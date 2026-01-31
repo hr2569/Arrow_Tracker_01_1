@@ -57,31 +57,6 @@ export default function CompetitionSetupScreen() {
     }, [])
   );
 
-  const addParticipant = () => {
-    if (!newParticipantName.trim()) {
-      Alert.alert('Name Required', 'Please enter a name for the archer.');
-      return;
-    }
-
-    const bow = bows.find(b => b.id === newParticipantBowId);
-    
-    const newParticipant: ParticipantEntry = {
-      id: `archer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      name: newParticipantName.trim(),
-      bowId: newParticipantBowId || undefined,
-      bowName: bow?.name,
-    };
-
-    setParticipants([...participants, newParticipant]);
-    setNewParticipantName('');
-    setNewParticipantBowId(null);
-    setShowAddParticipant(false);
-  };
-
-  const removeParticipant = (id: string) => {
-    setParticipants(participants.filter(p => p.id !== id));
-  };
-
   const handleStartCompetition = async () => {
     if (!newParticipantName.trim()) {
       Alert.alert('Name Required', 'Please enter your name.');
