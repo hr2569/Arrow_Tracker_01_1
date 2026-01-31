@@ -1493,36 +1493,44 @@ export default function ReportScreen() {
           </View>
         </View>
 
-        {/* Heatmap Overlay using SVG */}
-        <View style={[StyleSheet.absoluteFill, { borderRadius: size / 2, overflow: 'hidden' }]}>
-          <Svg width={size} height={size}>
-            <Defs>
-              {heatmapCells.map((cell, index) => (
-                <RadialGradient
-                  key={`grad-${index}`}
-                  id={`heatGradReport-${index}`}
-                  cx="50%"
-                  cy="50%"
-                  rx="50%"
-                  ry="50%"
-                >
-                  <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
-                  <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
-                </RadialGradient>
-              ))}
-            </Defs>
-            <G>
-              {heatmapCells.map((cell, index) => (
-                <Circle
-                  key={`heat-${index}`}
-                  cx={cell.x + cellSize / 2}
-                  cy={cell.y + cellSize / 2}
-                  r={cellSize * 2.0}
-                  fill={`url(#heatGradReport-${index})`}
-                />
-              ))}
-            </G>
-          </Svg>
+        {/* Heatmap Overlay using SVG - clipped to target area */}
+        <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+          <View style={{ width: targetSize, height: targetSize, borderRadius: targetSize / 2, overflow: 'hidden' }}>
+            <Svg width={targetSize} height={targetSize}>
+              <Defs>
+                {heatmapCells.map((cell, index) => (
+                  <RadialGradient
+                    key={`grad-${index}`}
+                    id={`heatGradReport-${index}`}
+                    cx="50%"
+                    cy="50%"
+                    rx="50%"
+                    ry="50%"
+                  >
+                    <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
+                    <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
+                  </RadialGradient>
+                ))}
+              </Defs>
+              <G>
+                {heatmapCells.map((cell, index) => {
+                  // Scale coordinates from full size to target size
+                  const scaledX = (cell.x / size) * targetSize;
+                  const scaledY = (cell.y / size) * targetSize;
+                  const scaledCellSize = (cellSize / size) * targetSize;
+                  return (
+                    <Circle
+                      key={`heat-${index}`}
+                      cx={scaledX + scaledCellSize / 2}
+                      cy={scaledY + scaledCellSize / 2}
+                      r={scaledCellSize * 2.0}
+                      fill={`url(#heatGradReport-${index})`}
+                    />
+                  );
+                })}
+              </G>
+            </Svg>
+          </View>
         </View>
       </View>
     );
