@@ -44,7 +44,6 @@ export default function CompetitionScoringScreen() {
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [showPassDevice, setShowPassDevice] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [loading, setLoading] = useState(true);
 
