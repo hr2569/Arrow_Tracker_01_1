@@ -648,28 +648,6 @@ export default function CompetitionScoringScreen() {
           </View>
         </View>
       </Modal>
-
-      {/* Pass Device Modal */}
-      <Modal visible={showPassDevice} transparent animationType="fade">
-        <View style={styles.passDeviceOverlay}>
-          <View style={styles.passDeviceContent}>
-            <View style={styles.passDeviceIcon}>
-              <Ionicons name="swap-horizontal" size={64} color="#FFD700" />
-            </View>
-            <Text style={styles.passDeviceTitle}>Pass the Device</Text>
-            <Text style={styles.passDeviceSubtitle}>
-              Next up: {competition.participants[competition.currentParticipantIndex]?.name}
-            </Text>
-            <Text style={styles.passDeviceRound}>Round {competition.currentRound}</Text>
-            <TouchableOpacity
-              style={styles.passDeviceButton}
-              onPress={() => setShowPassDevice(false)}
-            >
-              <Text style={styles.passDeviceButtonText}>Ready</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
