@@ -53,10 +53,6 @@ export default function CompetitionSetupScreen() {
       setLoading(true);
       const data = await getBows();
       setBows(data);
-      
-      // Check network status for multi-device mode
-      const status = await checkNetworkStatus();
-      setNetworkStatus(status);
     } catch (error) {
       console.error('Error fetching bows:', error);
     } finally {
