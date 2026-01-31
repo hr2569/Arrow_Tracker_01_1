@@ -803,16 +803,22 @@ export default function ReportScreen() {
             ` : ''}
           </div>
 
-          <!-- Page 2: Shot Distribution Heatmap -->
+          <!-- Heatmap Pages - One per target type -->
+          ${['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map(targetType => {
+            const shotsForType = shotsByTargetType[targetType] || [];
+            if (shotsForType.length === 0) return '';
+            return `
           <div class="page">
             <div class="page-header">
-              <h2>Shot Distribution Heatmap</h2>
-              <p>${allShots.length} arrows from ${reportStats.totalSessions} session${reportStats.totalSessions !== 1 ? 's' : ''}</p>
+              <h2>${getTargetTypeName(targetType)} Heatmap</h2>
+              <p>${shotsForType.length} arrows</p>
             </div>
             <div class="heatmap-container">
-              ${generateHeatmapSvg()}
+              ${generateHeatmapSvg(targetType, shotsForType)}
             </div>
           </div>
+            `;
+          }).join('')}
 
           <!-- Page 3: Score Distribution -->
           ${reportStats.totalArrows > 0 ? `
