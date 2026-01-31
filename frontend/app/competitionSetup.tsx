@@ -25,10 +25,7 @@ import {
   setActiveCompetition, 
   startCompetition 
 } from '../utils/competitionStorage';
-import { checkNetworkStatus, getLocalIpAddress } from '../utils/networkSync';
-
 type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
-type CompetitionMode = 'pass_and_play' | 'multi_device';
 
 interface ParticipantEntry {
   id: string;
