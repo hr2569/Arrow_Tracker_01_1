@@ -561,14 +561,14 @@ export default function ReportScreen() {
         
         // Define 5 rings from outside to inside with proper colors
         // Ring percentages: 100%, 80%, 60%, 40%, 20% of outer radius
-        // NFAA/Vegas 5-ring target: Blue(outer)-Blue-Red-Red-Gold(X center)
-        // Proportions: each ring is 20% of the radius
+        // NFAA/Vegas 5-ring target: Blue(outer)-Red-Red-Gold-Gold(X center)
+        // Matches TARGET_CONFIGS in appStore.ts
         const ringDefinitions = [
-          { radiusPercent: 1.0, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 5 - outer blue (6/7)
-          { radiusPercent: 0.8, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 4 - blue (8)
-          { radiusPercent: 0.6, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 3 - red (9)
-          { radiusPercent: 0.4, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 2 - red (10)
-          { radiusPercent: 0.2, fill: '#fff200', strokeColor: '#907000' },    // Ring 1 - yellow (X)
+          { radiusPercent: 1.0, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 1 - Blue (6)
+          { radiusPercent: 0.8, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 2 - Red (7)
+          { radiusPercent: 0.6, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 3 - Red (8)
+          { radiusPercent: 0.4, fill: '#fff200', strokeColor: '#907000' },    // Ring 4 - Gold (9)
+          { radiusPercent: 0.2, fill: '#fff200', strokeColor: '#907000' },    // Ring 5 - Gold (10/X)
         ];
         
         // Generate ring backgrounds (from outside to inside)
