@@ -187,42 +187,41 @@ export default function CompetitionScoringScreen() {
       return;
     }
 
-    Alert.alert(
-      'Commit Round',
-      `Are you sure you want to commit this round for ${currentParticipant?.name}?\n\nTotal: ${getTotalScore()} points\n\n⚠️ This cannot be undone!`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Commit',
-          style: 'destructive',
-          onPress: async () => {
-            if (!competition || !currentParticipant) return;
+    if (!competition || !currentParticipant) return;
 
-            const shots: CompetitionShot[] = arrows.map(a => ({
-              x: a.x,
-              y: a.y,
-              ring: a.score,
-            }));
+    const shots: CompetitionShot[] = arrows.map(a => ({
+      x: a.x,
+      y: a.y,
+      ring: a.score,
+    }));
 
-            const updatedCompetition = await commitRound(
-              competition.id,
-              currentParticipant.id,
-              competition.currentRound,
-              shots
-            );
+    // Store the result to show
+    const roundResult = {
+      archerName: currentParticipant.name,
+      roundNumber: competition.currentRound,
+      shots: arrows.map(a => a.score),
+      total: getTotalScore(),
+    };
 
-            if (updatedCompetition) {
-              setCompetition(updatedCompetition);
-              setArrows([]);
-
-              if (updatedCompetition.status === 'completed') {
-                router.replace('/competitionSummary');
-              }
-            }
-          },
-        },
-      ]
+    const updatedCompetition = await commitRound(
+      competition.id,
+      currentParticipant.id,
+      competition.currentRound,
+      shots
     );
+
+    if (updatedCompetition) {
+      setCompetition(updatedCompetition);
+      setArrows([]);
+      setLastRoundResult(roundResult);
+
+      if (updatedCompetition.status === 'completed') {
+        router.replace('/competitionSummary');
+      } else {
+        // Show the round result modal
+        setShowRoundResult(true);
+      }
+    }
   };
 
   const getTotalScore = () => arrows.reduce((sum, a) => sum + a.score, 0);
