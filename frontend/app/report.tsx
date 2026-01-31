@@ -401,7 +401,7 @@ export default function ReportScreen() {
       }
       
       // Calculate density
-      allShots.forEach((shot) => {
+      shots.forEach((shot) => {
         const gridX = Math.floor(shot.x * gridSize);
         const gridY = Math.floor(shot.y * gridSize);
         
