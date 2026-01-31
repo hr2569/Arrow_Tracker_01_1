@@ -459,19 +459,20 @@ export default function ReportScreen() {
         return { r, g, b, alpha };
       };
 
-      // Generate heat circles
+      // Generate heat circles with smoother rendering
       let heatCircles = '';
       densityGrid.forEach((row, y) => {
         row.forEach((density, x) => {
-          if (density > 0) {
+          if (density > 0.05) {  // Threshold to reduce noise
             const normalizedDensity = maxDensity > 0 ? density / maxDensity : 0;
             const color = getHeatColor(normalizedDensity);
             if (color) {
               const cx = x * cellSize + cellSize / 2;
               const cy = y * cellSize + cellSize / 2;
-              const r = cellSize * 1.5;
+              const r = cellSize * 2.0;  // Larger circles for overlap/smoothness
+              const alpha = color.alpha * Math.pow(normalizedDensity, 0.7);  // Smoother alpha curve
               heatCircles += `
-                <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha * normalizedDensity})" />
+                <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})" />
               `;
             }
           }
