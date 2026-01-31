@@ -555,21 +555,51 @@ export default function ReportScreen() {
           });
         });
         
-        // Generate single spot target
+        // Generate single spot target with proper ring separators (like WA Standard)
+        // NFAA/Vegas has 5 scoring rings: outer blue (6/7), blue (8), red (9), red (10), yellow (X)
         const outerR = singleSpotSize / 2;
-        const middleR = outerR * 0.65;
-        const innerR = outerR * 0.35;
+        
+        // Define 5 rings from outside to inside with proper colors
+        // Ring percentages: 100%, 80%, 60%, 40%, 20% of outer radius
+        const ringDefinitions = [
+          { radiusPercent: 1.0, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 1 - outer blue (6/7)
+          { radiusPercent: 0.8, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 2 - blue (8)
+          { radiusPercent: 0.6, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 3 - red (9)
+          { radiusPercent: 0.4, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 4 - red (10)
+          { radiusPercent: 0.2, fill: '#fff200', strokeColor: '#907000' },    // Ring 5 - yellow (X)
+        ];
+        
+        // Generate ring backgrounds (from outside to inside)
+        let ringBackgrounds = '';
+        ringDefinitions.forEach((ring) => {
+          const r = outerR * ring.radiusPercent;
+          ringBackgrounds += `
+            <circle cx="${centerPos}" cy="${centerPos}" r="${r}" fill="${ring.fill}" />
+          `;
+        });
+        
+        // Generate ring separator lines (drawn on top of heatmap)
+        let ringLines = '';
+        ringDefinitions.forEach((ring) => {
+          const r = outerR * ring.radiusPercent;
+          ringLines += `
+            <circle cx="${centerPos}" cy="${centerPos}" r="${r}" fill="none" stroke="${ring.strokeColor}" stroke-width="2" />
+          `;
+        });
 
         return `
           <svg width="600" height="600" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
             <!-- Background -->
             <rect width="${size}" height="${size}" fill="#f5f5f5" />
-            <!-- Single spot target -->
-            <circle cx="${centerPos}" cy="${centerPos}" r="${outerR}" fill="#00a2e8" stroke="#0077b3" stroke-width="3" />
-            <circle cx="${centerPos}" cy="${centerPos}" r="${middleR}" fill="#ed1c24" stroke="#b31217" stroke-width="2" />
-            <circle cx="${centerPos}" cy="${centerPos}" r="${innerR}" fill="#fff200" stroke="#ccaa00" stroke-width="1" />
+            <!-- Target ring backgrounds (from outside to inside) -->
+            ${ringBackgrounds}
             <!-- Heatmap overlay -->
             ${singleSpotHeatCircles}
+            <!-- Ring separator lines (on top of heatmap) -->
+            ${ringLines}
+            <!-- Center cross -->
+            <line x1="${centerPos - 12}" y1="${centerPos}" x2="${centerPos + 12}" y2="${centerPos}" stroke="#000" stroke-width="2" />
+            <line x1="${centerPos}" y1="${centerPos - 12}" x2="${centerPos}" y2="${centerPos + 12}" stroke="#000" stroke-width="2" />
           </svg>
         `;
       }
