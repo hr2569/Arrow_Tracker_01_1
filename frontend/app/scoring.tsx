@@ -378,11 +378,12 @@ export default function ScoringScreen() {
         <View style={[styles.zoomContainer, { height: zoomLevel > 1 ? 350 : 'auto' }]}>
           <ScrollView 
             horizontal={true}
-            showsHorizontalScrollIndicator={zoomLevel > 1}
+            showsHorizontalScrollIndicator={false}
             scrollEnabled={zoomLevel > 1}
             bounces={true}
-            decelerationRate="fast"
+            decelerationRate="normal"
             scrollEventThrottle={16}
+            directionalLockEnabled={false}
             contentContainerStyle={{
               width: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : '100%',
               alignItems: 'center',
@@ -390,11 +391,11 @@ export default function ScoringScreen() {
             }}
           >
             <ScrollView 
-              showsVerticalScrollIndicator={zoomLevel > 1}
+              showsVerticalScrollIndicator={false}
               scrollEnabled={zoomLevel > 1}
               nestedScrollEnabled={true}
               bounces={true}
-              decelerationRate="fast"
+              decelerationRate="normal"
               scrollEventThrottle={16}
               contentContainerStyle={{
                 height: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : 'auto',
