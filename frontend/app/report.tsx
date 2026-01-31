@@ -1021,18 +1021,25 @@ export default function ReportScreen() {
             ` : ''}
           </div>
 
-          <!-- Heatmap Pages - One per target type -->
+          <!-- Heatmap Pages - One per target type with scatter plot -->
           ${['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map(targetType => {
             const shotsForType = shotsByTargetType[targetType] || [];
             if (shotsForType.length === 0) return '';
             return `
           <div class="page">
             <div class="page-header">
-              <h2>${getTargetTypeName(targetType)} Heatmap</h2>
+              <h2>${getTargetTypeName(targetType)} - Shot Analysis</h2>
               <p>${shotsForType.length} arrows</p>
             </div>
-            <div class="heatmap-container">
-              ${generateHeatmapSvg(targetType, shotsForType)}
+            <div style="display: flex; justify-content: space-around; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+              <div style="text-align: center;">
+                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 18px;">Heat Map</h3>
+                ${generateHeatmapSvg(targetType, shotsForType)}
+              </div>
+              <div style="text-align: center;">
+                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 18px;">Shot Distribution</h3>
+                ${generateScatterPlotSvg(targetType, shotsForType)}
+              </div>
             </div>
           </div>
             `;
