@@ -491,12 +491,81 @@ export default function ReportScreen() {
       };
 
       // Render multi-spot target for Vegas and NFAA
+      // For multi-spot targets, shots are stored relative to individual spots (0-1)
+      // So we render heatmaps on each spot using those coordinates
       if (targetType !== 'wa_standard') {
+        // Generate heatmap circles for each spot
+        const generateSpotHeatmap = (spotCenterX: number, spotCenterY: number, spotSize: number) => {
+          const spotGridSize = 30;
+          const spotCellSize = spotSize / spotGridSize;
+          const spotDensityGrid: number[][] = [];
+          
+          for (let i = 0; i < spotGridSize; i++) {
+            spotDensityGrid[i] = [];
+            for (let j = 0; j < spotGridSize; j++) {
+              spotDensityGrid[i][j] = 0;
+            }
+          }
+          
+          // Calculate density using shot coordinates (relative to spot 0-1)
+          shots.forEach((shot) => {
+            const gridX = Math.floor(shot.x * spotGridSize);
+            const gridY = Math.floor(shot.y * spotGridSize);
+            
+            const blurRadius = 4;
+            for (let dx = -blurRadius; dx <= blurRadius; dx++) {
+              for (let dy = -blurRadius; dy <= blurRadius; dy++) {
+                const nx = gridX + dx;
+                const ny = gridY + dy;
+                if (nx >= 0 && nx < spotGridSize && ny >= 0 && ny < spotGridSize) {
+                  const distance = Math.sqrt(dx * dx + dy * dy);
+                  const weight = Math.exp(-distance * distance / 4);
+                  spotDensityGrid[ny][nx] += weight;
+                }
+              }
+            }
+          });
+          
+          let spotMaxDensity = 0;
+          spotDensityGrid.forEach(row => {
+            row.forEach(val => {
+              if (val > spotMaxDensity) spotMaxDensity = val;
+            });
+          });
+          
+          // Generate heat circles for this spot
+          let spotHeatCircles = '';
+          const spotLeft = spotCenterX - spotSize / 2;
+          const spotTop = spotCenterY - spotSize / 2;
+          
+          spotDensityGrid.forEach((row, y) => {
+            row.forEach((density, x) => {
+              if (density > 0) {
+                const normalizedDensity = spotMaxDensity > 0 ? density / spotMaxDensity : 0;
+                const color = getHeatColor(normalizedDensity);
+                if (color) {
+                  const cx = spotLeft + x * spotCellSize + spotCellSize / 2;
+                  const cy = spotTop + y * spotCellSize + spotCellSize / 2;
+                  const r = spotCellSize * 1.5;
+                  spotHeatCircles += `
+                    <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha * normalizedDensity})" />
+                  `;
+                }
+              }
+            });
+          });
+          
+          return spotHeatCircles;
+        };
+        
         let spotsSvg = '';
+        let allSpotHeatmaps = '';
+        
         spotCenters.forEach((center) => {
           const cx = center.x * size;
           const cy = center.y * size;
           spotsSvg += generateSpotSvg(cx, cy, spotSizePx);
+          allSpotHeatmaps += generateSpotHeatmap(cx, cy, spotSizePx);
         });
 
         return `
@@ -505,8 +574,8 @@ export default function ReportScreen() {
             <rect width="${size}" height="${size}" fill="#1a1a1a" />
             <!-- Multi-spot target backgrounds -->
             ${spotsSvg}
-            <!-- Heatmap overlay -->
-            ${heatCircles}
+            <!-- Heatmap overlay on each spot -->
+            ${allSpotHeatmaps}
           </svg>
         `;
       }
