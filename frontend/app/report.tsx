@@ -1252,13 +1252,14 @@ export default function ReportScreen() {
         });
       });
       
-      // Define 5 rings with proper colors (same as PDF) - from outside to inside
+      // Define 5 rings with proper colors - from outside to inside
+      // Matches TARGET_CONFIGS in appStore.ts: Blue → Red → Red → Gold → Gold
       const ringDefinitions = [
-        { radiusPercent: 1.0, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 1 - outer blue (6/7)
-        { radiusPercent: 0.8, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 2 - blue (8)
-        { radiusPercent: 0.6, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 3 - red (9)
-        { radiusPercent: 0.4, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 4 - red (10)
-        { radiusPercent: 0.2, fill: '#fff200', strokeColor: '#907000' },    // Ring 5 - yellow (X)
+        { radiusPercent: 1.0, fill: '#00a2e8', strokeColor: '#005090' },    // Ring 1 - Blue (6)
+        { radiusPercent: 0.8, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 2 - Red (7)
+        { radiusPercent: 0.6, fill: '#ed1c24', strokeColor: '#901015' },    // Ring 3 - Red (8)
+        { radiusPercent: 0.4, fill: '#fff200', strokeColor: '#907000' },    // Ring 4 - Gold (9)
+        { radiusPercent: 0.2, fill: '#fff200', strokeColor: '#907000' },    // Ring 5 - Gold (10/X)
       ];
       
       const centerPos = singleSpotSize / 2;
