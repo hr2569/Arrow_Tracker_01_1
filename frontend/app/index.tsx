@@ -35,19 +35,32 @@ export default function HomeScreen() {
 
         {/* Main Actions */}
         <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => router.push('/sessionSetup')}
-            activeOpacity={0.8}
-          >
-            <View style={styles.buttonIconContainer}>
-              <Ionicons name="add-circle" size={48} color="#fff" />
-            </View>
-            <Text style={styles.primaryButtonText}>New Session</Text>
-            <Text style={styles.buttonSubtext}>
-              Start scoring arrows
-            </Text>
-          </TouchableOpacity>
+          {/* Two Primary Buttons Row */}
+          <View style={styles.primaryRow}>
+            <TouchableOpacity
+              style={styles.primaryButtonHalf}
+              onPress={() => router.push('/sessionSetup')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.buttonIconContainerPrimary}>
+                <Ionicons name="add-circle" size={36} color="#fff" />
+              </View>
+              <Text style={styles.primaryButtonTextSmall}>New Session</Text>
+              <Text style={styles.buttonSubtextSmall}>Practice & Training</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.competitionButton}
+              onPress={() => router.push('/competitionSetup')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.buttonIconContainerCompetition}>
+                <Ionicons name="trophy" size={36} color="#000" />
+              </View>
+              <Text style={styles.competitionButtonText}>Competition</Text>
+              <Text style={styles.competitionSubtext}>Multi-Player Mode</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* History and Bows side by side */}
           <View style={styles.secondaryRow}>
