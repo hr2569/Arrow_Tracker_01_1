@@ -44,6 +44,13 @@ export default function CompetitionScoringScreen() {
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showRoundResult, setShowRoundResult] = useState(false);
+  const [lastRoundResult, setLastRoundResult] = useState<{
+    archerName: string;
+    roundNumber: number;
+    shots: number[];
+    total: number;
+  } | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [loading, setLoading] = useState(true);
 
