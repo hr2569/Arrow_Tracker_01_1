@@ -672,6 +672,120 @@ export default function ReportScreen() {
       `;
     };
 
+    // Generate Cartesian scatter plot SVG showing shot positions
+    const generateScatterPlotSvg = (targetType: string, shots: { x: number; y: number; ring: number }[]) => {
+      const size = 500;
+      const padding = 60;
+      const plotSize = size - padding * 2;
+      const center = size / 2;
+      
+      if (shots.length === 0) {
+        return `
+          <div style="width: 100%; height: ${size}px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <span style="color: #666; font-size: 16px;">No shot data available</span>
+          </div>
+        `;
+      }
+      
+      // Grid lines
+      let gridLines = '';
+      const gridCount = 10;
+      const gridStep = plotSize / gridCount;
+      
+      for (let i = 0; i <= gridCount; i++) {
+        const pos = padding + i * gridStep;
+        const opacity = i === gridCount / 2 ? 0.8 : 0.2;
+        const strokeWidth = i === gridCount / 2 ? 2 : 1;
+        // Vertical lines
+        gridLines += `<line x1="${pos}" y1="${padding}" x2="${pos}" y2="${size - padding}" stroke="#888" stroke-width="${strokeWidth}" opacity="${opacity}" />`;
+        // Horizontal lines
+        gridLines += `<line x1="${padding}" y1="${pos}" x2="${size - padding}" y2="${pos}" stroke="#888" stroke-width="${strokeWidth}" opacity="${opacity}" />`;
+      }
+      
+      // Axis labels
+      let axisLabels = '';
+      const labelStep = 2;
+      for (let i = 0; i <= gridCount; i += labelStep) {
+        const pos = padding + i * gridStep;
+        const value = ((i - gridCount / 2) / (gridCount / 2)).toFixed(1);
+        // X axis labels (bottom)
+        axisLabels += `<text x="${pos}" y="${size - padding + 20}" text-anchor="middle" font-size="12" fill="#333">${value}</text>`;
+        // Y axis labels (left) - inverted because SVG Y is top-down
+        const yValue = (-(i - gridCount / 2) / (gridCount / 2)).toFixed(1);
+        axisLabels += `<text x="${padding - 10}" y="${pos + 4}" text-anchor="end" font-size="12" fill="#333">${yValue}</text>`;
+      }
+      
+      // Plot shots as dots
+      let shotDots = '';
+      shots.forEach((shot, index) => {
+        // Convert from 0-1 range to -1 to 1 range (center = 0)
+        const normalizedX = (shot.x - 0.5) * 2;
+        const normalizedY = (shot.y - 0.5) * 2;
+        
+        // Convert to SVG coordinates
+        const svgX = center + normalizedX * (plotSize / 2);
+        const svgY = center + normalizedY * (plotSize / 2);
+        
+        // Color based on ring score
+        let dotColor = '#00a2e8'; // Blue for outer
+        if (shot.ring >= 9) dotColor = '#FFD700'; // Gold for 9-10
+        else if (shot.ring >= 7) dotColor = '#ed1c24'; // Red for 7-8
+        
+        shotDots += `<circle cx="${svgX}" cy="${svgY}" r="5" fill="${dotColor}" stroke="#000" stroke-width="1" opacity="0.85" />`;
+      });
+      
+      // Calculate statistics for display
+      const avgX = shots.reduce((sum, s) => sum + (s.x - 0.5) * 2, 0) / shots.length;
+      const avgY = shots.reduce((sum, s) => sum + (s.y - 0.5) * 2, 0) / shots.length;
+      const avgSvgX = center + avgX * (plotSize / 2);
+      const avgSvgY = center + avgY * (plotSize / 2);
+      
+      // Mean point of impact marker
+      const meanMarker = `
+        <circle cx="${avgSvgX}" cy="${avgSvgY}" r="10" fill="none" stroke="#8B0000" stroke-width="3" />
+        <line x1="${avgSvgX - 15}" y1="${avgSvgY}" x2="${avgSvgX + 15}" y2="${avgSvgY}" stroke="#8B0000" stroke-width="2" />
+        <line x1="${avgSvgX}" y1="${avgSvgY - 15}" x2="${avgSvgX}" y2="${avgSvgY + 15}" stroke="#8B0000" stroke-width="2" />
+      `;
+      
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background -->
+          <rect x="${padding}" y="${padding}" width="${plotSize}" height="${plotSize}" fill="#fafafa" stroke="#ccc" stroke-width="1" />
+          
+          <!-- Grid lines -->
+          ${gridLines}
+          
+          <!-- Axis labels -->
+          ${axisLabels}
+          
+          <!-- X axis title -->
+          <text x="${center}" y="${size - 15}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Horizontal (Left/Right)</text>
+          
+          <!-- Y axis title -->
+          <text x="15" y="${center}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333" transform="rotate(-90, 15, ${center})">Vertical (Up/Down)</text>
+          
+          <!-- Shot dots -->
+          ${shotDots}
+          
+          <!-- Mean point of impact -->
+          ${meanMarker}
+          
+          <!-- Legend -->
+          <rect x="${size - 130}" y="${padding + 10}" width="120" height="90" fill="white" stroke="#ccc" rx="4" />
+          <text x="${size - 120}" y="${padding + 28}" font-size="11" font-weight="bold" fill="#333">Legend</text>
+          <circle cx="${size - 115}" cy="${padding + 45}" r="5" fill="#FFD700" stroke="#000" stroke-width="1" />
+          <text x="${size - 105}" y="${padding + 49}" font-size="10" fill="#333">9-10 (Gold)</text>
+          <circle cx="${size - 115}" cy="${padding + 62}" r="5" fill="#ed1c24" stroke="#000" stroke-width="1" />
+          <text x="${size - 105}" y="${padding + 66}" font-size="10" fill="#333">7-8 (Red)</text>
+          <circle cx="${size - 115}" cy="${padding + 79}" r="5" fill="#00a2e8" stroke="#000" stroke-width="1" />
+          <text x="${size - 105}" y="${padding + 83}" font-size="10" fill="#333">≤6 (Blue)</text>
+          
+          <!-- Mean POI label -->
+          <text x="${size - 120}" y="${padding + 95}" font-size="9" fill="#8B0000">● Mean POI: (${avgX.toFixed(2)}, ${(-avgY).toFixed(2)})</text>
+        </svg>
+      `;
+    };
+
     return `
       <!DOCTYPE html>
       <html>
