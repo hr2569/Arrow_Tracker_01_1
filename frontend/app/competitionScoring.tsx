@@ -576,16 +576,20 @@ export default function CompetitionScoringScreen() {
       {/* Commit Button */}
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.commitButton, arrows.length !== 3 && styles.commitButtonDisabled]}
+          style={styles.commitButton}
           onPress={handleCommitRound}
-          disabled={arrows.length !== 3}
         >
-          <Ionicons name="lock-closed" size={24} color={arrows.length === 3 ? '#000' : '#666'} />
-          <Text style={[styles.commitButtonText, arrows.length !== 3 && styles.commitButtonTextDisabled]}>
-            Commit Round
+          <Ionicons name="lock-closed" size={24} color="#000" />
+          <Text style={styles.commitButtonText}>
+            Commit Round {arrows.length < 3 ? `(${3 - arrows.length} = M)` : ''}
           </Text>
         </TouchableOpacity>
-        <Text style={styles.commitWarning}>⚠️ Committed rounds cannot be edited</Text>
+        <Text style={styles.commitWarning}>
+          {arrows.length < 3 
+            ? `Missing arrows will be marked as M (miss)`
+            : `⚠️ Committed rounds cannot be edited`
+          }
+        </Text>
       </View>
 
       {/* Score Picker Modal */}
