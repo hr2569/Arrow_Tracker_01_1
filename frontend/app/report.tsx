@@ -1306,7 +1306,7 @@ export default function ReportScreen() {
                     key={`heat-multi-${index}`}
                     cx={cell.x + spotCellSize / 2}
                     cy={cell.y + spotCellSize / 2}
-                    r={spotCellSize * 1.8}
+                    r={spotCellSize * 2.2}
                     fill={`url(#heatGradMulti-${targetType}-${index})`}
                   />
                 ))}
