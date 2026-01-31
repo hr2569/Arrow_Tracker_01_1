@@ -382,86 +382,12 @@ export default function CompetitionSetupScreen() {
               !newParticipantName.trim() && styles.startButtonDisabled,
             ]}
             onPress={handleStartCompetition}
-            disabled={participants.length === 0}
+            disabled={!newParticipantName.trim()}
           >
             <Ionicons name="trophy" size={24} color="#000" />
             <Text style={styles.startButtonText}>Start Competition</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Add Archer Modal */}
-        <Modal visible={showAddParticipant} transparent animationType="slide">
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Add Archer</Text>
-                <TouchableOpacity onPress={() => setShowAddParticipant(false)}>
-                  <Ionicons name="close" size={24} color="#fff" />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.modalBody}>
-                <Text style={styles.inputLabel}>Archer's Name *</Text>
-                <TextInput
-                  style={styles.modalInput}
-                  value={newParticipantName}
-                  onChangeText={setNewParticipantName}
-                  placeholder="Enter archer's name"
-                  placeholderTextColor="#666"
-                  autoFocus
-                />
-
-                <Text style={styles.inputLabel}>Select Bow (Optional)</Text>
-                {bows.length === 0 ? (
-                  <View style={styles.noBowsMessage}>
-                    <Text style={styles.noBowsText}>No bows available</Text>
-                    <TouchableOpacity onPress={() => {
-                      setShowAddParticipant(false);
-                      router.push('/bows');
-                    }}>
-                      <Text style={styles.addBowLink}>Add bows first</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bowsScroll}>
-                    <View style={styles.bowsRow}>
-                      <TouchableOpacity
-                        style={[styles.bowOption, !newParticipantBowId && styles.bowOptionSelected]}
-                        onPress={() => setNewParticipantBowId(null)}
-                      >
-                        <Ionicons name="close-circle-outline" size={24} color={!newParticipantBowId ? '#FFD700' : '#666'} />
-                        <Text style={[styles.bowOptionText, !newParticipantBowId && styles.bowOptionTextSelected]}>
-                          None
-                        </Text>
-                      </TouchableOpacity>
-                      {bows.map((bow) => (
-                        <TouchableOpacity
-                          key={bow.id}
-                          style={[styles.bowOption, newParticipantBowId === bow.id && styles.bowOptionSelected]}
-                          onPress={() => setNewParticipantBowId(bow.id)}
-                        >
-                          {renderBowIcon(bow.bow_type, newParticipantBowId === bow.id)}
-                          <Text style={[styles.bowOptionText, newParticipantBowId === bow.id && styles.bowOptionTextSelected]}>
-                            {bow.name}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </ScrollView>
-                )}
-              </View>
-
-              <TouchableOpacity
-                style={[styles.modalButton, !newParticipantName.trim() && styles.modalButtonDisabled]}
-                onPress={addParticipant}
-                disabled={!newParticipantName.trim()}
-              >
-                <Ionicons name="person-add" size={20} color="#000" />
-                <Text style={styles.modalButtonText}>Add Archer</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
