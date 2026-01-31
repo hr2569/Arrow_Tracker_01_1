@@ -477,6 +477,44 @@ export default function StatsScreen() {
           <RingDistribution />
         </View>
 
+        {/* Stats by Target Type */}
+        <View style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>
+            <Ionicons name="apps" size={18} color="#8B0000" /> Stats by Target Type
+          </Text>
+          <View style={styles.targetTypeStats}>
+            {['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map((targetType) => {
+              const typeStats = statsByTargetType[targetType];
+              if (!typeStats || typeStats.sessions === 0) return null;
+              return (
+                <View key={targetType} style={styles.targetTypeRow}>
+                  <View style={styles.targetTypeHeader}>
+                    <Text style={styles.targetTypeName}>{getTargetTypeName(targetType)}</Text>
+                    <Text style={styles.targetTypeAvg}>Avg: {typeStats.avgPerArrow}/arrow</Text>
+                  </View>
+                  <View style={styles.targetTypeDetails}>
+                    <View style={styles.targetTypeStat}>
+                      <Text style={styles.targetTypeValue}>{typeStats.sessions}</Text>
+                      <Text style={styles.targetTypeLabel}>Sessions</Text>
+                    </View>
+                    <View style={styles.targetTypeStat}>
+                      <Text style={styles.targetTypeValue}>{typeStats.arrows}</Text>
+                      <Text style={styles.targetTypeLabel}>Arrows</Text>
+                    </View>
+                    <View style={styles.targetTypeStat}>
+                      <Text style={styles.targetTypeValue}>{typeStats.points}</Text>
+                      <Text style={styles.targetTypeLabel}>Points</Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
+            {Object.values(statsByTargetType).every(s => s.sessions === 0) && (
+              <Text style={styles.noDataText}>No sessions recorded yet</Text>
+            )}
+          </View>
+        </View>
+
         {/* Shot Heatmap */}
         {stats.totalArrows > 0 && (
           <View style={styles.sectionCard}>
