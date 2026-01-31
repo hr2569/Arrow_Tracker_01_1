@@ -517,12 +517,12 @@ export default function StatsScreen() {
 
         {/* Shot Heatmap */}
         {stats.totalArrows > 0 && (
-          <View style={styles.sectionCard}>
+          <View style={styles.sectionCard} key={`heatmap-${targetTypeFilter}`}>
             <Text style={styles.sectionTitle}>
               <Ionicons name="locate" size={18} color="#8B0000" /> Shot Distribution ({getTargetTypeName(targetTypeFilter)})
             </Text>
             <View style={styles.heatmapContainer}>
-              <Svg width={SCREEN_WIDTH - 80} height={SCREEN_WIDTH - 80} viewBox="0 0 200 200">
+              <Svg key={`svg-${targetTypeFilter}`} width={SCREEN_WIDTH - 80} height={SCREEN_WIDTH - 80} viewBox="0 0 200 200">
                 {/* Target rings background - changes based on target type */}
                 <G>
                   {targetTypeFilter === 'wa_standard' ? (
