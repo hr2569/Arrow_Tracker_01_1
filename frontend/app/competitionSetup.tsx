@@ -319,10 +319,10 @@ export default function CompetitionSetupScreen() {
             </View>
           </View>
 
-          {/* Participants Section */}
+          {/* Archers Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Participants ({participants.length})</Text>
+              <Text style={styles.sectionTitle}>Archers ({participants.length})</Text>
               <TouchableOpacity 
                 style={styles.addButton}
                 onPress={() => setShowAddParticipant(true)}
@@ -334,9 +334,9 @@ export default function CompetitionSetupScreen() {
 
             {participants.length === 0 ? (
               <View style={styles.emptyParticipants}>
-                <Ionicons name="people-outline" size={48} color="#333" />
-                <Text style={styles.emptyText}>No participants added yet</Text>
-                <Text style={styles.emptySubtext}>Tap "Add" to add participants</Text>
+                <Ionicons name="person-outline" size={48} color="#333" />
+                <Text style={styles.emptyText}>No archers added yet</Text>
+                <Text style={styles.emptySubtext}>Tap "Add" to add archers</Text>
               </View>
             ) : (
               <View style={styles.participantsList}>
