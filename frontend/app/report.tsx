@@ -309,7 +309,8 @@ export default function ReportScreen() {
   // Generate PDF HTML content
   const generatePdfHtml = () => {
     // Score range based on target type
-    const scoreRange = targetType === 'wa_standard' 
+    const currentTargetType = selectedTargetType || 'wa_standard';
+    const scoreRange = currentTargetType === 'wa_standard' 
       ? [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]  // WA: 10-1 + M
       : [10, 9, 8, 7, 6, 0];  // Vegas/NFAA: 10-6 + M
       
