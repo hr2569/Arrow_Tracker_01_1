@@ -1634,7 +1634,10 @@ export default function ReportScreen() {
               <Ionicons name="bar-chart" size={18} color="#8B0000" /> Score Distribution
             </Text>
             <View style={styles.distributionList}>
-              {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((ring) => {
+              {(targetType === 'wa_standard' 
+                ? [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0] 
+                : [10, 9, 8, 7, 6, 0]
+              ).map((ring) => {
                 const count = reportStats.ringDistribution[ring] || 0;
                 const percentage = reportStats.totalArrows > 0 ? (count / reportStats.totalArrows) * 100 : 0;
                 return (
