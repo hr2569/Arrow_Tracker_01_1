@@ -1530,6 +1530,48 @@ export default function ReportScreen() {
           </View>
         </View>
 
+        {/* Stats by Target Type */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>
+            <Ionicons name="apps" size={18} color="#8B0000" /> By Target Type
+          </Text>
+          <View style={styles.targetTypeList}>
+            {['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map((targetType) => {
+              const typeStats = statsByTargetType[targetType];
+              if (!typeStats || typeStats.sessions === 0) return null;
+              return (
+                <View key={targetType} style={styles.targetTypeCard}>
+                  <View style={styles.targetTypeHeaderRow}>
+                    <Text style={styles.targetTypeTitleText}>{getTargetTypeName(targetType)}</Text>
+                    <Text style={styles.targetTypeAvgText}>{typeStats.avgPerArrow}/arrow</Text>
+                  </View>
+                  <View style={styles.targetTypeStatsRow}>
+                    <View style={styles.targetTypeStatBox}>
+                      <Text style={styles.targetTypeStatValue}>{typeStats.sessions}</Text>
+                      <Text style={styles.targetTypeStatLabel}>Sessions</Text>
+                    </View>
+                    <View style={styles.targetTypeStatBox}>
+                      <Text style={styles.targetTypeStatValue}>{typeStats.rounds}</Text>
+                      <Text style={styles.targetTypeStatLabel}>Rounds</Text>
+                    </View>
+                    <View style={styles.targetTypeStatBox}>
+                      <Text style={styles.targetTypeStatValue}>{typeStats.arrows}</Text>
+                      <Text style={styles.targetTypeStatLabel}>Arrows</Text>
+                    </View>
+                    <View style={styles.targetTypeStatBox}>
+                      <Text style={styles.targetTypeStatValue}>{typeStats.points}</Text>
+                      <Text style={styles.targetTypeStatLabel}>Points</Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
+            {Object.values(statsByTargetType).every(s => s.sessions === 0) && (
+              <Text style={styles.noTargetDataText}>No data for any target type in selected period</Text>
+            )}
+          </View>
+        </View>
+
         {/* Highlights Card */}
         {reportStats.totalSessions > 0 && (
           <View style={styles.card}>
