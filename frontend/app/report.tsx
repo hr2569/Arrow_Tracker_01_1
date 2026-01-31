@@ -1103,46 +1103,130 @@ export default function ReportScreen() {
     });
 
     // Render multi-spot target (Vegas or NFAA)
+    // For multi-spot targets, shots are stored with coordinates relative to individual spots (0-1)
+    // We render each spot with its own heatmap overlay based on all shots
+    // Since we don't know which spot each shot was on, we show the same heatmap on each spot
     if (targetType !== 'wa_standard') {
+      const currentSpotSize = targetType === 'vegas_3spot' ? size * 0.38 : size * 0.28;
+      
+      // Render a single spot with heatmap overlay
+      const SpotWithHeatmap = ({ centerX, centerY, spotIdx }: { centerX: number, centerY: number, spotIdx: number }) => {
+        const spotRadiusPx = currentSpotSize / 2;
+        
+        // Create mini heatmap grid for this spot
+        const miniGridSize = 24;
+        const miniCellSize = currentSpotSize / miniGridSize;
+        const miniDensityGrid: number[][] = Array(miniGridSize).fill(null).map(() => Array(miniGridSize).fill(0));
+        
+        // Calculate density using shot coordinates (which are relative to spot, 0-1)
+        shots.forEach((shot) => {
+          const gridX = Math.floor(shot.x * miniGridSize);
+          const gridY = Math.floor(shot.y * miniGridSize);
+          
+          const blurRadius = 3;
+          for (let dx = -blurRadius; dx <= blurRadius; dx++) {
+            for (let dy = -blurRadius; dy <= blurRadius; dy++) {
+              const nx = gridX + dx;
+              const ny = gridY + dy;
+              if (nx >= 0 && nx < miniGridSize && ny >= 0 && ny < miniGridSize) {
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const weight = Math.exp(-distance * distance / 4);
+                miniDensityGrid[ny][nx] += weight;
+              }
+            }
+          }
+        });
+        
+        let miniMaxDensity = 0;
+        miniDensityGrid.forEach(row => {
+          row.forEach(val => {
+            if (val > miniMaxDensity) miniMaxDensity = val;
+          });
+        });
+        
+        const miniHeatmapCells: { x: number; y: number; color: string; opacity: number }[] = [];
+        miniDensityGrid.forEach((row, y) => {
+          row.forEach((density, x) => {
+            if (density > 0) {
+              const normalizedDensity = miniMaxDensity > 0 ? density / miniMaxDensity : 0;
+              miniHeatmapCells.push({
+                x: x * miniCellSize,
+                y: y * miniCellSize,
+                color: getHeatColor(normalizedDensity),
+                opacity: normalizedDensity,
+              });
+            }
+          });
+        });
+        
+        return (
+          <View
+            style={{
+              position: 'absolute',
+              left: centerX - spotRadiusPx,
+              top: centerY - spotRadiusPx,
+              width: currentSpotSize,
+              height: currentSpotSize,
+            }}
+          >
+            {/* Spot background rings */}
+            <View style={[heatmapStyles.ring, {
+              width: currentSpotSize, height: currentSpotSize, borderRadius: currentSpotSize / 2,
+              backgroundColor: '#00a2e8', borderColor: '#0077b3', borderWidth: 1,
+            }]}>
+              <View style={[heatmapStyles.ring, {
+                width: currentSpotSize * 0.65, height: currentSpotSize * 0.65, borderRadius: currentSpotSize * 0.325,
+                backgroundColor: '#ed1c24', borderColor: '#b31217', borderWidth: 1,
+              }]}>
+                <View style={[heatmapStyles.ring, {
+                  width: currentSpotSize * 0.35, height: currentSpotSize * 0.35, borderRadius: currentSpotSize * 0.175,
+                  backgroundColor: '#fff200', borderColor: '#ccaa00', borderWidth: 1,
+                }]} />
+              </View>
+            </View>
+            
+            {/* Heatmap overlay for this spot */}
+            <View style={[StyleSheet.absoluteFill, { borderRadius: currentSpotSize / 2, overflow: 'hidden' }]}>
+              <Svg width={currentSpotSize} height={currentSpotSize}>
+                <Defs>
+                  {miniHeatmapCells.map((cell, index) => (
+                    <RadialGradient
+                      key={`grad-spot-${spotIdx}-${index}`}
+                      id={`heatGradSpot-${spotIdx}-${index}`}
+                      cx="50%"
+                      cy="50%"
+                      rx="50%"
+                      ry="50%"
+                    >
+                      <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
+                      <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
+                    </RadialGradient>
+                  ))}
+                </Defs>
+                <G>
+                  {miniHeatmapCells.map((cell, index) => (
+                    <Circle
+                      key={`heat-spot-${spotIdx}-${index}`}
+                      cx={cell.x + miniCellSize / 2}
+                      cy={cell.y + miniCellSize / 2}
+                      r={miniCellSize * 1.5}
+                      fill={`url(#heatGradSpot-${spotIdx}-${index})`}
+                    />
+                  ))}
+                </G>
+              </Svg>
+            </View>
+          </View>
+        );
+      };
+      
       return (
         <View style={[heatmapStyles.container, { width: size, height: size }]}>
-          {/* Multi-spot target background */}
+          {/* Multi-spot target with heatmaps on each spot */}
           <View style={[heatmapStyles.multiSpotBackground, { width: size, height: size }]}>
             {spotCenters.map((spot, idx) => (
-              <SingleSpot key={`spot-${idx}`} centerX={spot.x} centerY={spot.y} />
+              <SpotWithHeatmap key={`spot-heat-${idx}`} centerX={spot.x} centerY={spot.y} spotIdx={idx} />
             ))}
-          </View>
-
-          {/* Heatmap Overlay using SVG */}
-          <View style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
-            <Svg width={size} height={size}>
-              <Defs>
-                {heatmapCells.map((cell, index) => (
-                  <RadialGradient
-                    key={`grad-${index}`}
-                    id={`heatGradReport-${index}`}
-                    cx="50%"
-                    cy="50%"
-                    rx="50%"
-                    ry="50%"
-                  >
-                    <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
-                    <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
-                  </RadialGradient>
-                ))}
-              </Defs>
-              <G>
-                {heatmapCells.map((cell, index) => (
-                  <Circle
-                    key={`heat-${index}`}
-                    cx={cell.x + cellSize / 2}
-                    cy={cell.y + cellSize / 2}
-                    r={cellSize * 1.5}
-                    fill={`url(#heatGradReport-${index})`}
-                  />
-                ))}
-              </G>
-            </Svg>
           </View>
         </View>
       );
