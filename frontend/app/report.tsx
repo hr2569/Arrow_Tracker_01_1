@@ -497,8 +497,8 @@ export default function ReportScreen() {
         const singleSpotSize = size * 0.85;
         const centerPos = size / 2;
         
-        // Generate heatmap circles for the single spot
-        const spotGridSize = 40;
+        // Generate heatmap circles for the single spot - HIGH RESOLUTION for smoothness
+        const spotGridSize = 60;  // Increased for smoother appearance
         const spotCellSize = singleSpotSize / spotGridSize;
         const spotDensityGrid: number[][] = [];
         
@@ -513,14 +513,14 @@ export default function ReportScreen() {
           const gridX = Math.floor(shot.x * spotGridSize);
           const gridY = Math.floor(shot.y * spotGridSize);
           
-          const blurRadius = 5;
+          const blurRadius = 8;  // Larger blur for smoother gradients
           for (let dx = -blurRadius; dx <= blurRadius; dx++) {
             for (let dy = -blurRadius; dy <= blurRadius; dy++) {
               const nx = gridX + dx;
               const ny = gridY + dy;
               if (nx >= 0 && nx < spotGridSize && ny >= 0 && ny < spotGridSize) {
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                const weight = Math.exp(-distance * distance / 5);
+                const weight = Math.exp(-distance * distance / 12);  // Smoother falloff
                 spotDensityGrid[ny][nx] += weight;
               }
             }
@@ -540,15 +540,16 @@ export default function ReportScreen() {
         
         spotDensityGrid.forEach((row, y) => {
           row.forEach((density, x) => {
-            if (density > 0) {
+            if (density > 0.05) {  // Threshold to reduce noise
               const normalizedDensity = spotMaxDensity > 0 ? density / spotMaxDensity : 0;
               const color = getHeatColor(normalizedDensity);
               if (color) {
                 const cx = spotLeft + x * spotCellSize + spotCellSize / 2;
                 const cy = spotTop + y * spotCellSize + spotCellSize / 2;
-                const r = spotCellSize * 1.5;
+                const r = spotCellSize * 2.2;  // Larger circles for overlap/smoothness
+                const alpha = color.alpha * Math.pow(normalizedDensity, 0.7);  // Smoother alpha curve
                 singleSpotHeatCircles += `
-                  <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha * normalizedDensity})" />
+                  <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})" />
                 `;
               }
             }
