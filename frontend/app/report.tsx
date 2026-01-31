@@ -1635,7 +1635,7 @@ export default function ReportScreen() {
               <Ionicons name="bar-chart" size={18} color="#8B0000" /> Score Distribution
             </Text>
             <View style={styles.distributionList}>
-              {(targetType === 'wa_standard' 
+              {((selectedTargetType || 'wa_standard') === 'wa_standard' 
                 ? [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0] 
                 : [10, 9, 8, 7, 6, 0]
               ).map((ring) => {
