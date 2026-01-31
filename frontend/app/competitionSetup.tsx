@@ -11,7 +11,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -25,14 +24,8 @@ import {
   setActiveCompetition, 
   startCompetition 
 } from '../utils/competitionStorage';
-type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
 
-interface ParticipantEntry {
-  id: string;
-  name: string;
-  bowId?: string;
-  bowName?: string;
-}
+type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
 
 export default function CompetitionSetupScreen() {
   const router = useRouter();
@@ -43,8 +36,6 @@ export default function CompetitionSetupScreen() {
   const [distance, setDistance] = useState('18');
   const [distanceUnit, setDistanceUnit] = useState<'m' | 'yd'>('m');
   const [competitionName, setCompetitionName] = useState('');
-  const [participants, setParticipants] = useState<ParticipantEntry[]>([]);
-  const [showAddParticipant, setShowAddParticipant] = useState(false);
   const [newParticipantName, setNewParticipantName] = useState('');
   const [newParticipantBowId, setNewParticipantBowId] = useState<string | null>(null);
 
