@@ -85,11 +85,10 @@ export const createCompetition = async (data: {
   name: string;
   targetType: string;
   distance: string;
-  mode: 'pass_and_play' | 'multi_device';
+  mode: 'local';
   participants: { name: string; bowId?: string; bowName?: string }[];
 }): Promise<Competition> => {
   const competitionId = generateId();
-  const joinCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   
   const participants: Participant[] = data.participants.map(p => ({
     id: generateId(),
@@ -109,8 +108,7 @@ export const createCompetition = async (data: {
     currentParticipantIndex: 0,
     currentRound: 1,
     status: 'setup',
-    mode: data.mode,
-    joinCode: data.mode === 'multi_device' ? joinCode : undefined,
+    mode: 'local',
     maxRounds: 10,
     arrowsPerRound: 3,
     createdAt: new Date().toISOString(),
