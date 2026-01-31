@@ -68,14 +68,14 @@ export default function CompetitionSetupScreen() {
 
   const addParticipant = () => {
     if (!newParticipantName.trim()) {
-      Alert.alert('Name Required', 'Please enter a name for the participant.');
+      Alert.alert('Name Required', 'Please enter a name for the archer.');
       return;
     }
 
     const bow = bows.find(b => b.id === newParticipantBowId);
     
     const newParticipant: ParticipantEntry = {
-      id: `participant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `archer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       name: newParticipantName.trim(),
       bowId: newParticipantBowId || undefined,
       bowName: bow?.name,
@@ -93,7 +93,7 @@ export default function CompetitionSetupScreen() {
 
   const handleStartCompetition = async () => {
     if (participants.length === 0) {
-      Alert.alert('No Participants', 'Please add at least one participant.');
+      Alert.alert('No Archers', 'Please add at least one archer.');
       return;
     }
 
