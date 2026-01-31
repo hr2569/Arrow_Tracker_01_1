@@ -449,7 +449,7 @@ export default function CompetitionSetupScreen() {
                 disabled={!newParticipantName.trim()}
               >
                 <Ionicons name="person-add" size={20} color="#000" />
-                <Text style={styles.modalButtonText}>Add Participant</Text>
+                <Text style={styles.modalButtonText}>Add Archer</Text>
               </TouchableOpacity>
             </View>
           </View>
