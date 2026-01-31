@@ -45,9 +45,8 @@ export interface Competition {
   currentParticipantIndex: number;
   currentRound: number;
   status: 'setup' | 'in_progress' | 'completed';
-  mode: 'pass_and_play' | 'multi_device';
+  mode: 'local';
   hostDeviceId?: string;
-  joinCode?: string;
   maxRounds: number;
   arrowsPerRound: number;
   createdAt: string;
