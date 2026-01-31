@@ -192,6 +192,66 @@ export default function StatsScreen() {
     };
   }, [filteredSessions]);
 
+  // Calculate stats by target type (for all sessions, not filtered by target type)
+  const statsByTargetType = useMemo(() => {
+    const now = new Date();
+    
+    // Filter sessions by time period only (not by target type)
+    const timeFilteredSessions = sessions.filter((session) => {
+      if (bowFilter && session.bow_name !== bowFilter) return false;
+      if (distanceFilter && session.distance !== distanceFilter) return false;
+      
+      const sessionDate = new Date(session.created_at);
+      
+      switch (selectedPeriod) {
+        case 'day':
+          return sessionDate.toDateString() === now.toDateString();
+        case 'week':
+          const weekAgo = new Date(now);
+          weekAgo.setDate(now.getDate() - 7);
+          return sessionDate >= weekAgo;
+        case 'month':
+          const monthAgo = new Date(now);
+          monthAgo.setMonth(now.getMonth() - 1);
+          return sessionDate >= monthAgo;
+        case 'year':
+          const yearAgo = new Date(now);
+          yearAgo.setFullYear(now.getFullYear() - 1);
+          return sessionDate >= yearAgo;
+        case 'all':
+        default:
+          return true;
+      }
+    });
+
+    const targetTypes = ['wa_standard', 'vegas_3spot', 'nfaa_indoor'];
+    const result: { [key: string]: { sessions: number; arrows: number; points: number; avgPerArrow: string } } = {};
+
+    targetTypes.forEach(targetType => {
+      const sessionsForType = timeFilteredSessions.filter(s => (s.target_type || 'wa_standard') === targetType);
+      let totalArrows = 0;
+      let totalPoints = 0;
+
+      sessionsForType.forEach(session => {
+        totalPoints += session.total_score || 0;
+        session.rounds?.forEach(round => {
+          round.shots?.forEach(() => {
+            totalArrows++;
+          });
+        });
+      });
+
+      result[targetType] = {
+        sessions: sessionsForType.length,
+        arrows: totalArrows,
+        points: totalPoints,
+        avgPerArrow: totalArrows > 0 ? (totalPoints / totalArrows).toFixed(1) : '0',
+      };
+    });
+
+    return result;
+  }, [sessions, selectedPeriod, bowFilter, distanceFilter]);
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchSessions();
