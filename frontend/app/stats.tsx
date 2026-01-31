@@ -550,9 +550,6 @@ export default function StatsScreen() {
                     </>
                   )}
                 </G>
-                  <Circle cx="100" cy="100" r="19" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
-                  <Circle cx="100" cy="100" r="9.5" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
-                </G>
                 
                 {/* Shot markers */}
                 {stats.allShots.map((shot, index) => {
