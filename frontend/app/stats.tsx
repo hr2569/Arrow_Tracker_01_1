@@ -524,32 +524,31 @@ export default function StatsScreen() {
             <View style={styles.heatmapContainer}>
               <Svg key={`svg-${targetTypeFilter}`} width={SCREEN_WIDTH - 80} height={SCREEN_WIDTH - 80} viewBox="0 0 200 200">
                 {/* Target rings background - changes based on target type */}
-                <G>
-                  {targetTypeFilter === 'wa_standard' ? (
-                    <>
-                      {/* WA Standard - 10 rings: white, white, black, black, blue, blue, red, red, gold, gold */}
-                      <Circle cx="100" cy="100" r="95" fill="#f5f5f0" stroke="#333" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="85.5" fill="#f5f5f0" stroke="#333" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="76" fill="#2a2a2a" stroke="#555" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="66.5" fill="#2a2a2a" stroke="#555" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="57" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="47.5" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="38" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="28.5" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="19" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="9.5" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
-                    </>
-                  ) : (
-                    <>
-                      {/* Vegas 3-Spot & NFAA Indoor - 5 rings: blue, blue, red, red, gold */}
-                      <Circle cx="100" cy="100" r="95" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="76" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="57" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="38" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
-                      <Circle cx="100" cy="100" r="19" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
-                    </>
-                  )}
-                </G>
+                {targetTypeFilter === 'wa_standard' && (
+                  <G>
+                    {/* WA Standard - 10 rings: white, white, black, black, blue, blue, red, red, gold, gold */}
+                    <Circle cx="100" cy="100" r="95" fill="#f5f5f0" stroke="#333" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="85.5" fill="#f5f5f0" stroke="#333" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="76" fill="#2a2a2a" stroke="#555" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="66.5" fill="#2a2a2a" stroke="#555" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="57" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="47.5" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="38" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="28.5" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="19" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="9.5" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
+                  </G>
+                )}
+                {(targetTypeFilter === 'vegas_3spot' || targetTypeFilter === 'nfaa_indoor') && (
+                  <G>
+                    {/* Vegas 3-Spot & NFAA Indoor - 5 rings: blue, blue, red, red, gold */}
+                    <Circle cx="100" cy="100" r="95" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="76" fill="#00a2e8" stroke="#0077b3" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="57" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="38" fill="#ed1c24" stroke="#b31217" strokeWidth="0.5" />
+                    <Circle cx="100" cy="100" r="19" fill="#fff200" stroke="#ccaa00" strokeWidth="0.5" />
+                  </G>
+                )}
                 
                 {/* Shot markers */}
                 {stats.allShots.map((shot, index) => {
