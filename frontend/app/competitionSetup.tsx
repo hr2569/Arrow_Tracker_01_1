@@ -191,48 +191,6 @@ export default function CompetitionSetupScreen() {
             />
           </View>
 
-          {/* Mode Selection */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Competition Mode</Text>
-            <View style={styles.modeContainer}>
-              <TouchableOpacity
-                style={[styles.modeCard, mode === 'pass_and_play' && styles.modeCardSelected]}
-                onPress={() => setMode('pass_and_play')}
-              >
-                <Ionicons 
-                  name="people" 
-                  size={32} 
-                  color={mode === 'pass_and_play' ? '#FFD700' : '#666'} 
-                />
-                <Text style={[styles.modeTitle, mode === 'pass_and_play' && styles.modeTitleSelected]}>
-                  Pass & Play
-                </Text>
-                <Text style={styles.modeDesc}>Single device, take turns</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.modeCard, mode === 'multi_device' && styles.modeCardSelected]}
-                onPress={() => setMode('multi_device')}
-              >
-                <Ionicons 
-                  name="wifi" 
-                  size={32} 
-                  color={mode === 'multi_device' ? '#FFD700' : '#666'} 
-                />
-                <Text style={[styles.modeTitle, mode === 'multi_device' && styles.modeTitleSelected]}>
-                  Multi-Device
-                </Text>
-                <Text style={styles.modeDesc}>WiFi/Bluetooth sync</Text>
-                {networkStatus?.isWifi && (
-                  <View style={styles.wifiIndicator}>
-                    <Ionicons name="checkmark-circle" size={12} color="#4CAF50" />
-                    <Text style={styles.wifiText}>WiFi Connected</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-
           {/* Target Type Selection */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Target Face</Text>
