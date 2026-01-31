@@ -134,14 +134,20 @@ export default function ReportScreen() {
     });
   }, [sessions, startDate, endDate, selectedBow, selectedDistance, selectedTargetType]);
 
-  // Get all shots for heatmap
-  const allShots = useMemo(() => {
-    const shots: { x: number; y: number; ring: number }[] = [];
+  // Get all shots for heatmap, grouped by target type
+  const shotsByTargetType = useMemo(() => {
+    const grouped: { [key: string]: { x: number; y: number; ring: number }[] } = {
+      'wa_standard': [],
+      'vegas_3spot': [],
+      'nfaa_indoor': [],
+    };
+    
     filteredSessions.forEach((session) => {
+      const targetType = session.target_type || 'wa_standard';
       session.rounds?.forEach((round) => {
         round.shots?.forEach((shot: any) => {
           if (shot.x !== undefined && shot.y !== undefined) {
-            shots.push({
+            grouped[targetType]?.push({
               x: shot.x,
               y: shot.y,
               ring: shot.ring || 0,
@@ -150,8 +156,14 @@ export default function ReportScreen() {
         });
       });
     });
-    return shots;
+    
+    return grouped;
   }, [filteredSessions]);
+
+  // Legacy: all shots combined (for backward compatibility)
+  const allShots = useMemo(() => {
+    return Object.values(shotsByTargetType).flat();
+  }, [shotsByTargetType]);
 
   // Calculate report statistics
   const reportStats = useMemo(() => {
