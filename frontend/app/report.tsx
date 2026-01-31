@@ -495,15 +495,26 @@ export default function ReportScreen() {
       }
 
       // WA Standard single target
-      // Target rings colors
-      const ringColorsPdf = ['#f5f5f0', '#f5f5f0', '#2a2a2a', '#2a2a2a', '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24', '#fff200', '#fff200'];
+      // Target rings colors based on target type
+      const getTargetRingColors = () => {
+        if (targetType === 'wa_standard') {
+          // WA Standard - 10 rings: white, white, black, black, blue, blue, red, red, gold, gold
+          return ['#f5f5f0', '#f5f5f0', '#2a2a2a', '#2a2a2a', '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24', '#fff200', '#fff200'];
+        } else {
+          // Vegas & NFAA - 5 rings (doubled for 10): blue, blue, blue, blue, red, red, red, red, gold, gold
+          return ['#00a2e8', '#00a2e8', '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24', '#ed1c24', '#ed1c24', '#fff200', '#fff200'];
+        }
+      };
+      const ringColorsPdf = getTargetRingColors();
       
       // Generate target ring backgrounds (filled circles)
       let targetRingBgs = '';
-      for (let ringNum = 1; ringNum <= 10; ringNum++) {
-        const diameterPercent = (11 - ringNum) / 10;
+      const numRings = targetType === 'wa_standard' ? 10 : 5;
+      for (let ringNum = 1; ringNum <= numRings; ringNum++) {
+        const diameterPercent = (numRings + 1 - ringNum) / numRings;
         const ringSize = targetSize * diameterPercent;
-        const bgColor = ringColorsPdf[ringNum - 1];
+        const colorIndex = targetType === 'wa_standard' ? ringNum - 1 : Math.floor((ringNum - 1) * 2);
+        const bgColor = ringColorsPdf[colorIndex] || '#fff200';
         targetRingBgs += `
           <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="${bgColor}" />
         `;
@@ -511,10 +522,15 @@ export default function ReportScreen() {
       
       // Generate target ring outlines (to draw on top of heatmap)
       let targetRingLines = '';
-      for (let ringNum = 1; ringNum <= 10; ringNum++) {
-        const diameterPercent = (11 - ringNum) / 10;
+      for (let ringNum = 1; ringNum <= numRings; ringNum++) {
+        const diameterPercent = (numRings + 1 - ringNum) / numRings;
         const ringSize = targetSize * diameterPercent;
-        const borderColor = ringNum <= 2 ? '#888' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#005090' : ringNum <= 8 ? '#901015' : '#907000';
+        let borderColor;
+        if (targetType === 'wa_standard') {
+          borderColor = ringNum <= 2 ? '#888' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#005090' : ringNum <= 8 ? '#901015' : '#907000';
+        } else {
+          borderColor = ringNum <= 2 ? '#005090' : ringNum <= 4 ? '#901015' : '#907000';
+        }
         targetRingLines += `
           <circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="none" stroke="${borderColor}" stroke-width="2" />
         `;
