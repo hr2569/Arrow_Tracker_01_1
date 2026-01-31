@@ -389,8 +389,8 @@ export default function ReportScreen() {
       const spotRadius = targetType === 'vegas_3spot' ? vegasSpotRadius : nfaaSpotRadius;
       const spotSizePx = spotRadius * 2 * size;
       
-      // Grid for density calculation
-      const gridSize = 60;
+      // Grid for density calculation - HIGH RESOLUTION for smoothness
+      const gridSize = 80;  // Increased for smoother appearance
       const cellSize = size / gridSize;
       const densityGrid: number[][] = [];
       for (let i = 0; i < gridSize; i++) {
@@ -400,19 +400,19 @@ export default function ReportScreen() {
         }
       }
       
-      // Calculate density
+      // Calculate density with larger blur
       shots.forEach((shot) => {
         const gridX = Math.floor(shot.x * gridSize);
         const gridY = Math.floor(shot.y * gridSize);
         
-        const blurRadius = 6;
+        const blurRadius = 10;  // Larger blur for smoother gradients
         for (let dx = -blurRadius; dx <= blurRadius; dx++) {
           for (let dy = -blurRadius; dy <= blurRadius; dy++) {
             const nx = gridX + dx;
             const ny = gridY + dy;
             if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
               const distance = Math.sqrt(dx * dx + dy * dy);
-              const weight = Math.exp(-distance * distance / 6);
+              const weight = Math.exp(-distance * distance / 16);  // Smoother falloff
               densityGrid[ny][nx] += weight;
             }
           }
