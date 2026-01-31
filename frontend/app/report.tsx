@@ -1389,7 +1389,7 @@ export default function ReportScreen() {
                   key={`heat-${index}`}
                   cx={cell.x + cellSize / 2}
                   cy={cell.y + cellSize / 2}
-                  r={cellSize * 1.5}
+                  r={cellSize * 2.0}
                   fill={`url(#heatGradReport-${index})`}
                 />
               ))}
