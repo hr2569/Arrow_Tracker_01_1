@@ -102,24 +102,12 @@ export default function CompetitionSetupScreen() {
       return;
     }
 
-    if (mode === 'multi_device' && (!networkStatus?.isWifi || !networkStatus?.ipAddress)) {
-      Alert.alert(
-        'WiFi Required',
-        'Multi-device mode requires all devices to be on the same WiFi network. Please connect to WiFi or use Pass & Play mode.',
-        [
-          { text: 'Use Pass & Play', onPress: () => setMode('pass_and_play') },
-          { text: 'Cancel', style: 'cancel' },
-        ]
-      );
-      return;
-    }
-
     try {
       const competition = await createCompetition({
         name: competitionName || `Competition ${new Date().toLocaleDateString()}`,
         targetType: selectedTargetType,
         distance: `${distance}${distanceUnit}`,
-        mode,
+        mode: 'local',
         participants: participants.map(p => ({
           name: p.name,
           bowId: p.bowId,
