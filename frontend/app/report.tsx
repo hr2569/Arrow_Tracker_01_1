@@ -1208,8 +1208,8 @@ export default function ReportScreen() {
       const singleSpotSize = size * 0.75;
       const spotRadiusPx = singleSpotSize / 2;
       
-      // Recalculate density grid specifically for single spot display
-      const spotGridSize = 40;
+      // Recalculate density grid specifically for single spot display - HIGH RES
+      const spotGridSize = 55;  // Increased for smoother appearance
       const spotCellSize = singleSpotSize / spotGridSize;
       const spotDensityGrid: number[][] = Array(spotGridSize).fill(null).map(() => Array(spotGridSize).fill(0));
       
@@ -1218,14 +1218,14 @@ export default function ReportScreen() {
         const gridX = Math.floor(shot.x * spotGridSize);
         const gridY = Math.floor(shot.y * spotGridSize);
         
-        const blurRadius = 4;
+        const blurRadius = 7;  // Larger blur for smoother gradients
         for (let dx = -blurRadius; dx <= blurRadius; dx++) {
           for (let dy = -blurRadius; dy <= blurRadius; dy++) {
             const nx = gridX + dx;
             const ny = gridY + dy;
             if (nx >= 0 && nx < spotGridSize && ny >= 0 && ny < spotGridSize) {
               const distance = Math.sqrt(dx * dx + dy * dy);
-              const weight = Math.exp(-distance * distance / 5);
+              const weight = Math.exp(-distance * distance / 10);  // Smoother falloff
               spotDensityGrid[ny][nx] += weight;
             }
           }
@@ -1239,17 +1239,18 @@ export default function ReportScreen() {
         });
       });
       
-      // Generate heatmap cells for this spot
+      // Generate heatmap cells for this spot with smoother rendering
       const spotHeatmapCells: { x: number; y: number; color: string; opacity: number }[] = [];
       spotDensityGrid.forEach((row, y) => {
         row.forEach((density, x) => {
-          if (density > 0) {
+          if (density > 0.03) {  // Small threshold to reduce noise
             const normalizedDensity = spotMaxDensity > 0 ? density / spotMaxDensity : 0;
+            const smoothedOpacity = Math.pow(normalizedDensity, 0.7);  // Smoother curve
             spotHeatmapCells.push({
               x: x * spotCellSize,
               y: y * spotCellSize,
               color: getHeatColor(normalizedDensity),
-              opacity: normalizedDensity,
+              opacity: smoothedOpacity,
             });
           }
         });
