@@ -652,10 +652,17 @@ export default function ReportScreen() {
 
       return `
         <svg width="600" height="600" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="targetClip">
+              <circle cx="${size/2}" cy="${size/2}" r="${targetSize/2}" />
+            </clipPath>
+          </defs>
           <!-- Target ring backgrounds -->
           ${targetRingBgs}
-          <!-- Heatmap overlay -->
-          ${heatCircles}
+          <!-- Heatmap overlay (clipped to target area) -->
+          <g clip-path="url(#targetClip)">
+            ${heatCircles}
+          </g>
           <!-- Target ring lines (on top of heatmap) -->
           ${targetRingLines}
           <!-- Center cross -->
