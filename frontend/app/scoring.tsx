@@ -377,40 +377,12 @@ export default function ScoringScreen() {
           )}
         </View>
 
-        <View style={[styles.zoomContainer, { height: zoomLevel > 1 ? 350 : 'auto' }]}>
-          <ScrollView 
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            scrollEnabled={zoomLevel > 1}
-            bounces={true}
-            decelerationRate="normal"
-            scrollEventThrottle={16}
-            directionalLockEnabled={false}
-            contentContainerStyle={{
-              width: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : '100%',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <ScrollView 
-              showsVerticalScrollIndicator={false}
-              scrollEnabled={zoomLevel > 1}
-              nestedScrollEnabled={true}
-              bounces={true}
-              decelerationRate="normal"
-              scrollEventThrottle={16}
-              contentContainerStyle={{
-                height: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : 'auto',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <View style={[styles.targetWrapper, { transform: [{ scale: zoomLevel }] }]}>
-                {renderTargetContent()}
-              </View>
-            </ScrollView>
-          </ScrollView>
-        </View>
+        <ZoomableTarget 
+          zoomLevel={zoomLevel}
+          baseTargetSize={BASE_TARGET_SIZE}
+        >
+          {renderTargetContent()}
+        </ZoomableTarget>
 
         <View style={styles.arrowList}>
           <View style={styles.arrowListHeader}>
