@@ -319,49 +319,55 @@ export default function CompetitionSetupScreen() {
             </View>
           </View>
 
-          {/* Archers Section */}
+          {/* Archer's Name Section */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Archers ({participants.length})</Text>
-              <TouchableOpacity 
-                style={styles.addButton}
-                onPress={() => setShowAddParticipant(true)}
-              >
-                <Ionicons name="add" size={20} color="#FFD700" />
-                <Text style={styles.addButtonText}>Add</Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.sectionTitle}>Archer's Name</Text>
+            <TextInput
+              style={styles.textInput}
+              value={newParticipantName}
+              onChangeText={setNewParticipantName}
+              placeholder="Enter your name"
+              placeholderTextColor="#666"
+            />
+          </View>
 
-            {participants.length === 0 ? (
-              <View style={styles.emptyParticipants}>
-                <Ionicons name="person-outline" size={48} color="#333" />
-                <Text style={styles.emptyText}>No archers added yet</Text>
-                <Text style={styles.emptySubtext}>Tap "Add" to add archers</Text>
-              </View>
+          {/* Select Bow Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Select Bow (Optional)</Text>
+            {bows.length === 0 ? (
+              <TouchableOpacity 
+                style={styles.addBowCard}
+                onPress={() => router.push('/bows')}
+              >
+                <Ionicons name="add-circle-outline" size={24} color="#FFD700" />
+                <Text style={styles.addBowCardText}>Add a bow first</Text>
+              </TouchableOpacity>
             ) : (
-              <View style={styles.participantsList}>
-                {participants.map((participant, index) => (
-                  <View key={participant.id} style={styles.participantCard}>
-                    <View style={styles.participantRank}>
-                      <Text style={styles.participantRankText}>{index + 1}</Text>
-                    </View>
-                    <View style={styles.participantInfo}>
-                      <Text style={styles.participantName}>{participant.name}</Text>
-                      {participant.bowName && (
-                        <Text style={styles.participantBow}>
-                          <Ionicons name="arrow-forward-outline" size={12} color="#666" /> {participant.bowName}
-                        </Text>
-                      )}
-                    </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.bowsRowInline}>
+                  <TouchableOpacity
+                    style={[styles.bowOptionInline, !newParticipantBowId && styles.bowOptionInlineSelected]}
+                    onPress={() => setNewParticipantBowId(null)}
+                  >
+                    <Ionicons name="close-circle-outline" size={28} color={!newParticipantBowId ? '#FFD700' : '#666'} />
+                    <Text style={[styles.bowOptionTextInline, !newParticipantBowId && styles.bowOptionTextInlineSelected]}>
+                      None
+                    </Text>
+                  </TouchableOpacity>
+                  {bows.map((bow) => (
                     <TouchableOpacity
-                      style={styles.removeButton}
-                      onPress={() => removeParticipant(participant.id)}
+                      key={bow.id}
+                      style={[styles.bowOptionInline, newParticipantBowId === bow.id && styles.bowOptionInlineSelected]}
+                      onPress={() => setNewParticipantBowId(bow.id)}
                     >
-                      <Ionicons name="close" size={20} color="#ff4444" />
+                      {renderBowIcon(bow.bow_type, newParticipantBowId === bow.id)}
+                      <Text style={[styles.bowOptionTextInline, newParticipantBowId === bow.id && styles.bowOptionTextInlineSelected]}>
+                        {bow.name}
+                      </Text>
                     </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
+                  ))}
+                </View>
+              </ScrollView>
             )}
           </View>
         </ScrollView>
@@ -371,7 +377,7 @@ export default function CompetitionSetupScreen() {
           <TouchableOpacity
             style={[
               styles.startButton,
-              participants.length === 0 && styles.startButtonDisabled,
+              !newParticipantName.trim() && styles.startButtonDisabled,
             ]}
             onPress={handleStartCompetition}
             disabled={participants.length === 0}
