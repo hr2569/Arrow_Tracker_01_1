@@ -182,14 +182,20 @@ export default function CompetitionScoringScreen() {
   };
 
   const handleCommitRound = async () => {
-    if (arrows.length !== 3) {
-      Alert.alert('Incomplete Round', 'Please place exactly 3 arrows before committing.');
-      return;
-    }
-
     if (!competition || !currentParticipant) return;
 
-    const shots: CompetitionShot[] = arrows.map(a => ({
+    // Fill missing arrows with M (miss = 0 points)
+    const filledArrows = [...arrows];
+    while (filledArrows.length < 3) {
+      filledArrows.push({
+        id: `miss-${Date.now()}-${filledArrows.length}`,
+        x: 0.5, // Center
+        y: 0.5,
+        score: 0, // Miss
+      });
+    }
+
+    const shots: CompetitionShot[] = filledArrows.map(a => ({
       x: a.x,
       y: a.y,
       ring: a.score,
@@ -199,8 +205,8 @@ export default function CompetitionScoringScreen() {
     const roundResult = {
       archerName: currentParticipant.name,
       roundNumber: competition.currentRound,
-      shots: arrows.map(a => a.score),
-      total: getTotalScore(),
+      shots: filledArrows.map(a => a.score),
+      total: filledArrows.reduce((sum, a) => sum + a.score, 0),
     };
 
     const updatedCompetition = await commitRound(
