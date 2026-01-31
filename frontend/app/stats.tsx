@@ -279,9 +279,14 @@ export default function StatsScreen() {
   const RingDistribution = () => {
     const maxCount = Math.max(...Object.values(stats.ringCounts), 1);
     
+    // Different score ranges for different target types
+    const scoreRange = targetTypeFilter === 'wa_standard' 
+      ? [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]  // WA: 10-1 + M
+      : [10, 9, 8, 7, 6, 0];  // Vegas/NFAA: 10-6 + M
+    
     return (
       <View style={styles.ringDistribution}>
-        {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((ring) => {
+        {scoreRange.map((ring) => {
           const count = stats.ringCounts[ring] || 0;
           const percentage = stats.totalArrows > 0 ? ((count / stats.totalArrows) * 100).toFixed(1) : '0';
           const barWidth = (count / maxCount) * 100;
