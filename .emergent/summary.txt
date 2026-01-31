@@ -1,143 +1,116 @@
 <analysis>
-
 **original_problem_statement**: The user wants to convert a client-server application into a 100% offline, local-storage-based Expo app. The key features are: managing archery bows, scoring archery sessions, viewing history/stats, and a manual Backup & Restore feature.
 
 Recent user requests that have been worked on in this session:
-1.  Fixing a critical bug where all arrow taps on the scoring screen registered as a center hit.
-2.  Restoring a missing heatmap feature to the stats screen.
-3.  Adding a zoom feature to the scoring target. The user first requested pinch-to-zoom, which caused crashes, and then settled on a button-based zoom.
-4.  Allowing the user to drag/pan the target when zoomed in.
-5.  Making the arrow markers on the target scale proportionally when zoomed.
-6.  Displaying statistics and heatmaps correctly based on the selected target type (WA, Vegas, NFAA) in both the Stats and Report screens.
-7.  If a report includes multiple target types, it should generate a separate heatmap for each one.
-8.  Ensuring scrolling is fluid on the scoring screen.
+1.  Verify that reports with multiple target types (WA, NFAA, Vegas) generate a separate heatmap for each type.
+2.  Fix the rendering of heatmaps for multi-spot targets (NFAA Indoor and Vegas 3-Spot), which the user described as weird and wrong. This involved multiple iterations.
+3.  Fix a bug where the NFAA Indoor heatmap would show stripes by incorrectly plotting shots from other target types.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is fully offline, using AsyncStorage for data persistence. The core scoring functionality, which was previously broken, has been fixed and now correctly registers scores based on tap location. The Stats screen has been updated to include a Shot Distribution heatmap that visually displays all recorded shots. A button-based zoom feature (+, -, Reset) has been added to the scoring screen, which allows for smooth, fluid panning in all directions when zoomed. The statistics and report generation logic have been significantly updated to correctly filter and display data based on the selected target type.
+The application is a fully offline Expo app using AsyncStorage. The core feature for generating reports with multiple heatmaps (one per target type) is implemented and has been extensively debugged in this session. A series of visual bugs related to the rendering of heatmaps for multi-spot targets (NFAA, Vegas) have been addressed. The current implementation shows a single, representative spot for these targets with an aggregated heatmap of all shots for that target type, which resolves the visual weirdness reported by the user.
 
 **Last working item**:
-    - Last item agent was working: Implementing a feature in  to generate a separate heatmap for each target type present in the selected report data. This involved significant changes to data processing (grouping shots by target type), the in-app UI rendering logic, and the PDF generation logic ().
-    - Status: IN PROGRESS
-    - Agent Testing Done: N
-    - Which testing method agent to use? manual testing by curl. The agent should navigate to the  page, generate a report that includes sessions with different target types (WA, NFAA), and verify that the generated report (both in-app preview and the shared PDF) displays a separate, correctly rendered heatmap for each target type.
+    - Last item agent was working: Fixing a data-filtering bug in the NFAA Indoor heatmap. When All Targets were selected for a report, the NFAA heatmap was incorrectly rendering shots from other target types (e.g., WA Standard), causing a stripes visual artifact. The agent fixed this by ensuring the heatmap calculation logic inside the  component in  re-calculates the shot density grid using only the shots specific to that target type.
+    - Status: USER VERIFICATION PENDING
+    - Agent Testing Done: Y
+    - Which testing method agent to use? Manual verification by the user. The agent should ask the user to generate a report with All Targets selected and confirm that the NFAA Indoor Heatmap now correctly shows only the relevant shots, without any stripes.
     - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-  - Issue 1: The feature to generate multiple heatmaps in the report (one for each target type) is incomplete and untested. (P0)
-  
-  Issues Detail:
-  - Issue 1: 
-     - Attempted fixes: The agent has refactored  to support this. It involved:
-        1. Grouping shots by target type in .
-        2. Modifying the in-app  component to accept  as a prop.
-        3. Looping through the grouped shots to render multiple heatmap cards in the UI.
-        4. Parameterizing the  function for the PDF export.
-        5. Modifying the PDF HTML generation to loop and create a page with a heatmap for each target type.
-     - Next debug checklist: 
-        1. Restart the expo server.
-        2. Since there is no saved session data, you must first create some. Go to , create at least two sessions with different target types (e.g., one 'WA Standard' and one 'NFAA Indoor'). Score a few arrows in each.
-        3. Navigate to the  page.
-        4. Generate a report covering the sessions you just created.
-        5. Verify that the in-app report preview shows two separate Shot Distribution cards, one for each target type, with the correct target face image.
-        6. Use the 'Share Report' button and verify the generated output (PDF/HTML) also contains two separate heatmaps.
-     - Why fix this issue and what will be achieved with the fix? This fulfills a direct user request to provide more granular and accurate visual data in the reports, making them more useful for analyzing performance across different archery disciplines.
-     - Status:  IN PROGRESS
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on other issue: None
+  - No pending implementation issues. The primary pending item is user verification of the last fix.
 
 **In progress Task List**:
-- No other tasks are in progress. The focus is on completing and testing the multi-heatmap report feature.
+  - No tasks are currently in progress.
 
 **Upcoming and Future Tasks**
-    - **Future Task (P1):** Refactor target face rendering logic. The code to render the different target faces (WA vs. Vegas/NFAA) is currently duplicated across , , and . This logic should be extracted into a single, reusable component to improve maintainability and prevent future inconsistencies.
-    - **Future Task (P2):** Re-attempt pinch-to-zoom in a production build. The user's initial request for pinch-to-zoom failed in the Expo Go development environment due to native dependency issues. If the user desires, an attempt could be made to build a standalone APK to test if the feature works in a production environment, as native modules are more stable there.
+    - **Upcoming Task (P0): Test PDF Export.** The agent made changes to the PDF generation logic ( in ) to fix the heatmap appearance, but the final PDF output was never tested. The next agent must guide the user to test the Share Report button and verify that the heatmaps in the generated PDF are correct.
+    - **Future Task (P1): Improve Data Model for Multi-Spot Accuracy.** The agent discovered a significant data modeling limitation: the  (which specific spot a shot was on in a multi-spot target) is not saved with the shot data. The current heatmap is a workaround that aggregates all shots onto one representative spot. The correct long-term solution is to:
+        1.  Modify  to save the  with each arrow object.
+        2.  Update the  logic in  to persist this new data.
+        3.  Refactor the heatmaps in  and  to use  to plot shots on the exact spot they were recorded on, rather than showing an aggregated view.
+    - **Future Task (P2): Refactor Target Face Rendering Logic.** The code to render the different target faces is duplicated across , , and . This should be extracted into a single, reusable component to improve maintainability.
+    - **Future Task (P3): Re-attempt Pinch-to-Zoom.** This was a previous user request that was unstable in Expo Go. It could be revisited if the user wants to test it in a standalone production build (APK/AAB).
 
 **Completed work in this session**
-- **Scoring Screen Overhaul**:
-  - **Bug Fix**: Fixed the critical bug where all taps on the target scored 10 points. Now uses web-compatible  with  for reliable coordinate detection in the preview. ()
-  - **Zoom Feature**: Implemented a stable, button-based zoom feature (+, -, Reset) after pinch-to-zoom was found to be unstable in Expo Go. ()
-  - **Panning/Dragging**: Implemented fluid 2D scrolling (horizontal and vertical) when the target is zoomed, without visible scrollbars. ()
-  - **Proportional Markers**: Arrow markers now scale inversely with the zoom level, maintaining a consistent visual size on screen. ()
-- **Stats & Reports Enhancement**:
-  - **Heatmap Restored**: The missing Shot Distribution heatmap was re-implemented on the stats screen. ()
-  - **Target-Aware Visuals**: The heatmaps and score distribution charts in both  and  now correctly display the appropriate target face and score ranges (e.g., 10-ring WA vs. 5-ring NFAA) based on the selected filter.
-  - **Stats by Target Type**: Added a new section in both  and  that provides a statistical breakdown for each target type included in the data set.
-- **Build Configuration**:
-  - Fixed an EAS build error by adding  to the  profile in , allowing for successful APK builds.
-  - Provided the user with the correct configuration to build AAB files for the Play Store.
+- **Multi-Heatmap Report Verification**:
+  - Injected test data with three different target types (, , ) to enable robust testing.
+  - Confirmed the report screen correctly generates separate statistics and heatmap sections for each target type present in the filtered data.
+- **Multi-Spot Heatmap Rendering Fixes**:
+  - **Initial Fix**: Addressed an issue where shots on multi-spot targets were rendered using incorrect absolute coordinates. The fix involved rendering heat overlays on each individual spot.
+  - **Second Iteration**: Addressed user feedback that showing the same heatmap on all three spots looked weird. The implementation was changed to render a single, clean, representative spot with an aggregated heatmap for NFAA and Vegas targets.
+  - **Final Fix**: Resolved a data-leakage bug where the NFAA heatmap would show stripes by incorrectly including shots from other target types. The fix ensures the heatmap density is calculated using only shots for that specific target type.
 
 **Earlier issues found/mentioned but not fixed**
-   - None. The agent addressed all issues raised by the user in this session, although one is still in progress.
+   - **Issue 1: Missing  in Shot Data**
+     - **Debug checklist**:
+        - Check  to confirm  is not added to the arrow/shot object when a shot is recorded.
+        - Check  and  to confirm the session data saved to AsyncStorage does not contain  for shots.
+     - **Why to solve this issue and what will be achieved with this?**: Solving this will allow for a hyper-accurate shot distribution heatmap for multi-spot targets. Instead of an aggregated summary on one spot, the heatmap could show exactly which shots landed on the top, middle, or bottom spot, which is far more useful for performance analysis.
+     - **Should Test frontend/backend/both after fix**: Frontend.
+     - **Is recurring issue?**: N/A (It's a design limitation, not a recurring bug).
 
 **Known issue recurrence from previous fork**
   - None.
 
 **Code Architecture**
-
+targetIndextargetIndex
 
 **Key Technical Concepts**
-- **Offline First**: All data is stored via .
-- **State Management**:  is used for global state ().
-- **Web Compatibility**: The scoring bug was fixed by using web-specific  and  for the web preview, while retaining  with  for native.
-- **Controlled Zoom**: Zoom on the scoring screen is managed via React state () and , avoiding problematic gesture handlers.
-- **2D Scrolling**: Achieved by nesting  components with dynamic  to enable panning on the zoomed target.
+- **AsyncStorage Data Injection**: The agent successfully injected test data into the browser's  to simulate saved sessions for testing the offline app.
+- **Heatmap Generation**: Heatmaps are generated by creating a 2D density grid () based on shot coordinates and then rendering colored SVG circles with opacity proportional to the density.
+- **Coordinate Transformation Workaround**: Due to missing  data, the agent implemented a workaround where all shots for a multi-spot target are treated as if they were on a single spot, allowing for a clean, aggregated heatmap display.
+- **Data Filtering in Components**: The final bug fix involved ensuring that data passed as props to a child component () was used correctly within that component's internal calculations, preventing data leakage from other sources.
 
 **key DB schema**
-  - Not applicable. Data is stored as JSON objects in AsyncStorage.
+  - Not applicable. Data is stored as JSON objects in AsyncStorage. The key object is .
 
 **changes in tech stack**
-  - None. The project remains locked to Expo SDK 51.
+  - None.
 
 **All files of reference**
 - **Most Important File for Next Steps:**
-  - : This file was last being edited to support multiple heatmaps and needs to be tested and potentially debugged.
-- **Other Modified Files in this Session:**
-  - : Contains the fixed scoring logic and the new zoom/pan feature.
-  - : Contains the restored heatmap and target-aware statistics.
-  - : Contains the corrected build configuration.
+  - : Contains all the recent fixes for heatmaps. The PDF export functionality within this file needs testing.
+- **Files for Future Work:**
+  - : Will need to be modified to start saving  for shots.
+  - : Will need to be modified to persist the  data.
 
 **Areas that need refactoring**:
-- The target face rendering logic is duplicated in , , and . This should be extracted into a reusable component.
+- The target face rendering logic is duplicated in , , and .
+- The  component in  has become very complex due to handling multiple target types and workarounds. It could be broken down into smaller, more specialized components.
 
 **key api endpoints**
 - None.
 
 **Critical Info for New Agent**
-- **Your highest priority (P0) is to test and fix the multi-heatmap feature in **. The previous agent made significant, untested changes to this file. You will need to create test data (sessions with different target types) to verify its functionality.
-- The project is **strictly locked to Expo SDK 51**. Do NOT upgrade packages, as it will likely break the build.
-- **Pinch-to-zoom is unstable** in the development environment. The user has accepted a button-based zoom. Do not try to re-implement pinch-to-zoom unless the user explicitly asks to try it in a production APK build.
+- **Your first action should be to ask the user to verify the latest fix**. Specifically, ask them to generate a report with All Targets selected and confirm the NFAA Indoor Heatmap no longer has stripes and looks correct.
+- **The PDF export feature for reports is untested.** After the user confirms the in-app view is correct, you MUST guide them to test the Share Report button and check the generated PDF.
+- **Explain the  data model limitation** to the user. The current heatmap for multi-spot targets is a best-effort summary. Propose the future task of saving  with each shot to enable a truly accurate heatmap, and ask if they would like to proceed with that improvement.
 
 **documents created in this job**
   - None.
 
-**Last 10 User Messages and any pending HUMAN messages** 
- - 10.  - IN PROGRESS. This is the last task the agent was working on.
- - 9.  - Resolved. Agent fixed a variable name error in .
- - 8.  - Resolved. Agent fixed the logic to display the correct target face visuals based on the selected filter.
- - 7.  - Resolved. User confirmed the button was not an issue.
- - 6.  - Partially Resolved. Scrollbar removed, target face logic fixed. Arrow button issue was dismissed by the user.
- - 5.  - Resolved. Scrolling was made fluid and stats/reports were updated.
- - 4.  - Resolved. Agent provided correct  configuration for AAB.
- - 3.  (referring to an EAS build error) - Resolved. Agent fixed .
- - 2.  - Resolved. Agent implemented proper 2D scrolling.
- - 1.  - Resolved. Agent provided code.
+**Last 10 User Messages and any pending HUMAN messages**
+- 10.  - **RESOLVED**. This was the final bug the agent fixed by ensuring shot data was correctly filtered within the heatmap component.
+- 9.  - **Partially Resolved**. The user confirmed the Vegas fix was good but indicated the NFAA one was not, leading to the final bug fix.
+- 8.  - **Resolved**. User feedback after the agent's second attempt at fixing the heatmaps. The agent found the duplicate heatmap on all spots and fixed it.
+- 7.  - **Resolved**. This was the initial feedback that kicked off the entire debugging session for the multi-spot heatmaps.
+- 6-1. (Not relevant - user messages from previous fork summary)
 
 **Project Health Check:**
-- **Broken**: The report generation in  is in an untested and potentially broken state after major refactoring for the multi-heatmap feature.
-- **Mocked**: No mocked components.
+- **Broken**: Nothing is known to be broken, but the PDF export feature is untested and should be considered at risk.
+- **Mocked**: No mocked components. Test data was manually injected into localStorage for the session.
 
 **3rd Party Integrations**
 - : For local data storage.
-- : For the backup feature.
+- : For the backup/share feature.
 - : For the restore feature.
 - : For client-side state management.
 - : For rendering targets and heatmaps.
 
 **Testing status**
-  - Testing agent used after significant changes: YES (for initial scoring bug fix).
+  - Testing agent used after significant changes: NO
   - Troubleshoot agent used after agent stuck in loop: NO
   - Test files created: []
   - Known regressions: None.
@@ -146,6 +119,6 @@ The application is fully offline, using AsyncStorage for data persistence. The c
 - None required.
 
 **What agent forgot to execute**
-- The agent did not test the final, complex changes made to  for the multi-heatmap feature before the session ended. This is the most critical pending action.
+- The agent consistently modified the PDF generation logic ( in ) in parallel with the in-app heatmap fixes, but it never once tested the actual PDF output via the Share Report button. This is a critical untested piece of functionality.
 
 </analysis>
