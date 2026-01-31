@@ -208,6 +208,39 @@ export default function ReportScreen() {
     };
   }, [filteredSessions]);
 
+  // Stats by target type for report
+  const statsByTargetType = useMemo(() => {
+    const targetTypes = ['wa_standard', 'vegas_3spot', 'nfaa_indoor'];
+    const result: { [key: string]: { sessions: number; arrows: number; points: number; avgPerArrow: string; rounds: number } } = {};
+
+    targetTypes.forEach(targetType => {
+      const sessionsForType = filteredSessions.filter(s => (s.target_type || 'wa_standard') === targetType);
+      let totalArrows = 0;
+      let totalPoints = 0;
+      let totalRounds = 0;
+
+      sessionsForType.forEach(session => {
+        totalPoints += session.total_score || 0;
+        session.rounds?.forEach(round => {
+          totalRounds++;
+          round.shots?.forEach(() => {
+            totalArrows++;
+          });
+        });
+      });
+
+      result[targetType] = {
+        sessions: sessionsForType.length,
+        arrows: totalArrows,
+        points: totalPoints,
+        rounds: totalRounds,
+        avgPerArrow: totalArrows > 0 ? (totalPoints / totalArrows).toFixed(1) : '0',
+      };
+    });
+
+    return result;
+  }, [filteredSessions]);
+
   const formatDateRange = () => {
     const start = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     const end = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
