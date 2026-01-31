@@ -43,16 +43,10 @@ export default function CompetitionSetupScreen() {
   const [distance, setDistance] = useState('18');
   const [distanceUnit, setDistanceUnit] = useState<'m' | 'yd'>('m');
   const [competitionName, setCompetitionName] = useState('');
-  const [mode, setMode] = useState<CompetitionMode>('pass_and_play');
   const [participants, setParticipants] = useState<ParticipantEntry[]>([]);
   const [showAddParticipant, setShowAddParticipant] = useState(false);
   const [newParticipantName, setNewParticipantName] = useState('');
   const [newParticipantBowId, setNewParticipantBowId] = useState<string | null>(null);
-  const [networkStatus, setNetworkStatus] = useState<{
-    isConnected: boolean;
-    isWifi: boolean;
-    ipAddress: string | null;
-  } | null>(null);
 
   const fetchBows = async () => {
     try {
