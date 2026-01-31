@@ -667,7 +667,7 @@ export default function CompetitionScoringScreen() {
             {lastRoundResult && (
               <>
                 <Text style={styles.roundResultArcher}>{lastRoundResult.archerName}</Text>
-                <Text style={styles.roundResultRound}>Round {lastRoundResult.roundNumber}</Text>
+                <Text style={styles.roundResultRound}>Round {lastRoundResult.roundNumber} of {competition?.maxRounds}</Text>
                 
                 <View style={styles.roundResultScores}>
                   {lastRoundResult.shots.map((shot, idx) => (
@@ -689,19 +689,20 @@ export default function CompetitionScoringScreen() {
               </>
             )}
 
-            <View style={styles.roundResultNext}>
-              <Text style={styles.roundResultNextLabel}>Next Up</Text>
-              <Text style={styles.roundResultNextArcher}>
-                {competition?.participants[competition.currentParticipantIndex]?.name}
-              </Text>
-              <Text style={styles.roundResultNextRound}>Round {competition?.currentRound}</Text>
-            </View>
+            {competition && competition.currentRound <= competition.maxRounds && (
+              <View style={styles.roundResultNext}>
+                <Text style={styles.roundResultNextLabel}>Next Round</Text>
+                <Text style={styles.roundResultNextRound}>Round {competition.currentRound}</Text>
+              </View>
+            )}
 
             <TouchableOpacity
               style={styles.roundResultButton}
               onPress={() => setShowRoundResult(false)}
             >
-              <Text style={styles.roundResultButtonText}>Continue</Text>
+              <Text style={styles.roundResultButtonText}>
+                {competition && competition.currentRound <= competition.maxRounds ? 'Continue' : 'View Results'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
