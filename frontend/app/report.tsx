@@ -2073,6 +2073,57 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  targetTypeList: {
+    gap: 12,
+  },
+  targetTypeCard: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 16,
+  },
+  targetTypeHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  targetTypeTitleText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  targetTypeAvgText: {
+    color: '#8B0000',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  targetTypeStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  targetTypeStatBox: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  targetTypeStatValue: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  targetTypeStatLabel: {
+    color: '#888',
+    fontSize: 10,
+    marginTop: 2,
+  },
+  noTargetDataText: {
+    color: '#666',
+    fontSize: 14,
+    textAlign: 'center',
+    padding: 20,
+  },
 });
 
 const heatmapStyles = StyleSheet.create({
