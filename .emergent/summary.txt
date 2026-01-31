@@ -1,135 +1,132 @@
 <analysis>
 
-**original_problem_statement**: The user wants to convert a client-server application into a 100% offline, local-storage-based Expo app. The key features are: managing archery bows, scoring archery sessions, viewing history/stats, and a manual Backup & Restore feature using the device's native share sheet.
+**original_problem_statement**: The user wants to convert a client-server application into a 100% offline, local-storage-based Expo app. The key features are: managing archery bows, scoring archery sessions, viewing history/stats, and a manual Backup & Restore feature.
 
-Recent user requests include:
-1.  Correcting the scoring logic and target faces for WA, Vegas, and NFAA archery styles.
-2.  Arranging the Vegas target in a triangle and the NFAA target vertically.
-3.  Removing an auto-sharing popup after saving a session.
-4.  Removing a double back button on the scoring screen.
-5.  Adding pinch-to-zoom on the targets (later deprioritized due to crashes).
-6.  Changing the center mark of the targets to a .
-7.  Fixing a bug where all arrows score in the center regardless of tap location.
-8.  Restoring a missing heatmap from the stats screen.
-9.  Building a functional APK.
+Recent user requests that have been worked on in this session:
+1.  Fixing a critical bug where all arrow taps on the scoring screen registered as a center hit.
+2.  Restoring a missing heatmap feature to the stats screen.
+3.  Adding a zoom feature to the scoring target. The user first requested pinch-to-zoom, which caused crashes, and then settled on a button-based zoom.
+4.  Allowing the user to drag/pan the target when zoomed in.
+5.  Making the arrow markers on the target scale proportionally when zoomed.
+6.  Displaying statistics and heatmaps correctly based on the selected target type (WA, Vegas, NFAA) in both the Stats and Report screens.
+7.  If a report includes multiple target types, it should generate a separate heatmap for each one.
+8.  Ensuring scrolling is fluid on the scoring screen.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application has been fully migrated from a backend API to use  for local data persistence. The UI has been updated to reflect this, and the app name has been changed to Arrow Tracker. The agent has successfully configured the project to build an APK by downgrading to Expo SDK 51 and resolving numerous dependency and configuration issues. The target rendering logic for different archery styles (WA, Vegas, NFAA) has been implemented with correct layouts (single, triangle, vertical) and a  center mark.
+The application is fully offline, using AsyncStorage for data persistence. The core scoring functionality, which was previously broken, has been fixed and now correctly registers scores based on tap location. The Stats screen has been updated to include a Shot Distribution heatmap that visually displays all recorded shots. A button-based zoom feature (+, -, Reset) has been added to the scoring screen, which allows for smooth, fluid panning in all directions when zoomed. The statistics and report generation logic have been significantly updated to correctly filter and display data based on the selected target type.
 
 **Last working item**:
-    - Last item agent was working: Fixing a critical bug where arrow scoring on the  screen is not working correctly. All taps on the target are registered as a center hit (10 points), regardless of the actual location. The agent's last attempt was to replace  with a  component using the  event, which is theorized to provide more reliable touch coordinates on mobile.
+    - Last item agent was working: Implementing a feature in  to generate a separate heatmap for each target type present in the selected report data. This involved significant changes to data processing (grouping shots by target type), the in-app UI rendering logic, and the PDF generation logic ().
     - Status: IN PROGRESS
-    - Agent Testing Done: N (The agent implemented the fix but has not yet tested it with the screenshot tool)
-    - Which testing method agent to use? screenshot tool. Use the  with a script that clicks on different parts of the target in  to verify that the scores registered are not all 10s.
+    - Agent Testing Done: N
+    - Which testing method agent to use? manual testing by curl. The agent should navigate to the  page, generate a report that includes sessions with different target types (WA, NFAA), and verify that the generated report (both in-app preview and the shared PDF) displays a separate, correctly rendered heatmap for each target type.
     - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-  - Issue 1: Arrow scoring is broken; all taps score 10 points (P0)
-  - Issue 2: Heatmap feature is missing from the Stats screen (P1)
+  - Issue 1: The feature to generate multiple heatmaps in the report (one for each target type) is incomplete and untested. (P0)
   
   Issues Detail:
   - Issue 1: 
-     - Attempted fixes: The agent has tried multiple approaches to get accurate click coordinates within React Native Web's preview, including using , , and web-specific event properties, all of which failed. The latest attempt, which is ready for testing, was to replace  with  and use the  event handler. The agent also briefly implemented a pinch-to-zoom feature which caused crashes and was subsequently removed.
+     - Attempted fixes: The agent has refactored  to support this. It involved:
+        1. Grouping shots by target type in .
+        2. Modifying the in-app  component to accept  as a prop.
+        3. Looping through the grouped shots to render multiple heatmap cards in the UI.
+        4. Parameterizing the  function for the PDF export.
+        5. Modifying the PDF HTML generation to loop and create a page with a heatmap for each target type.
      - Next debug checklist: 
-       1. Run a test using the  on  to verify if the  fix correctly registers scores based on tap location.
-       2. If it fails, log the entire  object from  to the console to inspect all available coordinate properties (, , etc.).
-       3. If  are still unreliable, the next best approach is to get the target element's absolute position on the screen and calculate the relative tap position using the event's .
-     - Why fix this issue and what will be achieved with the fix? This is the most critical bug, as it makes the app's primary function (scoring) unusable. Fixing it will make the app functional for the user.
+        1. Restart the expo server.
+        2. Since there is no saved session data, you must first create some. Go to , create at least two sessions with different target types (e.g., one 'WA Standard' and one 'NFAA Indoor'). Score a few arrows in each.
+        3. Navigate to the  page.
+        4. Generate a report covering the sessions you just created.
+        5. Verify that the in-app report preview shows two separate Shot Distribution cards, one for each target type, with the correct target face image.
+        6. Use the 'Share Report' button and verify the generated output (PDF/HTML) also contains two separate heatmaps.
+     - Why fix this issue and what will be achieved with the fix? This fulfills a direct user request to provide more granular and accurate visual data in the reports, making them more useful for analyzing performance across different archery disciplines.
      - Status:  IN PROGRESS
-     - Is recurring issue? Y
-     - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on other issue: None
-  - Issue 2: 
-     - Attempted fixes: None. The agent has not started work on this yet.
-     - Next debug checklist:
-       1. View  to understand its current structure.
-       2. Re-implement the heatmap logic. This will involve fetching all session data from , aggregating all shot coordinates (, ), and rendering them on a visual component.  could be used to draw circles for each shot location.
-     - Why fix this issue and what will be achieved with the fix? This restores a feature the user explicitly requested.
-     - Status:  NOT STARTED
      - Is recurring issue? N
      - Should Test frontend/backend/both after fix? Frontend
      - Blocked on other issue: None
 
 **In progress Task List**:
-- There are no other in-progress tasks. The focus is on the two pending issues.
+- No other tasks are in progress. The focus is on completing and testing the multi-heatmap report feature.
 
 **Upcoming and Future Tasks**
-    - There are no other upcoming tasks requested by the user. The primary goal is to fix the outstanding issues and deliver a working APK.
+    - **Future Task (P1):** Refactor target face rendering logic. The code to render the different target faces (WA vs. Vegas/NFAA) is currently duplicated across , , and . This logic should be extracted into a single, reusable component to improve maintainability and prevent future inconsistencies.
+    - **Future Task (P2):** Re-attempt pinch-to-zoom in a production build. The user's initial request for pinch-to-zoom failed in the Expo Go development environment due to native dependency issues. If the user desires, an attempt could be made to build a standalone APK to test if the feature works in a production environment, as native modules are more stable there.
 
 **Completed work in this session**
-- **APK Build Stabilized**:
-  - Successfully configured  and  for EAS builds.
-  - Resolved numerous build errors by **downgrading the project to Expo SDK 51** and aligning all  dependencies.
-  - Fixed project ID and owner mismatches.
-  - Removed a conflicting native  directory that was causing build failures.
-- **App Renaming and Cleanup**:
-  - Renamed the app from Archery Scorer to Arrow Tracker across all relevant files (, etc.).
-  - Removed all remaining backend dependencies () and refactored  to be offline.
-- **Feature Implementation & Bug Fixes**:
-  - Implemented automatic backup via share sheet after each session.
-  - Removed the session and round limits for arrows.
-  - Corrected target scoring logic and color schemes in .
-  - Implemented correct target layouts in  (Vegas triangle, NFAA vertical).
-  - Fixed a double back button on the scoring screen by setting  in .
-  - Replaced the target's center dot with a  mark.
-  - Removed a buggy pinch-to-zoom implementation that was causing crashes.
+- **Scoring Screen Overhaul**:
+  - **Bug Fix**: Fixed the critical bug where all taps on the target scored 10 points. Now uses web-compatible  with  for reliable coordinate detection in the preview. ()
+  - **Zoom Feature**: Implemented a stable, button-based zoom feature (+, -, Reset) after pinch-to-zoom was found to be unstable in Expo Go. ()
+  - **Panning/Dragging**: Implemented fluid 2D scrolling (horizontal and vertical) when the target is zoomed, without visible scrollbars. ()
+  - **Proportional Markers**: Arrow markers now scale inversely with the zoom level, maintaining a consistent visual size on screen. ()
+- **Stats & Reports Enhancement**:
+  - **Heatmap Restored**: The missing Shot Distribution heatmap was re-implemented on the stats screen. ()
+  - **Target-Aware Visuals**: The heatmaps and score distribution charts in both  and  now correctly display the appropriate target face and score ranges (e.g., 10-ring WA vs. 5-ring NFAA) based on the selected filter.
+  - **Stats by Target Type**: Added a new section in both  and  that provides a statistical breakdown for each target type included in the data set.
+- **Build Configuration**:
+  - Fixed an EAS build error by adding  to the  profile in , allowing for successful APK builds.
+  - Provided the user with the correct configuration to build AAB files for the Play Store.
+
+**Earlier issues found/mentioned but not fixed**
+   - None. The agent addressed all issues raised by the user in this session, although one is still in progress.
+
+**Known issue recurrence from previous fork**
+  - None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Offline First**: Application logic is fully migrated to use .
-- **State Management**:  is used for global state, managing session settings, target types, and rounds. The configuration is in .
-- **File-based Routing**:  is used for navigation.
-- **Build System**: Expo Application Services (EAS) is configured to build the Android APK.
-- **Expo SDK Version**: The project has been **downgraded to Expo SDK 51** to resolve persistent build issues. This is a critical constraint.
+- **Offline First**: All data is stored via .
+- **State Management**:  is used for global state ().
+- **Web Compatibility**: The scoring bug was fixed by using web-specific  and  for the web preview, while retaining  with  for native.
+- **Controlled Zoom**: Zoom on the scoring screen is managed via React state () and , avoiding problematic gesture handlers.
+- **2D Scrolling**: Achieved by nesting  components with dynamic  to enable panning on the zoomed target.
 
 **key DB schema**
-  - Not applicable. Data is stored as JSON objects in AsyncStorage using  utility functions.
+  - Not applicable. Data is stored as JSON objects in AsyncStorage.
 
 **changes in tech stack**
-  - The project has been downgraded from Expo SDK 54 to **Expo SDK 51**. All related dependencies in  have been aligned to this version.
+  - None. The project remains locked to Expo SDK 51.
 
 **All files of reference**
-- **Most Important Files for Next Steps:**
-  - : Contains the broken scoring logic. This is the primary file to work on.
-  - : The file where the missing heatmap needs to be restored.
-  - : Defines the target configurations and global state.
-- **Configuration Files (Critical - Do Not Change Unless Necessary):**
-  - : Contains the dependency list locked to Expo SDK 51.
-  - : Contains the Expo and EAS project configuration.
+- **Most Important File for Next Steps:**
+  - : This file was last being edited to support multiple heatmaps and needs to be tested and potentially debugged.
+- **Other Modified Files in this Session:**
+  - : Contains the fixed scoring logic and the new zoom/pan feature.
+  - : Contains the restored heatmap and target-aware statistics.
+  - : Contains the corrected build configuration.
 
 **Areas that need refactoring**:
-- The  directory is obsolete and can be safely deleted to clean up the workspace.
+- The target face rendering logic is duplicated in , , and . This should be extracted into a reusable component.
 
 **key api endpoints**
-- None. All API endpoints are deprecated.
+- None.
 
 **Critical Info for New Agent**
-- **Your highest priority (P0) is to fix the arrow scoring bug in **. The user cannot use the app until this is resolved. The core of the problem is getting reliable touch coordinates in the React Native Web preview. The last implemented fix using  and  must be tested first.
-- **Your second priority (P1) is to restore the heatmap feature on the stats screen** ().
-- **The project is locked to Expo SDK 51**. Do not attempt to upgrade the Expo SDK or its related dependencies, as this will likely reintroduce the build failures the previous agent spent significant time resolving.
-- The  directory is entirely obsolete and should be ignored.
+- **Your highest priority (P0) is to test and fix the multi-heatmap feature in **. The previous agent made significant, untested changes to this file. You will need to create test data (sessions with different target types) to verify its functionality.
+- The project is **strictly locked to Expo SDK 51**. Do NOT upgrade packages, as it will likely break the build.
+- **Pinch-to-zoom is unstable** in the development environment. The user has accepted a button-based zoom. Do not try to re-implement pinch-to-zoom unless the user explicitly asks to try it in a production APK build.
 
 **documents created in this job**
   - None.
 
 **Last 10 User Messages and any pending HUMAN messages** 
- - 10.  - Completed.
- - 9.  - In Progress (This is the main bug).
- - 8.  - Completed (zoom removed due to crash,  added).
- - 7.  (re: removing backup code) - Completed (agent confirmed it was already removed).
- - 6.  - Completed.
- - 5.  - In Progress (scoring bug) / Completed (back button).
- - 4.  - In Progress (This is the main bug).
- - 3.  - Completed.
- - 2.  - In Progress (scoring) / Completed (layouts).
- - 1.  - In Progress. This message initiated the current set of tasks.
+ - 10.  - IN PROGRESS. This is the last task the agent was working on.
+ - 9.  - Resolved. Agent fixed a variable name error in .
+ - 8.  - Resolved. Agent fixed the logic to display the correct target face visuals based on the selected filter.
+ - 7.  - Resolved. User confirmed the button was not an issue.
+ - 6.  - Partially Resolved. Scrollbar removed, target face logic fixed. Arrow button issue was dismissed by the user.
+ - 5.  - Resolved. Scrolling was made fluid and stats/reports were updated.
+ - 4.  - Resolved. Agent provided correct  configuration for AAB.
+ - 3.  (referring to an EAS build error) - Resolved. Agent fixed .
+ - 2.  - Resolved. Agent implemented proper 2D scrolling.
+ - 1.  - Resolved. Agent provided code.
 
 **Project Health Check:**
-- **Broken**: The core scoring functionality is broken in the preview, making the app's main purpose unusable for the user.
+- **Broken**: The report generation in  is in an untested and potentially broken state after major refactoring for the multi-heatmap feature.
 - **Mocked**: No mocked components.
 
 **3rd Party Integrations**
@@ -137,19 +134,18 @@ The application has been fully migrated from a backend API to use  for local dat
 - : For the backup feature.
 - : For the restore feature.
 - : For client-side state management.
+- : For rendering targets and heatmaps.
 
 **Testing status**
-  - Testing agent used after significant changes: NO
+  - Testing agent used after significant changes: YES (for initial scoring bug fix).
   - Troubleshoot agent used after agent stuck in loop: NO
   - Test files created: []
-  - Known regressions: 
-    - The heatmap feature on the stats screen has been lost during refactoring.
-    - Arrow scoring is fundamentally broken.
+  - Known regressions: None.
 
 **Credentials to test flow:**
 - None required.
 
 **What agent forgot to execute**
-- The agent has not yet started work on restoring the missing heatmap feature in , which was part of the user's initial request in this session.
+- The agent did not test the final, complex changes made to  for the multi-heatmap feature before the session ended. This is the most critical pending action.
 
 </analysis>
