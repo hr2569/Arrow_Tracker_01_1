@@ -1183,17 +1183,18 @@ export default function ReportScreen() {
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     };
 
-    // Create heatmap cells
+    // Create heatmap cells with smoother appearance
     const heatmapCells: { x: number; y: number; color: string; opacity: number }[] = [];
     densityGrid.forEach((row, y) => {
       row.forEach((density, x) => {
-        if (density > 0) {
+        if (density > 0.03) {  // Small threshold to reduce noise
           const normalizedDensity = maxDensity > 0 ? density / maxDensity : 0;
+          const smoothedOpacity = Math.pow(normalizedDensity, 0.7);  // Smoother opacity curve
           heatmapCells.push({
             x: x * cellSize,
             y: y * cellSize,
             color: getHeatColor(normalizedDensity),
-            opacity: normalizedDensity,
+            opacity: smoothedOpacity,
           });
         }
       });
