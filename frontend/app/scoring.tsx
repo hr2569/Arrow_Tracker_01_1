@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
   zoomControls: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 12, marginBottom: 12 },
   zoomButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#333', alignItems: 'center', justifyContent: 'center' },
   zoomText: { color: '#fff', fontSize: 14, fontWeight: '600', minWidth: 50, textAlign: 'center' },
-  zoomContainer: { overflow: 'hidden', marginBottom: 20, borderRadius: 12, backgroundColor: '#0a0a0a' },
+  zoomContainer: { overflow: 'hidden', marginBottom: 20, borderRadius: 12, backgroundColor: '#0a0a0a', alignItems: 'center', justifyContent: 'center' },
   targetWrapper: { alignItems: 'center', padding: 20 },
   triangleContainer: { alignItems: 'center' },
   triangleTop: { marginBottom: 16 },
