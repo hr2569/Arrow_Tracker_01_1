@@ -284,9 +284,9 @@ export default function ScoringScreen() {
 
   const getAvailableScores = (): number[] => {
     if (targetType === 'wa_standard') {
-      return [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+      return [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]; // 11 = X ring
     } else {
-      return [10, 9, 8, 7, 6, 0];
+      return [11, 10, 9, 8, 7, 6, 0]; // 11 = X ring
     }
   };
 
