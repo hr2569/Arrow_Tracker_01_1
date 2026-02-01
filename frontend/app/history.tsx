@@ -1446,6 +1446,52 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   // Competition styles
+  competitionsTabRow: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginBottom: 8,
+    gap: 8,
+  },
+  competitionsTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    gap: 8,
+  },
+  competitionsTabActive: {
+    backgroundColor: '#FFD700',
+  },
+  competitionsTabText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFD700',
+  },
+  competitionsTabTextActive: {
+    color: '#000',
+  },
+  mergeReportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#111',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#333',
+    gap: 6,
+  },
+  mergeReportButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFD700',
+  },
   competitionCard: {
     backgroundColor: '#111',
     borderRadius: 16,
