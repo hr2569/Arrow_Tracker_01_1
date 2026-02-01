@@ -20,6 +20,7 @@ import {
   Competition,
 } from '../utils/competitionStorage';
 import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import * as FileSystem from '../utils/fileSystemLegacy';
 import { TARGET_CONFIGS } from '../store/appStore';
 
