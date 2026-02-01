@@ -237,9 +237,13 @@ export default function ScoringScreen() {
     setSelectedArrowIndex(null);
   };
 
-  const getTotalScore = () => arrows.reduce((sum, a) => sum + a.score, 0);
+  // X ring (11) counts as 10 points
+  const getPointValue = (score: number) => score === 11 ? 10 : score;
+  
+  const getTotalScore = () => arrows.reduce((sum, a) => sum + getPointValue(a.score), 0);
 
   const getScoreColor = (score: number) => {
+    if (score === 11) return '#FFD700'; // X ring - gold
     if (score >= 9) return '#FFD700';
     if (score >= 7) return '#ed1c24';
     if (score >= 5) return '#00a2e8';
@@ -249,12 +253,21 @@ export default function ScoringScreen() {
   };
 
   const getScoreTextColor = (score: number) => {
+    if (score === 11) return '#000'; // X ring
     if (score >= 9) return '#000';
     if (score >= 7) return '#fff';
     if (score >= 5) return '#fff';
     if (score >= 3) return '#fff';
     if (score >= 1) return '#000';
     return '#fff';
+  };
+  
+  // Display helper: converts score to display string
+  const getScoreDisplay = (score: number) => {
+    if (score === 11) return 'X';
+    if (score === 10) return '10';
+    if (score === 0) return 'M';
+    return score.toString();
   };
 
   const handleFinishRound = () => {
