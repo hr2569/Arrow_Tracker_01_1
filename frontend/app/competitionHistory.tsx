@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
+import { getCompetitions, Competition, deleteCompetition as deleteCompeteCompetition } from '../utils/competitionStorage';
+import { TARGET_CONFIGS } from '../store/appStore';
 
 const BOW_TYPES: { [key: string]: string } = {
   recurve: 'Recurve',
@@ -24,7 +26,7 @@ const BOW_TYPES: { [key: string]: string } = {
   traditional: 'Traditional',
 };
 
-interface Archer {
+interface ManualArcher {
   id: string;
   name: string;
   bowType: string;
@@ -37,8 +39,26 @@ interface ManualCompetition {
   id: string;
   name: string;
   date: string;
-  archers: Archer[];
+  archers: ManualArcher[];
   type: string;
+}
+
+// Unified competition type for display
+interface DisplayCompetition {
+  id: string;
+  name: string;
+  date: string;
+  source: 'compete' | 'manual';
+  archerCount: number;
+  archerName?: string;
+  bowName?: string;
+  totalScore?: number;
+  targetType?: string;
+  distance?: string;
+  // For manual competitions
+  archers?: ManualArcher[];
+  // For compete competitions
+  originalData?: Competition;
 }
 
 const ROUNDS_COUNT = 10;
