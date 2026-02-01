@@ -497,7 +497,7 @@ export default function CompetitionSummaryScreen() {
                 <td><strong>${ri + 1}</strong></td>
                 ${sortedShots.map(shot => `
                   <td style="background: ${getScoreBgColor(shot.ring)}; color: ${getScoreTextColorHex(shot.ring)}; font-weight: bold;">
-                    ${shot.ring === 10 ? 'X' : shot.ring === 0 ? 'M' : shot.ring}
+                    ${shot.ring === 11 ? 'X' : shot.ring === 10 ? '10' : shot.ring === 0 ? 'M' : shot.ring}
                   </td>
                 `).join('')}
                 <td class="round-total">${round.totalScore}</td>
