@@ -15,7 +15,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
-import { documentDirectory } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -399,8 +398,8 @@ export default function ManualScoring() {
         const baseFileName = `${competitionName.replace(/[^a-z0-9]/gi, '_')}_Results`;
         const pdfFileName = baseFileName + '.pdf';
         const jsonFileName = baseFileName + '.arrowtracker.json';
-        const pdfDestination = (documentDirectory || '') + pdfFileName;
-        const jsonDestination = (documentDirectory || '') + jsonFileName;
+        const pdfDestination = (FileSystem.documentDirectory || '') + pdfFileName;
+        const jsonDestination = (FileSystem.documentDirectory || '') + jsonFileName;
         
         await FileSystem.moveAsync({
           from: uri,

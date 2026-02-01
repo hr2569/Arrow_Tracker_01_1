@@ -14,7 +14,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
-import { documentDirectory } from 'expo-file-system';
 import * as Print from 'expo-print';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -69,14 +68,14 @@ export default function ImportPdf() {
     if (Platform.OS === 'web') return;
     
     try {
-      const files = await FileSystem.readDirectoryAsync((documentDirectory || '') || '');
+      const files = await FileSystem.readDirectoryAsync((FileSystem.documentDirectory || '') || '');
       const arrowTrackerFiles = files.filter(f => f.endsWith('.arrowtracker.json'));
       
       const loadedFiles: ImportedFile[] = [];
       for (const fileName of arrowTrackerFiles) {
         try {
           const content = await FileSystem.readAsStringAsync(
-            (documentDirectory || '') + fileName
+            (FileSystem.documentDirectory || '') + fileName
           );
           const data = JSON.parse(content) as ImportedCompetition;
           if (data.type === 'arrowtracker_competition') {
@@ -405,8 +404,8 @@ export default function ImportPdf() {
         const baseFileName = `${newCompetitionName.replace(/[^a-z0-9]/gi, '_')}_Results`;
         const pdfFileName = baseFileName + '.pdf';
         const jsonFileName = baseFileName + '.arrowtracker.json';
-        const pdfDestination = (documentDirectory || '') + pdfFileName;
-        const jsonDestination = (documentDirectory || '') + jsonFileName;
+        const pdfDestination = (FileSystem.documentDirectory || '') + pdfFileName;
+        const jsonDestination = (FileSystem.documentDirectory || '') + jsonFileName;
         
         await FileSystem.moveAsync({
           from: uri,

@@ -17,7 +17,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Svg, { Defs, RadialGradient, Stop, Circle, G } from 'react-native-svg';
 import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
-import { documentDirectory } from 'expo-file-system';
 import { getSessions, getBows, Session, Bow } from '../utils/localStorage';
 
 type ReportPeriod = 'week' | 'month' | 'year' | 'custom' | 'all';
@@ -1091,7 +1090,7 @@ export default function ReportScreen() {
         const filename = `Session_Report_${dateStr}.pdf`;
         
         // Save to documents directory
-        const documentsDir = (documentDirectory || '');
+        const documentsDir = (FileSystem.documentDirectory || '');
         const destinationUri = `${documentsDir}${filename}`;
         
         await FileSystem.copyAsync({

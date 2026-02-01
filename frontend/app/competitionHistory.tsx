@@ -15,7 +15,6 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
-import { documentDirectory } from 'expo-file-system';
 import { getCompetitions, Competition, deleteCompetition as deleteCompeteCompetition } from '../utils/competitionStorage';
 import { TARGET_CONFIGS } from '../store/appStore';
 
@@ -347,7 +346,7 @@ export default function CompetitionHistory() {
       } else {
         const { uri } = await Print.printToFileAsync({ html });
         const fileName = `${competition.name.replace(/[^a-z0-9]/gi, '_')}_Results.pdf`;
-        const destinationUri = (documentDirectory || '') + fileName;
+        const destinationUri = (FileSystem.documentDirectory || '') + fileName;
         
         await FileSystem.moveAsync({
           from: uri,
