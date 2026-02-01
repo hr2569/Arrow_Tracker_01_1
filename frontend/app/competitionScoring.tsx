@@ -702,7 +702,7 @@ export default function CompetitionScoringScreen() {
                       style={[styles.roundResultScoreBadge, { backgroundColor: getScoreColor(shot) }]}
                     >
                       <Text style={[styles.roundResultScoreText, { color: getScoreTextColor(shot) }]}>
-                        {shot === 10 ? 'X' : shot === 0 ? 'M' : shot}
+                        {getScoreDisplay(shot)}
                       </Text>
                     </View>
                   ))}
