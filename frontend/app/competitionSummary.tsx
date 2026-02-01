@@ -362,12 +362,25 @@ export default function CompetitionSummaryScreen() {
 
       const { uri } = await Print.printToFileAsync({ html });
       
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(uri, {
-          mimeType: 'application/pdf',
-          dialogTitle: 'Share Competition Report',
-        });
-      }
+      // Generate filename with date and archer name
+      const dateStr = new Date().toISOString().split('T')[0];
+      const archerNameClean = archer.name.replace(/[^a-zA-Z0-9]/g, '_');
+      const filename = `Competition_${archerNameClean}_${dateStr}.pdf`;
+      
+      // Save to documents directory
+      const documentsDir = FileSystem.documentDirectory;
+      const destinationUri = `${documentsDir}${filename}`;
+      
+      await FileSystem.copyAsync({
+        from: uri,
+        to: destinationUri,
+      });
+      
+      Alert.alert(
+        'Report Saved',
+        `Competition report saved as:\n${filename}`,
+        [{ text: 'OK' }]
+      );
     } catch (error) {
       console.error('Error generating report:', error);
       Alert.alert('Error', 'Failed to generate report. Please try again.');
