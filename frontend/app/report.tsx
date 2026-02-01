@@ -268,35 +268,6 @@ export default function ReportScreen() {
   };
 
   // Generate shareable report text
-  const generateReportText = () => {
-    let report = `🎯 ARCHERY REPORT\n`;
-    report += `Period: ${formatDateRange()}\n`;
-    if (selectedBow || selectedDistance) {
-      report += `Filter: ${getFilterSummary()}\n`;
-    }
-    report += `Generated: ${new Date().toLocaleDateString()}\n`;
-    report += `━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    
-    report += `📊 OVERVIEW\n`;
-    report += `• Sessions: ${reportStats.totalSessions}\n`;
-    report += `• Rounds: ${reportStats.totalRounds}\n`;
-    report += `• Arrows Shot: ${reportStats.totalArrows}\n`;
-    report += `• Total Points: ${reportStats.totalPoints}\n\n`;
-    
-    report += `📈 AVERAGES\n`;
-    report += `• Per Arrow: ${reportStats.avgPerArrow}\n`;
-    report += `• Per Round: ${reportStats.avgPerRound}\n`;
-    report += `• Per Session: ${reportStats.avgPerSession}\n\n`;
-    
-    if (reportStats.totalSessions > 0) {
-      report += `🏆 HIGHLIGHTS\n`;
-      report += `• Best Session: ${reportStats.bestSession.score} pts (${reportStats.bestSession.date})\n`;
-      report += `• Lowest Session: ${reportStats.worstSession.score} pts (${reportStats.worstSession.date})\n\n`;
-    }
-
-    return report;
-  };
-
   // Generate PDF HTML content
   const generatePdfHtml = () => {
     // Score range based on target type
