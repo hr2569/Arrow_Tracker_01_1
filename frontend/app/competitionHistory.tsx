@@ -603,4 +603,33 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pdfButtonText: { color: '#000', fontWeight: 'bold', fontSize: 14 },
+  sourceTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2a2a1a',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginBottom: 12,
+    gap: 4,
+  },
+  sourceTagText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#FFD700',
+  },
+  scoreContainer: {
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  totalScoreLabel: {
+    fontSize: 10,
+    color: '#888',
+  },
+  totalScoreValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFD700',
+  },
 });
