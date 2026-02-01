@@ -528,8 +528,18 @@ export default function MergeCompetitionsScreen() {
             })}
           </ScrollView>
 
-          {/* Generate Button */}
+          {/* Footer Buttons */}
           <View style={styles.footer}>
+            <TouchableOpacity
+              style={[styles.shareButton, selectedIds.size < 2 && styles.buttonDisabled]}
+              onPress={handleShare}
+              disabled={selectedIds.size < 2}
+            >
+              <Ionicons name="share-social" size={20} color={selectedIds.size >= 2 ? '#fff' : '#666'} />
+              <Text style={[styles.shareButtonText, selectedIds.size < 2 && styles.buttonTextDisabled]}>
+                Share
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity
               style={[styles.generateButton, selectedIds.size < 2 && styles.generateButtonDisabled]}
               onPress={generateMergedReport}
@@ -541,7 +551,7 @@ export default function MergeCompetitionsScreen() {
                 <>
                   <Ionicons name="download-outline" size={20} color={selectedIds.size >= 2 ? '#000' : '#666'} />
                   <Text style={[styles.generateButtonText, selectedIds.size < 2 && styles.generateButtonTextDisabled]}>
-                    Save Merged Report ({selectedIds.size} selected)
+                    Save PDF ({selectedIds.size})
                   </Text>
                 </>
               )}
