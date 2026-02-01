@@ -525,24 +525,20 @@ export default function CompetitionSummaryScreen() {
       return;
     }
 
-    // Mobile - create PDF and open directly in Google Drive
+    // Mobile - create PDF and open share sheet
     try {
       const html = generatePdfHtml();
 
       const { uri } = await Print.printToFileAsync({ html });
       
-      // Get content URI for the file
-      const contentUri = await FileSystem.getContentUriAsync(uri);
-      
-      // Open directly with PDF viewer (Google Drive if it's the default)
-      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-        data: contentUri,
-        flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
-        type: 'application/pdf',
+      // Open share sheet - select Google Drive to open
+      await Sharing.shareAsync(uri, {
+        mimeType: 'application/pdf',
+        UTI: 'com.adobe.pdf',
       });
     } catch (error) {
       console.error('Error generating report:', error);
-      Alert.alert('Error', 'Failed to open PDF. Make sure you have a PDF viewer installed.');
+      Alert.alert('Error', 'Failed to generate PDF');
     } finally {
       setGenerating(false);
     }
