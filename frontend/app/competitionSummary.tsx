@@ -285,58 +285,6 @@ export default function CompetitionSummaryScreen() {
       </svg>
     `;
   };
-    let heatmapSvg = '';
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
-        const density = densityGrid[y][x];
-        if (density > 0) {
-          const normalizedDensity = maxDensity > 0 ? density / maxDensity : 0;
-          const heatColor = getHeatColor(normalizedDensity);
-          if (heatColor) {
-            const cellX = x * cellSize;
-            const cellY = y * cellSize;
-            // Only draw within target circle
-            const distFromCenter = Math.sqrt(
-              Math.pow(cellX + cellSize/2 - size/2, 2) + 
-              Math.pow(cellY + cellSize/2 - size/2, 2)
-            );
-            if (distFromCenter < size * 0.475) {
-              heatmapSvg += `<rect x="${cellX}" y="${cellY}" width="${cellSize + 1}" height="${cellSize + 1}" fill="${heatColor}" />`;
-            }
-          }
-        }
-      }
-    }
-    
-    // Generate shot markers
-    let shotsSvg = '';
-    shots.forEach(shot => {
-      const cx = shot.x * size;
-      const cy = shot.y * size;
-      shotsSvg += `
-        <circle cx="${cx}" cy="${cy}" r="4" fill="rgba(255,255,255,0.9)" stroke="#000" stroke-width="1"/>
-      `;
-    });
-    
-    // Calculate mean point of impact
-    if (shots.length > 0) {
-      const meanX = shots.reduce((sum, s) => sum + s.x, 0) / shots.length * size;
-      const meanY = shots.reduce((sum, s) => sum + s.y, 0) / shots.length * size;
-      shotsSvg += `
-        <circle cx="${meanX}" cy="${meanY}" r="8" fill="none" stroke="#00ff00" stroke-width="2"/>
-        <line x1="${meanX - 10}" y1="${meanY}" x2="${meanX + 10}" y2="${meanY}" stroke="#00ff00" stroke-width="2"/>
-        <line x1="${meanX}" y1="${meanY - 10}" x2="${meanX}" y2="${meanY + 10}" stroke="#00ff00" stroke-width="2"/>
-      `;
-    }
-    
-    return `
-      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-        ${ringsSvg}
-        ${heatmapSvg}
-        ${shotsSvg}
-      </svg>
-    `;
-  };
 
   const generateScatterPlotSvg = (shots: { x: number; y: number; ring: number }[], size: number): string => {
     const padding = 30;
