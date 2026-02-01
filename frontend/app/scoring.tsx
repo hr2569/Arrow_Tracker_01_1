@@ -155,14 +155,17 @@ export default function ScoringScreen() {
       if (normalizedDist > 0.3) return 7;
       if (normalizedDist > 0.2) return 8;
       if (normalizedDist > 0.1) return 9;
-      return 10;
+      if (normalizedDist > 0.05) return 10; // Regular 10
+      return 11; // X ring (innermost, counts as 10 points but tracked separately)
     } else {
+      // Vegas 3-spot and NFAA Indoor
       if (normalizedDist > 1.0) return 0;
       if (normalizedDist > 0.8) return 6;
       if (normalizedDist > 0.6) return 7;
       if (normalizedDist > 0.4) return 8;
       if (normalizedDist > 0.2) return 9;
-      return 10;
+      if (normalizedDist > 0.1) return 10; // Regular 10
+      return 11; // X ring
     }
   }, [targetType]);
 
