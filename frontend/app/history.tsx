@@ -473,13 +473,6 @@ export default function HistoryScreen() {
             Competitions {competitions.length > 0 ? `(${competitions.length})` : ''}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.mergeReportButton}
-          onPress={() => router.push('/mergeCompetitions')}
-        >
-          <Ionicons name="git-merge-outline" size={18} color="#FFD700" />
-          <Text style={styles.mergeReportButtonText}>Merge Reports</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Competitions Tab */}
