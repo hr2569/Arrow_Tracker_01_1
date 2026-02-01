@@ -538,7 +538,7 @@ export default function ScoringScreen() {
                   onPress={() => handleUpdateScore(score)}
                 >
                   <Text style={[styles.scoreButtonText, { color: getScoreTextColor(score) }]}>
-                    {score === 10 ? 'X' : score === 0 ? 'M' : score}
+                    {getScoreDisplay(score)}
                   </Text>
                 </TouchableOpacity>
               ))}
