@@ -401,58 +401,109 @@ export default function CompetitionHistory() {
           </View>
         ) : (
           competitions.map((competition) => {
-            // Get unique bow types
-            const bowTypes = [...new Set(competition.archers.map(a => a.bowType))];
-            
-            return (
-              <View key={competition.id} style={styles.competitionCard}>
-                <View style={styles.competitionHeader}>
-                  <View style={styles.competitionInfo}>
-                    <Text style={styles.competitionName}>{competition.name}</Text>
-                    <Text style={styles.competitionDate}>
-                      {new Date(competition.date).toLocaleDateString()}
-                    </Text>
-                    <Text style={styles.competitionMeta}>
-                      {competition.archers.length} archers • {bowTypes.length} categories
-                    </Text>
+            if (competition.source === 'compete') {
+              // Single archer competition from "Compete" flow
+              return (
+                <View key={competition.id} style={styles.competitionCard}>
+                  <View style={styles.sourceTag}>
+                    <Ionicons name="locate" size={12} color="#FFD700" />
+                    <Text style={styles.sourceTagText}>Compete</Text>
                   </View>
+                  <View style={styles.competitionHeader}>
+                    <View style={styles.competitionInfo}>
+                      <Text style={styles.competitionName}>{competition.name}</Text>
+                      <Text style={styles.competitionDate}>
+                        {new Date(competition.date).toLocaleDateString()}
+                      </Text>
+                      <Text style={styles.competitionMeta}>
+                        {competition.archerName} • {competition.bowName || 'No bow'}
+                      </Text>
+                      {competition.targetType && competition.distance && (
+                        <Text style={styles.competitionMeta}>
+                          {TARGET_CONFIGS[competition.targetType as keyof typeof TARGET_CONFIGS]?.name || competition.targetType} • {competition.distance}
+                        </Text>
+                      )}
+                    </View>
+                    <View style={styles.scoreContainer}>
+                      <Text style={styles.totalScoreLabel}>Score</Text>
+                      <Text style={styles.totalScoreValue}>{competition.totalScore}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => handleDeleteCompetition(competition)}
+                    >
+                      <Ionicons name="trash-outline" size={20} color="#ed1c24" />
+                    </TouchableOpacity>
+                  </View>
+
                   <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => deleteCompetition(competition)}
+                    style={styles.pdfButton}
+                    onPress={() => viewCompeteCompetition(competition)}
                   >
-                    <Ionicons name="trash-outline" size={20} color="#ed1c24" />
+                    <Ionicons name="eye" size={18} color="#000" />
+                    <Text style={styles.pdfButtonText}>View Results & PDF</Text>
                   </TouchableOpacity>
                 </View>
+              );
+            } else {
+              // Manual scoring competition (multiple archers)
+              const bowTypes = competition.archers ? [...new Set(competition.archers.map(a => a.bowType))] : [];
+              
+              return (
+                <View key={competition.id} style={styles.competitionCard}>
+                  <View style={[styles.sourceTag, { backgroundColor: '#1a3a1a' }]}>
+                    <Ionicons name="clipboard" size={12} color="#4CAF50" />
+                    <Text style={[styles.sourceTagText, { color: '#4CAF50' }]}>Score Keeping</Text>
+                  </View>
+                  <View style={styles.competitionHeader}>
+                    <View style={styles.competitionInfo}>
+                      <Text style={styles.competitionName}>{competition.name}</Text>
+                      <Text style={styles.competitionDate}>
+                        {new Date(competition.date).toLocaleDateString()}
+                      </Text>
+                      <Text style={styles.competitionMeta}>
+                        {competition.archerCount} archers • {bowTypes.length} categories
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => handleDeleteCompetition(competition)}
+                    >
+                      <Ionicons name="trash-outline" size={20} color="#ed1c24" />
+                    </TouchableOpacity>
+                  </View>
 
-                {/* Bow Type Categories Preview */}
-                <View style={styles.categoriesPreview}>
-                  {bowTypes.map((bowType) => {
-                    const categoryArchers = competition.archers
-                      .filter(a => a.bowType === bowType)
-                      .sort((a, b) => b.totalScore - a.totalScore);
-                    const winner = categoryArchers[0];
-                    
-                    return (
-                      <View key={bowType} style={styles.categoryPreview}>
-                        <Text style={styles.categoryName}>{BOW_TYPES[bowType] || bowType}</Text>
-                        <Text style={styles.categoryWinner}>
-                          🥇 {winner?.name} ({winner?.totalScore})
-                        </Text>
-                      </View>
-                    );
-                  })}
+                  {/* Bow Type Categories Preview */}
+                  {competition.archers && bowTypes.length > 0 && (
+                    <View style={styles.categoriesPreview}>
+                      {bowTypes.map((bowType) => {
+                        const categoryArchers = competition.archers!
+                          .filter(a => a.bowType === bowType)
+                          .sort((a, b) => b.totalScore - a.totalScore);
+                        const winner = categoryArchers[0];
+                        
+                        return (
+                          <View key={bowType} style={styles.categoryPreview}>
+                            <Text style={styles.categoryName}>{BOW_TYPES[bowType] || bowType}</Text>
+                            <Text style={styles.categoryWinner}>
+                              🥇 {winner?.name} ({winner?.totalScore})
+                            </Text>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  )}
+
+                  <TouchableOpacity
+                    style={styles.pdfButton}
+                    onPress={() => regenerateManualPdf(competition)}
+                  >
+                    <Ionicons name="document-text" size={18} color="#000" />
+                    <Text style={styles.pdfButtonText}>View/Download PDF</Text>
+                  </TouchableOpacity>
                 </View>
-
-                {/* Actions */}
-                <TouchableOpacity
-                  style={styles.pdfButton}
-                  onPress={() => regeneratePdf(competition)}
-                >
-                  <Ionicons name="document-text" size={18} color="#000" />
-                  <Text style={styles.pdfButtonText}>View/Download PDF</Text>
-                </TouchableOpacity>
-              </View>
-            );
+              );
+            }
           })
         )}
       </ScrollView>
