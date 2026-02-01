@@ -71,7 +71,11 @@ export default function CompetitionSummaryScreen() {
     text += `👤 Archer: ${archer.name}\n`;
     text += `📅 Date: ${new Date(competition.completedAt || competition.createdAt).toLocaleDateString()}\n`;
     text += `🎯 Target: ${targetConfig?.name || competition.targetType}\n`;
-    text += `📏 Distance: ${competition.distance}\n\n`;
+    text += `📏 Distance: ${competition.distance}\n`;
+    if (archer.bowName) {
+      text += `🏹 Bow: ${archer.bowName}\n`;
+    }
+    text += `\n`;
     
     text += `${'─'.repeat(30)}\n`;
     text += `TOTAL SCORE: ${archer.totalScore}/${maxScore} (${percentage}%)\n`;
