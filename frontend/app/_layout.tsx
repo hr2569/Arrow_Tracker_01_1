@@ -159,6 +159,12 @@ export default function RootLayout() {
             headerShown: false,
           }} 
         />
+        <Stack.Screen 
+          name="competitionHistory" 
+          options={{ 
+            headerShown: false,
+          }} 
+        />
       </Stack>
     </>
   );
