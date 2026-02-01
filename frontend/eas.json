@@ -11,7 +11,8 @@
         "buildType": "apk",
         "withoutCredentials": true
       },
-      "node": "22.12.0"
+      "node": "22.12.0",
+      "config": "custom.yml"
     },
     "preview": {
       "distribution": "internal",
@@ -19,14 +20,16 @@
         "buildType": "apk",
         "withoutCredentials": true
       },
-      "node": "22.12.0"
+      "node": "22.12.0",
+      "config": "custom.yml"
     },
     "production": {
       "android": {
         "buildType": "apk",
         "withoutCredentials": true
       },
-      "node": "22.12.0"
+      "node": "22.12.0",
+      "config": "custom.yml"
     }
   },
   "submit": {
