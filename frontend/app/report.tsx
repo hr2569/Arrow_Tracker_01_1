@@ -1974,12 +1974,6 @@ export default function ReportScreen() {
           </View>
         )}
 
-        {/* Share Button */}
-        <TouchableOpacity style={styles.shareButtonLarge} onPress={handleShare}>
-          <Ionicons name="share-social" size={24} color="#fff" />
-          <Text style={styles.shareButtonText}>Share Report</Text>
-        </TouchableOpacity>
-
         {/* Save PDF Button */}
         <TouchableOpacity style={styles.downloadPdfButton} onPress={handleDownloadPdf}>
           <Ionicons name="download-outline" size={24} color="#fff" />
