@@ -530,6 +530,10 @@ export default function CompetitionSummaryScreen() {
 
       {/* Footer Actions */}
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+          <Ionicons name="share-social" size={20} color="#fff" />
+          <Text style={styles.shareButtonText}>Share</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.reportButton}
           onPress={generateCompetitionReport}
@@ -540,13 +544,12 @@ export default function CompetitionSummaryScreen() {
           ) : (
             <>
               <Ionicons name="download-outline" size={20} color="#000" />
-              <Text style={styles.reportButtonText}>Save Report</Text>
+              <Text style={styles.reportButtonText}>Save PDF</Text>
             </>
           )}
         </TouchableOpacity>
         <TouchableOpacity style={styles.finishButton} onPress={handleFinish}>
           <Ionicons name="home" size={20} color="#fff" />
-          <Text style={styles.finishButtonText}>Done</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
