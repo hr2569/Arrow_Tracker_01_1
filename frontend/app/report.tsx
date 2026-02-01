@@ -1062,7 +1062,7 @@ export default function ReportScreen() {
     `;
   };
 
-  // Handle PDF - create and open with share dialog (Google Drive, etc.)
+  // Handle PDF - create and open directly
   const handleDownloadPdf = async () => {
     if (Platform.OS === 'web') {
       // For web, open in new tab directly
@@ -1076,7 +1076,7 @@ export default function ReportScreen() {
         alert('Failed to open PDF. Please try again.');
       }
     } else {
-      // Mobile - create PDF and open share dialog
+      // Mobile - create PDF and open it directly
       try {
         const html = generatePdfHtml();
         console.log('Generating PDF...');
@@ -1084,17 +1084,11 @@ export default function ReportScreen() {
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
         
-        // Check if sharing is available
-        const isAvailable = await Sharing.isAvailableAsync();
-        if (isAvailable) {
-          // Open share dialog - user can choose Google Drive, email, etc.
-          await Sharing.shareAsync(uri, {
-            mimeType: 'application/pdf',
-            dialogTitle: 'Open PDF with...',
-          });
-        } else {
-          Alert.alert('Error', 'Sharing is not available on this device');
-        }
+        // Open the PDF directly using sharing (opens in default PDF viewer)
+        await Sharing.shareAsync(uri, {
+          mimeType: 'application/pdf',
+          UTI: 'com.adobe.pdf',
+        });
       } catch (error) {
         console.error('PDF error:', error);
         Alert.alert('Error', 'Failed to generate PDF');
