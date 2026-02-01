@@ -345,12 +345,24 @@ export default function MergeCompetitionsScreen() {
 
       const { uri } = await Print.printToFileAsync({ html });
       
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(uri, {
-          mimeType: 'application/pdf',
-          dialogTitle: 'Share Merged Report',
-        });
-      }
+      // Generate filename with date
+      const dateStr = new Date().toISOString().split('T')[0];
+      const filename = `Merged_Report_${dateStr}.pdf`;
+      
+      // Save to documents directory
+      const documentsDir = FileSystem.documentDirectory;
+      const destinationUri = `${documentsDir}${filename}`;
+      
+      await FileSystem.copyAsync({
+        from: uri,
+        to: destinationUri,
+      });
+      
+      Alert.alert(
+        'Report Saved',
+        `Merged report saved as:\n${filename}\n\n${selected.length} competitions combined.`,
+        [{ text: 'OK' }]
+      );
     } catch (error) {
       console.error('Error generating report:', error);
       Alert.alert('Error', 'Failed to generate report. Please try again.');
