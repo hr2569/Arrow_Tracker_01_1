@@ -7,11 +7,11 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/b4062224-2894-434d-805f-21efd4c841d7"
+      "url": "https://u.expo.dev/791e93b9-9927-4998-9877-cd3fce197483"
     },
     "extra": {
       "eas": {
-        "projectId": "b4062224-2894-434d-805f-21efd4c841d7"
+        "projectId": "791e93b9-9927-4998-9877-cd3fce197483"
       }
     },
     "version": "1.0.0",
