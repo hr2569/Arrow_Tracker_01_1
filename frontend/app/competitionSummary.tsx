@@ -367,17 +367,19 @@ export default function CompetitionSummaryScreen() {
             </tr>
           </thead>
           <tbody>
-            ${archer.rounds.map((round, ri) => `
+            ${archer.rounds.map((round, ri) => {
+              const sortedShots = [...round.shots].sort((a, b) => b.ring - a.ring);
+              return `
               <tr>
                 <td><strong>${ri + 1}</strong></td>
-                ${round.shots.map(shot => `
+                ${sortedShots.map(shot => `
                   <td style="background: ${getScoreBgColor(shot.ring)}; color: ${getScoreTextColorHex(shot.ring)}; font-weight: bold;">
                     ${shot.ring === 10 ? 'X' : shot.ring === 0 ? 'M' : shot.ring}
                   </td>
                 `).join('')}
                 <td class="round-total">${round.totalScore}</td>
               </tr>
-            `).join('')}
+            `}).join('')}
             <tr style="background: #8B0000; color: #fff;">
               <td><strong>TOTAL</strong></td>
               <td colspan="3"></td>
