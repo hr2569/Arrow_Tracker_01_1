@@ -136,12 +136,6 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
-          name="mergeCompetitions" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
           name="competitionMenu" 
           options={{ 
             headerShown: false,
