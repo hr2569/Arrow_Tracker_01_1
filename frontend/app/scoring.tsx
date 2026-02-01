@@ -505,7 +505,7 @@ export default function ScoringScreen() {
                   onLongPress={() => handleDeleteArrow(index)}
                 >
                   <Text style={[styles.arrowScore, { color: getScoreTextColor(arrow.score) }]}>
-                    {arrow.score === 10 ? 'X' : arrow.score === 0 ? 'M' : arrow.score}
+                    {getScoreDisplay(arrow.score)}
                   </Text>
                   {isMultiTarget && arrow.targetIndex !== undefined && (
                     <Text style={[styles.arrowTargetLabel, { color: getScoreTextColor(arrow.score) }]}>
