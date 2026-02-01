@@ -3,6 +3,11 @@ build:
   steps:
     - eas/checkout
     - run:
+        name: Install Node
+        command: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+    - run:
         name: Install dependencies
         command: npm install --legacy-peer-deps
     - eas/prebuild
