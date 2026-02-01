@@ -28,7 +28,7 @@ export default function CompetitionMenu() {
 
       {/* Menu Options */}
       <View style={styles.menuContainer}>
-        {/* Shoot Button */}
+        {/* Compete Button */}
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => router.push('/competitionSetup')}
@@ -38,7 +38,7 @@ export default function CompetitionMenu() {
             <Ionicons name="locate" size={40} color="#000" />
           </View>
           <View style={styles.menuTextContainer}>
-            <Text style={styles.menuButtonTitle}>Shoot</Text>
+            <Text style={styles.menuButtonTitle}>Compete</Text>
             <Text style={styles.menuButtonSubtitle}>Start a new competition round</Text>
           </View>
           <Ionicons name="chevron-forward" size={24} color="#FFD700" />
