@@ -399,8 +399,8 @@ export default function ManualScoring() {
         const baseFileName = `${competitionName.replace(/[^a-z0-9]/gi, '_')}_Results`;
         const pdfFileName = baseFileName + '.pdf';
         const jsonFileName = baseFileName + '.arrowtracker.json';
-        const pdfDestination = FileSystem.documentDirectory + pdfFileName;
-        const jsonDestination = FileSystem.documentDirectory + jsonFileName;
+        const pdfDestination = (documentDirectory || '') + pdfFileName;
+        const jsonDestination = (documentDirectory || '') + jsonFileName;
         
         await FileSystem.moveAsync({
           from: uri,
