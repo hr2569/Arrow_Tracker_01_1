@@ -152,18 +152,6 @@ export default function CompetitionSetupScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Competition Name */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Competition Name (Optional)</Text>
-            <TextInput
-              style={styles.textInput}
-              value={competitionName}
-              onChangeText={setCompetitionName}
-              placeholder="e.g., Club Championship 2025"
-              placeholderTextColor="#666"
-            />
-          </View>
-
           {/* Target Type Selection */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Target Face</Text>
