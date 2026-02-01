@@ -109,6 +109,7 @@ export default function CompetitionSummaryScreen() {
   };
 
   const getScoreBgColor = (score: number): string => {
+    if (score === 11) return '#FFD700'; // X ring
     if (score >= 9) return '#FFD700';
     if (score >= 7) return '#ed1c24';
     if (score >= 5) return '#00a2e8';
@@ -118,6 +119,7 @@ export default function CompetitionSummaryScreen() {
   };
 
   const getScoreTextColorHex = (score: number): string => {
+    if (score === 11) return '#000'; // X ring
     if (score >= 9) return '#000';
     if (score >= 7) return '#fff';
     if (score >= 5) return '#fff';
