@@ -193,8 +193,10 @@ export default function HistoryScreen() {
 
   const fetchSessions = async () => {
     try {
-      const data = await getSessions();
-      setSessions(data);
+      const sessionsData = await getSessions();
+      const competitionsData = await getCompetitions();
+      setSessions(sessionsData);
+      setCompetitions(competitionsData.filter(c => c.status === 'completed'));
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
