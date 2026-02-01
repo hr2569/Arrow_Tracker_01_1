@@ -662,7 +662,7 @@ export default function CompetitionSummaryScreen() {
                         style={[styles.arrowBadge, { backgroundColor: getScoreBgColor(shot.ring) }]}
                       >
                         <Text style={[styles.arrowText, { color: getScoreTextColorHex(shot.ring) }]}>
-                          {shot.ring === 10 ? 'X' : shot.ring === 0 ? 'M' : shot.ring}
+                          {shot.ring === 11 ? 'X' : shot.ring === 10 ? '10' : shot.ring === 0 ? 'M' : shot.ring}
                         </Text>
                       </View>
                     ))}
