@@ -230,18 +230,206 @@ export default function CompetitionSummaryScreen() {
     `;
   };
 
+  const generatePdfHtml = () => {
+    if (!competition) return '';
+    
+    const archer = competition.participants[0];
+    const targetConfig = TARGET_CONFIGS[competition.targetType as keyof typeof TARGET_CONFIGS];
+    const allShots = archer.rounds.flatMap(r => r.shots);
+    const maxPossibleScore = competition.maxRounds * competition.arrowsPerRound * 10;
+    
+    const heatmapSvg = generateHeatmapSvg(allShots, 250, competition.targetType);
+    const scatterSvg = generateScatterPlotSvg(allShots, 250);
+
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Competition Report</title>
+        <style>
+          body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            padding: 30px;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #8B0000;
+          }
+          .header h1 {
+            color: #8B0000;
+            margin: 0 0 5px 0;
+            font-size: 28px;
+          }
+          .header .archer-name {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+            margin: 10px 0;
+          }
+          .header .meta {
+            color: #666;
+            font-size: 14px;
+          }
+          .total-score {
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a1a, #333);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+          }
+          .total-score .score {
+            font-size: 64px;
+            font-weight: bold;
+            color: #FFD700;
+          }
+          .total-score .max {
+            font-size: 18px;
+            color: #888;
+          }
+          .rounds-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+          }
+          .rounds-table th {
+            background: #8B0000;
+            color: #fff;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 14px;
+          }
+          .rounds-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+          }
+          .rounds-table tr:nth-child(even) {
+            background: #f9f9f9;
+          }
+          .rounds-table .round-total {
+            font-weight: bold;
+            background: #f0f0f0;
+          }
+          .charts-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+          }
+          .chart-box {
+            text-align: center;
+          }
+          .chart-box h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 16px;
+          }
+          .footer {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🏆 COMPETITION REPORT</h1>
+          <div class="archer-name">${archer.name}</div>
+          <div class="meta">
+            ${competition.name || 'Competition'} • ${new Date(competition.completedAt || competition.createdAt).toLocaleDateString()}<br/>
+            ${targetConfig?.name || competition.targetType} • ${competition.distance}
+          </div>
+        </div>
+
+        <div class="total-score">
+          <div class="score">${archer.totalScore}</div>
+          <div class="max">out of ${maxPossibleScore} (${Math.round((archer.totalScore / maxPossibleScore) * 100)}%)</div>
+        </div>
+
+        <table class="rounds-table">
+          <thead>
+            <tr>
+              <th>Round</th>
+              <th>Arrow 1</th>
+              <th>Arrow 2</th>
+              <th>Arrow 3</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${archer.rounds.map((round, ri) => `
+              <tr>
+                <td><strong>${ri + 1}</strong></td>
+                ${round.shots.map(shot => `
+                  <td style="background: ${getScoreBgColor(shot.ring)}; color: ${getScoreTextColorHex(shot.ring)}; font-weight: bold;">
+                    ${shot.ring === 10 ? 'X' : shot.ring === 0 ? 'M' : shot.ring}
+                  </td>
+                `).join('')}
+                <td class="round-total">${round.totalScore}</td>
+              </tr>
+            `).join('')}
+            <tr style="background: #8B0000; color: #fff;">
+              <td><strong>TOTAL</strong></td>
+              <td colspan="3"></td>
+              <td><strong>${archer.totalScore}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="charts-container">
+          <div class="chart-box">
+            <h3>Heat Map</h3>
+            ${heatmapSvg}
+          </div>
+          <div class="chart-box">
+            <h3>Shot Distribution</h3>
+            ${scatterSvg}
+          </div>
+        </div>
+
+        <div class="footer">
+          Generated by Arrow Tracker • ${new Date().toLocaleString()}
+        </div>
+      </body>
+      </html>
+    `;
+  };
+
   const generateCompetitionReport = async () => {
     if (!competition) return;
 
     setGenerating(true);
+    
+    if (Platform.OS === 'web') {
+      // For web, open in new tab directly
+      try {
+        const html = generatePdfHtml();
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } catch (error) {
+        console.error('Web PDF error:', error);
+        alert('Failed to open PDF. Please try again.');
+      } finally {
+        setGenerating(false);
+      }
+      return;
+    }
+
+    // Mobile - save directly
     try {
       const archer = competition.participants[0];
-      const targetConfig = TARGET_CONFIGS[competition.targetType as keyof typeof TARGET_CONFIGS];
-      const allShots = archer.rounds.flatMap(r => r.shots);
-      const maxPossibleScore = competition.maxRounds * competition.arrowsPerRound * 10;
-      
-      const heatmapSvg = generateHeatmapSvg(allShots, 250, competition.targetType);
-      const scatterSvg = generateScatterPlotSvg(allShots, 250);
+      const html = generatePdfHtml();
 
       const html = `
         <!DOCTYPE html>
