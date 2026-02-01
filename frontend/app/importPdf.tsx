@@ -69,14 +69,14 @@ export default function ImportPdf() {
     if (Platform.OS === 'web') return;
     
     try {
-      const files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory || '');
+      const files = await FileSystem.readDirectoryAsync((documentDirectory || '') || '');
       const arrowTrackerFiles = files.filter(f => f.endsWith('.arrowtracker.json'));
       
       const loadedFiles: ImportedFile[] = [];
       for (const fileName of arrowTrackerFiles) {
         try {
           const content = await FileSystem.readAsStringAsync(
-            FileSystem.documentDirectory + fileName
+            (documentDirectory || '') + fileName
           );
           const data = JSON.parse(content) as ImportedCompetition;
           if (data.type === 'arrowtracker_competition') {
@@ -405,8 +405,8 @@ export default function ImportPdf() {
         const baseFileName = `${newCompetitionName.replace(/[^a-z0-9]/gi, '_')}_Results`;
         const pdfFileName = baseFileName + '.pdf';
         const jsonFileName = baseFileName + '.arrowtracker.json';
-        const pdfDestination = FileSystem.documentDirectory + pdfFileName;
-        const jsonDestination = FileSystem.documentDirectory + jsonFileName;
+        const pdfDestination = (documentDirectory || '') + pdfFileName;
+        const jsonDestination = (documentDirectory || '') + jsonFileName;
         
         await FileSystem.moveAsync({
           from: uri,
