@@ -21,6 +21,7 @@ import {
 } from '../utils/competitionStorage';
 import * as Print from 'expo-print';
 import * as FileSystem from '../utils/fileSystemCompat';
+import { documentDirectory } from '../utils/fileSystemCompat';
 import { TARGET_CONFIGS } from '../store/appStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
