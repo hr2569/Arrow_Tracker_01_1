@@ -347,7 +347,7 @@ export default function CompetitionHistory() {
       } else {
         const { uri } = await Print.printToFileAsync({ html });
         const fileName = `${competition.name.replace(/[^a-z0-9]/gi, '_')}_Results.pdf`;
-        const destinationUri = FileSystem.documentDirectory + fileName;
+        const destinationUri = (documentDirectory || '') + fileName;
         
         await FileSystem.moveAsync({
           from: uri,
