@@ -13,7 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from '../utils/fileSystemLegacy';
 import * as Print from 'expo-print';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
