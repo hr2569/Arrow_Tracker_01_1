@@ -538,7 +538,7 @@ export default function CompetitionSummaryScreen() {
         
         // Try to get content URI and open with IntentLauncher (only works in native build)
         try {
-          const contentUri = await FileSystem.getContentUriAsync(uri);
+          const contentUri = await getContentUriAsync(uri);
           console.log('Content URI:', contentUri);
           
           // Try to open directly in Google Drive
