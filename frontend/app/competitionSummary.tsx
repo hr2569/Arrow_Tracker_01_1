@@ -7,6 +7,7 @@ import {
   ScrollView,
   Alert,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -18,7 +19,7 @@ import {
   Competition,
 } from '../utils/competitionStorage';
 import * as Print from 'expo-print';
-import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 import { TARGET_CONFIGS } from '../store/appStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
