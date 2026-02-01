@@ -382,7 +382,7 @@ export default function CompetitionScoringScreen() {
                 onPress={() => handleEditArrow(globalIndex)}
               >
                 <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
-                  {arrow.score === 10 ? 'X' : arrow.score === 0 ? 'M' : arrow.score}
+                  {getScoreDisplay(arrow.score)}
                 </Text>
               </TouchableOpacity>
             );
@@ -577,7 +577,7 @@ export default function CompetitionScoringScreen() {
                     onLongPress={() => handleDeleteArrow(index)}
                   >
                     <Text style={[styles.arrowScore, { color: getScoreTextColor(arrow.score) }]}>
-                      {arrow.score === 10 ? 'X' : arrow.score === 0 ? 'M' : arrow.score}
+                      {getScoreDisplay(arrow.score)}
                     </Text>
                   </TouchableOpacity>
                 ) : (
