@@ -580,23 +580,17 @@ export default function CompetitionSummaryScreen() {
       return;
     }
 
-    // Mobile - create PDF and open share dialog
+    // Mobile - create PDF and open it directly
     try {
       const html = generatePdfHtml();
 
       const { uri } = await Print.printToFileAsync({ html });
       
-      // Check if sharing is available
-      const isAvailable = await Sharing.isAvailableAsync();
-      if (isAvailable) {
-        // Open share dialog - user can choose Google Drive, email, etc.
-        await Sharing.shareAsync(uri, {
-          mimeType: 'application/pdf',
-          dialogTitle: 'Open PDF with...',
-        });
-      } else {
-        Alert.alert('Error', 'Sharing is not available on this device');
-      }
+      // Open the PDF directly using sharing (opens in default PDF viewer)
+      await Sharing.shareAsync(uri, {
+        mimeType: 'application/pdf',
+        UTI: 'com.adobe.pdf',
+      });
     } catch (error) {
       console.error('Error generating report:', error);
       Alert.alert('Error', 'Failed to generate report. Please try again.');
