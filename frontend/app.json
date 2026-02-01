@@ -19,7 +19,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "arrowtracker",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "platforms": ["android", "web"],
     "web": {
       "bundler": "metro",
