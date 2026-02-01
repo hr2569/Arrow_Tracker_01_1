@@ -650,7 +650,7 @@ export default function ManualScoring() {
                 <View style={styles.roundPreview}>
                   <Text style={styles.roundPreviewLabel}>Round Total:</Text>
                   <Text style={styles.roundPreviewValue}>
-                    {currentArrowScores.reduce((sum, s) => sum + (s !== null ? getPointValue(s) : 0), 0)}
+                    {currentArrowScores.reduce((sum: number, s) => sum + (s !== null ? getPointValue(s) : 0), 0)}
                   </Text>
                 </View>
 
