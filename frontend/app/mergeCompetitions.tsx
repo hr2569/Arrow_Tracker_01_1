@@ -463,12 +463,12 @@ export default function MergeCompetitionsScreen() {
               disabled={selectedIds.size < 2 || generating}
             >
               {generating ? (
-                <Text style={styles.generateButtonText}>Generating...</Text>
+                <Text style={styles.generateButtonText}>Saving...</Text>
               ) : (
                 <>
-                  <Ionicons name="document-text" size={20} color={selectedIds.size >= 2 ? '#000' : '#666'} />
+                  <Ionicons name="download-outline" size={20} color={selectedIds.size >= 2 ? '#000' : '#666'} />
                   <Text style={[styles.generateButtonText, selectedIds.size < 2 && styles.generateButtonTextDisabled]}>
-                    Generate Merged Report ({selectedIds.size} selected)
+                    Save Merged Report ({selectedIds.size} selected)
                   </Text>
                 </>
               )}
