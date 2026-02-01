@@ -524,24 +524,28 @@ export default function CompetitionSummaryScreen() {
               <Text style={styles.roundsHeaderText}>Arrows</Text>
               <Text style={styles.roundsHeaderText}>Total</Text>
             </View>
-            {archer.rounds.map((round, ri) => (
-              <View key={ri} style={styles.roundRow}>
-                <Text style={styles.roundNumber}>{ri + 1}</Text>
-                <View style={styles.roundArrows}>
-                  {round.shots.map((shot, si) => (
-                    <View
-                      key={si}
-                      style={[styles.arrowBadge, { backgroundColor: getScoreBgColor(shot.ring) }]}
-                    >
-                      <Text style={[styles.arrowText, { color: getScoreTextColorHex(shot.ring) }]}>
-                        {shot.ring === 10 ? 'X' : shot.ring === 0 ? 'M' : shot.ring}
-                      </Text>
-                    </View>
-                  ))}
+            {archer.rounds.map((round, ri) => {
+              // Sort shots from highest to lowest score for display
+              const sortedShots = [...round.shots].sort((a, b) => b.ring - a.ring);
+              return (
+                <View key={ri} style={styles.roundRow}>
+                  <Text style={styles.roundNumber}>{ri + 1}</Text>
+                  <View style={styles.roundArrows}>
+                    {sortedShots.map((shot, si) => (
+                      <View
+                        key={si}
+                        style={[styles.arrowBadge, { backgroundColor: getScoreBgColor(shot.ring) }]}
+                      >
+                        <Text style={[styles.arrowText, { color: getScoreTextColorHex(shot.ring) }]}>
+                          {shot.ring === 10 ? 'X' : shot.ring === 0 ? 'M' : shot.ring}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                  <Text style={styles.roundTotal}>{round.totalScore}</Text>
                 </View>
-                <Text style={styles.roundTotal}>{round.totalScore}</Text>
-              </View>
-            ))}
+              );
+            })}
           </View>
         </View>
       </ScrollView>
