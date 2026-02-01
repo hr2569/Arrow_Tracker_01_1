@@ -59,6 +59,22 @@ export default function CompetitionMenu() {
           </View>
           <Ionicons name="chevron-forward" size={24} color="#FFD700" />
         </TouchableOpacity>
+
+        {/* Competition History Button */}
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => router.push('/competitionHistory')}
+          activeOpacity={0.8}
+        >
+          <View style={[styles.menuIconContainer, { backgroundColor: '#2a2a3a' }]}>
+            <Ionicons name="time" size={40} color="#9C27B0" />
+          </View>
+          <View style={styles.menuTextContainer}>
+            <Text style={styles.menuButtonTitle}>Competition History</Text>
+            <Text style={styles.menuButtonSubtitle}>View past competition results</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#FFD700" />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
