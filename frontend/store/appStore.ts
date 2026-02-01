@@ -39,10 +39,11 @@ export const TARGET_CONFIGS = {
     description: '10-ring World Archery target',
     rings: 10,
     maxScore: 10,
-    // Ring scores from outside to inside (ring 1 = outermost, ring 10 = innermost)
+    hasXRing: true,
+    // Ring scores from outside to inside (ring 1 = outermost, ring 10 = innermost, X = inner 10)
     scores: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     // Ring colors from outside to inside (2 rings per color zone)
-    // White: 1-2, Black: 3-4, Blue: 5-6, Red: 7-8, Gold: 9-10
+    // White: 1-2, Black: 3-4, Blue: 5-6, Red: 7-8, Gold: 9-10, X (inner gold)
     colors: [
       { bg: '#f5f5f0', border: '#333' },     // Ring 1 - White
       { bg: '#f5f5f0', border: '#333' },     // Ring 2 - White
@@ -53,8 +54,9 @@ export const TARGET_CONFIGS = {
       { bg: '#ed1c24', border: '#b31217' },  // Ring 7 - Red
       { bg: '#ed1c24', border: '#b31217' },  // Ring 8 - Red
       { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
-      { bg: '#fff200', border: '#ccaa00' },  // Ring 10 - Gold (X)
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 10 - Gold
     ],
+    xRingColor: { bg: '#fff200', border: '#b8860b' }, // X ring - Gold with darker border
     layout: 'single',
   },
   vegas_3spot: {
@@ -62,6 +64,7 @@ export const TARGET_CONFIGS = {
     description: 'Indoor 3-spot triangle',
     rings: 5,
     maxScore: 10,
+    hasXRing: true,
     // Scores: Blue=6, Red outer=7, Red inner=8, Gold outer=9, Gold center=10
     scores: [6, 7, 8, 9, 10],
     // Colors from outside to inside: Blue → Red → Gold
@@ -70,16 +73,17 @@ export const TARGET_CONFIGS = {
       { bg: '#ed1c24', border: '#b31217' },  // Ring 7 - Red
       { bg: '#ed1c24', border: '#b31217' },  // Ring 8 - Red
       { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
-      { bg: '#fff200', border: '#ccaa00' },  // Ring 10/X - Gold center
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 10 - Gold center
     ],
+    xRingColor: { bg: '#fff200', border: '#b8860b' }, // X ring
     layout: 'triple_vertical',
-    hasXRing: true,
   },
   nfaa_indoor: {
     name: 'NFAA Indoor',
     description: '3-spot vertical strip',
     rings: 5,
     maxScore: 10,
+    hasXRing: true,
     // Same scoring: Blue=6, Red=7-8, Gold=9-10
     scores: [6, 7, 8, 9, 10],
     // Colors from outside to inside: Blue → Red → Gold
@@ -88,10 +92,10 @@ export const TARGET_CONFIGS = {
       { bg: '#ed1c24', border: '#b31217' },  // Ring 7 - Red
       { bg: '#ed1c24', border: '#b31217' },  // Ring 8 - Red
       { bg: '#fff200', border: '#ccaa00' },  // Ring 9 - Gold
-      { bg: '#fff200', border: '#ccaa00' },  // Ring 10/X - Gold center
+      { bg: '#fff200', border: '#ccaa00' },  // Ring 10 - Gold center
     ],
+    xRingColor: { bg: '#fff200', border: '#b8860b' }, // X ring
     layout: 'triple_vertical',
-    hasXRing: true,
   },
 };
 
