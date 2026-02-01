@@ -286,56 +286,90 @@ export default function CompetitionSummaryScreen() {
     `;
   };
 
+  // Generate Cartesian scatter plot SVG showing shot positions - matching session report style
   const generateScatterPlotSvg = (shots: { x: number; y: number; ring: number }[], size: number): string => {
-    const padding = 30;
+    const padding = 60;
     const plotSize = size - padding * 2;
+    const center = size / 2;
+    
+    if (shots.length === 0) {
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+          <rect x="${padding}" y="${padding}" width="${plotSize}" height="${plotSize}" fill="#fafafa" stroke="#ccc" stroke-width="1" />
+          <text x="${center}" y="${center}" text-anchor="middle" fill="#666" font-size="14">No shot data</text>
+        </svg>
+      `;
+    }
     
     // Grid lines
-    let gridSvg = '';
-    for (let i = 0; i <= 4; i++) {
-      const pos = padding + (plotSize / 4) * i;
-      gridSvg += `
-        <line x1="${padding}" y1="${pos}" x2="${size - padding}" y2="${pos}" stroke="#333" stroke-width="1"/>
-        <line x1="${pos}" y1="${padding}" x2="${pos}" y2="${size - padding}" stroke="#333" stroke-width="1"/>
-      `;
+    let gridLines = '';
+    const gridCount = 10;
+    const gridStep = plotSize / gridCount;
+    
+    for (let i = 0; i <= gridCount; i++) {
+      const pos = padding + i * gridStep;
+      const opacity = i === gridCount / 2 ? 0.8 : 0.2;
+      const strokeWidth = i === gridCount / 2 ? 2 : 1;
+      gridLines += `<line x1="${pos}" y1="${padding}" x2="${pos}" y2="${size - padding}" stroke="#888" stroke-width="${strokeWidth}" opacity="${opacity}" />`;
+      gridLines += `<line x1="${padding}" y1="${pos}" x2="${size - padding}" y2="${pos}" stroke="#888" stroke-width="${strokeWidth}" opacity="${opacity}" />`;
     }
     
-    // Axes
-    const axisSvg = `
-      <line x1="${padding}" y1="${size - padding}" x2="${size - padding}" y2="${size - padding}" stroke="#666" stroke-width="2"/>
-      <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${size - padding}" stroke="#666" stroke-width="2"/>
-      <text x="${size/2}" y="${size - 5}" text-anchor="middle" fill="#888" font-size="10">Horizontal</text>
-      <text x="10" y="${size/2}" text-anchor="middle" fill="#888" font-size="10" transform="rotate(-90, 10, ${size/2})">Vertical</text>
-    `;
+    // Axis labels
+    let axisLabels = '';
+    const labelStep = 2;
+    for (let i = 0; i <= gridCount; i += labelStep) {
+      const pos = padding + i * gridStep;
+      const value = ((i - gridCount / 2) / (gridCount / 2)).toFixed(1);
+      axisLabels += `<text x="${pos}" y="${size - padding + 20}" text-anchor="middle" font-size="12" fill="#333">${value}</text>`;
+      const yValue = (-(i - gridCount / 2) / (gridCount / 2)).toFixed(1);
+      axisLabels += `<text x="${padding - 10}" y="${pos + 4}" text-anchor="end" font-size="12" fill="#333">${yValue}</text>`;
+    }
     
-    // Plot shots
-    let shotsSvg = '';
-    shots.forEach(shot => {
-      const cx = padding + shot.x * plotSize;
-      const cy = padding + shot.y * plotSize;
-      shotsSvg += `
-        <circle cx="${cx}" cy="${cy}" r="4" fill="#ed1c24" stroke="#000" stroke-width="1"/>
-      `;
+    // Plot shots as dots with color based on ring score
+    let shotDots = '';
+    shots.forEach((shot) => {
+      const normalizedX = (shot.x - 0.5) * 2;
+      const normalizedY = (shot.y - 0.5) * 2;
+      const svgX = center + normalizedX * (plotSize / 2);
+      const svgY = center + normalizedY * (plotSize / 2);
+      
+      let dotColor = '#00a2e8';
+      if (shot.ring >= 9 || shot.ring === 11) dotColor = '#FFD700';
+      else if (shot.ring >= 7) dotColor = '#ed1c24';
+      
+      shotDots += `<circle cx="${svgX}" cy="${svgY}" r="5" fill="${dotColor}" stroke="#000" stroke-width="1" opacity="0.85" />`;
     });
     
-    // Mean POI
-    if (shots.length > 0) {
-      const meanX = padding + (shots.reduce((sum, s) => sum + s.x, 0) / shots.length) * plotSize;
-      const meanY = padding + (shots.reduce((sum, s) => sum + s.y, 0) / shots.length) * plotSize;
-      shotsSvg += `
-        <circle cx="${meanX}" cy="${meanY}" r="6" fill="none" stroke="#00ff00" stroke-width="2"/>
-        <line x1="${meanX - 8}" y1="${meanY}" x2="${meanX + 8}" y2="${meanY}" stroke="#00ff00" stroke-width="2"/>
-        <line x1="${meanX}" y1="${meanY - 8}" x2="${meanX}" y2="${meanY + 8}" stroke="#00ff00" stroke-width="2"/>
-      `;
-    }
+    // Calculate mean point of impact
+    const avgX = shots.reduce((sum, s) => sum + (s.x - 0.5) * 2, 0) / shots.length;
+    const avgY = shots.reduce((sum, s) => sum + (s.y - 0.5) * 2, 0) / shots.length;
+    const avgSvgX = center + avgX * (plotSize / 2);
+    const avgSvgY = center + avgY * (plotSize / 2);
+    
+    const meanMarker = `
+      <circle cx="${avgSvgX}" cy="${avgSvgY}" r="10" fill="none" stroke="#8B0000" stroke-width="3" />
+      <line x1="${avgSvgX - 15}" y1="${avgSvgY}" x2="${avgSvgX + 15}" y2="${avgSvgY}" stroke="#8B0000" stroke-width="2" />
+      <line x1="${avgSvgX}" y1="${avgSvgY - 15}" x2="${avgSvgX}" y2="${avgSvgY + 15}" stroke="#8B0000" stroke-width="2" />
+    `;
     
     return `
-      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-        <rect x="${padding}" y="${padding}" width="${plotSize}" height="${plotSize}" fill="#111" stroke="#333"/>
-        ${gridSvg}
-        ${axisSvg}
-        ${shotsSvg}
-        <text x="${size/2}" y="${padding - 10}" text-anchor="middle" fill="#FFD700" font-size="12" font-weight="bold">Shot Distribution</text>
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+        <rect x="${padding}" y="${padding}" width="${plotSize}" height="${plotSize}" fill="#fafafa" stroke="#ccc" stroke-width="1" />
+        ${gridLines}
+        ${axisLabels}
+        <text x="${center}" y="${size - 15}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Horizontal (Left/Right)</text>
+        <text x="15" y="${center}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333" transform="rotate(-90, 15, ${center})">Vertical (Up/Down)</text>
+        ${shotDots}
+        ${meanMarker}
+        <rect x="${size - 130}" y="${padding + 10}" width="120" height="90" fill="white" stroke="#ccc" rx="4" />
+        <text x="${size - 120}" y="${padding + 28}" font-size="11" font-weight="bold" fill="#333">Legend</text>
+        <circle cx="${size - 115}" cy="${padding + 45}" r="5" fill="#FFD700" stroke="#000" stroke-width="1" />
+        <text x="${size - 105}" y="${padding + 49}" font-size="10" fill="#333">9-X (Gold)</text>
+        <circle cx="${size - 115}" cy="${padding + 62}" r="5" fill="#ed1c24" stroke="#000" stroke-width="1" />
+        <text x="${size - 105}" y="${padding + 66}" font-size="10" fill="#333">7-8 (Red)</text>
+        <circle cx="${size - 115}" cy="${padding + 79}" r="5" fill="#00a2e8" stroke="#000" stroke-width="1" />
+        <text x="${size - 105}" y="${padding + 83}" font-size="10" fill="#333">≤6 (Blue)</text>
+        <text x="${size - 120}" y="${padding + 95}" font-size="9" fill="#8B0000">● Mean POI: (${avgX.toFixed(2)}, ${(-avgY).toFixed(2)})</text>
       </svg>
     `;
   };
@@ -348,8 +382,9 @@ export default function CompetitionSummaryScreen() {
     const allShots = archer.rounds.flatMap(r => r.shots);
     const maxPossibleScore = competition.maxRounds * competition.arrowsPerRound * 10;
     
-    const heatmapSvg = generateHeatmapSvg(allShots, 250, competition.targetType);
-    const scatterSvg = generateScatterPlotSvg(allShots, 250);
+    // Use larger sizes to match session reports
+    const heatmapSvg = generateHeatmapSvg(allShots, 500, competition.targetType);
+    const scatterSvg = generateScatterPlotSvg(allShots, 500);
 
     return `
       <!DOCTYPE html>
