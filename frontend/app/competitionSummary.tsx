@@ -20,7 +20,7 @@ import {
   Competition,
 } from '../utils/competitionStorage';
 import * as Print from 'expo-print';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/build/legacy/FileSystem';
 import { TARGET_CONFIGS } from '../store/appStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
