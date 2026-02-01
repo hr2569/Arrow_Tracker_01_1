@@ -216,7 +216,7 @@ export default function MergeCompetitionsScreen() {
         byBowType[bowType].sort((a, b) => b.score - a.score);
       });
 
-      const html = `
+      const generateHtml = () => `
         <!DOCTYPE html>
         <html>
         <head>
