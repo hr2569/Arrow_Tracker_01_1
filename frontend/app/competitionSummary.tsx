@@ -528,7 +528,7 @@ export default function CompetitionSummaryScreen() {
     }
     
     if (Platform.OS === 'android') {
-      // Android - open directly in Google Drive
+      // Android - try to open directly in Google Drive, fall back to share sheet
       try {
         const html = generatePdfHtml();
         console.log('Generating PDF...');
@@ -536,37 +536,29 @@ export default function CompetitionSummaryScreen() {
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
         
-        // Get content URI for Android
-        const contentUri = await FileSystem.getContentUriAsync(uri);
-        console.log('Content URI:', contentUri);
-        
-        // Try to open directly in Google Drive
+        // Try to get content URI and open with IntentLauncher (only works in native build)
         try {
+          const contentUri = await FileSystem.getContentUriAsync(uri);
+          console.log('Content URI:', contentUri);
+          
+          // Try to open directly in Google Drive
           await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
             data: contentUri,
             flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
             type: 'application/pdf',
             packageName: 'com.google.android.apps.docs',
           });
-        } catch (driveError) {
-          console.log('Google Drive not available, trying default viewer...');
-          // Fallback to any PDF viewer
-          try {
-            await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-              data: contentUri,
-              flags: 1,
-              type: 'application/pdf',
+        } catch (intentError) {
+          console.log('IntentLauncher failed (likely Expo Go), using share sheet...', intentError);
+          // Fall back to share sheet (works in Expo Go and native)
+          const isAvailable = await Sharing.isAvailableAsync();
+          if (isAvailable) {
+            await Sharing.shareAsync(uri, {
+              mimeType: 'application/pdf',
+              dialogTitle: 'Open Report',
             });
-          } catch (viewerError) {
-            console.log('No PDF viewer, using share sheet...');
-            // Last resort - share sheet
-            const isAvailable = await Sharing.isAvailableAsync();
-            if (isAvailable) {
-              await Sharing.shareAsync(uri, {
-                mimeType: 'application/pdf',
-                dialogTitle: 'Open Report',
-              });
-            }
+          } else {
+            Alert.alert('Error', 'Sharing not available on this device');
           }
         }
       } catch (error) {
