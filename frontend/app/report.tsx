@@ -1064,7 +1064,7 @@ export default function ReportScreen() {
     `;
   };
 
-  // Handle PDF - save directly to device
+  // Handle PDF - create and open with share dialog (Google Drive, etc.)
   const handleDownloadPdf = async () => {
     if (Platform.OS === 'web') {
       // For web, open in new tab directly
@@ -1078,7 +1078,7 @@ export default function ReportScreen() {
         alert('Failed to open PDF. Please try again.');
       }
     } else {
-      // Mobile - save directly
+      // Mobile - create PDF and open share dialog
       try {
         const html = generatePdfHtml();
         console.log('Generating PDF...');
@@ -1086,24 +1086,17 @@ export default function ReportScreen() {
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
         
-        // Generate filename with date
-        const dateStr = new Date().toISOString().split('T')[0];
-        const filename = `Session_Report_${dateStr}.pdf`;
-        
-        // Save to documents directory
-        const documentsDir = (FileSystem.documentDirectory || '');
-        const destinationUri = `${documentsDir}${filename}`;
-        
-        await FileSystem.copyAsync({
-          from: uri,
-          to: destinationUri,
-        });
-        
-        Alert.alert(
-          'Report Saved',
-          `Session report saved as:\n${filename}`,
-          [{ text: 'OK' }]
-        );
+        // Check if sharing is available
+        const isAvailable = await Sharing.isAvailableAsync();
+        if (isAvailable) {
+          // Open share dialog - user can choose Google Drive, email, etc.
+          await Sharing.shareAsync(uri, {
+            mimeType: 'application/pdf',
+            dialogTitle: 'Open PDF with...',
+          });
+        } else {
+          Alert.alert('Error', 'Sharing is not available on this device');
+        }
       } catch (error) {
         console.error('PDF error:', error);
         Alert.alert('Error', 'Failed to generate PDF');
