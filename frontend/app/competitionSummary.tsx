@@ -131,6 +131,103 @@ export default function CompetitionSummaryScreen() {
     const rings = targetConfig?.rings || 10;
     const colors = targetConfig?.colors || [];
     
+    // If no shots, show empty target
+    if (shots.length === 0) {
+      let ringsSvg = '';
+      for (let i = 0; i < rings; i++) {
+        const ringRatio = (rings - i) / rings;
+        const ringSize = size * ringRatio * 0.95;
+        const color = colors[i];
+        ringsSvg += `
+          <circle 
+            cx="${size/2}" 
+            cy="${size/2}" 
+            r="${ringSize/2}" 
+            fill="${color?.bg || '#f5f5f0'}" 
+            stroke="${color?.border || '#333'}" 
+            stroke-width="1"
+          />
+        `;
+      }
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+          ${ringsSvg}
+          <text x="${size/2}" y="${size/2}" text-anchor="middle" fill="#666" font-size="14">No shots recorded</text>
+        </svg>
+      `;
+    }
+    
+    // Create density grid for heatmap
+    const gridSize = 50;
+    const cellSize = size / gridSize;
+    const densityGrid: number[][] = [];
+    for (let i = 0; i < gridSize; i++) {
+      densityGrid[i] = [];
+      for (let j = 0; j < gridSize; j++) {
+        densityGrid[i][j] = 0;
+      }
+    }
+    
+    // Calculate density with blur
+    shots.forEach((shot) => {
+      const gridX = Math.floor(shot.x * gridSize);
+      const gridY = Math.floor(shot.y * gridSize);
+      
+      const blurRadius = 6;
+      for (let dx = -blurRadius; dx <= blurRadius; dx++) {
+        for (let dy = -blurRadius; dy <= blurRadius; dy++) {
+          const nx = gridX + dx;
+          const ny = gridY + dy;
+          if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const weight = Math.exp(-distance * distance / 8);
+            densityGrid[ny][nx] += weight;
+          }
+        }
+      }
+    });
+    
+    let maxDensity = 0;
+    densityGrid.forEach(row => {
+      row.forEach(val => {
+        if (val > maxDensity) maxDensity = val;
+      });
+    });
+    
+    // Color function
+    const getHeatColor = (normalizedValue: number) => {
+      if (normalizedValue === 0) return null;
+      
+      const colors = [
+        { pos: 0, r: 0, g: 200, b: 0 },
+        { pos: 0.33, r: 255, g: 255, b: 0 },
+        { pos: 0.66, r: 255, g: 165, b: 0 },
+        { pos: 1, r: 255, g: 0, b: 0 },
+      ];
+      
+      let lower = colors[0];
+      let upper = colors[colors.length - 1];
+      
+      for (let i = 0; i < colors.length - 1; i++) {
+        if (normalizedValue >= colors[i].pos && normalizedValue <= colors[i + 1].pos) {
+          lower = colors[i];
+          upper = colors[i + 1];
+          break;
+        }
+      }
+      
+      const range = upper.pos - lower.pos;
+      const t = range === 0 ? 0 : (normalizedValue - lower.pos) / range;
+      
+      const r = Math.round(lower.r + t * (upper.r - lower.r));
+      const g = Math.round(lower.g + t * (upper.g - lower.g));
+      const b = Math.round(lower.b + t * (upper.b - lower.b));
+      const opacity = 0.3 + normalizedValue * 0.5;
+      
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    };
+    
+    // Generate target rings SVG
     let ringsSvg = '';
     for (let i = 0; i < rings; i++) {
       const ringRatio = (rings - i) / rings;
@@ -148,12 +245,37 @@ export default function CompetitionSummaryScreen() {
       `;
     }
     
+    // Generate heatmap cells
+    let heatmapSvg = '';
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
+        const density = densityGrid[y][x];
+        if (density > 0) {
+          const normalizedDensity = maxDensity > 0 ? density / maxDensity : 0;
+          const heatColor = getHeatColor(normalizedDensity);
+          if (heatColor) {
+            const cellX = x * cellSize;
+            const cellY = y * cellSize;
+            // Only draw within target circle
+            const distFromCenter = Math.sqrt(
+              Math.pow(cellX + cellSize/2 - size/2, 2) + 
+              Math.pow(cellY + cellSize/2 - size/2, 2)
+            );
+            if (distFromCenter < size * 0.475) {
+              heatmapSvg += `<rect x="${cellX}" y="${cellY}" width="${cellSize + 1}" height="${cellSize + 1}" fill="${heatColor}" />`;
+            }
+          }
+        }
+      }
+    }
+    
+    // Generate shot markers
     let shotsSvg = '';
     shots.forEach(shot => {
       const cx = shot.x * size;
       const cy = shot.y * size;
       shotsSvg += `
-        <circle cx="${cx}" cy="${cy}" r="5" fill="rgba(255,0,0,0.8)" stroke="#000" stroke-width="1"/>
+        <circle cx="${cx}" cy="${cy}" r="4" fill="rgba(255,255,255,0.9)" stroke="#000" stroke-width="1"/>
       `;
     });
     
@@ -169,8 +291,9 @@ export default function CompetitionSummaryScreen() {
     }
     
     return `
-      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
         ${ringsSvg}
+        ${heatmapSvg}
         ${shotsSvg}
       </svg>
     `;
