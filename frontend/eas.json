@@ -17,16 +17,20 @@
       "android": {
         "buildType": "apk",
         "withoutCredentials": true
-      }
+      },
+      "node": "18.18.0"
     },
     "production": {
       "android": {
         "buildType": "apk",
         "withoutCredentials": true
-      }
+      },
+      "node": "18.18.0"
     }
   },
   "submit": {
     "production": {}
-  }
+  },
+  "build.preview.env": {},
+  "build.production.env": {}
 }
