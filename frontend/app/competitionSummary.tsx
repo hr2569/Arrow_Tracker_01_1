@@ -483,11 +483,11 @@ export default function CompetitionSummaryScreen() {
           disabled={generating}
         >
           {generating ? (
-            <Text style={styles.reportButtonText}>Generating...</Text>
+            <Text style={styles.reportButtonText}>Saving...</Text>
           ) : (
             <>
-              <Ionicons name="share-outline" size={20} color="#000" />
-              <Text style={styles.reportButtonText}>Share Report</Text>
+              <Ionicons name="download-outline" size={20} color="#000" />
+              <Text style={styles.reportButtonText}>Save Report</Text>
             </>
           )}
         </TouchableOpacity>
