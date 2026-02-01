@@ -582,32 +582,23 @@ export default function CompetitionSummaryScreen() {
       return;
     }
 
-    // Mobile - save directly
+    // Mobile - create PDF and open share dialog
     try {
-      const archer = competition.participants[0];
       const html = generatePdfHtml();
 
       const { uri } = await Print.printToFileAsync({ html });
       
-      // Generate filename with date and archer name
-      const dateStr = new Date().toISOString().split('T')[0];
-      const archerNameClean = archer.name.replace(/[^a-zA-Z0-9]/g, '_');
-      const filename = `Competition_${archerNameClean}_${dateStr}.pdf`;
-      
-      // Save to documents directory
-      const documentsDir = FileSystem.documentDirectory;
-      const destinationUri = `${documentsDir}${filename}`;
-      
-      await FileSystem.copyAsync({
-        from: uri,
-        to: destinationUri,
-      });
-      
-      Alert.alert(
-        'Report Saved',
-        `Competition report saved as:\n${filename}`,
-        [{ text: 'OK' }]
-      );
+      // Check if sharing is available
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        // Open share dialog - user can choose Google Drive, email, etc.
+        await Sharing.shareAsync(uri, {
+          mimeType: 'application/pdf',
+          dialogTitle: 'Open PDF with...',
+        });
+      } else {
+        Alert.alert('Error', 'Sharing is not available on this device');
+      }
     } catch (error) {
       console.error('Error generating report:', error);
       Alert.alert('Error', 'Failed to generate report. Please try again.');
