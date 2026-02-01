@@ -395,15 +395,38 @@ export default function ManualScoring() {
         window.open(url, '_blank');
       } else {
         const { uri } = await Print.printToFileAsync({ html });
-        const fileName = `${competitionName.replace(/[^a-z0-9]/gi, '_')}_Results.pdf`;
-        const destinationUri = FileSystem.documentDirectory + fileName;
+        const baseFileName = `${competitionName.replace(/[^a-z0-9]/gi, '_')}_Results`;
+        const pdfFileName = baseFileName + '.pdf';
+        const jsonFileName = baseFileName + '.arrowtracker.json';
+        const pdfDestination = FileSystem.documentDirectory + pdfFileName;
+        const jsonDestination = FileSystem.documentDirectory + jsonFileName;
         
         await FileSystem.moveAsync({
           from: uri,
-          to: destinationUri,
+          to: pdfDestination,
         });
 
-        Alert.alert('Report Saved', `Saved as ${fileName}`);
+        // Save companion JSON file for easy import
+        const exportData = {
+          version: '1.0',
+          type: 'arrowtracker_competition',
+          name: competitionName,
+          date: new Date().toISOString(),
+          rounds: ROUNDS_COUNT,
+          arrowsPerRound: ARROWS_PER_ROUND,
+          archers: archers.map(a => ({
+            id: a.id,
+            name: a.name,
+            bowType: a.bowType,
+            rounds: a.rounds,
+            totalScore: getArcherTotal(a),
+            xCount: getArcherXCount(a),
+          })),
+        };
+        
+        await FileSystem.writeAsStringAsync(jsonDestination, JSON.stringify(exportData, null, 2));
+
+        Alert.alert('Report Saved', `Saved as ${pdfFileName}\nData file: ${jsonFileName}`);
       }
 
       // Also save the competition
