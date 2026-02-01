@@ -297,24 +297,6 @@ export default function ReportScreen() {
     return report;
   };
 
-  const handleShare = async () => {
-    const reportText = generateReportText();
-    
-    try {
-      if (Platform.OS === 'web') {
-        await navigator.clipboard.writeText(reportText);
-        alert('Report copied to clipboard!');
-      } else {
-        await Share.share({
-          message: reportText,
-          title: 'Arrow Tracker Report',
-        });
-      }
-    } catch (error) {
-      console.error('Share error:', error);
-    }
-  };
-
   // Generate PDF HTML content
   const generatePdfHtml = () => {
     // Score range based on target type
