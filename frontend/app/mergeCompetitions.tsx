@@ -633,9 +633,32 @@ const styles = StyleSheet.create({
   score: { color: '#FFD700', fontSize: 20, fontWeight: 'bold' },
   maxScore: { color: '#666', fontSize: 12 },
   footer: {
+    flexDirection: 'row',
     padding: 16,
+    gap: 8,
     borderTopWidth: 1,
     borderTopColor: '#222',
+  },
+  shareButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#8B0000',
+    paddingVertical: 14,
+    borderRadius: 12,
+    gap: 6,
+  },
+  shareButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  buttonDisabled: {
+    backgroundColor: '#333',
+  },
+  buttonTextDisabled: {
+    color: '#666',
   },
   generateButton: {
     flexDirection: 'row',
