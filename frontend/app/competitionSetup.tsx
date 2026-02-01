@@ -68,17 +68,22 @@ export default function CompetitionSetupScreen() {
       return;
     }
 
+    if (!newParticipantBowId) {
+      Alert.alert('Bow Required', 'Please select a bow.');
+      return;
+    }
+
     try {
       const bow = bows.find(b => b.id === newParticipantBowId);
       
       const competition = await createCompetition({
-        name: competitionName || `Competition ${new Date().toLocaleDateString()}`,
+        name: `Competition ${new Date().toLocaleDateString()}`,
         targetType: selectedTargetType,
         distance: `${distance}${distanceUnit}`,
         mode: 'local',
         participants: [{
           name: newParticipantName.trim(),
-          bowId: newParticipantBowId || undefined,
+          bowId: newParticipantBowId,
           bowName: bow?.name,
         }],
       });
