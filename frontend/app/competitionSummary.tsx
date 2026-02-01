@@ -129,38 +129,21 @@ export default function CompetitionSummaryScreen() {
   };
 
   const generateHeatmapSvg = (shots: { x: number; y: number; ring: number }[], size: number, targetType: string): string => {
-    const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS];
-    const rings = targetConfig?.rings || 10;
-    const colors = targetConfig?.colors || [];
-    
-    // If no shots, show empty target
+    // Match the session report heatmap style exactly
     if (shots.length === 0) {
-      let ringsSvg = '';
-      for (let i = 0; i < rings; i++) {
-        const ringRatio = (rings - i) / rings;
-        const ringSize = size * ringRatio * 0.95;
-        const color = colors[i];
-        ringsSvg += `
-          <circle 
-            cx="${size/2}" 
-            cy="${size/2}" 
-            r="${ringSize/2}" 
-            fill="${color?.bg || '#f5f5f0'}" 
-            stroke="${color?.border || '#333'}" 
-            stroke-width="1"
-          />
-        `;
-      }
       return `
-        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-          ${ringsSvg}
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+          <rect width="${size}" height="${size}" fill="#f5f5f5" rx="8" />
           <text x="${size/2}" y="${size/2}" text-anchor="middle" fill="#666" font-size="14">No shots recorded</text>
         </svg>
       `;
     }
+
+    const targetScale = 0.9;
+    const targetSize = size * targetScale;
     
-    // Create density grid for heatmap
-    const gridSize = 50;
+    // Grid for density calculation - HIGH RESOLUTION for smoothness
+    const gridSize = 80;
     const cellSize = size / gridSize;
     const densityGrid: number[][] = [];
     for (let i = 0; i < gridSize; i++) {
@@ -170,19 +153,19 @@ export default function CompetitionSummaryScreen() {
       }
     }
     
-    // Calculate density with blur
+    // Calculate density with larger blur for smoother gradients
     shots.forEach((shot) => {
       const gridX = Math.floor(shot.x * gridSize);
       const gridY = Math.floor(shot.y * gridSize);
       
-      const blurRadius = 6;
+      const blurRadius = 10;
       for (let dx = -blurRadius; dx <= blurRadius; dx++) {
         for (let dy = -blurRadius; dy <= blurRadius; dy++) {
           const nx = gridX + dx;
           const ny = gridY + dy;
           if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
             const distance = Math.sqrt(dx * dx + dy * dy);
-            const weight = Math.exp(-distance * distance / 8);
+            const weight = Math.exp(-distance * distance / 16);
             densityGrid[ny][nx] += weight;
           }
         }
@@ -196,24 +179,24 @@ export default function CompetitionSummaryScreen() {
       });
     });
     
-    // Color function
+    // Color function matching session report
     const getHeatColor = (normalizedValue: number) => {
       if (normalizedValue === 0) return null;
       
-      const colors = [
+      const colorStops = [
         { pos: 0, r: 0, g: 200, b: 0 },
         { pos: 0.33, r: 255, g: 255, b: 0 },
         { pos: 0.66, r: 255, g: 165, b: 0 },
         { pos: 1, r: 255, g: 0, b: 0 },
       ];
       
-      let lower = colors[0];
-      let upper = colors[colors.length - 1];
+      let lower = colorStops[0];
+      let upper = colorStops[colorStops.length - 1];
       
-      for (let i = 0; i < colors.length - 1; i++) {
-        if (normalizedValue >= colors[i].pos && normalizedValue <= colors[i + 1].pos) {
-          lower = colors[i];
-          upper = colors[i + 1];
+      for (let i = 0; i < colorStops.length - 1; i++) {
+        if (normalizedValue >= colorStops[i].pos && normalizedValue <= colorStops[i + 1].pos) {
+          lower = colorStops[i];
+          upper = colorStops[i + 1];
           break;
         }
       }
@@ -221,33 +204,87 @@ export default function CompetitionSummaryScreen() {
       const range = upper.pos - lower.pos;
       const t = range === 0 ? 0 : (normalizedValue - lower.pos) / range;
       
-      const r = Math.round(lower.r + t * (upper.r - lower.r));
-      const g = Math.round(lower.g + t * (upper.g - lower.g));
-      const b = Math.round(lower.b + t * (upper.b - lower.b));
-      const opacity = 0.3 + normalizedValue * 0.5;
+      const r = Math.round(lower.r + (upper.r - lower.r) * t);
+      const g = Math.round(lower.g + (upper.g - lower.g) * t);
+      const b = Math.round(lower.b + (upper.b - lower.b) * t);
+      const alpha = 0.4 + normalizedValue * 0.5;
       
-      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      return { r, g, b, alpha };
     };
+
+    // Generate heat circles with smoother rendering
+    let heatCircles = '';
+    densityGrid.forEach((row, y) => {
+      row.forEach((density, x) => {
+        if (density > 0.05) {
+          const normalizedDensity = maxDensity > 0 ? density / maxDensity : 0;
+          const color = getHeatColor(normalizedDensity);
+          if (color) {
+            const cx = x * cellSize + cellSize / 2;
+            const cy = y * cellSize + cellSize / 2;
+            const r = cellSize * 2.0;
+            const alpha = color.alpha * Math.pow(normalizedDensity, 0.7);
+            heatCircles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})" />`;
+          }
+        }
+      });
+    });
+
+    // Target ring colors based on target type
+    const getTargetRingColors = () => {
+      if (targetType === 'wa_standard') {
+        return ['#f5f5f0', '#f5f5f0', '#2a2a2a', '#2a2a2a', '#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24', '#fff200', '#fff200'];
+      } else {
+        return ['#00a2e8', '#00a2e8', '#ed1c24', '#ed1c24', '#fff200'];
+      }
+    };
+    const ringColors = getTargetRingColors();
     
-    // Generate target rings SVG
-    let ringsSvg = '';
-    for (let i = 0; i < rings; i++) {
-      const ringRatio = (rings - i) / rings;
-      const ringSize = size * ringRatio * 0.95;
-      const color = colors[i];
-      ringsSvg += `
-        <circle 
-          cx="${size/2}" 
-          cy="${size/2}" 
-          r="${ringSize/2}" 
-          fill="${color?.bg || '#f5f5f0'}" 
-          stroke="${color?.border || '#333'}" 
-          stroke-width="1"
-        />
-      `;
+    // Generate target ring backgrounds
+    let targetRingBgs = '';
+    const numRings = targetType === 'wa_standard' ? 10 : 5;
+    for (let ringNum = 1; ringNum <= numRings; ringNum++) {
+      const diameterPercent = (numRings + 1 - ringNum) / numRings;
+      const ringSize = targetSize * diameterPercent;
+      const bgColor = ringColors[ringNum - 1] || '#fff200';
+      targetRingBgs += `<circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="${bgColor}" />`;
     }
     
-    // Generate heatmap cells
+    // Generate target ring outlines (drawn on top of heatmap)
+    let targetRingLines = '';
+    for (let ringNum = 1; ringNum <= numRings; ringNum++) {
+      const diameterPercent = (numRings + 1 - ringNum) / numRings;
+      const ringSize = targetSize * diameterPercent;
+      let borderColor;
+      if (targetType === 'wa_standard') {
+        borderColor = ringNum <= 2 ? '#888' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#005090' : ringNum <= 8 ? '#901015' : '#907000';
+      } else {
+        borderColor = ringNum <= 2 ? '#005090' : ringNum <= 4 ? '#901015' : '#907000';
+      }
+      targetRingLines += `<circle cx="${size/2}" cy="${size/2}" r="${ringSize/2}" fill="none" stroke="${borderColor}" stroke-width="2" />`;
+    }
+
+    return `
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="targetClip">
+            <circle cx="${size/2}" cy="${size/2}" r="${targetSize/2}" />
+          </clipPath>
+        </defs>
+        <!-- Target ring backgrounds -->
+        ${targetRingBgs}
+        <!-- Heatmap overlay (clipped to target area) -->
+        <g clip-path="url(#targetClip)">
+          ${heatCircles}
+        </g>
+        <!-- Target ring lines (on top of heatmap) -->
+        ${targetRingLines}
+        <!-- Center cross -->
+        <line x1="${size/2 - 12}" y1="${size/2}" x2="${size/2 + 12}" y2="${size/2}" stroke="#000" stroke-width="2" />
+        <line x1="${size/2}" y1="${size/2 - 12}" x2="${size/2}" y2="${size/2 + 12}" stroke="#000" stroke-width="2" />
+      </svg>
+    `;
+  };
     let heatmapSvg = '';
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
