@@ -133,7 +133,7 @@ export default function CompetitionHistory() {
     setRefreshing(false);
   };
 
-  const deleteCompetition = (competition: ManualCompetition) => {
+  const handleDeleteCompetition = (competition: DisplayCompetition) => {
     Alert.alert(
       'Delete Competition',
       `Are you sure you want to delete "${competition.name}"?`,
@@ -144,9 +144,20 @@ export default function CompetitionHistory() {
           style: 'destructive',
           onPress: async () => {
             try {
-              const updated = competitions.filter(c => c.id !== competition.id);
-              await AsyncStorage.setItem('manualCompetitions', JSON.stringify(updated));
-              setCompetitions(updated);
+              if (competition.source === 'compete') {
+                // Delete from competitionStorage
+                await deleteCompeteCompetition(competition.id);
+              } else {
+                // Delete from manualCompetitions
+                const data = await AsyncStorage.getItem('manualCompetitions');
+                if (data) {
+                  const manualComps = JSON.parse(data);
+                  const updated = manualComps.filter((c: ManualCompetition) => c.id !== competition.id);
+                  await AsyncStorage.setItem('manualCompetitions', JSON.stringify(updated));
+                }
+              }
+              // Reload
+              await loadCompetitions();
             } catch (error) {
               console.error('Error deleting competition:', error);
               Alert.alert('Error', 'Failed to delete competition');
@@ -170,10 +181,17 @@ export default function CompetitionHistory() {
     return '';
   };
 
-  const regeneratePdf = async (competition: ManualCompetition) => {
+  // Navigate to the competition summary for "compete" type
+  const viewCompeteCompetition = (competition: DisplayCompetition) => {
+    router.push(`/competitionSummary?id=${competition.id}`);
+  };
+
+  const regenerateManualPdf = async (competition: DisplayCompetition) => {
+    if (!competition.archers) return;
+    
     try {
       // Group archers by bow type
-      const archersByBowType: { [key: string]: Archer[] } = {};
+      const archersByBowType: { [key: string]: ManualArcher[] } = {};
       competition.archers.forEach(archer => {
         if (!archersByBowType[archer.bowType]) {
           archersByBowType[archer.bowType] = [];
