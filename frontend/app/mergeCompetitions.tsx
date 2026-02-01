@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { getCompetitions, Competition } from '../utils/competitionStorage';
 import * as Print from 'expo-print';
-import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 import { TARGET_CONFIGS } from '../store/appStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
