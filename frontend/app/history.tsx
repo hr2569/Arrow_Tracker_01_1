@@ -444,7 +444,16 @@ export default function HistoryScreen() {
           onPress={() => setActiveTab('history')}
         >
           <Ionicons name="time-outline" size={18} color={activeTab === 'history' ? '#fff' : '#888'} />
-          <Text style={[styles.tabButtonText, activeTab === 'history' && styles.tabButtonTextActive]}>History</Text>
+          <Text style={[styles.tabButtonText, activeTab === 'history' && styles.tabButtonTextActive]}>Sessions</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'competitions' && styles.tabButtonActive]}
+          onPress={() => setActiveTab('competitions')}
+        >
+          <Ionicons name="trophy-outline" size={18} color={activeTab === 'competitions' ? '#FFD700' : '#888'} />
+          <Text style={[styles.tabButtonText, activeTab === 'competitions' && { color: '#FFD700' }]}>
+            Competitions {competitions.length > 0 ? `(${competitions.length})` : ''}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'stats' && styles.tabButtonActive]}
@@ -462,6 +471,79 @@ export default function HistoryScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Competitions Tab */}
+      {activeTab === 'competitions' ? (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFD700" />
+          }
+        >
+          {competitions.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="trophy-outline" size={64} color="#333" />
+              <Text style={styles.emptyTitle}>No Competitions Yet</Text>
+              <Text style={styles.emptySubtitle}>Complete a competition to see it here</Text>
+              <TouchableOpacity
+                style={styles.emptyButton}
+                onPress={() => router.push('/competitionSetup')}
+              >
+                <Ionicons name="add" size={20} color="#000" />
+                <Text style={styles.emptyButtonText}>Start Competition</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            competitions.map((comp) => {
+              const archer = comp.participants[0];
+              const maxScore = comp.maxRounds * comp.arrowsPerRound * 10;
+              const percentage = Math.round((archer.totalScore / maxScore) * 100);
+              
+              return (
+                <TouchableOpacity
+                  key={comp.id}
+                  style={styles.competitionCard}
+                  onPress={() => {
+                    setActiveCompetition(comp.id);
+                    router.push('/competitionSummary');
+                  }}
+                >
+                  <View style={styles.competitionHeader}>
+                    <View style={styles.competitionTrophy}>
+                      <Ionicons name="trophy" size={24} color="#FFD700" />
+                    </View>
+                    <View style={styles.competitionInfo}>
+                      <Text style={styles.competitionName}>{comp.name || 'Competition'}</Text>
+                      <Text style={styles.competitionArcher}>{archer.name}</Text>
+                      <Text style={styles.competitionDate}>
+                        {new Date(comp.completedAt || comp.createdAt).toLocaleDateString()}
+                      </Text>
+                    </View>
+                    <View style={styles.competitionScore}>
+                      <Text style={styles.competitionScoreValue}>{archer.totalScore}</Text>
+                      <Text style={styles.competitionScoreMax}>/{maxScore}</Text>
+                      <Text style={styles.competitionPercentage}>{percentage}%</Text>
+                    </View>
+                  </View>
+                  <View style={styles.competitionMeta}>
+                    <View style={styles.competitionMetaItem}>
+                      <MiniTargetFace targetType={comp.targetType} size={24} />
+                      <Text style={styles.competitionMetaText}>{getTargetTypeName(comp.targetType)}</Text>
+                    </View>
+                    <View style={styles.competitionMetaItem}>
+                      <Ionicons name="locate-outline" size={14} color="#888" />
+                      <Text style={styles.competitionMetaText}>{comp.distance}</Text>
+                    </View>
+                    <View style={styles.competitionMetaItem}>
+                      <Ionicons name="apps-outline" size={14} color="#888" />
+                      <Text style={styles.competitionMetaText}>{comp.maxRounds} rounds</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
+          )}
+        </ScrollView>
+      ) : (
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
