@@ -1131,6 +1131,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginTop: 16,
   },
+  emptySubtitle: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 8,
+  },
   emptyText: {
     fontSize: 16,
     color: '#888888',
