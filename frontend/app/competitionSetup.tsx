@@ -329,10 +329,10 @@ export default function CompetitionSetupScreen() {
           <TouchableOpacity
             style={[
               styles.startButton,
-              !newParticipantName.trim() && styles.startButtonDisabled,
+              (!newParticipantName.trim() || !newParticipantBowId) && styles.startButtonDisabled,
             ]}
             onPress={handleStartCompetition}
-            disabled={!newParticipantName.trim()}
+            disabled={!newParticipantName.trim() || !newParticipantBowId}
           >
             <Ionicons name="trophy" size={24} color="#000" />
             <Text style={styles.startButtonText}>Start Competition</Text>
