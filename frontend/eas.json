@@ -18,19 +18,21 @@
         "buildType": "apk",
         "withoutCredentials": true
       },
-      "node": "18.18.0"
+      "env": {
+        "YARN_ENABLE_IMMUTABLE_INSTALLS": "false"
+      }
     },
     "production": {
       "android": {
         "buildType": "apk",
         "withoutCredentials": true
       },
-      "node": "18.18.0"
+      "env": {
+        "YARN_ENABLE_IMMUTABLE_INSTALLS": "false"
+      }
     }
   },
   "submit": {
     "production": {}
-  },
-  "build.preview.env": {},
-  "build.production.env": {}
+  }
 }
