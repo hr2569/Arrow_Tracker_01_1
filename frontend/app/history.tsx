@@ -1434,4 +1434,92 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  // Competition styles
+  competitionCard: {
+    backgroundColor: '#111',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  competitionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  competitionTrophy: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  competitionInfo: {
+    flex: 1,
+  },
+  competitionName: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  competitionArcher: {
+    color: '#FFD700',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  competitionDate: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  competitionScore: {
+    alignItems: 'flex-end',
+  },
+  competitionScoreValue: {
+    color: '#FFD700',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  competitionScoreMax: {
+    color: '#666',
+    fontSize: 12,
+  },
+  competitionPercentage: {
+    color: '#888',
+    fontSize: 12,
+  },
+  competitionMeta: {
+    flexDirection: 'row',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#222',
+    gap: 16,
+  },
+  competitionMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  competitionMetaText: {
+    color: '#888',
+    fontSize: 12,
+  },
+  emptyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFD700',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 16,
+    gap: 8,
+  },
+  emptyButtonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
