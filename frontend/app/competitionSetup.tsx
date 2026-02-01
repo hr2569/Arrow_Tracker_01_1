@@ -35,7 +35,6 @@ export default function CompetitionSetupScreen() {
   const [selectedTargetType, setSelectedTargetType] = useState<TargetType>('wa_standard');
   const [distance, setDistance] = useState('18');
   const [distanceUnit, setDistanceUnit] = useState<'m' | 'yd'>('m');
-  const [competitionName, setCompetitionName] = useState('');
   const [newParticipantName, setNewParticipantName] = useState('');
   const [newParticipantBowId, setNewParticipantBowId] = useState<string | null>(null);
 
