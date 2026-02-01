@@ -1,64 +1,35 @@
 // Compatibility layer for expo-file-system
-// This handles the API changes in newer versions
+// This provides a safe way to access documentDirectory and other APIs
 
-// Import the module
-import * as ExpoFileSystem from 'expo-file-system';
+import { Platform } from 'react-native';
 
-// For backward compatibility, we need to access documentDirectory
-// In newer versions, it might be in different locations
-let _documentDirectory: string | null = null;
-let _cacheDirectory: string | null = null;
+// For web, we'll use a mock path. For native, we need the real path.
+// The documentDirectory will be set at runtime when the module loads on native.
+export let documentDirectory: string | null = null;
+export let cacheDirectory: string | null = null;
 
-// Try to get documentDirectory from various sources
-try {
-  // Try direct access (older API)
-  if ((ExpoFileSystem as any).documentDirectory) {
-    _documentDirectory = (ExpoFileSystem as any).documentDirectory;
+// Dynamically import and set the directories
+const initFileSystem = async () => {
+  try {
+    const FileSystem = await import('expo-file-system');
+    
+    // Try to access documentDirectory
+    if ((FileSystem as any).documentDirectory) {
+      documentDirectory = (FileSystem as any).documentDirectory;
+    }
+    
+    if ((FileSystem as any).cacheDirectory) {
+      cacheDirectory = (FileSystem as any).cacheDirectory;
+    }
+  } catch (e) {
+    console.warn('Could not initialize FileSystem directories:', e);
   }
-} catch (e) {
-  console.log('Could not access documentDirectory directly');
+};
+
+// Initialize on module load (non-blocking)
+if (Platform.OS !== 'web') {
+  initFileSystem();
 }
 
-try {
-  // Try Paths.document (newer API)
-  if ((ExpoFileSystem as any).Paths?.document?.uri) {
-    _documentDirectory = (ExpoFileSystem as any).Paths.document.uri;
-  }
-} catch (e) {
-  console.log('Could not access Paths.document');
-}
-
-try {
-  if ((ExpoFileSystem as any).cacheDirectory) {
-    _cacheDirectory = (ExpoFileSystem as any).cacheDirectory;
-  }
-} catch (e) {
-  console.log('Could not access cacheDirectory directly');
-}
-
-try {
-  if ((ExpoFileSystem as any).Paths?.cache?.uri) {
-    _cacheDirectory = (ExpoFileSystem as any).Paths.cache.uri;
-  }
-} catch (e) {
-  console.log('Could not access Paths.cache');
-}
-
-// Export the directories
-export const documentDirectory = _documentDirectory;
-export const cacheDirectory = _cacheDirectory;
-
-// Re-export commonly used functions from expo-file-system
-export const {
-  readAsStringAsync,
-  writeAsStringAsync,
-  deleteAsync,
-  getInfoAsync,
-  makeDirectoryAsync,
-  readDirectoryAsync,
-  copyAsync,
-  moveAsync,
-} = ExpoFileSystem as any;
-
-// Default export for compatibility with `import * as FileSystem`
-export default ExpoFileSystem;
+// Re-export the full module for other functions
+export * from 'expo-file-system';
