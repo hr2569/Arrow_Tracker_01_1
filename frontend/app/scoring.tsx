@@ -401,7 +401,7 @@ export default function ScoringScreen() {
                 onPress={() => handleEditArrow(globalIndex)}
               >
                 <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
-                  {arrow.score === 10 ? 'X' : arrow.score === 0 ? 'M' : arrow.score}
+                  {getScoreDisplay(arrow.score)}
                 </Text>
               </TouchableOpacity>
             );
