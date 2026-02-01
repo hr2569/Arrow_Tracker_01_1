@@ -304,6 +304,25 @@ export default function CompetitionScoringScreen() {
         />
       );
     }
+    
+    // Add X ring (innermost ring within gold)
+    const xRingSize = size * 0.05 * 0.95;
+    const xRingColor = (targetConfig as any)?.xRingColor || { bg: '#fff200', border: '#b8860b' };
+    ringElements.push(
+      <View
+        key={`xring-${targetIndex}`}
+        style={{
+          position: 'absolute',
+          width: xRingSize,
+          height: xRingSize,
+          borderRadius: xRingSize / 2,
+          backgroundColor: xRingColor.bg,
+          borderWidth: 2,
+          borderColor: xRingColor.border,
+        }}
+        pointerEvents="none"
+      />
+    );
 
     const targetArrows = isMultiTarget 
       ? arrows.filter(a => a.targetIndex === targetIndex)
