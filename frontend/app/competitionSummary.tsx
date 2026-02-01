@@ -93,24 +93,6 @@ export default function CompetitionSummaryScreen() {
   };
 
   // Share text report
-  const handleShare = async () => {
-    const reportText = generateReportText();
-    
-    try {
-      if (Platform.OS === 'web') {
-        await navigator.clipboard.writeText(reportText);
-        alert('Report copied to clipboard!');
-      } else {
-        await Share.share({
-          message: reportText,
-          title: 'Competition Report',
-        });
-      }
-    } catch (error) {
-      console.error('Share error:', error);
-    }
-  };
-
   const getScoreBgColor = (score: number): string => {
     if (score === 11) return '#FFD700'; // X ring
     if (score >= 9) return '#FFD700';
