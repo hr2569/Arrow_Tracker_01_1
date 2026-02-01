@@ -594,7 +594,7 @@ export default function CompetitionSummaryScreen() {
       const filename = `Competition_${archerNameClean}_${dateStr}.pdf`;
       
       // Save to documents directory
-      const documentsDir = documentDirectory;
+      const documentsDir = FileSystem.documentDirectory;
       const destinationUri = `${documentsDir}${filename}`;
       
       await FileSystem.copyAsync({
