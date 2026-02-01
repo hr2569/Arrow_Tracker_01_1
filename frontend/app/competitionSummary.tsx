@@ -79,7 +79,7 @@ export default function CompetitionSummaryScreen() {
     
     text += `ROUND BREAKDOWN:\n`;
     archer.rounds.forEach((round, i) => {
-      const arrows = round.shots.map(s => s.ring === 10 ? 'X' : s.ring === 0 ? 'M' : s.ring).join(' | ');
+      const arrows = round.shots.map(s => s.ring === 11 ? 'X' : s.ring === 10 ? '10' : s.ring === 0 ? 'M' : s.ring).join(' | ');
       text += `Round ${i + 1}: ${arrows} = ${round.totalScore}\n`;
     });
     
