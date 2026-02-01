@@ -16,8 +16,8 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Svg, { Defs, RadialGradient, Stop, Circle, G } from 'react-native-svg';
 import * as Print from 'expo-print';
-import * as FileSystem from '../utils/fileSystemCompat';
-import { documentDirectory } from '../utils/fileSystemCompat';
+import * as FileSystem from 'expo-file-system';
+import { documentDirectory } from 'expo-file-system';
 import { getSessions, getBows, Session, Bow } from '../utils/localStorage';
 
 type ReportPeriod = 'week' | 'month' | 'year' | 'custom' | 'all';

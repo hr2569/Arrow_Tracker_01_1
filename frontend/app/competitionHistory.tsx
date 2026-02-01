@@ -14,8 +14,8 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Print from 'expo-print';
-import * as FileSystem from '../utils/fileSystemCompat';
-import { documentDirectory } from '../utils/fileSystemCompat';
+import * as FileSystem from 'expo-file-system';
+import { documentDirectory } from 'expo-file-system';
 import { getCompetitions, Competition, deleteCompetition as deleteCompeteCompetition } from '../utils/competitionStorage';
 import { TARGET_CONFIGS } from '../store/appStore';
 
