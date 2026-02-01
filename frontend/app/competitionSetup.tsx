@@ -294,7 +294,7 @@ export default function CompetitionSetupScreen() {
 
           {/* Select Bow Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Select Bow (Optional)</Text>
+            <Text style={styles.sectionTitle}>Select Bow</Text>
             {bows.length === 0 ? (
               <TouchableOpacity 
                 style={styles.addBowCard}
@@ -306,15 +306,6 @@ export default function CompetitionSetupScreen() {
             ) : (
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View style={styles.bowsRowInline}>
-                  <TouchableOpacity
-                    style={[styles.bowOptionInline, !newParticipantBowId && styles.bowOptionInlineSelected]}
-                    onPress={() => setNewParticipantBowId(null)}
-                  >
-                    <Ionicons name="close-circle-outline" size={28} color={!newParticipantBowId ? '#FFD700' : '#666'} />
-                    <Text style={[styles.bowOptionTextInline, !newParticipantBowId && styles.bowOptionTextInlineSelected]}>
-                      None
-                    </Text>
-                  </TouchableOpacity>
                   {bows.map((bow) => (
                     <TouchableOpacity
                       key={bow.id}
