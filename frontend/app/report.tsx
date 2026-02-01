@@ -1091,7 +1091,7 @@ export default function ReportScreen() {
         const filename = `Session_Report_${dateStr}.pdf`;
         
         // Save to documents directory
-        const documentsDir = FileSystem.documentDirectory;
+        const documentsDir = (documentDirectory || '');
         const destinationUri = `${documentsDir}${filename}`;
         
         await FileSystem.copyAsync({
