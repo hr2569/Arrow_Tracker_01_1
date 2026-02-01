@@ -464,17 +464,21 @@ export default function CompetitionSummaryScreen() {
           }
           .charts-container {
             display: flex;
-            justify-content: center;
-            gap: 30px;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 20px;
+            flex-wrap: wrap;
             margin-top: 30px;
+            page-break-before: always;
           }
           .chart-box {
             text-align: center;
           }
           .chart-box h3 {
             margin: 0 0 10px 0;
-            color: #333;
-            font-size: 16px;
+            color: #8B0000;
+            font-size: 18px;
+            font-weight: bold;
           }
           .footer {
             text-align: center;
