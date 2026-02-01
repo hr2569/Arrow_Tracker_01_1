@@ -51,14 +51,14 @@ export default function HomeScreen() {
 
             <TouchableOpacity
               style={styles.competitionButton}
-              onPress={() => router.push('/competitionSetup')}
+              onPress={() => router.push('/competitionMenu')}
               activeOpacity={0.8}
             >
               <View style={styles.buttonIconContainerCompetition}>
                 <Ionicons name="trophy" size={36} color="#000" />
               </View>
               <Text style={styles.competitionButtonText}>Competition</Text>
-              <Text style={styles.competitionSubtext}>Multi-Player Mode</Text>
+              <Text style={styles.competitionSubtext}>Shoot & Score Keeping</Text>
             </TouchableOpacity>
           </View>
 
