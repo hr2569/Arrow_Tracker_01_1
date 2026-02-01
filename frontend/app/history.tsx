@@ -437,7 +437,7 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Tab Selector */}
+      {/* Tab Selector - Row 1: Main Tabs */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'history' && styles.tabButtonActive]}
@@ -445,15 +445,6 @@ export default function HistoryScreen() {
         >
           <Ionicons name="time-outline" size={18} color={activeTab === 'history' ? '#fff' : '#888'} />
           <Text style={[styles.tabButtonText, activeTab === 'history' && styles.tabButtonTextActive]}>Sessions</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'competitions' && styles.tabButtonActive]}
-          onPress={() => setActiveTab('competitions')}
-        >
-          <Ionicons name="trophy-outline" size={18} color={activeTab === 'competitions' ? '#FFD700' : '#888'} />
-          <Text style={[styles.tabButtonText, activeTab === 'competitions' && { color: '#FFD700' }]}>
-            Competitions {competitions.length > 0 ? `(${competitions.length})` : ''}
-          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'stats' && styles.tabButtonActive]}
@@ -468,6 +459,26 @@ export default function HistoryScreen() {
         >
           <Ionicons name="document-text-outline" size={18} color={activeTab === 'report' ? '#fff' : '#888'} />
           <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>Report</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Tab Selector - Row 2: Competitions */}
+      <View style={styles.competitionsTabRow}>
+        <TouchableOpacity
+          style={[styles.competitionsTab, activeTab === 'competitions' && styles.competitionsTabActive]}
+          onPress={() => setActiveTab('competitions')}
+        >
+          <Ionicons name="trophy" size={18} color={activeTab === 'competitions' ? '#000' : '#FFD700'} />
+          <Text style={[styles.competitionsTabText, activeTab === 'competitions' && styles.competitionsTabTextActive]}>
+            Competitions {competitions.length > 0 ? `(${competitions.length})` : ''}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.mergeReportButton}
+          onPress={() => router.push('/mergeCompetitions')}
+        >
+          <Ionicons name="git-merge-outline" size={18} color="#FFD700" />
+          <Text style={styles.mergeReportButtonText}>Merge Reports</Text>
         </TouchableOpacity>
       </View>
 
