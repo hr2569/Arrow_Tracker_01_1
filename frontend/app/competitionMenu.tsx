@@ -59,22 +59,6 @@ export default function CompetitionMenu() {
           </View>
           <Ionicons name="chevron-forward" size={24} color="#FFD700" />
         </TouchableOpacity>
-
-        {/* Merge Reports Button */}
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => router.push('/mergeCompetitions')}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.menuIconContainer, { backgroundColor: '#3a2a1a' }]}>
-            <Ionicons name="git-merge" size={40} color="#FF9800" />
-          </View>
-          <View style={styles.menuTextContainer}>
-            <Text style={styles.menuButtonTitle}>Merge Reports</Text>
-            <Text style={styles.menuButtonSubtitle}>Combine multiple competition results</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={24} color="#FFD700" />
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
