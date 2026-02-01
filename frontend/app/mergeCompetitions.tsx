@@ -455,17 +455,6 @@ export default function MergeCompetitionsScreen() {
     }
   };
 
-  // Helper to extract bow type from bow name
-  const getBowType = (bowName: string): string => {
-    const name = bowName.toLowerCase();
-    if (name.includes('recurve') || name.includes('olympic')) return 'Recurve';
-    if (name.includes('compound')) return 'Compound';
-    if (name.includes('barebow')) return 'Barebow';
-    if (name.includes('traditional') || name.includes('longbow')) return 'Traditional';
-    if (name.includes('crossbow')) return 'Crossbow';
-    return 'Other';
-  };
-
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
