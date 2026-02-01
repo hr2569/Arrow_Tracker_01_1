@@ -66,16 +66,54 @@ const ARROWS_PER_ROUND = 3;
 
 export default function CompetitionHistory() {
   const router = useRouter();
-  const [competitions, setCompetitions] = useState<ManualCompetition[]>([]);
+  const [competitions, setCompetitions] = useState<DisplayCompetition[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadCompetitions = async () => {
     try {
-      const data = await AsyncStorage.getItem('manualCompetitions');
-      if (data) {
-        setCompetitions(JSON.parse(data));
+      const allCompetitions: DisplayCompetition[] = [];
+
+      // Load "Compete" competitions (single archer, from competitionStorage)
+      const competeData = await getCompetitions();
+      const completedCompete = competeData.filter(c => c.status === 'completed');
+      completedCompete.forEach(comp => {
+        const archer = comp.participants[0];
+        allCompetitions.push({
+          id: comp.id,
+          name: comp.name,
+          date: comp.completedAt || comp.createdAt,
+          source: 'compete',
+          archerCount: 1,
+          archerName: archer?.name,
+          bowName: archer?.bowName,
+          totalScore: archer?.totalScore,
+          targetType: comp.targetType,
+          distance: comp.distance,
+          originalData: comp,
+        });
+      });
+
+      // Load "Manual" competitions (multiple archers)
+      const manualData = await AsyncStorage.getItem('manualCompetitions');
+      if (manualData) {
+        const manualComps: ManualCompetition[] = JSON.parse(manualData);
+        manualComps.forEach(comp => {
+          allCompetitions.push({
+            id: comp.id,
+            name: comp.name,
+            date: comp.date,
+            source: 'manual',
+            archerCount: comp.archers.length,
+            archers: comp.archers,
+          });
+        });
       }
+
+      // Sort by date (newest first)
+      allCompetitions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      setCompetitions(allCompetitions);
     } catch (error) {
       console.error('Error loading competitions:', error);
     } finally {
