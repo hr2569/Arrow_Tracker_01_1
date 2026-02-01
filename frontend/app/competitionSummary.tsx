@@ -707,10 +707,6 @@ export default function CompetitionSummaryScreen() {
 
       {/* Footer Actions */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-          <Ionicons name="share-social" size={20} color="#fff" />
-          <Text style={styles.shareButtonText}>Share</Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={styles.reportButton}
           onPress={generateCompetitionReport}
