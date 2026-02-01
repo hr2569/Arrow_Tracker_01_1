@@ -496,7 +496,7 @@ export default function CompetitionSummaryScreen() {
           <div class="archer-name">${archer.name}</div>
           <div class="meta">
             ${competition.name || 'Competition'} • ${new Date(competition.completedAt || competition.createdAt).toLocaleDateString()}<br/>
-            ${targetConfig?.name || competition.targetType} • ${competition.distance}
+            ${targetConfig?.name || competition.targetType} • ${competition.distance}${archer.bowName ? ` • ${archer.bowName}` : ''}
           </div>
         </div>
 
