@@ -427,6 +427,24 @@ export default function MergeCompetitionsScreen() {
         </html>
       `;
 
+      // Web handling
+      if (Platform.OS === 'web') {
+        try {
+          const html = generateHtml();
+          const blob = new Blob([html], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        } catch (error) {
+          console.error('Web PDF error:', error);
+          alert('Failed to open PDF. Please try again.');
+        } finally {
+          setGenerating(false);
+        }
+        return;
+      }
+
+      // Mobile - save directly
+      const html = generateHtml();
       const { uri } = await Print.printToFileAsync({ html });
       
       // Generate filename with date
