@@ -623,25 +623,6 @@ export default function CompetitionSummaryScreen() {
       try {
         const html = generatePdfHtml(qrCodeDataUrl);
         const { uri } = await Print.printToFileAsync({ html });
-        const archerNameClean = archer.name.replace(/[^a-zA-Z0-9]/g, '_');
-        const baseFileName = `Competition_${archerNameClean}_${dateStr}`;
-        const jsonFileName = baseFileName + '.arrowtracker.json';
-        const jsonDestination = (FileSystem.documentDirectory || '') + jsonFileName;
-        
-        try {
-          await FileSystem.writeAsStringAsync(jsonDestination, JSON.stringify(exportData, null, 2));
-          console.log('JSON saved at:', jsonDestination);
-          // Show reminder to send file to score keeper
-          setTimeout(() => {
-            Alert.alert(
-              '📋 Export File Created',
-              `Don't forget to send "${jsonFileName}" to your Score Keeper!`,
-              [{ text: 'OK' }]
-            );
-          }, 1000);
-        } catch (jsonError) {
-          console.log('Could not save JSON file:', jsonError);
-        }
         
         const isAvailable = await Sharing.isAvailableAsync();
         if (isAvailable) {
