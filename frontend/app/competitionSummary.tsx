@@ -22,6 +22,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { getContentUriAsync } from 'expo-file-system';
+import * as FileSystem from '../utils/fileSystemLegacy';
 import { TARGET_CONFIGS } from '../store/appStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
