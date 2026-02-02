@@ -546,7 +546,7 @@ export default function CompetitionSummaryScreen() {
 
     setGenerating(true);
     
-    // Prepare export data for QR code (compact format)
+    // Prepare export data for import code (compact format)
     const archer = competition.participants[0];
     const exportData = {
       v: '1.0',
@@ -559,23 +559,18 @@ export default function CompetitionSummaryScreen() {
       r: archer.rounds.map(r => r.shots.map(s => s.ring === 11 ? 10 : s.ring)),
     };
     
-    // Generate QR code as data URL
-    let qrCodeDataUrl = '';
-    try {
-      const qrData = JSON.stringify(exportData);
-      qrCodeDataUrl = await QRCode.toDataURL(qrData, {
-        width: 200,
-        margin: 2,
-        errorCorrectionLevel: 'M',
-      });
-    } catch (qrError) {
-      console.log('Could not generate QR code:', qrError);
-    }
+    // Generate import code as base64 encoded JSON
+    const importCode = btoa(JSON.stringify(exportData));
+    
+    // Generate filename: Competition_Date_ArcherName
+    const dateStr = new Date().toISOString().split('T')[0];
+    const archerNameClean = archer.name.replace(/[^a-zA-Z0-9]/g, '_');
+    const pdfFileName = `Competition_${dateStr}_${archerNameClean}.pdf`;
     
     if (Platform.OS === 'web') {
       // For web, open in new tab directly
       try {
-        const html = generatePdfHtml(qrCodeDataUrl);
+        const html = generatePdfHtml(importCode);
         const blob = new Blob([html], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
@@ -591,11 +586,19 @@ export default function CompetitionSummaryScreen() {
     if (Platform.OS === 'android') {
       // Android - try to open directly in Google Drive, fall back to share sheet
       try {
-        const html = generatePdfHtml(qrCodeDataUrl);
+        const html = generatePdfHtml(importCode);
         console.log('Generating PDF...');
         
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
+        
+        // Copy to a file with proper name
+        const newUri = (FileSystem.documentDirectory || '') + pdfFileName;
+        try {
+          await FileSystem.copyAsync({ from: uri, to: newUri });
+        } catch (e) {
+          console.log('Could not copy with name:', e);
+        }
         
         // Try to get content URI and open with IntentLauncher (only works in native build)
         try {
@@ -631,7 +634,7 @@ export default function CompetitionSummaryScreen() {
     } else {
       // iOS - use share sheet (can't force specific app on iOS)
       try {
-        const html = generatePdfHtml(qrCodeDataUrl);
+        const html = generatePdfHtml(importCode);
         const { uri } = await Print.printToFileAsync({ html });
         
         const isAvailable = await Sharing.isAvailableAsync();
