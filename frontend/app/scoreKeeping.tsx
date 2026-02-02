@@ -20,7 +20,7 @@ export default function ScoreKeeping() {
           <Ionicons name="arrow-back" size={24} color="#FFD700" />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
-          <Ionicons name="clipboard" size={28} color="#4CAF50" />
+          <Ionicons name="clipboard" size={28} color="#FFD700" />
           <Text style={styles.headerTitle}>Score Keeping</Text>
         </View>
         <View style={styles.placeholder} />
@@ -35,13 +35,13 @@ export default function ScoreKeeping() {
           activeOpacity={0.8}
         >
           <View style={styles.menuIconContainer}>
-            <Ionicons name="create" size={40} color="#4CAF50" />
+            <Ionicons name="create" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
             <Text style={styles.menuButtonTitle}>Manual</Text>
             <Text style={styles.menuButtonSubtitle}>Manually enter scores for archers</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#FFD700" />
+          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
 
         {/* Import PDFs Button */}
@@ -50,14 +50,14 @@ export default function ScoreKeeping() {
           onPress={() => router.push('/importPdf')}
           activeOpacity={0.8}
         >
-          <View style={[styles.menuIconContainer, { backgroundColor: '#1a2a3a' }]}>
-            <Ionicons name="document-text" size={40} color="#2196F3" />
+          <View style={[styles.menuIconContainer, { backgroundColor: '#2a1a1a' }]}>
+            <Ionicons name="document-text" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
-            <Text style={styles.menuButtonTitle}>Import PDFs</Text>
-            <Text style={styles.menuButtonSubtitle}>Import score sheets from PDF files</Text>
+            <Text style={styles.menuButtonTitle}>Import Scores</Text>
+            <Text style={styles.menuButtonSubtitle}>Batch import scores from competition PDFs</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#FFD700" />
+          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: '#8B0000',
   },
   backButton: {
     padding: 8,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#FFD700',
   },
   placeholder: {
     width: 40,
@@ -106,13 +106,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#8B0000',
   },
   menuIconContainer: {
     width: 64,
     height: 64,
     borderRadius: 12,
-    backgroundColor: '#1a3a1a',
+    backgroundColor: '#3a1a1a',
     alignItems: 'center',
     justifyContent: 'center',
   },
