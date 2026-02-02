@@ -512,6 +512,26 @@ export default function CompetitionSummaryScreen() {
 
     setGenerating(true);
     
+    // Prepare export data for .arrowtracker.json file
+    const archer = competition.participants[0];
+    const exportData = {
+      version: '1.0',
+      type: 'arrowtracker_competition',
+      name: competition.name || 'Competition',
+      date: competition.completedAt || competition.createdAt,
+      rounds: competition.maxRounds,
+      arrowsPerRound: competition.arrowsPerRound,
+      archers: [{
+        id: archer.name.replace(/\s+/g, '_').toLowerCase() + '_' + Date.now(),
+        name: archer.name,
+        bowType: archer.bowType || 'recurve',
+        rounds: archer.rounds.map(r => r.shots.map(s => s.ring === 11 ? 10 : s.ring)),
+        totalScore: archer.totalScore,
+        xCount: archer.rounds.reduce((total, r) => 
+          total + r.shots.filter(s => s.ring === 11).length, 0),
+      }],
+    };
+    
     if (Platform.OS === 'web') {
       // For web, open in new tab directly
       try {
@@ -536,6 +556,20 @@ export default function CompetitionSummaryScreen() {
         
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
+        
+        // Save companion JSON file for import
+        const dateStr = new Date().toISOString().split('T')[0];
+        const archerNameClean = archer.name.replace(/[^a-zA-Z0-9]/g, '_');
+        const baseFileName = `Competition_${archerNameClean}_${dateStr}`;
+        const jsonFileName = baseFileName + '.arrowtracker.json';
+        const jsonDestination = (FileSystem.documentDirectory || '') + jsonFileName;
+        
+        try {
+          await FileSystem.writeAsStringAsync(jsonDestination, JSON.stringify(exportData, null, 2));
+          console.log('JSON saved at:', jsonDestination);
+        } catch (jsonError) {
+          console.log('Could not save JSON file:', jsonError);
+        }
         
         // Try to get content URI and open with IntentLauncher (only works in native build)
         try {
@@ -573,6 +607,20 @@ export default function CompetitionSummaryScreen() {
       try {
         const html = generatePdfHtml();
         const { uri } = await Print.printToFileAsync({ html });
+        
+        // Save companion JSON file for import
+        const dateStr = new Date().toISOString().split('T')[0];
+        const archerNameClean = archer.name.replace(/[^a-zA-Z0-9]/g, '_');
+        const baseFileName = `Competition_${archerNameClean}_${dateStr}`;
+        const jsonFileName = baseFileName + '.arrowtracker.json';
+        const jsonDestination = (FileSystem.documentDirectory || '') + jsonFileName;
+        
+        try {
+          await FileSystem.writeAsStringAsync(jsonDestination, JSON.stringify(exportData, null, 2));
+          console.log('JSON saved at:', jsonDestination);
+        } catch (jsonError) {
+          console.log('Could not save JSON file:', jsonError);
+        }
         
         const isAvailable = await Sharing.isAvailableAsync();
         if (isAvailable) {
