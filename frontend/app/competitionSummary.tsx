@@ -581,33 +581,11 @@ export default function CompetitionSummaryScreen() {
     if (Platform.OS === 'android') {
       // Android - try to open directly in Google Drive, fall back to share sheet
       try {
-        const html = generatePdfHtml();
+        const html = generatePdfHtml(qrCodeDataUrl);
         console.log('Generating PDF...');
         
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
-        
-        // Save companion JSON file for import
-        const dateStr = new Date().toISOString().split('T')[0];
-        const archerNameClean = archer.name.replace(/[^a-zA-Z0-9]/g, '_');
-        const baseFileName = `Competition_${archerNameClean}_${dateStr}`;
-        const jsonFileName = baseFileName + '.arrowtracker.json';
-        const jsonDestination = (FileSystem.documentDirectory || '') + jsonFileName;
-        
-        try {
-          await FileSystem.writeAsStringAsync(jsonDestination, JSON.stringify(exportData, null, 2));
-          console.log('JSON saved at:', jsonDestination);
-          // Show reminder to send file to score keeper
-          setTimeout(() => {
-            Alert.alert(
-              '📋 Export File Created',
-              `Don't forget to send "${jsonFileName}" to your Score Keeper!`,
-              [{ text: 'OK' }]
-            );
-          }, 1000);
-        } catch (jsonError) {
-          console.log('Could not save JSON file:', jsonError);
-        }
         
         // Try to get content URI and open with IntentLauncher (only works in native build)
         try {
@@ -643,11 +621,8 @@ export default function CompetitionSummaryScreen() {
     } else {
       // iOS - use share sheet (can't force specific app on iOS)
       try {
-        const html = generatePdfHtml();
+        const html = generatePdfHtml(qrCodeDataUrl);
         const { uri } = await Print.printToFileAsync({ html });
-        
-        // Save companion JSON file for import
-        const dateStr = new Date().toISOString().split('T')[0];
         const archerNameClean = archer.name.replace(/[^a-zA-Z0-9]/g, '_');
         const baseFileName = `Competition_${archerNameClean}_${dateStr}`;
         const jsonFileName = baseFileName + '.arrowtracker.json';
