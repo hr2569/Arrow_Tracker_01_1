@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,11 +9,11 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
-  Modal,
+  TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as IntentLauncher from 'expo-intent-launcher';
@@ -37,31 +37,32 @@ interface ImportedArcher {
   rounds: number[][];
 }
 
-const ROUNDS_COUNT = 10;
-const ARROWS_PER_ROUND = 3;
-
 export default function ImportPdf() {
   const router = useRouter();
-  const [permission, requestPermission] = useCameraPermissions();
-  const [scanning, setScanning] = useState(false);
+  const [importCode, setImportCode] = useState('');
   const [importedArchers, setImportedArchers] = useState<ImportedArcher[]>([]);
   const [competitionName, setCompetitionName] = useState('Competition Results');
   const [generating, setGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
-  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
-    setScanning(false);
+  const handleImportCode = () => {
+    if (!importCode.trim()) {
+      Alert.alert('Error', 'Please enter an import code');
+      return;
+    }
     
     try {
-      const parsed = JSON.parse(data);
+      // Decode base64 and parse JSON
+      const decoded = atob(importCode.trim());
+      const parsed = JSON.parse(decoded);
       
-      // Validate it's an Arrow Tracker QR code
+      // Validate it's an Arrow Tracker code
       if (parsed.t !== 'at_comp' || !parsed.n || !parsed.b || parsed.s === undefined) {
-        Alert.alert('Invalid QR Code', 'This is not a valid Arrow Tracker competition QR code.');
+        Alert.alert('Invalid Code', 'This is not a valid Arrow Tracker import code.');
         return;
       }
       
-      // Create archer object from QR data
+      // Create archer object from imported data
       const newArcher: ImportedArcher = {
         id: `${parsed.n.replace(/\s+/g, '_')}_${Date.now()}`,
         name: parsed.n,
@@ -85,6 +86,7 @@ export default function ImportPdf() {
                 setImportedArchers(prev => 
                   prev.map(a => a.name === newArcher.name ? newArcher : a)
                 );
+                setImportCode('');
                 Alert.alert('Updated', `${newArcher.name}'s data has been updated.`);
               }
             },
@@ -92,18 +94,15 @@ export default function ImportPdf() {
         );
       } else {
         setImportedArchers(prev => [...prev, newArcher]);
+        setImportCode('');
         Alert.alert(
           'Archer Imported!',
           `${newArcher.name} (${BOW_TYPES[newArcher.bowType] || newArcher.bowType})\nScore: ${newArcher.totalScore}`,
-          [
-            { text: 'Done', style: 'cancel' },
-            { text: 'Scan Another', onPress: () => setScanning(true) },
-          ]
         );
       }
     } catch (error) {
-      console.error('QR Parse Error:', error);
-      Alert.alert('Parse Error', 'Could not read the QR code data. Make sure it\'s a valid Arrow Tracker competition QR code.');
+      console.error('Import Error:', error);
+      Alert.alert('Invalid Code', 'Could not read the import code. Make sure you copied the entire code from the PDF.');
     }
   };
 
@@ -338,52 +337,6 @@ export default function ImportPdf() {
     }
   };
 
-  // Camera permission handling
-  if (!permission) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#FFD700" />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // QR Scanner Modal
-  const renderScanner = () => (
-    <Modal visible={scanning} animationType="slide">
-      <SafeAreaView style={styles.scannerContainer}>
-        <View style={styles.scannerHeader}>
-          <TouchableOpacity onPress={() => setScanning(false)} style={styles.closeButton}>
-            <Ionicons name="close" size={32} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.scannerTitle}>Scan QR Code</Text>
-          <View style={{ width: 40 }} />
-        </View>
-        
-        <View style={styles.cameraContainer}>
-          <CameraView
-            style={styles.camera}
-            facing="back"
-            barcodeScannerSettings={{
-              barcodeTypes: ['qr'],
-            }}
-            onBarcodeScanned={handleBarCodeScanned}
-          />
-          <View style={styles.scanOverlay}>
-            <View style={styles.scanFrame} />
-          </View>
-        </View>
-        
-        <View style={styles.scannerFooter}>
-          <Text style={styles.scannerInstructions}>
-            Point camera at the QR code on an archer's competition report
-          </Text>
-        </View>
-      </SafeAreaView>
-    </Modal>
-  );
-
   // Preview screen
   if (showPreview) {
     const archersByBowType: { [key: string]: ImportedArcher[] } = {};
@@ -472,8 +425,6 @@ export default function ImportPdf() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {renderScanner()}
-      
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
@@ -483,64 +434,70 @@ export default function ImportPdf() {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        {/* Instructions */}
-        <View style={styles.instructionsCard}>
-          <Ionicons name="qr-code" size={32} color="#2196F3" />
-          <View style={styles.instructionsContent}>
-            <Text style={styles.instructionsTitle}>Scan Competition QR Codes</Text>
-            <Text style={styles.instructionsText}>
-              Scan the QR code from each archer's competition report PDF. The app will automatically import their name, bow type, and scores.
-            </Text>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+          {/* Instructions */}
+          <View style={styles.instructionsCard}>
+            <Ionicons name="document-text" size={32} color="#2196F3" />
+            <View style={styles.instructionsContent}>
+              <Text style={styles.instructionsTitle}>Import Archer Scores</Text>
+              <Text style={styles.instructionsText}>
+                Copy the Import Code from each archer's competition PDF and paste it below to add their scores.
+              </Text>
+            </View>
           </View>
-        </View>
 
-        {/* Scan Button */}
-        <TouchableOpacity
-          style={styles.scanButton}
-          onPress={() => {
-            if (!permission.granted) {
-              requestPermission();
-            } else {
-              setScanning(true);
-            }
-          }}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="scan" size={48} color="#000" />
-          <Text style={styles.scanButtonText}>Scan QR Code</Text>
-          <Text style={styles.scanButtonSubtext}>
-            {importedArchers.length > 0 
-              ? `${importedArchers.length} archer${importedArchers.length > 1 ? 's' : ''} imported`
-              : 'Tap to start scanning'}
-          </Text>
-        </TouchableOpacity>
+          {/* Import Code Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>Import Code</Text>
+            <TextInput
+              style={styles.codeInput}
+              placeholder="Paste import code here..."
+              placeholderTextColor="#666"
+              value={importCode}
+              onChangeText={setImportCode}
+              multiline
+              numberOfLines={4}
+            />
+            <TouchableOpacity
+              style={[styles.importButton, !importCode.trim() && styles.importButtonDisabled]}
+              onPress={handleImportCode}
+              disabled={!importCode.trim()}
+            >
+              <Ionicons name="add-circle" size={24} color="#000" />
+              <Text style={styles.importButtonText}>Add Archer</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Imported Archers List */}
-        {importedArchers.length > 0 && (
-          <View style={styles.archersSection}>
-            <Text style={styles.sectionTitle}>Imported Archers ({importedArchers.length})</Text>
-            
-            {importedArchers.map((archer, index) => (
-              <View key={archer.id} style={styles.archerItem}>
-                <View style={styles.archerItemInfo}>
-                  <Text style={styles.archerItemName}>{archer.name}</Text>
-                  <Text style={styles.archerItemMeta}>
-                    {BOW_TYPES[archer.bowType] || archer.bowType} • Score: {archer.totalScore} • X: {archer.xCount}
-                  </Text>
+          {/* Imported Archers List */}
+          {importedArchers.length > 0 && (
+            <View style={styles.archersSection}>
+              <Text style={styles.sectionTitle}>Imported Archers ({importedArchers.length})</Text>
+              
+              {importedArchers.map((archer, index) => (
+                <View key={archer.id} style={styles.archerItem}>
+                  <View style={styles.archerItemInfo}>
+                    <Text style={styles.archerItemName}>{archer.name}</Text>
+                    <Text style={styles.archerItemMeta}>
+                      {BOW_TYPES[archer.bowType] || archer.bowType} • Score: {archer.totalScore} • X: {archer.xCount}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => removeArcher(index)} style={styles.removeButton}>
+                    <Ionicons name="trash-outline" size={20} color="#ed1c24" />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => removeArcher(index)} style={styles.removeButton}>
-                  <Ionicons name="trash-outline" size={20} color="#ed1c24" />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        )}
-      </ScrollView>
+              ))}
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Generate Button */}
       {importedArchers.length > 0 && (
-        <View style={styles.footer}>
+        <View style={styles.footerButtons}>
           <TouchableOpacity
             style={styles.previewButton}
             onPress={() => setShowPreview(true)}
@@ -558,7 +515,6 @@ export default function ImportPdf() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -594,17 +550,45 @@ const styles = StyleSheet.create({
     color: '#aaa',
     lineHeight: 20,
   },
-  scanButton: {
-    backgroundColor: '#2196F3',
-    borderRadius: 20,
-    padding: 32,
+  inputSection: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#888',
+    marginBottom: 8,
+  },
+  codeInput: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 12,
+    padding: 12,
+    color: '#fff',
+    fontSize: 14,
+    minHeight: 100,
+    textAlignVertical: 'top',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    marginBottom: 12,
+  },
+  importButton: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
-    marginBottom: 20,
+    backgroundColor: '#2196F3',
+    borderRadius: 12,
+    padding: 14,
+    gap: 8,
   },
-  scanButtonText: { fontSize: 22, fontWeight: 'bold', color: '#000' },
-  scanButtonSubtext: { fontSize: 14, color: '#000', opacity: 0.7 },
+  importButtonDisabled: {
+    backgroundColor: '#444',
+    opacity: 0.6,
+  },
+  importButtonText: { fontSize: 16, fontWeight: 'bold', color: '#000' },
   archersSection: {
     backgroundColor: '#1a1a1a',
     borderRadius: 16,
@@ -624,7 +608,7 @@ const styles = StyleSheet.create({
   archerItemName: { fontSize: 16, fontWeight: 'bold', color: '#fff' },
   archerItemMeta: { fontSize: 12, color: '#888', marginTop: 2 },
   removeButton: { padding: 8 },
-  footer: {
+  footerButtons: {
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: '#222',
@@ -639,34 +623,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   previewButtonText: { fontSize: 16, fontWeight: 'bold', color: '#000' },
-  // Scanner styles
-  scannerContainer: { flex: 1, backgroundColor: '#000' },
-  scannerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  closeButton: { padding: 8 },
-  scannerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
-  cameraContainer: { flex: 1, position: 'relative' },
-  camera: { flex: 1 },
-  scanOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scanFrame: {
-    width: 250,
-    height: 250,
-    borderWidth: 3,
-    borderColor: '#2196F3',
-    borderRadius: 20,
-    backgroundColor: 'transparent',
-  },
-  scannerFooter: { padding: 20 },
-  scannerInstructions: { color: '#fff', textAlign: 'center', fontSize: 14 },
   // Preview styles
   previewHeader: {
     alignItems: 'center',
@@ -706,6 +662,11 @@ const styles = StyleSheet.create({
   scoreInfo: { alignItems: 'flex-end' },
   totalScore: { fontSize: 18, fontWeight: 'bold', color: '#FFD700' },
   xCount: { fontSize: 12, color: '#888' },
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#222',
+  },
   generateButton: {
     flexDirection: 'row',
     alignItems: 'center',
