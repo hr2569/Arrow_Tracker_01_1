@@ -25,8 +25,13 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        {/* Hero Section */}
+        {/* Hero Section with Logo */}
         <View style={styles.hero}>
+          <Image 
+            source={require('../assets/images/logo.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={styles.title}>Arrow Tracker</Text>
           <Text style={styles.subtitle}>
             Track your shots and improve your aim
