@@ -47,62 +47,71 @@ export default function ImportPdf() {
 
   const handleImportCode = () => {
     if (!importCode.trim()) {
-      Alert.alert('Error', 'Please enter an import code');
+      Alert.alert('Error', 'Please enter import code(s)');
       return;
     }
     
-    try {
-      // Decode base64 and parse JSON
-      const decoded = atob(importCode.trim());
-      const parsed = JSON.parse(decoded);
+    // Split by newlines to support batch import
+    const codes = importCode.trim().split('\n').filter(c => c.trim());
+    const newArchers: ImportedArcher[] = [];
+    const errors: string[] = [];
+    const duplicates: string[] = [];
+    
+    for (const code of codes) {
+      try {
+        // Decode base64 and parse JSON
+        const decoded = atob(code.trim());
+        const parsed = JSON.parse(decoded);
+        
+        // Validate it's an Arrow Tracker code
+        if (parsed.t !== 'at_comp' || !parsed.n || !parsed.b || parsed.s === undefined) {
+          errors.push(`Invalid code format`);
+          continue;
+        }
+        
+        // Check if archer already exists in current list or new imports
+        const existsInList = importedArchers.some(a => a.name === parsed.n);
+        const existsInNew = newArchers.some(a => a.name === parsed.n);
+        
+        if (existsInList || existsInNew) {
+          duplicates.push(parsed.n);
+          continue;
+        }
+        
+        // Create archer object from imported data
+        newArchers.push({
+          id: `${parsed.n.replace(/\s+/g, '_')}_${Date.now()}_${Math.random()}`,
+          name: parsed.n,
+          bowType: parsed.b,
+          totalScore: parsed.s,
+          xCount: parsed.x || 0,
+          rounds: parsed.r || [],
+        });
+      } catch (error) {
+        errors.push(`Failed to parse code`);
+      }
+    }
+    
+    // Add all valid archers
+    if (newArchers.length > 0) {
+      setImportedArchers(prev => [...prev, ...newArchers]);
+      setImportCode('');
       
-      // Validate it's an Arrow Tracker code
-      if (parsed.t !== 'at_comp' || !parsed.n || !parsed.b || parsed.s === undefined) {
-        Alert.alert('Invalid Code', 'This is not a valid Arrow Tracker import code.');
-        return;
+      let message = `Successfully imported ${newArchers.length} archer${newArchers.length > 1 ? 's' : ''}:\n`;
+      message += newArchers.map(a => `• ${a.name} (${BOW_TYPES[a.bowType] || a.bowType}): ${a.totalScore} pts`).join('\n');
+      
+      if (duplicates.length > 0) {
+        message += `\n\nSkipped ${duplicates.length} duplicate${duplicates.length > 1 ? 's' : ''}: ${duplicates.join(', ')}`;
+      }
+      if (errors.length > 0) {
+        message += `\n\n${errors.length} code${errors.length > 1 ? 's' : ''} failed to import`;
       }
       
-      // Create archer object from imported data
-      const newArcher: ImportedArcher = {
-        id: `${parsed.n.replace(/\s+/g, '_')}_${Date.now()}`,
-        name: parsed.n,
-        bowType: parsed.b,
-        totalScore: parsed.s,
-        xCount: parsed.x || 0,
-        rounds: parsed.r || [],
-      };
-      
-      // Check if archer already exists
-      const exists = importedArchers.some(a => a.name === newArcher.name);
-      if (exists) {
-        Alert.alert(
-          'Duplicate Archer',
-          `${newArcher.name} has already been imported. Do you want to replace their data?`,
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { 
-              text: 'Replace', 
-              onPress: () => {
-                setImportedArchers(prev => 
-                  prev.map(a => a.name === newArcher.name ? newArcher : a)
-                );
-                setImportCode('');
-                Alert.alert('Updated', `${newArcher.name}'s data has been updated.`);
-              }
-            },
-          ]
-        );
-      } else {
-        setImportedArchers(prev => [...prev, newArcher]);
-        setImportCode('');
-        Alert.alert(
-          'Archer Imported!',
-          `${newArcher.name} (${BOW_TYPES[newArcher.bowType] || newArcher.bowType})\nScore: ${newArcher.totalScore}`,
-        );
-      }
-    } catch (error) {
-      console.error('Import Error:', error);
-      Alert.alert('Invalid Code', 'Could not read the import code. Make sure you copied the entire code from the PDF.');
+      Alert.alert('Import Complete', message);
+    } else if (duplicates.length > 0) {
+      Alert.alert('Already Imported', `All archers are already in the list: ${duplicates.join(', ')}`);
+    } else {
+      Alert.alert('Import Failed', 'No valid import codes found. Make sure you copied the entire code from each PDF.');
     }
   };
 
