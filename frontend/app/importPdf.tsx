@@ -452,24 +452,24 @@ export default function ImportPdf() {
           <View style={styles.instructionsCard}>
             <Ionicons name="document-text" size={32} color="#2196F3" />
             <View style={styles.instructionsContent}>
-              <Text style={styles.instructionsTitle}>Import Archer Scores</Text>
+              <Text style={styles.instructionsTitle}>Batch Import Archer Scores</Text>
               <Text style={styles.instructionsText}>
-                Copy the Import Code from each archer's competition PDF and paste it below to add their scores.
+                Copy the Import Codes from each archer's competition PDF and paste them all below (one code per line) to import all archers at once.
               </Text>
             </View>
           </View>
 
           {/* Import Code Input */}
           <View style={styles.inputSection}>
-            <Text style={styles.inputLabel}>Import Code</Text>
+            <Text style={styles.inputLabel}>Import Codes (one per line for batch import)</Text>
             <TextInput
               style={styles.codeInput}
-              placeholder="Paste import code here..."
+              placeholder="Paste import codes here...&#10;Each code on a new line for batch import"
               placeholderTextColor="#666"
               value={importCode}
               onChangeText={setImportCode}
               multiline
-              numberOfLines={4}
+              numberOfLines={6}
             />
             <TouchableOpacity
               style={[styles.importButton, !importCode.trim() && styles.importButtonDisabled]}
@@ -477,7 +477,7 @@ export default function ImportPdf() {
               disabled={!importCode.trim()}
             >
               <Ionicons name="add-circle" size={24} color="#000" />
-              <Text style={styles.importButtonText}>Add Archer</Text>
+              <Text style={styles.importButtonText}>Import All Archers</Text>
             </TouchableOpacity>
           </View>
 
