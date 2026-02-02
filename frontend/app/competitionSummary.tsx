@@ -626,6 +626,14 @@ export default function CompetitionSummaryScreen() {
         try {
           await FileSystem.writeAsStringAsync(jsonDestination, JSON.stringify(exportData, null, 2));
           console.log('JSON saved at:', jsonDestination);
+          // Show reminder to send file to score keeper
+          setTimeout(() => {
+            Alert.alert(
+              '📋 Export File Created',
+              `Don't forget to send "${jsonFileName}" to your Score Keeper!`,
+              [{ text: 'OK' }]
+            );
+          }, 1000);
         } catch (jsonError) {
           console.log('Could not save JSON file:', jsonError);
         }
