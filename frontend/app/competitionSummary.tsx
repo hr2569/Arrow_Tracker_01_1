@@ -326,7 +326,7 @@ export default function CompetitionSummaryScreen() {
     `;
   };
 
-  const generatePdfHtml = (qrCodeDataUrl?: string) => {
+  const generatePdfHtml = (importCode?: string) => {
     if (!competition) return '';
     
     const archer = competition.participants[0];
@@ -338,12 +338,12 @@ export default function CompetitionSummaryScreen() {
     const heatmapSvg = generateHeatmapSvg(allShots, 500, competition.targetType);
     const scatterSvg = generateScatterPlotSvg(allShots, 500);
     
-    // QR code section (only if data URL provided)
-    const qrCodeSection = qrCodeDataUrl ? `
-      <div class="qr-section">
-        <h3>📱 Import Code</h3>
-        <p style="font-size: 12px; color: #666;">Scan this QR code to import results into Score Keeping</p>
-        <img src="${qrCodeDataUrl}" width="150" height="150" />
+    // Import code section
+    const importCodeSection = importCode ? `
+      <div class="import-section">
+        <h3>📋 Import Code</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Enter this code in Score Keeping → Import to add your results</p>
+        <div class="import-code">${importCode}</div>
       </div>
     ` : '';
 
