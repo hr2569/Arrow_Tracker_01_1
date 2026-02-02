@@ -14,8 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
-import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.4);
@@ -30,7 +28,7 @@ interface Arrow {
   targetIndex?: number;
 }
 
-// Zoomable Target Component with smooth diagonal panning
+// Zoomable Target Component with nested ScrollViews for smooth scrolling
 interface ZoomableTargetProps {
   zoomLevel: number;
   baseTargetSize: number;
@@ -38,82 +36,39 @@ interface ZoomableTargetProps {
 }
 
 const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSize, children }) => {
-  // Pan offset values
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  
-  // Saved offset for gesture continuation
-  const savedTranslateX = useSharedValue(0);
-  const savedTranslateY = useSharedValue(0);
-  
-  // Calculate pan bounds based on zoom level
-  const scaledSize = (baseTargetSize + 40) * zoomLevel;
-  const maxPanX = Math.max(0, (scaledSize - SCREEN_WIDTH + 40) / 2);
-  const maxPanY = Math.max(0, (scaledSize - CONTAINER_HEIGHT) / 2);
-  
-  // Reset pan when zoom level changes to 1
-  React.useEffect(() => {
-    if (zoomLevel === 1) {
-      translateX.value = withSpring(0, { damping: 20, stiffness: 200 });
-      translateY.value = withSpring(0, { damping: 20, stiffness: 200 });
-      savedTranslateX.value = 0;
-      savedTranslateY.value = 0;
-    }
-  }, [zoomLevel]);
-  
-  // Pan gesture handler - allows smooth diagonal movement
-  const panGesture = Gesture.Pan()
-    .enabled(zoomLevel > 1)
-    .onStart(() => {
-      savedTranslateX.value = translateX.value;
-      savedTranslateY.value = translateY.value;
-    })
-    .onUpdate((event) => {
-      // Apply movement in both X and Y simultaneously for diagonal panning
-      const newX = savedTranslateX.value + event.translationX;
-      const newY = savedTranslateY.value + event.translationY;
-      
-      // Clamp values within bounds
-      translateX.value = Math.max(-maxPanX, Math.min(maxPanX, newX));
-      translateY.value = Math.max(-maxPanY, Math.min(maxPanY, newY));
-    })
-    .onEnd((event) => {
-      // Add momentum with velocity
-      const velocityFactor = 0.1;
-      const targetX = translateX.value + event.velocityX * velocityFactor;
-      const targetY = translateY.value + event.velocityY * velocityFactor;
-      
-      // Animate to final position with spring physics, clamped to bounds
-      translateX.value = withSpring(
-        Math.max(-maxPanX, Math.min(maxPanX, targetX)),
-        { damping: 20, stiffness: 150, velocity: event.velocityX * 0.01 }
-      );
-      translateY.value = withSpring(
-        Math.max(-maxPanY, Math.min(maxPanY, targetY)),
-        { damping: 20, stiffness: 150, velocity: event.velocityY * 0.01 }
-      );
-      
-      // Save final positions
-      savedTranslateX.value = Math.max(-maxPanX, Math.min(maxPanX, targetX));
-      savedTranslateY.value = Math.max(-maxPanY, Math.min(maxPanY, targetY));
-    });
-  
-  // Animated style combining scale and translation
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { scale: zoomLevel },
-    ],
-  }));
-  
   return (
     <View style={[styles.zoomContainer, { height: zoomLevel > 1 ? CONTAINER_HEIGHT : 'auto' }]}>
-      <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.targetWrapper, animatedStyle]}>
-          {children}
-        </Animated.View>
-      </GestureDetector>
+      <ScrollView 
+        horizontal={true}
+        showsHorizontalScrollIndicator={zoomLevel > 1}
+        scrollEnabled={zoomLevel > 1}
+        bounces={true}
+        decelerationRate="fast"
+        scrollEventThrottle={16}
+        contentContainerStyle={{
+          width: zoomLevel > 1 ? (baseTargetSize + 40) * zoomLevel : '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <ScrollView 
+          showsVerticalScrollIndicator={zoomLevel > 1}
+          scrollEnabled={zoomLevel > 1}
+          nestedScrollEnabled={true}
+          bounces={true}
+          decelerationRate="fast"
+          scrollEventThrottle={16}
+          contentContainerStyle={{
+            height: zoomLevel > 1 ? (baseTargetSize + 40) * zoomLevel : 'auto',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <View style={{ transform: [{ scale: zoomLevel }] }}>
+            {children}
+          </View>
+        </ScrollView>
+      </ScrollView>
     </View>
   );
 };
