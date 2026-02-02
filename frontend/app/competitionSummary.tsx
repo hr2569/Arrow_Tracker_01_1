@@ -441,7 +441,7 @@ export default function CompetitionSummaryScreen() {
             font-size: 18px;
             font-weight: bold;
           }
-          .qr-section {
+          .qr-section, .import-section {
             text-align: center;
             margin-top: 30px;
             padding: 20px;
@@ -449,9 +449,19 @@ export default function CompetitionSummaryScreen() {
             border-radius: 12px;
             border: 2px dashed #8B0000;
           }
-          .qr-section h3 {
+          .qr-section h3, .import-section h3 {
             margin: 0 0 5px 0;
             color: #8B0000;
+          }
+          .import-code {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            background: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            word-break: break-all;
+            color: #333;
           }
           .footer {
             text-align: center;
