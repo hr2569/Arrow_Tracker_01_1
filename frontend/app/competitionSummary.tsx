@@ -440,6 +440,18 @@ export default function CompetitionSummaryScreen() {
             font-size: 18px;
             font-weight: bold;
           }
+          .qr-section {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            border: 2px dashed #8B0000;
+          }
+          .qr-section h3 {
+            margin: 0 0 5px 0;
+            color: #8B0000;
+          }
           .footer {
             text-align: center;
             color: #888;
