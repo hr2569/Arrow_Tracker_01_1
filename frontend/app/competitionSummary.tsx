@@ -536,30 +536,36 @@ export default function CompetitionSummaryScreen() {
 
     setGenerating(true);
     
-    // Prepare export data for .arrowtracker.json file
+    // Prepare export data for QR code (compact format)
     const archer = competition.participants[0];
     const exportData = {
-      version: '1.0',
-      type: 'arrowtracker_competition',
-      name: competition.name || 'Competition',
-      date: competition.completedAt || competition.createdAt,
-      rounds: competition.maxRounds,
-      arrowsPerRound: competition.arrowsPerRound,
-      archers: [{
-        id: archer.name.replace(/\s+/g, '_').toLowerCase() + '_' + Date.now(),
-        name: archer.name,
-        bowType: archer.bowType || 'recurve',
-        rounds: archer.rounds.map(r => r.shots.map(s => s.ring === 11 ? 10 : s.ring)),
-        totalScore: archer.totalScore,
-        xCount: archer.rounds.reduce((total, r) => 
-          total + r.shots.filter(s => s.ring === 11).length, 0),
-      }],
+      v: '1.0',
+      t: 'at_comp',
+      n: archer.name,
+      b: archer.bowType || 'recurve',
+      s: archer.totalScore,
+      x: archer.rounds.reduce((total, r) => 
+        total + r.shots.filter(s => s.ring === 11).length, 0),
+      r: archer.rounds.map(r => r.shots.map(s => s.ring === 11 ? 10 : s.ring)),
     };
+    
+    // Generate QR code as data URL
+    let qrCodeDataUrl = '';
+    try {
+      const qrData = JSON.stringify(exportData);
+      qrCodeDataUrl = await QRCode.toDataURL(qrData, {
+        width: 200,
+        margin: 2,
+        errorCorrectionLevel: 'M',
+      });
+    } catch (qrError) {
+      console.log('Could not generate QR code:', qrError);
+    }
     
     if (Platform.OS === 'web') {
       // For web, open in new tab directly
       try {
-        const html = generatePdfHtml();
+        const html = generatePdfHtml(qrCodeDataUrl);
         const blob = new Blob([html], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
