@@ -439,61 +439,41 @@ export default function CompetitionScoringScreen() {
     }
   };
 
-  // Zoomable Target Component
+  // Zoomable Target Component with nested ScrollViews for smooth scrolling
   const ZoomableTarget = ({ children }: { children: React.ReactNode }) => {
-    const translateX = useSharedValue(0);
-    const translateY = useSharedValue(0);
-    const savedTranslateX = useSharedValue(0);
-    const savedTranslateY = useSharedValue(0);
-    
-    const scaledSize = (BASE_TARGET_SIZE + 40) * zoomLevel;
-    const maxPanX = Math.max(0, (scaledSize - SCREEN_WIDTH + 40) / 2);
-    const maxPanY = Math.max(0, (scaledSize - CONTAINER_HEIGHT) / 2);
-    
-    useEffect(() => {
-      if (zoomLevel === 1) {
-        translateX.value = withSpring(0);
-        translateY.value = withSpring(0);
-        savedTranslateX.value = 0;
-        savedTranslateY.value = 0;
-      }
-    }, [zoomLevel]);
-    
-    const panGesture = Gesture.Pan()
-      .enabled(zoomLevel > 1)
-      .onStart(() => {
-        savedTranslateX.value = translateX.value;
-        savedTranslateY.value = translateY.value;
-      })
-      .onUpdate((event) => {
-        const newX = savedTranslateX.value + event.translationX;
-        const newY = savedTranslateY.value + event.translationY;
-        translateX.value = Math.max(-maxPanX, Math.min(maxPanX, newX));
-        translateY.value = Math.max(-maxPanY, Math.min(maxPanY, newY));
-      })
-      .onEnd((event) => {
-        const velocityFactor = 0.1;
-        const targetX = translateX.value + event.velocityX * velocityFactor;
-        const targetY = translateY.value + event.velocityY * velocityFactor;
-        translateX.value = withSpring(Math.max(-maxPanX, Math.min(maxPanX, targetX)));
-        translateY.value = withSpring(Math.max(-maxPanY, Math.min(maxPanY, targetY)));
-      });
-    
-    const animatedStyle = useAnimatedStyle(() => ({
-      transform: [
-        { translateX: translateX.value },
-        { translateY: translateY.value },
-        { scale: zoomLevel },
-      ],
-    }));
-    
     return (
       <View style={[styles.zoomContainer, { height: zoomLevel > 1 ? CONTAINER_HEIGHT : 'auto' }]}>
-        <GestureDetector gesture={panGesture}>
-          <Animated.View style={[styles.targetWrapper, animatedStyle]}>
-            {children}
-          </Animated.View>
-        </GestureDetector>
+        <ScrollView 
+          horizontal={true}
+          showsHorizontalScrollIndicator={zoomLevel > 1}
+          scrollEnabled={zoomLevel > 1}
+          bounces={true}
+          decelerationRate="fast"
+          scrollEventThrottle={16}
+          contentContainerStyle={{
+            width: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <ScrollView 
+            showsVerticalScrollIndicator={zoomLevel > 1}
+            scrollEnabled={zoomLevel > 1}
+            nestedScrollEnabled={true}
+            bounces={true}
+            decelerationRate="fast"
+            scrollEventThrottle={16}
+            contentContainerStyle={{
+              height: zoomLevel > 1 ? (BASE_TARGET_SIZE + 40) * zoomLevel : 'auto',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <View style={{ transform: [{ scale: zoomLevel }] }}>
+              {children}
+            </View>
+          </ScrollView>
+        </ScrollView>
       </View>
     );
   };
