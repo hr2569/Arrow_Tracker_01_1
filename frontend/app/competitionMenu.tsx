@@ -35,13 +35,13 @@ export default function CompetitionMenu() {
           activeOpacity={0.8}
         >
           <View style={styles.menuIconContainer}>
-            <Ionicons name="locate" size={40} color="#000" />
+            <Ionicons name="locate" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
             <Text style={styles.menuButtonTitle}>Compete</Text>
             <Text style={styles.menuButtonSubtitle}>Start a new competition round</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#FFD700" />
+          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
 
         {/* Score Keeping Button */}
@@ -50,14 +50,14 @@ export default function CompetitionMenu() {
           onPress={() => router.push('/scoreKeeping')}
           activeOpacity={0.8}
         >
-          <View style={[styles.menuIconContainer, { backgroundColor: '#1a3a1a' }]}>
-            <Ionicons name="clipboard" size={40} color="#4CAF50" />
+          <View style={[styles.menuIconContainer, { backgroundColor: '#2a1a1a' }]}>
+            <Ionicons name="clipboard" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
             <Text style={styles.menuButtonTitle}>Score Keeping</Text>
             <Text style={styles.menuButtonSubtitle}>Record scores for other archers</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#FFD700" />
+          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
 
         {/* Competition History Button */}
@@ -66,14 +66,14 @@ export default function CompetitionMenu() {
           onPress={() => router.push('/competitionHistory')}
           activeOpacity={0.8}
         >
-          <View style={[styles.menuIconContainer, { backgroundColor: '#2a2a3a' }]}>
-            <Ionicons name="time" size={40} color="#9C27B0" />
+          <View style={[styles.menuIconContainer, { backgroundColor: '#1a1a2a' }]}>
+            <Ionicons name="time" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
             <Text style={styles.menuButtonTitle}>Competition History</Text>
             <Text style={styles.menuButtonSubtitle}>View past competition results</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#FFD700" />
+          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: '#8B0000',
   },
   backButton: {
     padding: 8,
@@ -122,13 +122,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#8B0000',
   },
   menuIconContainer: {
     width: 64,
     height: 64,
     borderRadius: 12,
-    backgroundColor: '#3a3a1a',
+    backgroundColor: '#3a1a1a',
     alignItems: 'center',
     justifyContent: 'center',
   },
