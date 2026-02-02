@@ -24,6 +24,7 @@ import * as IntentLauncher from 'expo-intent-launcher';
 import { getContentUriAsync } from 'expo-file-system';
 import * as FileSystem from '../utils/fileSystemLegacy';
 import { TARGET_CONFIGS } from '../store/appStore';
+import QRCode from 'qrcode';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
