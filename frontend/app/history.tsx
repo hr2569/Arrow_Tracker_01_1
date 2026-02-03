@@ -140,9 +140,8 @@ interface GroupedSessions {
 
 export default function HistoryScreen() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'history' | 'competitions' | 'stats' | 'report'>('history');
+  const [activeTab, setActiveTab] = useState<'history' | 'stats' | 'report'>('history');
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [expandedSession, setExpandedSession] = useState<string | null>(null);
@@ -193,9 +192,7 @@ export default function HistoryScreen() {
   const fetchSessions = async () => {
     try {
       const sessionsData = await getSessions();
-      const competitionsData = await getCompetitions();
       setSessions(sessionsData);
-      setCompetitions(competitionsData.filter(c => c.status === 'completed'));
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
