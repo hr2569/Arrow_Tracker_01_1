@@ -36,35 +36,59 @@ interface ZoomableTargetProps {
 }
 
 const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSize, children }) => {
+  const scaledSize = (baseTargetSize + 40) * zoomLevel;
+  const isZoomed = zoomLevel > 1;
+  
+  if (!isZoomed) {
+    // When not zoomed, just render the content directly without scroll
+    return (
+      <View style={styles.zoomContainer}>
+        {children}
+      </View>
+    );
+  }
+  
+  // When zoomed, use nested ScrollViews for 2D panning
   return (
-    <View style={[styles.zoomContainer, { height: zoomLevel > 1 ? CONTAINER_HEIGHT : 'auto' }]}>
+    <View style={[styles.zoomContainer, { height: CONTAINER_HEIGHT, overflow: 'hidden' }]}>
       <ScrollView 
         horizontal={true}
-        showsHorizontalScrollIndicator={zoomLevel > 1}
-        scrollEnabled={zoomLevel > 1}
+        showsHorizontalScrollIndicator={true}
+        scrollEnabled={true}
         bounces={true}
-        decelerationRate="fast"
+        bouncesZoom={true}
+        alwaysBounceHorizontal={true}
+        decelerationRate="normal"
         scrollEventThrottle={16}
+        style={{ flex: 1 }}
         contentContainerStyle={{
-          width: zoomLevel > 1 ? (baseTargetSize + 40) * zoomLevel : '100%',
-          alignItems: 'center',
-          justifyContent: 'center',
+          width: scaledSize,
+          minHeight: CONTAINER_HEIGHT,
         }}
       >
         <ScrollView 
-          showsVerticalScrollIndicator={zoomLevel > 1}
-          scrollEnabled={zoomLevel > 1}
+          showsVerticalScrollIndicator={true}
+          scrollEnabled={true}
           nestedScrollEnabled={true}
           bounces={true}
-          decelerationRate="fast"
+          alwaysBounceVertical={true}
+          decelerationRate="normal"
           scrollEventThrottle={16}
+          style={{ flex: 1 }}
           contentContainerStyle={{
-            height: zoomLevel > 1 ? (baseTargetSize + 40) * zoomLevel : 'auto',
+            height: scaledSize,
+            width: scaledSize,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <View style={{ transform: [{ scale: zoomLevel }] }}>
+          <View style={{ 
+            width: baseTargetSize + 40,
+            height: baseTargetSize + 40,
+            transform: [{ scale: zoomLevel }],
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
             {children}
           </View>
         </ScrollView>
