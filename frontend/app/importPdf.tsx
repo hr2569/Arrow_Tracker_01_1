@@ -39,7 +39,6 @@ interface ImportedArcher {
 
 export default function ImportPdf() {
   const router = useRouter();
-  const [importCode, setImportCode] = useState('');
   const [importedArchers, setImportedArchers] = useState<ImportedArcher[]>([]);
   const [competitionName, setCompetitionName] = useState('Competition Results');
   const [generating, setGenerating] = useState(false);
