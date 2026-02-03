@@ -1052,9 +1052,21 @@ export default function ReportScreen() {
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
         
+        // Copy to a file with proper name
+        const newUri = (FileSystem.documentDirectory || '') + pdfFileName;
+        try {
+          await FileSystem.copyAsync({ from: uri, to: newUri });
+          console.log('PDF copied to:', newUri);
+        } catch (e) {
+          console.log('Could not copy with name:', e);
+        }
+        
+        // Use the original URI for content URI (more reliable)
+        const fileToOpen = uri;
+        
         // Try to get content URI and open with Chrome directly
         try {
-          const contentUri = await getContentUriAsync(uri);
+          const contentUri = await FileSystem.getContentUriAsync(fileToOpen);
           console.log('Content URI:', contentUri);
           
           // Open directly in Google Chrome
@@ -1068,7 +1080,7 @@ export default function ReportScreen() {
           console.log('Chrome failed, trying default viewer...', intentError);
           // Try default PDF viewer if Chrome fails
           try {
-            const contentUri = await getContentUriAsync(uri);
+            const contentUri = await FileSystem.getContentUriAsync(fileToOpen);
             await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
               data: contentUri,
               flags: 1,
@@ -1079,9 +1091,9 @@ export default function ReportScreen() {
             // Final fallback to share sheet
             const isAvailable = await Sharing.isAvailableAsync();
             if (isAvailable) {
-              await Sharing.shareAsync(uri, {
+              await Sharing.shareAsync(fileToOpen, {
                 mimeType: 'application/pdf',
-                dialogTitle: 'Open Report',
+                dialogTitle: pdfFileName,
               });
             } else {
               Alert.alert('Error', 'No PDF viewer available on this device');
