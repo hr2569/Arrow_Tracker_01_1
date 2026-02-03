@@ -1018,8 +1018,13 @@ export default function ReportScreen() {
     `;
   };
 
-  // Handle PDF - create and open with default PDF viewer
+  // Handle PDF - create and open instantly in Chrome
   const handleDownloadPdf = async () => {
+    // Generate filename with date
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const pdfFileName = `Arrow_Tracker_Report_${dateStr}.pdf`;
+    
     if (Platform.OS === 'web') {
       // For web, open in new tab directly
       try {
@@ -1032,7 +1037,7 @@ export default function ReportScreen() {
         alert('Failed to open PDF. Please try again.');
       }
     } else if (Platform.OS === 'android') {
-      // Android - try to open directly in default PDF viewer
+      // Android - open directly in Chrome
       try {
         const html = generatePdfHtml();
         console.log('Generating PDF...');
@@ -1040,28 +1045,40 @@ export default function ReportScreen() {
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
         
-        // Try to get content URI and open with IntentLauncher (only works in native build)
+        // Try to get content URI and open with Chrome directly
         try {
           const contentUri = await getContentUriAsync(uri);
           console.log('Content URI:', contentUri);
           
-          // Open in default PDF viewer (no packageName to let user choose)
+          // Open directly in Google Chrome
           await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
             data: contentUri,
             flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
             type: 'application/pdf',
+            packageName: 'com.android.chrome',
           });
         } catch (intentError) {
-          console.log('IntentLauncher failed (likely Expo Go), using share sheet...', intentError);
-          // Fall back to share sheet (works in Expo Go and native)
-          const isAvailable = await Sharing.isAvailableAsync();
-          if (isAvailable) {
-            await Sharing.shareAsync(uri, {
-              mimeType: 'application/pdf',
-              dialogTitle: 'Open Report',
+          console.log('Chrome failed, trying default viewer...', intentError);
+          // Try default PDF viewer if Chrome fails
+          try {
+            const contentUri = await getContentUriAsync(uri);
+            await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+              data: contentUri,
+              flags: 1,
+              type: 'application/pdf',
             });
-          } else {
-            Alert.alert('Error', 'Sharing not available on this device');
+          } catch (viewerError) {
+            console.log('Default viewer failed, using share sheet...', viewerError);
+            // Final fallback to share sheet
+            const isAvailable = await Sharing.isAvailableAsync();
+            if (isAvailable) {
+              await Sharing.shareAsync(uri, {
+                mimeType: 'application/pdf',
+                dialogTitle: 'Open Report',
+              });
+            } else {
+              Alert.alert('Error', 'No PDF viewer available on this device');
+            }
           }
         }
       } catch (error) {
