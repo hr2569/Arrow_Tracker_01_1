@@ -1025,7 +1025,7 @@ export default function ReportScreen() {
     `;
   };
 
-  // Handle PDF - create and open instantly in Chrome
+  // Handle PDF - create and open instantly
   const handleDownloadPdf = async () => {
     // Generate filename with date
     const today = new Date();
@@ -1044,68 +1044,53 @@ export default function ReportScreen() {
         alert('Failed to open PDF. Please try again.');
       }
     } else if (Platform.OS === 'android') {
-      // Android - open directly in Chrome
+      // Android - open directly in PDF viewer
       try {
         const html = generatePdfHtml();
-        console.log('Generating PDF...');
+        console.log('Generating PDF:', pdfFileName);
         
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
         
-        // Copy to a file with proper name
-        const newUri = (FileSystem.documentDirectory || '') + pdfFileName;
-        try {
-          await FileSystem.copyAsync({ from: uri, to: newUri });
-          console.log('PDF copied to:', newUri);
-        } catch (e) {
-          console.log('Could not copy with name:', e);
-        }
+        // Copy to document directory with proper name
+        const newUri = FileSystem.documentDirectory + pdfFileName;
+        await FileSystem.copyAsync({ from: uri, to: newUri });
+        console.log('PDF saved as:', newUri);
         
-        // Use the original URI for content URI (more reliable)
-        const fileToOpen = uri;
+        // Get content URI for sharing with other apps
+        const contentUri = await FileSystem.getContentUriAsync(newUri);
+        console.log('Content URI:', contentUri);
         
-        // Try to get content URI and open with Chrome directly
-        try {
-          const contentUri = await FileSystem.getContentUriAsync(fileToOpen);
-          console.log('Content URI:', contentUri);
-          
-          // Open directly in Google Chrome
-          await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-            data: contentUri,
-            flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
-            type: 'application/pdf',
-            packageName: 'com.android.chrome',
-          });
-        } catch (intentError) {
-          console.log('Chrome failed, trying default viewer...', intentError);
-          // Try default PDF viewer if Chrome fails
-          try {
-            const contentUri = await FileSystem.getContentUriAsync(fileToOpen);
-            await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-              data: contentUri,
-              flags: 1,
-              type: 'application/pdf',
-            });
-          } catch (viewerError) {
-            console.log('Default viewer failed, using share sheet...', viewerError);
-            // Final fallback to share sheet
-            const isAvailable = await Sharing.isAvailableAsync();
-            if (isAvailable) {
-              await Sharing.shareAsync(fileToOpen, {
-                mimeType: 'application/pdf',
-                dialogTitle: pdfFileName,
-              });
-            } else {
-              Alert.alert('Error', 'No PDF viewer available on this device');
-            }
-          }
-        }
-      } catch (error) {
+        // Open with default PDF viewer using VIEW action
+        // Using flags: FLAG_GRANT_READ_URI_PERMISSION (1) | FLAG_ACTIVITY_NEW_TASK (268435456)
+        await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+          data: contentUri,
+          flags: 268435457,
+          type: 'application/pdf',
+        });
+        
+        console.log('PDF opened successfully');
+      } catch (error: any) {
         console.error('PDF error:', error);
-        Alert.alert('Error', 'Failed to generate PDF');
+        // If Intent fails, try share sheet as fallback
+        try {
+          const html = generatePdfHtml();
+          const { uri } = await Print.printToFileAsync({ html });
+          const isAvailable = await Sharing.isAvailableAsync();
+          if (isAvailable) {
+            await Sharing.shareAsync(uri, {
+              mimeType: 'application/pdf',
+              dialogTitle: pdfFileName,
+            });
+          } else {
+            Alert.alert('Error', 'Could not open PDF: ' + error.message);
+          }
+        } catch (shareError) {
+          Alert.alert('Error', 'Failed to generate PDF');
+        }
       }
     } else {
-      // iOS - use share sheet (can't force specific app on iOS)
+      // iOS - use share sheet
       try {
         const html = generatePdfHtml();
         const { uri } = await Print.printToFileAsync({ html });
