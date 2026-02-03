@@ -308,11 +308,11 @@ export default function ImportPdf() {
         
         try {
           const contentUri = await getContentUriAsync(uri);
+          // Open in default PDF viewer (no packageName to let user choose)
           await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
             data: contentUri,
             flags: 1,
             type: 'application/pdf',
-            packageName: 'com.google.android.apps.docs',
           });
         } catch (intentError) {
           const isAvailable = await Sharing.isAvailableAsync();
