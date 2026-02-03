@@ -20,7 +20,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getSessions, updateSession, deleteSession, Session } from '../utils/localStorage';
-import { getCompetitions, Competition, deleteCompetition, setActiveCompetition } from '../utils/competitionStorage';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHART_WIDTH = SCREEN_WIDTH - 72;
