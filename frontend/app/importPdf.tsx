@@ -448,41 +448,8 @@ export default function ImportPdf() {
         style={{ flex: 1 }}
       >
         <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-          {/* Instructions */}
-          <View style={styles.instructionsCard}>
-            <Ionicons name="document-text" size={32} color="#2196F3" />
-            <View style={styles.instructionsContent}>
-              <Text style={styles.instructionsTitle}>Batch Import Archer Scores</Text>
-              <Text style={styles.instructionsText}>
-                Copy the Import Codes from each archer's competition PDF and paste them all below (one code per line) to import all archers at once.
-              </Text>
-            </View>
-          </View>
-
-          {/* Import Code Input */}
-          <View style={styles.inputSection}>
-            <Text style={styles.inputLabel}>Import Codes (one per line for batch import)</Text>
-            <TextInput
-              style={styles.codeInput}
-              placeholder="Paste import codes here...&#10;Each code on a new line for batch import"
-              placeholderTextColor="#666"
-              value={importCode}
-              onChangeText={setImportCode}
-              multiline
-              numberOfLines={6}
-            />
-            <TouchableOpacity
-              style={[styles.importButton, !importCode.trim() && styles.importButtonDisabled]}
-              onPress={handleImportCode}
-              disabled={!importCode.trim()}
-            >
-              <Ionicons name="add-circle" size={24} color="#000" />
-              <Text style={styles.importButtonText}>Import All Archers</Text>
-            </TouchableOpacity>
-          </View>
-
           {/* Imported Archers List */}
-          {importedArchers.length > 0 && (
+          {importedArchers.length > 0 ? (
             <View style={styles.archersSection}>
               <Text style={styles.sectionTitle}>Imported Archers ({importedArchers.length})</Text>
               
@@ -499,6 +466,14 @@ export default function ImportPdf() {
                   </TouchableOpacity>
                 </View>
               ))}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons name="document-text-outline" size={64} color="#444" />
+              <Text style={styles.emptyStateTitle}>No Archers Imported</Text>
+              <Text style={styles.emptyStateText}>
+                Archers will appear here when imported from competition results.
+              </Text>
             </View>
           )}
         </ScrollView>
