@@ -518,6 +518,26 @@ const styles = StyleSheet.create({
   archerItemName: { fontSize: 16, fontWeight: 'bold', color: '#fff' },
   archerItemMeta: { fontSize: 12, color: '#888', marginTop: 2 },
   removeButton: { padding: 8 },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+    marginTop: 60,
+  },
+  emptyStateTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyStateText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
   footerButtons: {
     padding: 16,
     borderTopWidth: 1,
