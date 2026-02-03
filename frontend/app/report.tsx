@@ -1047,47 +1047,57 @@ export default function ReportScreen() {
       // Android - open directly in PDF viewer
       try {
         const html = generatePdfHtml();
-        console.log('Generating PDF:', pdfFileName);
         
+        // Generate PDF
         const { uri } = await Print.printToFileAsync({ html });
-        console.log('PDF generated at:', uri);
         
         // Copy to document directory with proper name
         const newUri = FileSystem.documentDirectory + pdfFileName;
         await FileSystem.copyAsync({ from: uri, to: newUri });
-        console.log('PDF saved as:', newUri);
         
         // Get content URI for sharing with other apps
         const contentUri = await FileSystem.getContentUriAsync(newUri);
-        console.log('Content URI:', contentUri);
         
-        // Open with default PDF viewer using VIEW action
-        // Using flags: FLAG_GRANT_READ_URI_PERMISSION (1) | FLAG_ACTIVITY_NEW_TASK (268435456)
-        await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-          data: contentUri,
-          flags: 268435457,
-          type: 'application/pdf',
-        });
-        
-        console.log('PDF opened successfully');
-      } catch (error: any) {
-        console.error('PDF error:', error);
-        // If Intent fails, try share sheet as fallback
-        try {
-          const html = generatePdfHtml();
-          const { uri } = await Print.printToFileAsync({ html });
-          const isAvailable = await Sharing.isAvailableAsync();
-          if (isAvailable) {
-            await Sharing.shareAsync(uri, {
-              mimeType: 'application/pdf',
-              dialogTitle: pdfFileName,
-            });
-          } else {
-            Alert.alert('Error', 'Could not open PDF: ' + error.message);
+        // Try to open with IntentLauncher
+        const result = await IntentLauncher.startActivityAsync(
+          IntentLauncher.ActivityAction.VIEW,
+          {
+            data: contentUri,
+            flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+            type: 'application/pdf',
           }
-        } catch (shareError) {
-          Alert.alert('Error', 'Failed to generate PDF');
-        }
+        );
+        
+        console.log('Intent result:', result);
+      } catch (error: any) {
+        console.error('PDF/Intent error:', error);
+        
+        // Show error and offer share sheet as alternative
+        Alert.alert(
+          'Opening PDF',
+          'Choose how to open the report:',
+          [
+            {
+              text: 'Share',
+              onPress: async () => {
+                try {
+                  const html = generatePdfHtml();
+                  const { uri } = await Print.printToFileAsync({ html });
+                  const isAvailable = await Sharing.isAvailableAsync();
+                  if (isAvailable) {
+                    await Sharing.shareAsync(uri, {
+                      mimeType: 'application/pdf',
+                      dialogTitle: pdfFileName,
+                    });
+                  }
+                } catch (e) {
+                  Alert.alert('Error', 'Failed to share PDF');
+                }
+              }
+            },
+            { text: 'Cancel', style: 'cancel' }
+          ]
+        );
       }
     } else {
       // iOS - use share sheet
