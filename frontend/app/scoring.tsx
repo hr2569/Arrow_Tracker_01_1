@@ -116,24 +116,6 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
     </View>
   );
 };
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <View style={{ 
-            width: baseTargetSize + 40,
-            height: baseTargetSize + 40,
-            transform: [{ scale: zoomLevel }],
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            {children}
-          </View>
-        </ScrollView>
-      </ScrollView>
-    </View>
-  );
-};
 
 export default function ScoringScreen() {
   const router = useRouter();
