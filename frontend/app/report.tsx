@@ -273,6 +273,13 @@ export default function ReportScreen() {
   // Generate shareable report text
   // Generate PDF HTML content
   const generatePdfHtml = () => {
+    // Generate date for title
+    const reportDate = new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    
     // Score range based on target type
     const currentTargetType = selectedTargetType || 'wa_standard';
     const scoreRange = currentTargetType === 'wa_standard' 
