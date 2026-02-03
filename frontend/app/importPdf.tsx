@@ -370,41 +370,36 @@ export default function ImportPdf() {
         <View style={styles.placeholder} />
       </View>
 
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
-        <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-          {/* Imported Archers List */}
-          {importedArchers.length > 0 ? (
-            <View style={styles.archersSection}>
-              <Text style={styles.sectionTitle}>Imported Archers ({importedArchers.length})</Text>
-              
-              {importedArchers.map((archer, index) => (
-                <View key={archer.id} style={styles.archerItem}>
-                  <View style={styles.archerItemInfo}>
-                    <Text style={styles.archerItemName}>{archer.name}</Text>
-                    <Text style={styles.archerItemMeta}>
-                      {BOW_TYPES[archer.bowType] || archer.bowType} • Score: {archer.totalScore} • X: {archer.xCount}
-                    </Text>
-                  </View>
-                  <TouchableOpacity onPress={() => removeArcher(index)} style={styles.removeButton}>
-                    <Ionicons name="trash-outline" size={20} color="#ed1c24" />
-                  </TouchableOpacity>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+        {/* Imported Archers List */}
+        {importedArchers.length > 0 ? (
+          <View style={styles.archersSection}>
+            <Text style={styles.sectionTitle}>Imported Archers ({importedArchers.length})</Text>
+            
+            {importedArchers.map((archer, index) => (
+              <View key={archer.id} style={styles.archerItem}>
+                <View style={styles.archerItemInfo}>
+                  <Text style={styles.archerItemName}>{archer.name}</Text>
+                  <Text style={styles.archerItemMeta}>
+                    {BOW_TYPES[archer.bowType] || archer.bowType} • Score: {archer.totalScore} • X: {archer.xCount}
+                  </Text>
                 </View>
-              ))}
-            </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="document-text-outline" size={64} color="#444" />
-              <Text style={styles.emptyStateTitle}>No Archers Imported</Text>
-              <Text style={styles.emptyStateText}>
-                Archers will appear here when imported from competition results.
-              </Text>
-            </View>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
+                <TouchableOpacity onPress={() => removeArcher(index)} style={styles.removeButton}>
+                  <Ionicons name="trash-outline" size={20} color="#ed1c24" />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.emptyState}>
+            <Ionicons name="document-text-outline" size={64} color="#444" />
+            <Text style={styles.emptyStateTitle}>No Archers Imported</Text>
+            <Text style={styles.emptyStateText}>
+              Archers will appear here when imported from competition results.
+            </Text>
+          </View>
+        )}
+      </ScrollView>
 
       {/* Generate Button */}
       {importedArchers.length > 0 && (
