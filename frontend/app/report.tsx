@@ -1025,7 +1025,7 @@ export default function ReportScreen() {
     `;
   };
 
-  // Handle PDF - create and open instantly
+  // Handle PDF - create and open/share
   const handleDownloadPdf = async () => {
     // Generate filename with date
     const today = new Date();
@@ -1043,78 +1043,35 @@ export default function ReportScreen() {
         console.error('Web PDF error:', error);
         alert('Failed to open PDF. Please try again.');
       }
-    } else if (Platform.OS === 'android') {
-      // Android - open directly in PDF viewer
+    } else {
+      // Mobile (Android/iOS) - generate PDF and share
       try {
         const html = generatePdfHtml();
         
         // Generate PDF
-        const { uri } = await Print.printToFileAsync({ html });
+        const { uri } = await Print.printToFileAsync({ 
+          html,
+          base64: false,
+        });
         
         // Copy to document directory with proper name
         const newUri = FileSystem.documentDirectory + pdfFileName;
         await FileSystem.copyAsync({ from: uri, to: newUri });
         
-        // Get content URI for sharing with other apps
-        const contentUri = await FileSystem.getContentUriAsync(newUri);
-        
-        // Try to open with IntentLauncher
-        const result = await IntentLauncher.startActivityAsync(
-          IntentLauncher.ActivityAction.VIEW,
-          {
-            data: contentUri,
-            flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
-            type: 'application/pdf',
-          }
-        );
-        
-        console.log('Intent result:', result);
-      } catch (error: any) {
-        console.error('PDF/Intent error:', error);
-        
-        // Show error and offer share sheet as alternative
-        Alert.alert(
-          'Opening PDF',
-          'Choose how to open the report:',
-          [
-            {
-              text: 'Share',
-              onPress: async () => {
-                try {
-                  const html = generatePdfHtml();
-                  const { uri } = await Print.printToFileAsync({ html });
-                  const isAvailable = await Sharing.isAvailableAsync();
-                  if (isAvailable) {
-                    await Sharing.shareAsync(uri, {
-                      mimeType: 'application/pdf',
-                      dialogTitle: pdfFileName,
-                    });
-                  }
-                } catch (e) {
-                  Alert.alert('Error', 'Failed to share PDF');
-                }
-              }
-            },
-            { text: 'Cancel', style: 'cancel' }
-          ]
-        );
-      }
-    } else {
-      // iOS - use share sheet
-      try {
-        const html = generatePdfHtml();
-        const { uri } = await Print.printToFileAsync({ html });
-        
+        // Share the PDF (will open share sheet on mobile)
         const isAvailable = await Sharing.isAvailableAsync();
         if (isAvailable) {
-          await Sharing.shareAsync(uri, {
+          await Sharing.shareAsync(newUri, {
             mimeType: 'application/pdf',
+            dialogTitle: pdfFileName,
             UTI: 'com.adobe.pdf',
           });
+        } else {
+          Alert.alert('Error', 'Sharing not available on this device');
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('PDF error:', error);
-        Alert.alert('Error', 'Failed to generate PDF');
+        Alert.alert('Error', 'Failed to generate PDF: ' + error.message);
       }
     }
   };
