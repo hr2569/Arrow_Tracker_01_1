@@ -14,6 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withDecay, withSpring } from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.4);
@@ -28,7 +30,7 @@ interface Arrow {
   targetIndex?: number;
 }
 
-// Zoomable Target Component with nested ScrollViews for smooth scrolling
+// Zoomable Target Component with gesture-based panning in all directions
 interface ZoomableTargetProps {
   zoomLevel: number;
   baseTargetSize: number;
@@ -36,11 +38,59 @@ interface ZoomableTargetProps {
 }
 
 const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSize, children }) => {
-  const scaledSize = (baseTargetSize + 40) * zoomLevel;
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const prevTranslateX = useSharedValue(0);
+  const prevTranslateY = useSharedValue(0);
+  
   const isZoomed = zoomLevel > 1;
+  const scaledSize = (baseTargetSize + 40) * zoomLevel;
+  const maxPan = (scaledSize - CONTAINER_HEIGHT) / 2;
+  
+  // Reset position when zoom level changes
+  React.useEffect(() => {
+    translateX.value = withSpring(0);
+    translateY.value = withSpring(0);
+    prevTranslateX.value = 0;
+    prevTranslateY.value = 0;
+  }, [zoomLevel]);
+  
+  const panGesture = Gesture.Pan()
+    .enabled(isZoomed)
+    .onStart(() => {
+      prevTranslateX.value = translateX.value;
+      prevTranslateY.value = translateY.value;
+    })
+    .onUpdate((event) => {
+      // Calculate new position with bounds
+      const newX = prevTranslateX.value + event.translationX;
+      const newY = prevTranslateY.value + event.translationY;
+      
+      // Clamp to bounds with some elasticity
+      translateX.value = Math.max(-maxPan, Math.min(maxPan, newX));
+      translateY.value = Math.max(-maxPan, Math.min(maxPan, newY));
+    })
+    .onEnd((event) => {
+      // Add momentum/decay for smooth scrolling feel
+      translateX.value = withDecay({
+        velocity: event.velocityX,
+        clamp: [-maxPan, maxPan],
+      });
+      translateY.value = withDecay({
+        velocity: event.velocityY,
+        clamp: [-maxPan, maxPan],
+      });
+    });
+  
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { scale: zoomLevel },
+    ],
+  }));
   
   if (!isZoomed) {
-    // When not zoomed, just render the content directly without scroll
     return (
       <View style={styles.zoomContainer}>
         {children}
@@ -48,36 +98,24 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
     );
   }
   
-  // When zoomed, use nested ScrollViews for 2D panning
   return (
     <View style={[styles.zoomContainer, { height: CONTAINER_HEIGHT, overflow: 'hidden' }]}>
-      <ScrollView 
-        horizontal={true}
-        showsHorizontalScrollIndicator={true}
-        scrollEnabled={true}
-        bounces={true}
-        bouncesZoom={true}
-        alwaysBounceHorizontal={true}
-        decelerationRate="normal"
-        scrollEventThrottle={16}
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          width: scaledSize,
-          minHeight: CONTAINER_HEIGHT,
-        }}
-      >
-        <ScrollView 
-          showsVerticalScrollIndicator={true}
-          scrollEnabled={true}
-          nestedScrollEnabled={true}
-          bounces={true}
-          alwaysBounceVertical={true}
-          decelerationRate="normal"
-          scrollEventThrottle={16}
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            height: scaledSize,
-            width: scaledSize,
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[
+          {
+            width: baseTargetSize + 40,
+            height: baseTargetSize + 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+          animatedStyle
+        ]}>
+          {children}
+        </Animated.View>
+      </GestureDetector>
+    </View>
+  );
+};
             alignItems: 'center',
             justifyContent: 'center',
           }}
