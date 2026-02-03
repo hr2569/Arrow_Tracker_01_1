@@ -441,13 +441,58 @@ export default function CompetitionScoringScreen() {
     }
   };
 
-  // Zoomable Target Component with nested ScrollViews for smooth scrolling
+  // Zoomable Target Component with gesture-based panning in all directions
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const prevTranslateX = useSharedValue(0);
+  const prevTranslateY = useSharedValue(0);
+  
+  const scaledSize = (BASE_TARGET_SIZE + 40) * zoomLevel;
+  const maxPan = (scaledSize - CONTAINER_HEIGHT) / 2;
+  
+  // Reset position when zoom level changes
+  useEffect(() => {
+    translateX.value = withSpring(0);
+    translateY.value = withSpring(0);
+    prevTranslateX.value = 0;
+    prevTranslateY.value = 0;
+  }, [zoomLevel]);
+  
+  const panGesture = Gesture.Pan()
+    .enabled(zoomLevel > 1)
+    .onStart(() => {
+      prevTranslateX.value = translateX.value;
+      prevTranslateY.value = translateY.value;
+    })
+    .onUpdate((event) => {
+      const newX = prevTranslateX.value + event.translationX;
+      const newY = prevTranslateY.value + event.translationY;
+      translateX.value = Math.max(-maxPan, Math.min(maxPan, newX));
+      translateY.value = Math.max(-maxPan, Math.min(maxPan, newY));
+    })
+    .onEnd((event) => {
+      translateX.value = withDecay({
+        velocity: event.velocityX,
+        clamp: [-maxPan, maxPan],
+      });
+      translateY.value = withDecay({
+        velocity: event.velocityY,
+        clamp: [-maxPan, maxPan],
+      });
+    });
+  
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { scale: zoomLevel },
+    ],
+  }));
+
   const ZoomableTarget = ({ children }: { children: React.ReactNode }) => {
-    const scaledSize = (BASE_TARGET_SIZE + 40) * zoomLevel;
     const isZoomed = zoomLevel > 1;
     
     if (!isZoomed) {
-      // When not zoomed, just render the content directly without scroll
       return (
         <View style={styles.zoomContainer}>
           {children}
@@ -455,51 +500,21 @@ export default function CompetitionScoringScreen() {
       );
     }
     
-    // When zoomed, use nested ScrollViews for 2D panning
     return (
       <View style={[styles.zoomContainer, { height: CONTAINER_HEIGHT, overflow: 'hidden' }]}>
-        <ScrollView 
-          horizontal={true}
-          showsHorizontalScrollIndicator={true}
-          scrollEnabled={true}
-          bounces={true}
-          bouncesZoom={true}
-          alwaysBounceHorizontal={true}
-          decelerationRate="normal"
-          scrollEventThrottle={16}
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            width: scaledSize,
-            minHeight: CONTAINER_HEIGHT,
-          }}
-        >
-          <ScrollView 
-            showsVerticalScrollIndicator={true}
-            scrollEnabled={true}
-            nestedScrollEnabled={true}
-            bounces={true}
-            alwaysBounceVertical={true}
-            decelerationRate="normal"
-            scrollEventThrottle={16}
-            style={{ flex: 1 }}
-            contentContainerStyle={{
-              height: scaledSize,
-              width: scaledSize,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <View style={{ 
+        <GestureDetector gesture={panGesture}>
+          <Animated.View style={[
+            {
               width: BASE_TARGET_SIZE + 40,
               height: BASE_TARGET_SIZE + 40,
-              transform: [{ scale: zoomLevel }],
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-              {children}
-            </View>
-          </ScrollView>
-        </ScrollView>
+            },
+            animatedStyle
+          ]}>
+            {children}
+          </Animated.View>
+        </GestureDetector>
       </View>
     );
   };
