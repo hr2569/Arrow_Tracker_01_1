@@ -751,7 +751,7 @@ export default function ReportScreen() {
       <html>
         <head>
           <meta charset="utf-8">
-          <title>Arrow Tracker Report</title>
+          <title>Arrow Tracker Report ${reportDate}</title>
           <style>
             @page {
               size: A4;
