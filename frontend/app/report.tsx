@@ -1018,7 +1018,7 @@ export default function ReportScreen() {
     `;
   };
 
-  // Handle PDF - create and open with share sheet
+  // Handle PDF - create and open with default PDF viewer
   const handleDownloadPdf = async () => {
     if (Platform.OS === 'web') {
       // For web, open in new tab directly
@@ -1032,7 +1032,7 @@ export default function ReportScreen() {
         alert('Failed to open PDF. Please try again.');
       }
     } else if (Platform.OS === 'android') {
-      // Android - try to open directly in Google Drive, fall back to share sheet
+      // Android - try to open directly in default PDF viewer
       try {
         const html = generatePdfHtml();
         console.log('Generating PDF...');
@@ -1045,12 +1045,11 @@ export default function ReportScreen() {
           const contentUri = await getContentUriAsync(uri);
           console.log('Content URI:', contentUri);
           
-          // Try to open directly in Google Drive
+          // Open in default PDF viewer (no packageName to let user choose)
           await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
             data: contentUri,
             flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
             type: 'application/pdf',
-            packageName: 'com.google.android.apps.docs',
           });
         } catch (intentError) {
           console.log('IntentLauncher failed (likely Expo Go), using share sheet...', intentError);
