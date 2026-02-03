@@ -1048,7 +1048,7 @@ export default function ReportScreen() {
         alert('Failed to open PDF. Please try again.');
       }
     } else if (Platform.OS === 'android') {
-      // Android - try to open directly with IntentLauncher
+      // Android - generate PDF and open with intent or share
       try {
         const html = generatePdfHtml();
         
@@ -1058,36 +1058,31 @@ export default function ReportScreen() {
           base64: false,
         });
         
-        // Copy to cache directory with proper name (more reliable for sharing)
+        // Copy to cache directory with proper name
         const newUri = FileSystem.cacheDirectory + pdfFileName;
         await FileSystem.copyAsync({ from: uri, to: newUri });
         
-        // Get content URI
+        // Get content URI for Android intent
         const contentUri = await FileSystem.getContentUriAsync(newUri);
         
-        // Open directly with VIEW intent - no share sheet
-        await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-          data: contentUri,
-          flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
-          type: 'application/pdf',
-        });
-      } catch (error: any) {
-        console.error('IntentLauncher error:', error);
-        
-        // Fallback to share sheet if IntentLauncher fails
+        // Try to open with VIEW intent
         try {
-          const html = generatePdfHtml();
-          const { uri } = await Print.printToFileAsync({ html });
-          const newUri = FileSystem.cacheDirectory + pdfFileName;
-          await FileSystem.copyAsync({ from: uri, to: newUri });
-          
+          await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+            data: contentUri,
+            flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+            type: 'application/pdf',
+          });
+        } catch (intentError: any) {
+          // IntentLauncher failed - use share sheet instead
+          console.log('IntentLauncher not available, using share:', intentError.message);
           await Sharing.shareAsync(newUri, {
             mimeType: 'application/pdf',
             dialogTitle: pdfFileName,
           });
-        } catch (shareError) {
-          Alert.alert('Error', 'Failed to open PDF');
         }
+      } catch (error: any) {
+        console.error('PDF generation error:', error);
+        Alert.alert('Error', 'Failed to generate PDF: ' + error.message);
       }
     } else {
       // iOS - use share sheet
