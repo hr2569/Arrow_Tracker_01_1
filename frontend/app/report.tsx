@@ -1027,9 +1027,13 @@ export default function ReportScreen() {
 
   // Handle PDF - create and open/share
   const handleDownloadPdf = async () => {
-    // Generate filename with date
+    // Generate filename with date in readable format
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const dateStr = today.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    }).replace(/,/g, '').replace(/\s+/g, '_'); // "Feb_3_2025"
     const pdfFileName = `Arrow_Tracker_Report_${dateStr}.pdf`;
     
     if (Platform.OS === 'web') {
@@ -1043,8 +1047,8 @@ export default function ReportScreen() {
         console.error('Web PDF error:', error);
         alert('Failed to open PDF. Please try again.');
       }
-    } else {
-      // Mobile (Android/iOS) - generate PDF and share
+    } else if (Platform.OS === 'android') {
+      // Android - try to open directly with IntentLauncher
       try {
         const html = generatePdfHtml();
         
@@ -1054,24 +1058,52 @@ export default function ReportScreen() {
           base64: false,
         });
         
-        // Copy to document directory with proper name
-        const newUri = FileSystem.documentDirectory + pdfFileName;
+        // Copy to cache directory with proper name (more reliable for sharing)
+        const newUri = FileSystem.cacheDirectory + pdfFileName;
         await FileSystem.copyAsync({ from: uri, to: newUri });
         
-        // Share the PDF (will open share sheet on mobile)
-        const isAvailable = await Sharing.isAvailableAsync();
-        if (isAvailable) {
+        // Get content URI
+        const contentUri = await FileSystem.getContentUriAsync(newUri);
+        
+        // Open directly with VIEW intent - no share sheet
+        await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+          data: contentUri,
+          flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+          type: 'application/pdf',
+        });
+      } catch (error: any) {
+        console.error('IntentLauncher error:', error);
+        
+        // Fallback to share sheet if IntentLauncher fails
+        try {
+          const html = generatePdfHtml();
+          const { uri } = await Print.printToFileAsync({ html });
+          const newUri = FileSystem.cacheDirectory + pdfFileName;
+          await FileSystem.copyAsync({ from: uri, to: newUri });
+          
           await Sharing.shareAsync(newUri, {
             mimeType: 'application/pdf',
             dialogTitle: pdfFileName,
-            UTI: 'com.adobe.pdf',
           });
-        } else {
-          Alert.alert('Error', 'Sharing not available on this device');
+        } catch (shareError) {
+          Alert.alert('Error', 'Failed to open PDF');
         }
-      } catch (error: any) {
+      }
+    } else {
+      // iOS - use share sheet
+      try {
+        const html = generatePdfHtml();
+        const { uri } = await Print.printToFileAsync({ html });
+        const newUri = FileSystem.cacheDirectory + pdfFileName;
+        await FileSystem.copyAsync({ from: uri, to: newUri });
+        
+        await Sharing.shareAsync(newUri, {
+          mimeType: 'application/pdf',
+          UTI: 'com.adobe.pdf',
+        });
+      } catch (error) {
         console.error('PDF error:', error);
-        Alert.alert('Error', 'Failed to generate PDF: ' + error.message);
+        Alert.alert('Error', 'Failed to generate PDF');
       }
     }
   };
