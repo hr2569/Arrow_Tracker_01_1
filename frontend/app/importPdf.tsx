@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as IntentLauncher from 'expo-intent-launcher';
-import { getContentUriAsync } from 'expo-file-system';
+import { getContentUriAsync } from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BOW_TYPES: { [key: string]: string } = {
