@@ -138,45 +138,45 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   if (allShots.length === 0) return null;
   
   const center = size / 2;
-  const ringRadius = size * 0.45;
+  const maxRingRadius = size * 0.48;  // Target takes up most of the SVG
   
   // Convert shot coordinates to SVG coordinates
-  // Assuming shots x,y are normalized -1 to 1
+  // Shots x,y are normalized -1 to 1
   const getShotPosition = (shot: { x: number; y: number }) => {
-    const x = center + (shot.x * ringRadius);
-    const y = center + (shot.y * ringRadius);
+    const x = center + (shot.x * maxRingRadius);
+    const y = center + (shot.y * maxRingRadius);
     return { x, y };
   };
   
-  // Ring colors for WA standard target
+  // Ring colors for WA standard target (from outside to inside)
   const ringColors = [
-    { r: 0.1, color: '#FFFF00' }, // X
-    { r: 0.2, color: '#FFFF00' }, // 10
-    { r: 0.3, color: '#FF0000' }, // 9
-    { r: 0.4, color: '#FF0000' }, // 8
-    { r: 0.5, color: '#00BFFF' }, // 7
-    { r: 0.6, color: '#00BFFF' }, // 6
-    { r: 0.7, color: '#000000' }, // 5
-    { r: 0.8, color: '#000000' }, // 4
-    { r: 0.9, color: '#FFFFFF' }, // 3
-    { r: 1.0, color: '#FFFFFF' }, // 2
+    { r: 1.0, color: '#FFFFFF' },  // 1-2 white
+    { r: 0.9, color: '#FFFFFF' },  // white
+    { r: 0.8, color: '#000000' },  // 3-4 black
+    { r: 0.7, color: '#000000' },  // black
+    { r: 0.6, color: '#00BFFF' },  // 5-6 blue
+    { r: 0.5, color: '#00BFFF' },  // blue
+    { r: 0.4, color: '#FF0000' },  // 7-8 red
+    { r: 0.3, color: '#FF0000' },  // red
+    { r: 0.2, color: '#FFFF00' },  // 9-10 gold
+    { r: 0.1, color: '#FFFF00' },  // X gold
   ];
   
   return (
     <View style={scatterStyles.container}>
       <Text style={scatterStyles.title}>
-        <Ionicons name="scatter-plot" size={14} color="#8B0000" /> Shot Distribution
+        <Ionicons name="radio-button-on" size={14} color="#8B0000" /> Shot Distribution
       </Text>
       <Svg width={size} height={size} style={scatterStyles.svg}>
-        {/* Target rings */}
-        {[...ringColors].reverse().map((ring, i) => (
+        {/* Target rings - draw from outside in */}
+        {ringColors.map((ring, i) => (
           <Circle
             key={`ring-${i}`}
             cx={center}
             cy={center}
-            r={ringRadius * ring.r}
+            r={maxRingRadius * ring.r}
             fill={ring.color}
-            stroke={ring.color === '#FFFFFF' ? '#ccc' : '#333'}
+            stroke={ring.color === '#FFFFFF' ? '#ccc' : ring.color === '#000000' ? '#444' : '#333'}
             strokeWidth={0.5}
           />
         ))}
@@ -192,7 +192,7 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
               fill="#8B0000"
               stroke="#fff"
               strokeWidth={1}
-              opacity={0.8}
+              opacity={0.85}
             />
           );
         })}
