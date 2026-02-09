@@ -799,54 +799,49 @@ export default function ReportScreen() {
       }
       
       // Generate target face rings based on target type
-      const generateTargetRings = () => {
-        if (targetType === 'vegas_3spot') {
-          // Vegas 3-spot - simplified single target representation
-          const ringSize = maxRadius;
-          return `
-            <circle cx="${center}" cy="${center}" r="${ringSize}" fill="#00a2e8" />
-            <circle cx="${center}" cy="${center}" r="${ringSize * 0.7}" fill="#ed1c24" />
-            <circle cx="${center}" cy="${center}" r="${ringSize * 0.4}" fill="#fff200" />
-            <circle cx="${center}" cy="${center}" r="${ringSize * 0.2}" fill="#fff200" stroke="#000" stroke-width="1" />
-          `;
-        } else if (targetType === 'nfaa_indoor') {
-          // NFAA Indoor
-          const ringSize = maxRadius;
-          return `
-            <circle cx="${center}" cy="${center}" r="${ringSize}" fill="#00a2e8" />
-            <circle cx="${center}" cy="${center}" r="${ringSize * 0.75}" fill="#00a2e8" stroke="#fff" stroke-width="2" />
-            <circle cx="${center}" cy="${center}" r="${ringSize * 0.5}" fill="#ed1c24" />
-            <circle cx="${center}" cy="${center}" r="${ringSize * 0.3}" fill="#fff200" />
-            <circle cx="${center}" cy="${center}" r="${ringSize * 0.15}" fill="#fff" stroke="#000" stroke-width="1" />
-          `;
-        } else {
-          // WA Standard (default)
-          const rings = [
-            { r: 1.0, fill: '#FFFFFF', stroke: '#ccc' },
-            { r: 0.9, fill: '#FFFFFF', stroke: '#ccc' },
-            { r: 0.8, fill: '#000000', stroke: '#333' },
-            { r: 0.7, fill: '#000000', stroke: '#333' },
-            { r: 0.6, fill: '#00a2e8', stroke: '#0088cc' },
-            { r: 0.5, fill: '#00a2e8', stroke: '#0088cc' },
-            { r: 0.4, fill: '#ed1c24', stroke: '#cc0000' },
-            { r: 0.3, fill: '#ed1c24', stroke: '#cc0000' },
-            { r: 0.2, fill: '#fff200', stroke: '#cccc00' },
-            { r: 0.1, fill: '#fff200', stroke: '#cccc00' },
-          ];
-          return rings.map(ring => 
-            \`<circle cx="\${center}" cy="\${center}" r="\${maxRadius * ring.r}" fill="\${ring.fill}" stroke="\${ring.stroke}" stroke-width="1" />\`
-          ).join('\\n');
-        }
-      };
+      let targetRings = '';
+      if (targetType === 'vegas_3spot') {
+        const ringSize = maxRadius;
+        targetRings = `
+          <circle cx="${center}" cy="${center}" r="${ringSize}" fill="#00a2e8" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.7}" fill="#ed1c24" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.4}" fill="#fff200" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.2}" fill="#fff200" stroke="#000" stroke-width="1" />
+        `;
+      } else if (targetType === 'nfaa_indoor') {
+        const ringSize = maxRadius;
+        targetRings = `
+          <circle cx="${center}" cy="${center}" r="${ringSize}" fill="#00a2e8" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.75}" fill="#00a2e8" stroke="#fff" stroke-width="2" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.5}" fill="#ed1c24" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.3}" fill="#fff200" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.15}" fill="#fff" stroke="#000" stroke-width="1" />
+        `;
+      } else {
+        // WA Standard (default)
+        const rings = [
+          { r: 1.0, fill: '#FFFFFF', stroke: '#ccc' },
+          { r: 0.9, fill: '#FFFFFF', stroke: '#ccc' },
+          { r: 0.8, fill: '#000000', stroke: '#333' },
+          { r: 0.7, fill: '#000000', stroke: '#333' },
+          { r: 0.6, fill: '#00a2e8', stroke: '#0088cc' },
+          { r: 0.5, fill: '#00a2e8', stroke: '#0088cc' },
+          { r: 0.4, fill: '#ed1c24', stroke: '#cc0000' },
+          { r: 0.3, fill: '#ed1c24', stroke: '#cc0000' },
+          { r: 0.2, fill: '#fff200', stroke: '#cccc00' },
+          { r: 0.1, fill: '#fff200', stroke: '#cccc00' },
+        ];
+        targetRings = rings.map(ring => 
+          `<circle cx="${center}" cy="${center}" r="${maxRadius * ring.r}" fill="${ring.fill}" stroke="${ring.stroke}" stroke-width="1" />`
+        ).join('\n');
+      }
       
       // Plot shots on target
       let shotDots = '';
-      shots.forEach((shot, index) => {
-        // Shots x,y are already normalized to -1 to 1 range relative to target center
+      shots.forEach((shot) => {
         const svgX = center + shot.x * maxRadius;
         const svgY = center + shot.y * maxRadius;
-        
-        shotDots += \`<circle cx="\${svgX}" cy="\${svgY}" r="6" fill="#8B0000" stroke="#fff" stroke-width="2" opacity="0.9" />\`;
+        shotDots += `<circle cx="${svgX}" cy="${svgY}" r="6" fill="#8B0000" stroke="#fff" stroke-width="2" opacity="0.9" />`;
       });
       
       // Calculate Mean Point of Impact
@@ -855,34 +850,37 @@ export default function ReportScreen() {
       const avgSvgX = center + avgX * maxRadius;
       const avgSvgY = center + avgY * maxRadius;
       
-      const meanMarker = \`
-        <circle cx="\${avgSvgX}" cy="\${avgSvgY}" r="12" fill="none" stroke="#000" stroke-width="3" />
-        <circle cx="\${avgSvgX}" cy="\${avgSvgY}" r="12" fill="none" stroke="#FFD700" stroke-width="2" />
-        <line x1="\${avgSvgX - 18}" y1="\${avgSvgY}" x2="\${avgSvgX + 18}" y2="\${avgSvgY}" stroke="#000" stroke-width="3" />
-        <line x1="\${avgSvgX - 18}" y1="\${avgSvgY}" x2="\${avgSvgX + 18}" y2="\${avgSvgY}" stroke="#FFD700" stroke-width="2" />
-        <line x1="\${avgSvgX}" y1="\${avgSvgY - 18}" x2="\${avgSvgX}" y2="\${avgSvgY + 18}" stroke="#000" stroke-width="3" />
-        <line x1="\${avgSvgX}" y1="\${avgSvgY - 18}" x2="\${avgSvgX}" y2="\${avgSvgY + 18}" stroke="#FFD700" stroke-width="2" />
-      \`;
+      const meanMarker = `
+        <circle cx="${avgSvgX}" cy="${avgSvgY}" r="12" fill="none" stroke="#000" stroke-width="3" />
+        <circle cx="${avgSvgX}" cy="${avgSvgY}" r="12" fill="none" stroke="#FFD700" stroke-width="2" />
+        <line x1="${avgSvgX - 18}" y1="${avgSvgY}" x2="${avgSvgX + 18}" y2="${avgSvgY}" stroke="#000" stroke-width="3" />
+        <line x1="${avgSvgX - 18}" y1="${avgSvgY}" x2="${avgSvgX + 18}" y2="${avgSvgY}" stroke="#FFD700" stroke-width="2" />
+        <line x1="${avgSvgX}" y1="${avgSvgY - 18}" x2="${avgSvgX}" y2="${avgSvgY + 18}" stroke="#000" stroke-width="3" />
+        <line x1="${avgSvgX}" y1="${avgSvgY - 18}" x2="${avgSvgX}" y2="${avgSvgY + 18}" stroke="#FFD700" stroke-width="2" />
+      `;
       
-      return \`
-        <svg width="\${size}" height="\${size}" viewBox="0 0 \${size} \${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+      const poiDescription = `${avgX > 0 ? 'Right' : 'Left'} ${Math.abs(avgX * 100).toFixed(1)}%, ${avgY > 0 ? 'Low' : 'High'} ${Math.abs(avgY * 100).toFixed(1)}%`;
+      
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
           <!-- Target Face Background -->
-          <circle cx="\${center}" cy="\${center}" r="\${maxRadius + 5}" fill="#1a1a1a" />
-          \${generateTargetRings()}
+          <circle cx="${center}" cy="${center}" r="${maxRadius + 5}" fill="#1a1a1a" />
+          ${targetRings}
           
           <!-- Shot markers -->
-          \${shotDots}
+          ${shotDots}
           
           <!-- Mean Point of Impact -->
-          \${meanMarker}
+          ${meanMarker}
           
           <!-- Labels -->
-          <text x="\${center}" y="\${size - 15}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Shot Distribution on Target - \${shots.length} arrows</text>
+          <text x="${center}" y="${size - 15}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Shot Distribution on Target - ${shots.length} arrows</text>
         </svg>
         <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
-          <strong>Mean Point of Impact:</strong> (${avgX > 0 ? 'Right' : 'Left'} ${Math.abs(avgX * 100).toFixed(1)}%, ${avgY > 0 ? 'Low' : 'High'} ${Math.abs(avgY * 100).toFixed(1)}%)
+          <strong>Mean Point of Impact:</strong> (${poiDescription})
         </div>
-      \`;
+      `;
+    };
     };
 
     return `
