@@ -23,8 +23,7 @@
     },
     "production": {
       "android": {
-        "buildType": "apk",
-        "withoutCredentials": true
+        "buildType": "app-bundle"
       },
       "node": "22.12.0"
     }
