@@ -2212,46 +2212,6 @@ export default function ReportScreen() {
           </View>
         )}
 
-        {/* Heatmap Cards - One per target type with data */}
-        {['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map((targetType) => {
-          const shotsForType = shotsByTargetType[targetType] || [];
-          if (shotsForType.length === 0) return null;
-          
-          return (
-            <View key={`heatmap-${targetType}`} style={styles.card}>
-              <Text style={styles.cardTitle}>
-                <Ionicons name="flame" size={18} color="#8B0000" /> {getTargetTypeName(targetType)} Heatmap
-              </Text>
-              <Text style={styles.heatmapSubtitle}>
-                {shotsForType.length} arrows
-              </Text>
-              <View style={styles.heatmapContainer}>
-                <HeatmapTargetMap size={280} displayTargetType={targetType} shots={shotsForType} />
-              </View>
-            </View>
-          );
-        })}
-
-        {/* Shot Distribution Cards - One per target type with data */}
-        {['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map((targetType) => {
-          const shotsForType = shotsByTargetType[targetType] || [];
-          if (shotsForType.length === 0) return null;
-          
-          return (
-            <View key={`scatter-${targetType}`} style={styles.card}>
-              <Text style={styles.cardTitle}>
-                <Ionicons name="radio-button-on" size={18} color="#8B0000" /> {getTargetTypeName(targetType)} Shot Distribution
-              </Text>
-              <Text style={styles.heatmapSubtitle}>
-                {shotsForType.length} arrows • Gold marker = Mean POI
-              </Text>
-              <View style={styles.heatmapContainer}>
-                <ScatterTargetMap size={280} displayTargetType={targetType} shots={shotsForType} />
-              </View>
-            </View>
-          );
-        })}
-
         {/* Score Distribution */}
         {reportStats.totalArrows > 0 && (
           <View style={styles.card}>
