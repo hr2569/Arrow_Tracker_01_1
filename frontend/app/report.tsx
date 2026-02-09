@@ -1725,44 +1725,44 @@ export default function ReportScreen() {
             </View>
           )}
 
-          {/* Quick Select Buttons - Only show in date range mode */}
+          {/* Quick Select Buttons and Custom Date Range - Only show in date range mode */}
           {selectionMode === 'dateRange' && (
-          <View>
-          <View style={styles.quickSelectContainer}>
-            <Text style={styles.sectionLabel}>Time Range</Text>
-            <View style={styles.quickSelectGrid}>
-              {[
-                { key: 'week', label: 'Last Week', icon: 'calendar-outline' },
-                { key: 'month', label: 'Last Month', icon: 'calendar' },
-                { key: 'year', label: 'Last Year', icon: 'albums-outline' },
-                { key: 'all', label: 'All Time', icon: 'infinite' },
-              ].map((item) => (
-                <TouchableOpacity
-                  key={item.key}
-                  style={[
-                    styles.quickSelectButton,
-                    selectedPeriod === item.key && styles.quickSelectButtonActive,
-                  ]}
-                  onPress={() => setSelectedPeriod(item.key as ReportPeriod)}
-                >
-                  <Ionicons 
-                    name={item.icon as any} 
-                    size={24} 
-                    color={selectedPeriod === item.key ? '#fff' : '#8B0000'} 
-                  />
-                  <Text style={[
-                    styles.quickSelectText,
-                    selectedPeriod === item.key && styles.quickSelectTextActive,
-                  ]}>
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
+            <View>
+              <View style={styles.quickSelectContainer}>
+                <Text style={styles.sectionLabel}>Time Range</Text>
+                <View style={styles.quickSelectGrid}>
+                  {[
+                    { key: 'week', label: 'Last Week', icon: 'calendar-outline' },
+                    { key: 'month', label: 'Last Month', icon: 'calendar' },
+                    { key: 'year', label: 'Last Year', icon: 'albums-outline' },
+                    { key: 'all', label: 'All Time', icon: 'infinite' },
+                  ].map((item) => (
+                    <TouchableOpacity
+                      key={item.key}
+                      style={[
+                        styles.quickSelectButton,
+                        selectedPeriod === item.key && styles.quickSelectButtonActive,
+                      ]}
+                      onPress={() => setSelectedPeriod(item.key as ReportPeriod)}
+                    >
+                      <Ionicons 
+                        name={item.icon as any} 
+                        size={24} 
+                        color={selectedPeriod === item.key ? '#fff' : '#8B0000'} 
+                      />
+                      <Text style={[
+                        styles.quickSelectText,
+                        selectedPeriod === item.key && styles.quickSelectTextActive,
+                      ]}>
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
 
-          {/* Custom Date Range */}
-          <View style={styles.customRangeContainer}>
+              {/* Custom Date Range */}
+              <View style={styles.customRangeContainer}>
             <Text style={styles.sectionLabel}>Custom Date Range</Text>
             
             <View style={styles.dateRow}>
