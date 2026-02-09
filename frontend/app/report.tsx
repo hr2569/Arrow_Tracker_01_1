@@ -1727,7 +1727,7 @@ export default function ReportScreen() {
 
           {/* Quick Select Buttons and Custom Date Range - Only show in date range mode */}
           {selectionMode === 'dateRange' && (
-            <View>
+            <>
               <View style={styles.quickSelectContainer}>
                 <Text style={styles.sectionLabel}>Time Range</Text>
                 <View style={styles.quickSelectGrid}>
@@ -1763,7 +1763,7 @@ export default function ReportScreen() {
 
               {/* Custom Date Range */}
               <View style={styles.customRangeContainer}>
-            <Text style={styles.sectionLabel}>Custom Date Range</Text>
+                <Text style={styles.sectionLabel}>Custom Date Range</Text>
             
             <View style={styles.dateRow}>
               <Text style={styles.dateLabel}>From</Text>
