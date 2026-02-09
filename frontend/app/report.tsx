@@ -1714,8 +1714,9 @@ export default function ReportScreen() {
           <Svg width={targetSize} height={targetSize}>
             {/* Shot markers */}
             {shots.map((shot, index) => {
-              const svgX = shot.x * targetSize;
-              const svgY = shot.y * targetSize;
+              // Convert from -1 to 1 range to SVG coordinates (centered)
+              const svgX = (targetSize / 2) + (shot.x * targetSize / 2);
+              const svgY = (targetSize / 2) + (shot.y * targetSize / 2);
               return (
                 <Circle
                   key={`shot-${index}`}
@@ -1731,16 +1732,16 @@ export default function ReportScreen() {
             })}
             {/* Mean Point of Impact marker */}
             <Circle
-              cx={avgX * targetSize}
-              cy={avgY * targetSize}
+              cx={(targetSize / 2) + (avgX * targetSize / 2)}
+              cy={(targetSize / 2) + (avgY * targetSize / 2)}
               r={10}
               fill="none"
               stroke="#FFD700"
               strokeWidth={2}
             />
             <Circle
-              cx={avgX * targetSize}
-              cy={avgY * targetSize}
+              cx={(targetSize / 2) + (avgX * targetSize / 2)}
+              cy={(targetSize / 2) + (avgY * targetSize / 2)}
               r={3}
               fill="#FFD700"
             />
