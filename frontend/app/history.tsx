@@ -1438,9 +1438,11 @@ const styles = StyleSheet.create({
   },
   visualizationsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
     marginBottom: 16,
     paddingVertical: 8,
+    gap: 16,
   },
   roundItem: {
     flexDirection: 'row',
