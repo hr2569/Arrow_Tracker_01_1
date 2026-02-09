@@ -1652,7 +1652,7 @@ export default function ReportScreen() {
     const shots = inputShots || allShots;
     const targetType = displayTargetType || 'wa_standard';
     
-    if (shots.length === 0) {
+    if (!shots || shots.length === 0) {
       return (
         <View style={[heatmapStyles.emptyContainer, { width: size, height: size }]}>
           <Ionicons name="radio-button-on" size={48} color="#888888" />
@@ -1661,92 +1661,79 @@ export default function ReportScreen() {
       );
     }
 
-    const targetScale = 0.8;
-    const targetSize = size * targetScale;
-    const targetOffset = (size - targetSize) / 2;
+    const targetSize = size * 0.9;
+    const center = size / 2;
+    const maxRadius = targetSize / 2;
     
-    // Calculate mean point of impact
-    const avgX = shots.reduce((sum, s) => sum + s.x, 0) / shots.length;
-    const avgY = shots.reduce((sum, s) => sum + s.y, 0) / shots.length;
+    // Calculate mean point of impact safely
+    const avgX = shots.length > 0 ? shots.reduce((sum, s) => sum + (s.x || 0), 0) / shots.length : 0;
+    const avgY = shots.length > 0 ? shots.reduce((sum, s) => sum + (s.y || 0), 0) / shots.length : 0;
     
-    // Ring definitions for WA Standard
+    // Ring definitions for WA Standard (from outside to inside)
     const waRings = [
-      { radiusPercent: 1.0, bgColor: '#FFFFFF' },   // 1-2
-      { radiusPercent: 0.9, bgColor: '#FFFFFF' },   // 2
-      { radiusPercent: 0.8, bgColor: '#000000' },   // 3
-      { radiusPercent: 0.7, bgColor: '#000000' },   // 4
-      { radiusPercent: 0.6, bgColor: '#00a2e8' },   // 5
-      { radiusPercent: 0.5, bgColor: '#00a2e8' },   // 6
-      { radiusPercent: 0.4, bgColor: '#ed1c24' },   // 7
-      { radiusPercent: 0.3, bgColor: '#ed1c24' },   // 8
-      { radiusPercent: 0.2, bgColor: '#fff200' },   // 9
-      { radiusPercent: 0.1, bgColor: '#fff200' },   // 10/X
+      { radiusPercent: 1.0, bgColor: '#FFFFFF', stroke: '#ccc' },
+      { radiusPercent: 0.9, bgColor: '#FFFFFF', stroke: '#ccc' },
+      { radiusPercent: 0.8, bgColor: '#000000', stroke: '#444' },
+      { radiusPercent: 0.7, bgColor: '#000000', stroke: '#444' },
+      { radiusPercent: 0.6, bgColor: '#00a2e8', stroke: '#0077b3' },
+      { radiusPercent: 0.5, bgColor: '#00a2e8', stroke: '#0077b3' },
+      { radiusPercent: 0.4, bgColor: '#ed1c24', stroke: '#b31217' },
+      { radiusPercent: 0.3, bgColor: '#ed1c24', stroke: '#b31217' },
+      { radiusPercent: 0.2, bgColor: '#fff200', stroke: '#ccaa00' },
+      { radiusPercent: 0.1, bgColor: '#fff200', stroke: '#ccaa00' },
     ];
 
     return (
       <View style={[heatmapStyles.container, { width: size, height: size }]}>
-        {/* Target Face */}
-        <View style={[heatmapStyles.targetWrapper, { width: targetSize, height: targetSize }]}>
-          {waRings.map((ring, idx) => {
-            const ringSize = targetSize * ring.radiusPercent;
-            const ringNum = 10 - idx;
+        <Svg width={size} height={size}>
+          {/* Target rings - draw from outside in */}
+          {waRings.map((ring, idx) => (
+            <Circle
+              key={`ring-${idx}`}
+              cx={center}
+              cy={center}
+              r={maxRadius * ring.radiusPercent}
+              fill={ring.bgColor}
+              stroke={ring.stroke}
+              strokeWidth={1}
+            />
+          ))}
+          
+          {/* Shot markers */}
+          {shots.slice(0, 100).map((shot, index) => {
+            // Convert from -1 to 1 range to SVG coordinates (centered)
+            const svgX = center + ((shot.x || 0) * maxRadius);
+            const svgY = center + ((shot.y || 0) * maxRadius);
             return (
-              <View
-                key={`ring-scatter-${idx}`}
-                style={[
-                  heatmapStyles.ringAbsolute,
-                  {
-                    width: ringSize,
-                    height: ringSize,
-                    borderRadius: ringSize / 2,
-                    backgroundColor: ring.bgColor,
-                    borderColor: ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00',
-                    borderWidth: 1,
-                  },
-                ]}
+              <Circle
+                key={`shot-${index}`}
+                cx={svgX}
+                cy={svgY}
+                r={5}
+                fill="#8B0000"
+                stroke="#fff"
+                strokeWidth={1.5}
+                opacity={0.85}
               />
             );
           })}
-        </View>
-
-        {/* Shot dots overlay */}
-        <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
-          <Svg width={targetSize} height={targetSize}>
-            {/* Shot markers */}
-            {shots.map((shot, index) => {
-              // Convert from -1 to 1 range to SVG coordinates (centered)
-              const svgX = (targetSize / 2) + (shot.x * targetSize / 2);
-              const svgY = (targetSize / 2) + (shot.y * targetSize / 2);
-              return (
-                <Circle
-                  key={`shot-${index}`}
-                  cx={svgX}
-                  cy={svgY}
-                  r={5}
-                  fill="#8B0000"
-                  stroke="#fff"
-                  strokeWidth={1.5}
-                  opacity={0.85}
-                />
-              );
-            })}
-            {/* Mean Point of Impact marker */}
-            <Circle
-              cx={(targetSize / 2) + (avgX * targetSize / 2)}
-              cy={(targetSize / 2) + (avgY * targetSize / 2)}
-              r={10}
-              fill="none"
-              stroke="#FFD700"
-              strokeWidth={2}
-            />
-            <Circle
-              cx={(targetSize / 2) + (avgX * targetSize / 2)}
-              cy={(targetSize / 2) + (avgY * targetSize / 2)}
-              r={3}
-              fill="#FFD700"
-            />
-          </Svg>
-        </View>
+          
+          {/* Mean Point of Impact marker */}
+          <Circle
+            cx={center + (avgX * maxRadius)}
+            cy={center + (avgY * maxRadius)}
+            r={10}
+            fill="none"
+            stroke="#FFD700"
+            strokeWidth={2}
+          />
+          <Circle
+            cx={center + (avgX * maxRadius)}
+            cy={center + (avgY * maxRadius)}
+            r={3}
+            fill="#FFD700"
+          />
+        </Svg>
       </View>
     );
   };
