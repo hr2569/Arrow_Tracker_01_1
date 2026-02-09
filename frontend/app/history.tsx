@@ -905,6 +905,12 @@ export default function HistoryScreen() {
                       <View style={styles.expandedContent}>
                         <View style={styles.expandedDivider} />
                         
+                        {/* Scatter Map and Heatmap Row */}
+                        <View style={styles.visualizationsRow}>
+                          <ScatterMap session={session} size={140} />
+                          <HeatMap session={session} size={140} />
+                        </View>
+                        
                         {getRoundChartData(session) && session.rounds.length > 1 && (
                           <View style={styles.chartSection}>
                             <Text style={styles.chartTitle}>
@@ -929,9 +935,17 @@ export default function HistoryScreen() {
                         <Text style={styles.roundsTitle}>Round Details</Text>
                         {session.rounds.map((round, index) => (
                           <View key={round.id || index} style={styles.roundItem}>
-                            <Text style={styles.roundNumber}>
-                              Round {round.round_number || index + 1}
-                            </Text>
+                            <View style={styles.roundHeader}>
+                              <Text style={styles.roundNumber}>
+                                Round {round.round_number || index + 1}
+                              </Text>
+                              <TouchableOpacity
+                                style={styles.roundDeleteBtn}
+                                onPress={() => handleDeleteRound(session.id, round.id)}
+                              >
+                                <Ionicons name="trash-outline" size={16} color="#ff6b6b" />
+                              </TouchableOpacity>
+                            </View>
                             <View style={styles.roundShots}>
                               {round.shots?.map((shot: any, shotIndex: number) => (
                                 <View key={shotIndex} style={styles.shotBadge}>
