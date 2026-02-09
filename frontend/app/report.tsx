@@ -46,6 +46,10 @@ export default function ReportScreen() {
   const [selectedDistance, setSelectedDistance] = useState<string | null>(null);
   const [selectedTargetType, setSelectedTargetType] = useState<string | null>(null);
   
+  // Session selection mode
+  const [selectionMode, setSelectionMode] = useState<'dateRange' | 'sessions'>('dateRange');
+  const [selectedSessionIds, setSelectedSessionIds] = useState<Set<string>>(new Set());
+  
   // Custom date range
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
