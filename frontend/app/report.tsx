@@ -1601,25 +1601,10 @@ export default function ReportScreen() {
           </View>
         </View>
 
-        {/* Heatmap Overlay using SVG - clipped to target area */}
+        {/* Heatmap Overlay using SVG - using simple circles instead of gradients for performance */}
         <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
           <View style={{ width: targetSize, height: targetSize, borderRadius: targetSize / 2, overflow: 'hidden' }}>
             <Svg width={targetSize} height={targetSize}>
-              <Defs>
-                {heatmapCells.map((cell, index) => (
-                  <RadialGradient
-                    key={`grad-${index}`}
-                    id={`heatGradReport-${index}`}
-                    cx="50%"
-                    cy="50%"
-                    rx="50%"
-                    ry="50%"
-                  >
-                    <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
-                    <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
-                  </RadialGradient>
-                ))}
-              </Defs>
               <G>
                 {heatmapCells.map((cell, index) => {
                   // Scale coordinates from full size to target size
@@ -1631,8 +1616,9 @@ export default function ReportScreen() {
                       key={`heat-${index}`}
                       cx={scaledX + scaledCellSize / 2}
                       cy={scaledY + scaledCellSize / 2}
-                      r={scaledCellSize * 2.0}
-                      fill={`url(#heatGradReport-${index})`}
+                      r={scaledCellSize * 1.5}
+                      fill={cell.color}
+                      opacity={cell.opacity * 0.6}
                     />
                   );
                 })}
