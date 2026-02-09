@@ -1666,8 +1666,9 @@ export default function ReportScreen() {
     const maxRadius = targetSize / 2;
     
     // Calculate mean point of impact safely
-    const avgX = shots.length > 0 ? shots.reduce((sum, s) => sum + (s.x || 0), 0) / shots.length : 0;
-    const avgY = shots.length > 0 ? shots.reduce((sum, s) => sum + (s.y || 0), 0) / shots.length : 0;
+    // Shots are 0-1 from top-left, 0.5 = center
+    const avgX = shots.length > 0 ? shots.reduce((sum, s) => sum + (s.x || 0.5), 0) / shots.length : 0.5;
+    const avgY = shots.length > 0 ? shots.reduce((sum, s) => sum + (s.y || 0.5), 0) / shots.length : 0.5;
     
     // Ring definitions for WA Standard (from outside to inside)
     const waRings = [
@@ -1701,9 +1702,11 @@ export default function ReportScreen() {
           
           {/* Shot markers */}
           {shots.slice(0, 100).map((shot, index) => {
-            // Convert from -1 to 1 range to SVG coordinates (centered)
-            const svgX = center + ((shot.x || 0) * maxRadius);
-            const svgY = center + ((shot.y || 0) * maxRadius);
+            // Shots are 0-1 from top-left, convert to centered coordinates
+            const centeredX = ((shot.x || 0.5) - 0.5) * 2;  // Now -1 to 1
+            const centeredY = ((shot.y || 0.5) - 0.5) * 2;
+            const svgX = center + (centeredX * maxRadius);
+            const svgY = center + (centeredY * maxRadius);
             return (
               <Circle
                 key={`shot-${index}`}
@@ -1720,16 +1723,16 @@ export default function ReportScreen() {
           
           {/* Mean Point of Impact marker */}
           <Circle
-            cx={center + (avgX * maxRadius)}
-            cy={center + (avgY * maxRadius)}
+            cx={center + ((avgX - 0.5) * 2 * maxRadius)}
+            cy={center + ((avgY - 0.5) * 2 * maxRadius)}
             r={10}
             fill="none"
             stroke="#FFD700"
             strokeWidth={2}
           />
           <Circle
-            cx={center + (avgX * maxRadius)}
-            cy={center + (avgY * maxRadius)}
+            cx={center + ((avgX - 0.5) * 2 * maxRadius)}
+            cy={center + ((avgY - 0.5) * 2 * maxRadius)}
             r={3}
             fill="#FFD700"
           />
