@@ -1405,7 +1405,7 @@ export default function ReportScreen() {
       const r = Math.round(lower.r + (upper.r - lower.r) * t);
       const g = Math.round(lower.g + (upper.g - lower.g) * t);
       const b = Math.round(lower.b + (upper.b - lower.b) * t);
-      const alpha = 0.4 + normalizedValue * 0.5; // 0.4 to 0.9 opacity
+      const alpha = 0.25 + normalizedDensity * 0.35;  // More transparent: 0.25 to 0.6
       
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     };
