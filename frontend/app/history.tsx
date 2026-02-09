@@ -268,13 +268,16 @@ const HeatMap = ({ session, size = 140 }: { session: Session, size?: number }) =
 const scatterStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    justifyContent: 'center',
     marginVertical: 8,
+    flex: 1,
   },
   title: {
     color: '#888',
     fontSize: 12,
     fontWeight: '600',
     marginBottom: 8,
+    textAlign: 'center',
   },
   svg: {
     backgroundColor: '#1a1a1a',
@@ -295,6 +298,7 @@ const scatterStyles = StyleSheet.create({
   },
   heatmapRow: {
     flexDirection: 'row',
+    justifyContent: 'center',
   },
   heatmapCell: {
     borderWidth: 0.5,
