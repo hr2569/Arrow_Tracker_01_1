@@ -2,16 +2,16 @@
   "expo": {
     "name": "Arrow Tracker",
     "slug": "arrow-tracker",
-    "owner": "seu_jorge",
+    "owner": "pika_dura",
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/f7ce11a1-826c-4dc0-9052-5d986def4909"
+      "url": "https://u.expo.dev/35a35549-1ac6-487e-9ac5-c5e88610ddc3"
     },
     "extra": {
       "eas": {
-        "projectId": "f7ce11a1-826c-4dc0-9052-5d986def4909"
+        "projectId": "35a35549-1ac6-487e-9ac5-c5e88610ddc3"
       }
     },
     "version": "1.0.0",
