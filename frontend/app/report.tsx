@@ -1851,7 +1851,8 @@ export default function ReportScreen() {
                 maximumDate={new Date()}
               />
             )}
-          </View>
+              </View>
+            </>
           )}
 
           {/* Summary Preview */}
