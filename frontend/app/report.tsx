@@ -1280,10 +1280,10 @@ export default function ReportScreen() {
 
   // Heatmap Component - shows density of shots as a gradient overlay with target type support
   const HeatmapTargetMap = ({ size = 280, displayTargetType, shots: inputShots }: { size?: number, displayTargetType?: string, shots?: { x: number; y: number; ring: number }[] }) => {
-    const shots = inputShots || allShots;
+    const shots = inputShots || allShots || [];
     const targetType = displayTargetType || 'wa_standard';
     
-    if (shots.length === 0) {
+    if (!shots || shots.length === 0) {
       return (
         <View style={[heatmapStyles.emptyContainer, { width: size, height: size }]}>
           <Ionicons name="flame-outline" size={48} color="#888888" />
