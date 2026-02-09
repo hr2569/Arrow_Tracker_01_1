@@ -218,6 +218,35 @@ export const updateRound = async (sessionId: string, roundId: string, shots: { x
   }
 };
 
+export const deleteRound = async (sessionId: string, roundId: string): Promise<Session | null> => {
+  try {
+    const sessions = await getSessions();
+    const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+    if (sessionIndex === -1) return null;
+    
+    const roundIndex = sessions[sessionIndex].rounds.findIndex(r => r.id === roundId);
+    if (roundIndex === -1) return null;
+    
+    // Remove the round
+    sessions[sessionIndex].rounds.splice(roundIndex, 1);
+    
+    // Renumber remaining rounds
+    sessions[sessionIndex].rounds.forEach((round, idx) => {
+      round.round_number = idx + 1;
+    });
+    
+    // Recalculate total score
+    sessions[sessionIndex].total_score = sessions[sessionIndex].rounds.reduce((sum, r) => sum + r.total_score, 0);
+    sessions[sessionIndex].updated_at = new Date().toISOString();
+    
+    await AsyncStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+    return sessions[sessionIndex];
+  } catch (error) {
+    console.error('Error deleting round:', error);
+    return null;
+  }
+};
+
 // ============== Bows ==============
 
 export const getBows = async (): Promise<Bow[]> => {
