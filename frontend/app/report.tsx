@@ -40,6 +40,7 @@ export default function ReportScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<ReportPeriod>('month');
   const [showReport, setShowReport] = useState(false);
+  const [renderError, setRenderError] = useState<string | null>(null);
   
   // Filters
   const [selectedBow, setSelectedBow] = useState<string | null>(null);
