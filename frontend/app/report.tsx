@@ -1128,13 +1128,17 @@ export default function ReportScreen() {
               <h2>${getTargetTypeName(targetType)} - Shot Analysis</h2>
               <p>${shotsForType.length} arrows</p>
             </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 18px;">Target Face Shot Map</h3>
+              ${generateTargetFaceScatterSvg(targetType, shotsForType)}
+            </div>
             <div style="display: flex; justify-content: space-around; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
-              <div style="text-align: center;">
-                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 18px;">Heat Map</h3>
+              <div style="text-align: center; flex: 1; min-width: 200px;">
+                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 16px;">Heat Map</h3>
                 ${generateHeatmapSvg(targetType, shotsForType)}
               </div>
-              <div style="text-align: center;">
-                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 18px;">Shot Distribution</h3>
+              <div style="text-align: center; flex: 1; min-width: 200px;">
+                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 16px;">Cartesian Distribution</h3>
                 ${generateScatterPlotSvg(targetType, shotsForType)}
               </div>
             </div>
