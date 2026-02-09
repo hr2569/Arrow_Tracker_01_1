@@ -167,6 +167,6 @@ export default function RootLayout() {
           }} 
         />
       </Stack>
-    </>
+    </GestureHandlerRootView>
   );
 }
