@@ -1454,24 +1454,26 @@ export default function ReportScreen() {
       const singleSpotSize = size * 0.75;
       const spotRadiusPx = singleSpotSize / 2;
       
-      // Recalculate density grid specifically for single spot display - HIGH RES
-      const spotGridSize = 55;  // Increased for smoother appearance
+      // Recalculate density grid specifically for single spot display - reduced for performance
+      const spotGridSize = 25;  // Reduced from 55 to prevent Android crash
       const spotCellSize = singleSpotSize / spotGridSize;
       const spotDensityGrid: number[][] = Array(spotGridSize).fill(null).map(() => Array(spotGridSize).fill(0));
       
       // Calculate density using shot coordinates (which are relative to spot, 0-1)
-      shots.forEach((shot) => {
+      // Limit shots processed for performance
+      const limitedShots = shots.slice(0, 100);
+      limitedShots.forEach((shot) => {
         const gridX = Math.floor(shot.x * spotGridSize);
         const gridY = Math.floor(shot.y * spotGridSize);
         
-        const blurRadius = 7;  // Larger blur for smoother gradients
+        const blurRadius = 3;  // Reduced blur radius for performance
         for (let dx = -blurRadius; dx <= blurRadius; dx++) {
           for (let dy = -blurRadius; dy <= blurRadius; dy++) {
             const nx = gridX + dx;
             const ny = gridY + dy;
             if (nx >= 0 && nx < spotGridSize && ny >= 0 && ny < spotGridSize) {
               const distance = Math.sqrt(dx * dx + dy * dy);
-              const weight = Math.exp(-distance * distance / 10);  // Smoother falloff
+              const weight = Math.exp(-distance * distance / 6);
               spotDensityGrid[ny][nx] += weight;
             }
           }
@@ -1485,19 +1487,21 @@ export default function ReportScreen() {
         });
       });
       
-      // Generate heatmap cells for this spot with smoother rendering
+      // Generate heatmap cells - LIMIT TO 50 MAX to prevent Android crash from too many gradients
       const spotHeatmapCells: { x: number; y: number; color: string; opacity: number }[] = [];
+      let spotCellCount = 0;
       spotDensityGrid.forEach((row, y) => {
         row.forEach((density, x) => {
-          if (density > 0.03) {  // Small threshold to reduce noise
+          if (density > 0.08 && spotCellCount < 50) {  // Higher threshold, strict limit
             const normalizedDensity = spotMaxDensity > 0 ? density / spotMaxDensity : 0;
-            const smoothedOpacity = Math.pow(normalizedDensity, 0.7);  // Smoother curve
+            const smoothedOpacity = Math.pow(normalizedDensity, 0.7);
             spotHeatmapCells.push({
               x: x * spotCellSize,
               y: y * spotCellSize,
               color: getHeatColor(normalizedDensity),
               opacity: smoothedOpacity,
             });
+            spotCellCount++;
           }
         });
       });
