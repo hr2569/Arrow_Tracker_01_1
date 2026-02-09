@@ -132,6 +132,176 @@ const miniTargetStyles = StyleSheet.create({
   },
 });
 
+// Scatter Map Component - shows all arrow positions on target face
+const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }) => {
+  const allShots = session.rounds.flatMap(r => r.shots || []);
+  if (allShots.length === 0) return null;
+  
+  const center = size / 2;
+  const ringRadius = size * 0.45;
+  
+  // Convert shot coordinates to SVG coordinates
+  // Assuming shots x,y are normalized -1 to 1
+  const getShotPosition = (shot: { x: number; y: number }) => {
+    const x = center + (shot.x * ringRadius);
+    const y = center + (shot.y * ringRadius);
+    return { x, y };
+  };
+  
+  // Ring colors for WA standard target
+  const ringColors = [
+    { r: 0.1, color: '#FFFF00' }, // X
+    { r: 0.2, color: '#FFFF00' }, // 10
+    { r: 0.3, color: '#FF0000' }, // 9
+    { r: 0.4, color: '#FF0000' }, // 8
+    { r: 0.5, color: '#00BFFF' }, // 7
+    { r: 0.6, color: '#00BFFF' }, // 6
+    { r: 0.7, color: '#000000' }, // 5
+    { r: 0.8, color: '#000000' }, // 4
+    { r: 0.9, color: '#FFFFFF' }, // 3
+    { r: 1.0, color: '#FFFFFF' }, // 2
+  ];
+  
+  return (
+    <View style={scatterStyles.container}>
+      <Text style={scatterStyles.title}>
+        <Ionicons name="scatter-plot" size={14} color="#8B0000" /> Shot Distribution
+      </Text>
+      <Svg width={size} height={size} style={scatterStyles.svg}>
+        {/* Target rings */}
+        {[...ringColors].reverse().map((ring, i) => (
+          <Circle
+            key={`ring-${i}`}
+            cx={center}
+            cy={center}
+            r={ringRadius * ring.r}
+            fill={ring.color}
+            stroke={ring.color === '#FFFFFF' ? '#ccc' : '#333'}
+            strokeWidth={0.5}
+          />
+        ))}
+        {/* Shots */}
+        {allShots.map((shot, i) => {
+          const pos = getShotPosition(shot);
+          return (
+            <Circle
+              key={`shot-${i}`}
+              cx={pos.x}
+              cy={pos.y}
+              r={4}
+              fill="#8B0000"
+              stroke="#fff"
+              strokeWidth={1}
+              opacity={0.8}
+            />
+          );
+        })}
+      </Svg>
+    </View>
+  );
+};
+
+// Heatmap Component - shows density of arrow impacts
+const HeatMap = ({ session, size = 140 }: { session: Session, size?: number }) => {
+  const allShots = session.rounds.flatMap(r => r.shots || []);
+  if (allShots.length === 0) return null;
+  
+  const center = size / 2;
+  const gridSize = 7; // 7x7 grid
+  const cellSize = size / gridSize;
+  
+  // Create grid and count shots in each cell
+  const grid: number[][] = Array(gridSize).fill(0).map(() => Array(gridSize).fill(0));
+  let maxCount = 0;
+  
+  allShots.forEach(shot => {
+    // Convert -1 to 1 coordinates to grid indices
+    const gridX = Math.floor(((shot.x + 1) / 2) * gridSize);
+    const gridY = Math.floor(((shot.y + 1) / 2) * gridSize);
+    const clampedX = Math.max(0, Math.min(gridSize - 1, gridX));
+    const clampedY = Math.max(0, Math.min(gridSize - 1, gridY));
+    grid[clampedY][clampedX]++;
+    maxCount = Math.max(maxCount, grid[clampedY][clampedX]);
+  });
+  
+  // Get color based on intensity
+  const getHeatColor = (count: number) => {
+    if (count === 0) return 'transparent';
+    const intensity = count / maxCount;
+    if (intensity < 0.25) return 'rgba(139, 0, 0, 0.2)';
+    if (intensity < 0.5) return 'rgba(139, 0, 0, 0.4)';
+    if (intensity < 0.75) return 'rgba(139, 0, 0, 0.6)';
+    return 'rgba(139, 0, 0, 0.9)';
+  };
+  
+  return (
+    <View style={scatterStyles.container}>
+      <Text style={scatterStyles.title}>
+        <Ionicons name="flame" size={14} color="#8B0000" /> Impact Heatmap
+      </Text>
+      <View style={[scatterStyles.heatmapGrid, { width: size, height: size }]}>
+        {/* Target outline */}
+        <View style={[scatterStyles.targetOutline, { width: size, height: size, borderRadius: size / 2 }]} />
+        {/* Heat cells */}
+        {grid.map((row, y) => (
+          <View key={`row-${y}`} style={scatterStyles.heatmapRow}>
+            {row.map((count, x) => (
+              <View
+                key={`cell-${x}-${y}`}
+                style={[
+                  scatterStyles.heatmapCell,
+                  {
+                    width: cellSize,
+                    height: cellSize,
+                    backgroundColor: getHeatColor(count),
+                  }
+                ]}
+              />
+            ))}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+const scatterStyles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  title: {
+    color: '#888',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  svg: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 70,
+  },
+  heatmapGrid: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 70,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  targetOutline: {
+    position: 'absolute',
+    borderWidth: 2,
+    borderColor: '#333',
+    top: 0,
+    left: 0,
+  },
+  heatmapRow: {
+    flexDirection: 'row',
+  },
+  heatmapCell: {
+    borderWidth: 0.5,
+    borderColor: 'rgba(51, 51, 51, 0.3)',
+  },
+});
+
 interface GroupedSessions {
   label: string;
   sessions: Session[];
