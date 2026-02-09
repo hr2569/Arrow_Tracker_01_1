@@ -1432,15 +1432,30 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 12,
   },
+  visualizationsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 16,
+    paddingVertical: 8,
+  },
   roundItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
   },
+  roundHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 80,
+  },
   roundNumber: {
     fontSize: 12,
     color: '#888888',
-    width: 60,
+    flex: 1,
+  },
+  roundDeleteBtn: {
+    padding: 4,
+    marginLeft: 4,
   },
   roundShots: {
     flexDirection: 'row',
