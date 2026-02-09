@@ -1117,29 +1117,41 @@ export default function ReportScreen() {
             ` : ''}
           </div>
 
-          <!-- Heatmap Pages - One per target type with scatter plot -->
+          <!-- Shot Analysis Pages - Each graph on its own page -->
           ${['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map(targetType => {
             const shotsForType = shotsByTargetType[targetType] || [];
             if (shotsForType.length === 0) return '';
             return `
+          <!-- Target Face Shot Map Page -->
           <div class="page">
             <div class="page-header">
-              <h2>${getTargetTypeName(targetType)} - Shot Analysis</h2>
+              <h2>${getTargetTypeName(targetType)} - Target Face Shot Map</h2>
               <p>${shotsForType.length} arrows</p>
             </div>
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 18px;">Target Face Shot Map</h3>
+            <div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
               ${generateTargetFaceScatterSvg(targetType, shotsForType)}
             </div>
-            <div style="display: flex; justify-content: space-around; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
-              <div style="text-align: center; flex: 1; min-width: 200px;">
-                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 16px;">Heat Map</h3>
-                ${generateHeatmapSvg(targetType, shotsForType)}
-              </div>
-              <div style="text-align: center; flex: 1; min-width: 200px;">
-                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 16px;">Cartesian Distribution</h3>
-                ${generateScatterPlotSvg(targetType, shotsForType)}
-              </div>
+          </div>
+
+          <!-- Heat Map Page -->
+          <div class="page">
+            <div class="page-header">
+              <h2>${getTargetTypeName(targetType)} - Heat Map</h2>
+              <p>${shotsForType.length} arrows</p>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+              ${generateHeatmapSvg(targetType, shotsForType)}
+            </div>
+          </div>
+
+          <!-- Cartesian Distribution Page -->
+          <div class="page">
+            <div class="page-header">
+              <h2>${getTargetTypeName(targetType)} - Cartesian Distribution</h2>
+              <p>${shotsForType.length} arrows</p>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+              ${generateScatterPlotSvg(targetType, shotsForType)}
             </div>
           </div>
             `;
