@@ -1851,6 +1851,7 @@ export default function ReportScreen() {
               />
             )}
           </View>
+          )}
 
           {/* Summary Preview */}
           <View style={styles.previewCard}>
