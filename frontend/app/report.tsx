@@ -1534,30 +1534,16 @@ export default function ReportScreen() {
                 />
               ))}
               
-              {/* Heatmap overlay */}
-              <Defs>
-                {spotHeatmapCells.map((cell, index) => (
-                  <RadialGradient
-                    key={`grad-multi-${index}`}
-                    id={`heatGradMulti-${targetType}-${index}`}
-                    cx="50%"
-                    cy="50%"
-                    rx="50%"
-                    ry="50%"
-                  >
-                    <Stop offset="0%" stopColor={cell.color} stopOpacity={cell.opacity} />
-                    <Stop offset="100%" stopColor={cell.color} stopOpacity={0} />
-                  </RadialGradient>
-                ))}
-              </Defs>
+              {/* Heatmap overlay - using simple circles with opacity instead of gradients */}
               <G>
                 {spotHeatmapCells.map((cell, index) => (
                   <Circle
                     key={`heat-multi-${index}`}
                     cx={cell.x + spotCellSize / 2}
                     cy={cell.y + spotCellSize / 2}
-                    r={spotCellSize * 2.2}
-                    fill={`url(#heatGradMulti-${targetType}-${index})`}
+                    r={spotCellSize * 1.5}
+                    fill={cell.color}
+                    opacity={cell.opacity * 0.6}
                   />
                 ))}
               </G>
