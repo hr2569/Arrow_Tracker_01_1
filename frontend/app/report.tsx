@@ -2904,6 +2904,16 @@ const heatmapStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  targetWrapper: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ringAbsolute: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   targetBackground: {
     position: 'absolute',
     alignItems: 'center',
