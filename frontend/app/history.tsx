@@ -224,14 +224,14 @@ const HeatMap = ({ session, size = 140 }: { session: Session, size?: number }) =
     maxCount = Math.max(maxCount, grid[clampedY][clampedX]);
   });
   
-  // Get color based on intensity
+  // Get color based on intensity - more transparent
   const getHeatColor = (count: number) => {
     if (count === 0) return 'transparent';
     const intensity = count / maxCount;
-    if (intensity < 0.25) return 'rgba(139, 0, 0, 0.2)';
-    if (intensity < 0.5) return 'rgba(139, 0, 0, 0.4)';
-    if (intensity < 0.75) return 'rgba(139, 0, 0, 0.6)';
-    return 'rgba(139, 0, 0, 0.9)';
+    if (intensity < 0.25) return 'rgba(139, 0, 0, 0.15)';
+    if (intensity < 0.5) return 'rgba(139, 0, 0, 0.3)';
+    if (intensity < 0.75) return 'rgba(139, 0, 0, 0.45)';
+    return 'rgba(139, 0, 0, 0.65)';
   };
   
   return (
