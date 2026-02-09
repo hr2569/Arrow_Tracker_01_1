@@ -19,7 +19,8 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { getSessions, updateSession, deleteSession, Session } from '../utils/localStorage';
+import { getSessions, updateSession, deleteSession, deleteRound, Session, Round } from '../utils/localStorage';
+import Svg, { Circle, Defs, RadialGradient, Stop, G } from 'react-native-svg';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHART_WIDTH = SCREEN_WIDTH - 72;
