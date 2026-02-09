@@ -119,24 +119,58 @@ export default function ReportScreen() {
     setEndDate(now);
   }, [selectedPeriod]);
 
-  // Filter sessions by date range, bow, distance, and target type
+  // Filter sessions by date range OR selected sessions, plus bow, distance, and target type
   const filteredSessions = useMemo(() => {
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
+    let filtered = sessions;
     
-    return sessions.filter((session) => {
-      const sessionDate = new Date(session.created_at);
-      if (sessionDate < start || sessionDate > end) return false;
+    // Apply selection mode filter
+    if (selectionMode === 'sessions' && selectedSessionIds.size > 0) {
+      // Filter by selected session IDs
+      filtered = sessions.filter(session => selectedSessionIds.has(session.id));
+    } else {
+      // Filter by date range
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      
+      filtered = sessions.filter((session) => {
+        const sessionDate = new Date(session.created_at);
+        return sessionDate >= start && sessionDate <= end;
+      });
+    }
+    
+    // Apply additional filters
+    return filtered.filter((session) => {
       if (selectedBow && session.bow_id !== selectedBow) return false;
       if (selectedDistance && session.distance !== selectedDistance) return false;
-      // Filter by target type (treat missing as 'wa_standard')
       const sessionTargetType = session.target_type || 'wa_standard';
       if (selectedTargetType && sessionTargetType !== selectedTargetType) return false;
       return true;
     });
-  }, [sessions, startDate, endDate, selectedBow, selectedDistance, selectedTargetType]);
+  }, [sessions, startDate, endDate, selectedBow, selectedDistance, selectedTargetType, selectionMode, selectedSessionIds]);
+
+  // Toggle session selection
+  const toggleSessionSelection = (sessionId: string) => {
+    setSelectedSessionIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sessionId)) {
+        newSet.delete(sessionId);
+      } else {
+        newSet.add(sessionId);
+      }
+      return newSet;
+    });
+  };
+
+  // Select/deselect all sessions
+  const toggleSelectAll = () => {
+    if (selectedSessionIds.size === sessions.length) {
+      setSelectedSessionIds(new Set());
+    } else {
+      setSelectedSessionIds(new Set(sessions.map(s => s.id)));
+    }
+  };
 
   // Get all shots for heatmap, grouped by target type
   const shotsByTargetType = useMemo(() => {
