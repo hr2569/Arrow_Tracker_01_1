@@ -881,7 +881,6 @@ export default function ReportScreen() {
         </div>
       `;
     };
-    };
 
     return `
       <!DOCTYPE html>
