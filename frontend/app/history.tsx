@@ -300,6 +300,34 @@ export default function HistoryScreen() {
     );
   };
 
+  const handleDeleteRound = (sessionId: string, roundId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (session?.rounds.length === 1) {
+      Alert.alert('Cannot Delete', 'Sessions must have at least one round. Delete the session instead.');
+      return;
+    }
+    
+    const performDelete = async () => {
+      try {
+        const updatedSession = await deleteRound(sessionId, roundId);
+        if (updatedSession) {
+          setSessions(sessions.map(s => s.id === sessionId ? updatedSession : s));
+        }
+      } catch (err) {
+        Alert.alert('Error', 'Failed to delete round');
+      }
+    };
+
+    Alert.alert(
+      'Delete Round',
+      'Are you sure you want to delete this round? This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: performDelete },
+      ]
+    );
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
