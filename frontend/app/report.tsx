@@ -1653,7 +1653,80 @@ export default function ReportScreen() {
             </View>
           )}
 
-          {/* Quick Select Buttons */}
+          {/* Selection Mode Toggle */}
+          <View style={styles.filterSection}>
+            <Text style={styles.sectionLabel}>Select Sessions By</Text>
+            <View style={styles.modeToggleContainer}>
+              <TouchableOpacity
+                style={[styles.modeToggleButton, selectionMode === 'dateRange' && styles.modeToggleButtonActive]}
+                onPress={() => setSelectionMode('dateRange')}
+              >
+                <Ionicons name="calendar" size={18} color={selectionMode === 'dateRange' ? '#fff' : '#8B0000'} />
+                <Text style={[styles.modeToggleText, selectionMode === 'dateRange' && styles.modeToggleTextActive]}>
+                  Date Range
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modeToggleButton, selectionMode === 'sessions' && styles.modeToggleButtonActive]}
+                onPress={() => setSelectionMode('sessions')}
+              >
+                <Ionicons name="list" size={18} color={selectionMode === 'sessions' ? '#fff' : '#8B0000'} />
+                <Text style={[styles.modeToggleText, selectionMode === 'sessions' && styles.modeToggleTextActive]}>
+                  Individual Sessions
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Individual Session Selection */}
+          {selectionMode === 'sessions' && (
+            <View style={styles.sessionSelectionContainer}>
+              <View style={styles.sessionSelectionHeader}>
+                <Text style={styles.sectionLabel}>Select Sessions ({selectedSessionIds.size} selected)</Text>
+                <TouchableOpacity onPress={toggleSelectAll} style={styles.selectAllButton}>
+                  <Text style={styles.selectAllText}>
+                    {selectedSessionIds.size === sessions.length ? 'Deselect All' : 'Select All'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.sessionsList}>
+                {sessions.slice().reverse().map((session) => {
+                  const isSelected = selectedSessionIds.has(session.id);
+                  const sessionDate = new Date(session.created_at);
+                  const bowName = bows.find(b => b.id === session.bow_id)?.name || 'Unknown Bow';
+                  const totalScore = session.rounds.reduce((sum, r) => sum + r.arrows.reduce((s, a) => s + a.score, 0), 0);
+                  const totalArrows = session.rounds.reduce((sum, r) => sum + r.arrows.length, 0);
+                  
+                  return (
+                    <TouchableOpacity
+                      key={session.id}
+                      style={[styles.sessionSelectItem, isSelected && styles.sessionSelectItemActive]}
+                      onPress={() => toggleSessionSelection(session.id)}
+                    >
+                      <View style={[styles.sessionCheckbox, isSelected && styles.sessionCheckboxChecked]}>
+                        {isSelected && <Ionicons name="checkmark" size={16} color="#fff" />}
+                      </View>
+                      <View style={styles.sessionSelectInfo}>
+                        <Text style={styles.sessionSelectDate}>
+                          {sessionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </Text>
+                        <Text style={styles.sessionSelectDetails}>
+                          {bowName} • {session.distance || 'No distance'} • {session.rounds.length} rounds
+                        </Text>
+                      </View>
+                      <View style={styles.sessionSelectScore}>
+                        <Text style={styles.sessionSelectScoreValue}>{totalScore}</Text>
+                        <Text style={styles.sessionSelectScoreLabel}>pts</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+
+          {/* Quick Select Buttons - Only show in date range mode */}
+          {selectionMode === 'dateRange' && (
           <View style={styles.quickSelectContainer}>
             <Text style={styles.sectionLabel}>Time Range</Text>
             <View style={styles.quickSelectGrid}>
