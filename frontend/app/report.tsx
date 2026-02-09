@@ -2554,6 +2554,108 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 20,
   },
+  // Session selection styles
+  modeToggleContainer: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  modeToggleButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: '#1a1a1a',
+    borderWidth: 1,
+    borderColor: '#333',
+    gap: 8,
+  },
+  modeToggleButtonActive: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
+  },
+  modeToggleText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8B0000',
+  },
+  modeToggleTextActive: {
+    color: '#fff',
+  },
+  sessionSelectionContainer: {
+    marginBottom: 20,
+  },
+  sessionSelectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  selectAllButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  selectAllText: {
+    color: '#8B0000',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  sessionsList: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  sessionSelectItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  sessionSelectItemActive: {
+    backgroundColor: 'rgba(139, 0, 0, 0.15)',
+  },
+  sessionCheckbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#555',
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sessionCheckboxChecked: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
+  },
+  sessionSelectInfo: {
+    flex: 1,
+  },
+  sessionSelectDate: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 2,
+  },
+  sessionSelectDetails: {
+    fontSize: 12,
+    color: '#888',
+  },
+  sessionSelectScore: {
+    alignItems: 'flex-end',
+  },
+  sessionSelectScoreValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#8B0000',
+  },
+  sessionSelectScoreLabel: {
+    fontSize: 10,
+    color: '#888',
+  },
 });
 
 const heatmapStyles = StyleSheet.create({
