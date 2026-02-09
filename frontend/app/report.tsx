@@ -836,19 +836,23 @@ export default function ReportScreen() {
         ).join('\n');
       }
       
-      // Plot shots on target
+      // Plot shots on target - shots are 0-1 from top-left, 0.5 = center
       let shotDots = '';
       shots.forEach((shot) => {
-        const svgX = center + shot.x * maxRadius;
-        const svgY = center + shot.y * maxRadius;
+        const centeredX = (shot.x - 0.5) * 2;  // Convert to -1 to 1
+        const centeredY = (shot.y - 0.5) * 2;
+        const svgX = center + centeredX * maxRadius;
+        const svgY = center + centeredY * maxRadius;
         shotDots += `<circle cx="${svgX}" cy="${svgY}" r="6" fill="#8B0000" stroke="#fff" stroke-width="2" opacity="0.9" />`;
       });
       
       // Calculate Mean Point of Impact
       const avgX = shots.reduce((sum, s) => sum + s.x, 0) / shots.length;
       const avgY = shots.reduce((sum, s) => sum + s.y, 0) / shots.length;
-      const avgSvgX = center + avgX * maxRadius;
-      const avgSvgY = center + avgY * maxRadius;
+      const avgCenteredX = (avgX - 0.5) * 2;
+      const avgCenteredY = (avgY - 0.5) * 2;
+      const avgSvgX = center + avgCenteredX * maxRadius;
+      const avgSvgY = center + avgCenteredY * maxRadius;
       
       const meanMarker = `
         <circle cx="${avgSvgX}" cy="${avgSvgY}" r="12" fill="none" stroke="#000" stroke-width="3" />
