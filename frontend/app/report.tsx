@@ -1759,8 +1759,10 @@ export default function ReportScreen() {
               ))}
             </View>
           </View>
+          )}
 
           {/* Custom Date Range */}
+          {selectionMode === 'dateRange' && (
           <View style={styles.customRangeContainer}>
             <Text style={styles.sectionLabel}>Custom Date Range</Text>
             
