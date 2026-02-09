@@ -1693,9 +1693,9 @@ export default function ReportScreen() {
                 {sessions.slice().reverse().map((session) => {
                   const isSelected = selectedSessionIds.has(session.id);
                   const sessionDate = new Date(session.created_at);
-                  const bowName = bows.find(b => b.id === session.bow_id)?.name || 'Unknown Bow';
-                  const totalScore = session.rounds.reduce((sum, r) => sum + r.arrows.reduce((s, a) => s + a.score, 0), 0);
-                  const totalArrows = session.rounds.reduce((sum, r) => sum + r.arrows.length, 0);
+                  const bowName = session.bow_name || 'Unknown Bow';
+                  const totalScore = session.total_score || 0;
+                  const totalArrows = session.rounds.reduce((sum, r) => sum + (r.shots?.length || 0), 0);
                   
                   return (
                     <TouchableOpacity
