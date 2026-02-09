@@ -1727,7 +1727,7 @@ export default function ReportScreen() {
 
           {/* Quick Select Buttons - Only show in date range mode */}
           {selectionMode === 'dateRange' && (
-          <>
+          <View>
           <View style={styles.quickSelectContainer}>
             <Text style={styles.sectionLabel}>Time Range</Text>
             <View style={styles.quickSelectGrid}>
