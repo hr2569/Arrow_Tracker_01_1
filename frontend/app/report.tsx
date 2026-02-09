@@ -863,7 +863,7 @@ export default function ReportScreen() {
         <line x1="${avgSvgX}" y1="${avgSvgY - 18}" x2="${avgSvgX}" y2="${avgSvgY + 18}" stroke="#FFD700" stroke-width="2" />
       `;
       
-      const poiDescription = `${avgX > 0 ? 'Right' : 'Left'} ${Math.abs(avgX * 100).toFixed(1)}%, ${avgY > 0 ? 'Low' : 'High'} ${Math.abs(avgY * 100).toFixed(1)}%`;
+      const poiDescription = `${avgCenteredX > 0 ? 'Right' : 'Left'} ${Math.abs(avgCenteredX * 50).toFixed(1)}%, ${avgCenteredY > 0 ? 'Low' : 'High'} ${Math.abs(avgCenteredY * 50).toFixed(1)}%`;
       
       return `
         <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
