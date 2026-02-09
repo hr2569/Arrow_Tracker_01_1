@@ -1852,7 +1852,6 @@ export default function ReportScreen() {
               />
             )}
           </View>
-            </View>
           )}
 
           {/* Summary Preview */}
