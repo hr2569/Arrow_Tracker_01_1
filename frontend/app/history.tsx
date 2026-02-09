@@ -909,10 +909,9 @@ export default function HistoryScreen() {
                       <View style={styles.expandedContent}>
                         <View style={styles.expandedDivider} />
                         
-                        {/* Scatter Map and Heatmap Row */}
+                        {/* Shot Distribution */}
                         <View style={styles.visualizationsRow}>
-                          <ScatterMap session={session} size={140} />
-                          <HeatMap session={session} size={140} />
+                          <ScatterMap session={session} size={160} />
                         </View>
                         
                         {getRoundChartData(session) && session.rounds.length > 1 && (
