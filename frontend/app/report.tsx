@@ -1647,6 +1647,109 @@ export default function ReportScreen() {
     );
   };
 
+  // Scatter Map Component - shows shot distribution with dots on target
+  const ScatterTargetMap = ({ size = 280, displayTargetType, shots: inputShots }: { size?: number, displayTargetType?: string, shots?: { x: number; y: number; ring: number }[] }) => {
+    const shots = inputShots || allShots;
+    const targetType = displayTargetType || 'wa_standard';
+    
+    if (shots.length === 0) {
+      return (
+        <View style={[heatmapStyles.emptyContainer, { width: size, height: size }]}>
+          <Ionicons name="radio-button-on" size={48} color="#888888" />
+          <Text style={heatmapStyles.emptyText}>No shots in this period</Text>
+        </View>
+      );
+    }
+
+    const targetScale = 0.8;
+    const targetSize = size * targetScale;
+    const targetOffset = (size - targetSize) / 2;
+    
+    // Calculate mean point of impact
+    const avgX = shots.reduce((sum, s) => sum + s.x, 0) / shots.length;
+    const avgY = shots.reduce((sum, s) => sum + s.y, 0) / shots.length;
+    
+    // Ring definitions for WA Standard
+    const waRings = [
+      { radiusPercent: 1.0, bgColor: '#FFFFFF' },   // 1-2
+      { radiusPercent: 0.9, bgColor: '#FFFFFF' },   // 2
+      { radiusPercent: 0.8, bgColor: '#000000' },   // 3
+      { radiusPercent: 0.7, bgColor: '#000000' },   // 4
+      { radiusPercent: 0.6, bgColor: '#00a2e8' },   // 5
+      { radiusPercent: 0.5, bgColor: '#00a2e8' },   // 6
+      { radiusPercent: 0.4, bgColor: '#ed1c24' },   // 7
+      { radiusPercent: 0.3, bgColor: '#ed1c24' },   // 8
+      { radiusPercent: 0.2, bgColor: '#fff200' },   // 9
+      { radiusPercent: 0.1, bgColor: '#fff200' },   // 10/X
+    ];
+
+    return (
+      <View style={[heatmapStyles.container, { width: size, height: size }]}>
+        {/* Target Face */}
+        <View style={[heatmapStyles.targetWrapper, { width: targetSize, height: targetSize }]}>
+          {waRings.map((ring, idx) => {
+            const ringSize = targetSize * ring.radiusPercent;
+            const ringNum = 10 - idx;
+            return (
+              <View
+                key={`ring-scatter-${idx}`}
+                style={[
+                  heatmapStyles.ringAbsolute,
+                  {
+                    width: ringSize,
+                    height: ringSize,
+                    borderRadius: ringSize / 2,
+                    backgroundColor: ring.bgColor,
+                    borderColor: ringNum <= 2 ? '#ccc' : ringNum <= 4 ? '#444' : ringNum <= 6 ? '#0077b3' : ringNum <= 8 ? '#b31217' : '#ccaa00',
+                    borderWidth: 1,
+                  },
+                ]}
+              />
+            );
+          })}
+        </View>
+
+        {/* Shot dots overlay */}
+        <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+          <Svg width={targetSize} height={targetSize}>
+            {/* Shot markers */}
+            {shots.map((shot, index) => {
+              const svgX = shot.x * targetSize;
+              const svgY = shot.y * targetSize;
+              return (
+                <Circle
+                  key={`shot-${index}`}
+                  cx={svgX}
+                  cy={svgY}
+                  r={5}
+                  fill="#8B0000"
+                  stroke="#fff"
+                  strokeWidth={1.5}
+                  opacity={0.85}
+                />
+              );
+            })}
+            {/* Mean Point of Impact marker */}
+            <Circle
+              cx={avgX * targetSize}
+              cy={avgY * targetSize}
+              r={10}
+              fill="none"
+              stroke="#FFD700"
+              strokeWidth={2}
+            />
+            <Circle
+              cx={avgX * targetSize}
+              cy={avgY * targetSize}
+              r={3}
+              fill="#FFD700"
+            />
+          </Svg>
+        </View>
+      </View>
+    );
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
