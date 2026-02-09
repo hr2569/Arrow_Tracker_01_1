@@ -1427,19 +1427,21 @@ export default function ReportScreen() {
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     };
 
-    // Create heatmap cells with smoother appearance
+    // Create heatmap cells - limit to 100 for performance
     const heatmapCells: { x: number; y: number; color: string; opacity: number }[] = [];
+    let cellCount = 0;
     densityGrid.forEach((row, y) => {
       row.forEach((density, x) => {
-        if (density > 0.03) {  // Small threshold to reduce noise
+        if (density > 0.05 && cellCount < 100) {  // Higher threshold, limit count
           const normalizedDensity = maxDensity > 0 ? density / maxDensity : 0;
-          const smoothedOpacity = Math.pow(normalizedDensity, 0.7);  // Smoother opacity curve
+          const smoothedOpacity = Math.pow(normalizedDensity, 0.7);
           heatmapCells.push({
             x: x * cellSize,
             y: y * cellSize,
             color: getHeatColor(normalizedDensity),
             opacity: smoothedOpacity,
           });
+          cellCount++;
         }
       });
     });
