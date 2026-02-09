@@ -1359,26 +1359,26 @@ export default function ReportScreen() {
       );
     };
     
-    // Higher resolution grid for smoother heatmap
-    const gridSize = 70;  // Increased for smoother appearance
+    // Lower resolution grid for better Android performance
+    const gridSize = 35;  // Reduced for mobile performance
     const cellSize = size / gridSize;
     const densityGrid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
     
-    // Calculate density for each grid cell
-    shots.forEach((shot) => {
+    // Calculate density for each grid cell - limit shots processed
+    const limitedShots = shots.slice(0, 200);  // Limit to 200 shots for performance
+    limitedShots.forEach((shot) => {
       const gridX = Math.floor(shot.x * gridSize);
       const gridY = Math.floor(shot.y * gridSize);
       
-      // Larger blur radius for smoother gradients
-      const blurRadius = 8;  // Increased for smoother blending
+      // Smaller blur radius for better performance
+      const blurRadius = 4;
       for (let dx = -blurRadius; dx <= blurRadius; dx++) {
         for (let dy = -blurRadius; dy <= blurRadius; dy++) {
           const nx = gridX + dx;
           const ny = gridY + dy;
           if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
             const distance = Math.sqrt(dx * dx + dy * dy);
-            // Smoother gaussian falloff
-            const weight = Math.exp(-distance * distance / 14);  // Gentler falloff
+            const weight = Math.exp(-distance * distance / 8);
             densityGrid[ny][nx] += weight;
           }
         }
