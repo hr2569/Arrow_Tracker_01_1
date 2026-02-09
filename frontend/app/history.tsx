@@ -215,9 +215,9 @@ const HeatMap = ({ session, size = 140 }: { session: Session, size?: number }) =
   let maxCount = 0;
   
   allShots.forEach(shot => {
-    // Convert -1 to 1 coordinates to grid indices
-    const gridX = Math.floor(((shot.x + 1) / 2) * gridSize);
-    const gridY = Math.floor(((shot.y + 1) / 2) * gridSize);
+    // Shots are 0-1 from top-left, convert directly to grid indices
+    const gridX = Math.floor(shot.x * gridSize);
+    const gridY = Math.floor(shot.y * gridSize);
     const clampedX = Math.max(0, Math.min(gridSize - 1, gridX));
     const clampedY = Math.max(0, Math.min(gridSize - 1, gridY));
     grid[clampedY][clampedX]++;
