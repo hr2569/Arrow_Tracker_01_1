@@ -452,7 +452,7 @@ export default function ReportScreen() {
         const r = Math.round(lower.r + (upper.r - lower.r) * t);
         const g = Math.round(lower.g + (upper.g - lower.g) * t);
         const b = Math.round(lower.b + (upper.b - lower.b) * t);
-        const alpha = 0.4 + normalizedValue * 0.5;
+        const alpha = 0.25 + normalizedValue * 0.35;  // More transparent: 0.25 to 0.6
         
         return { r, g, b, alpha };
       };
@@ -468,7 +468,7 @@ export default function ReportScreen() {
               const cx = x * cellSize + cellSize / 2;
               const cy = y * cellSize + cellSize / 2;
               const r = cellSize * 2.0;  // Larger circles for overlap/smoothness
-              const alpha = color.alpha * Math.pow(normalizedDensity, 0.7);  // Smoother alpha curve
+              const alpha = color.alpha * Math.pow(normalizedDensity, 0.6);  // More transparent
               heatCircles += `
                 <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})" />
               `;
