@@ -203,6 +203,12 @@ export default function ScoringScreen() {
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
   const [showScorePicker, setShowScorePicker] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
+  
+  // Magnifier state for zoom-on-touch placement
+  const [isTouching, setIsTouching] = useState(false);
+  const [touchPosition, setTouchPosition] = useState({ x: 0, y: 0 });
+  const [activeTargetIndex, setActiveTargetIndex] = useState(0);
+  const [previewScore, setPreviewScore] = useState(0);
 
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   const isVegas = targetType === 'vegas_3spot';
