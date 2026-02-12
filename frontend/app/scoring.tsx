@@ -446,38 +446,6 @@ export default function ScoringScreen() {
       placeArrow(normalizedX, normalizedY, targetIndex);
     };
 
-    const handleWebMouseMove = (e: any) => {
-      if (!isTouching) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      handleTouchMove(x, y, size);
-    };
-
-    const handleWebMouseUp = () => {
-      if (isTouching) {
-        handleTouchEnd(size);
-      }
-    };
-
-    const webProps = Platform.OS === 'web' ? {
-      onMouseDown: handleWebMouseDown,
-      onMouseMove: handleWebMouseMove,
-      onMouseUp: handleWebMouseUp,
-      onMouseLeave: handleWebMouseUp,
-      style: {
-        width: size,
-        height: size,
-        backgroundColor: '#1a1a1a',
-        borderRadius: size / 2,
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'crosshair',
-        position: 'relative' as const,
-        userSelect: 'none' as const,
-      }
-    } : {};
-
     const nativeStyle = Platform.OS !== 'web' ? {
       width: size,
       height: size,
@@ -499,6 +467,8 @@ export default function ScoringScreen() {
       >
         {Platform.OS === 'web' ? (
           <View
+            // @ts-ignore - web-specific onClick handler
+            onClick={handleWebClick}
             style={{
               width: size,
               height: size,
