@@ -74,7 +74,7 @@ export default function RootLayout() {
           name="summary" 
           options={{ 
             title: 'Round Summary',
-            headerBackTitle: 'Back',
+            headerBackVisible: false,
             headerLeft: () => <HeaderBackButton />,
           }} 
         />
@@ -82,7 +82,7 @@ export default function RootLayout() {
           name="history" 
           options={{ 
             title: 'Score History',
-            headerBackTitle: 'Back',
+            headerBackVisible: false,
             headerLeft: () => <HeaderBackButton />,
           }} 
         />
@@ -90,7 +90,7 @@ export default function RootLayout() {
           name="stats" 
           options={{ 
             title: 'Statistics',
-            headerBackTitle: 'Back',
+            headerBackVisible: false,
             headerLeft: () => <HeaderBackButton />,
           }} 
         />
