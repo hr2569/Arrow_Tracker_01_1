@@ -209,9 +209,6 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
             strokeWidth={ring.strokeWidth || 0.5}
           />
         ))}
-        {isIndoor && (
-          <Circle cx={center} cy={center} r={maxRingRadius * 0.05} fill="none" stroke="#333333" strokeWidth={1} />
-        )}
         {allShots.map((shot, i) => {
           const pos = getShotPosition(shot);
           return (
