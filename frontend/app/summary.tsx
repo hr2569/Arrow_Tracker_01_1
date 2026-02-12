@@ -727,4 +727,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  modalCancelButton: {
+    marginTop: 12,
+    padding: 10,
+  },
+  modalCancelText: {
+    color: '#888888',
+    fontSize: 14,
+  },
 });
