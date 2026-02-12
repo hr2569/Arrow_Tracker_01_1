@@ -345,10 +345,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   versionText: {
-    color: '#666',
-    fontSize: 12,
+    color: '#aaa',
+    fontSize: 14,
     textAlign: 'center',
-    marginTop: 24,
-    paddingBottom: 16,
+    marginTop: 32,
+    paddingBottom: 20,
   },
 });
