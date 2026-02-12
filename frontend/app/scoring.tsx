@@ -421,9 +421,11 @@ export default function ScoringScreen() {
     // Web mouse events for magnifier
     const handleWebMouseDown = (e: any) => {
       e.preventDefault();
+      e.stopPropagation();
       const rect = e.currentTarget.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+      console.log('Mouse down on target:', x, y, 'size:', size, 'targetIndex:', targetIndex);
       handleTouchStart(x, y, size, targetIndex);
     };
 
