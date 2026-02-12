@@ -582,12 +582,14 @@ export default function ReportScreen() {
           `;
         });
         
-        // Generate ring separator lines (drawn on top of heatmap)
+        // Generate ring separator lines (drawn on top of heatmap) - very subtle
         let ringLines = '';
-        ringDefinitions.forEach((ring) => {
+        ringDefinitions.slice(1).forEach((ring) => {  // Skip outermost, only inner separators
           const r = outerR * ring.radiusPercent;
+          // Use color that matches the ring edge for subtlety
+          const subtleStroke = ring.fill === '#ed1c24' ? '#a01018' : '#c0a000';
           ringLines += `
-            <circle cx="${centerPos}" cy="${centerPos}" r="${r}" fill="none" stroke="${ring.strokeColor}" stroke-width="2" />
+            <circle cx="${centerPos}" cy="${centerPos}" r="${r}" fill="none" stroke="${subtleStroke}" stroke-width="0.8" />
           `;
         });
 
@@ -601,9 +603,8 @@ export default function ReportScreen() {
             ${singleSpotHeatCircles}
             <!-- Ring separator lines (on top of heatmap) -->
             ${ringLines}
-            <!-- Center cross -->
-            <line x1="${centerPos - 12}" y1="${centerPos}" x2="${centerPos + 12}" y2="${centerPos}" stroke="#000" stroke-width="2" />
-            <line x1="${centerPos}" y1="${centerPos - 12}" x2="${centerPos}" y2="${centerPos + 12}" stroke="#000" stroke-width="2" />
+            <!-- Small center dot only -->
+            <circle cx="${centerPos}" cy="${centerPos}" r="3" fill="#000" />
           </svg>
         `;
       }
