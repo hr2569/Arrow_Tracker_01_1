@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -24,7 +25,11 @@ export default function HomeScreen() {
         <Ionicons name="cloud-upload-outline" size={22} color="#888" />
       </TouchableOpacity>
 
-      <View style={styles.content}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Hero Section with Logo */}
         <View style={styles.hero}>
           <Image 
@@ -105,7 +110,7 @@ export default function HomeScreen() {
         
         {/* Version Number */}
         <Text style={styles.versionText}>v1.1.01</Text>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -114,7 +119,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#121212',
-    position: 'relative',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 30,
   },
   backupButton: {
     position: 'absolute',
