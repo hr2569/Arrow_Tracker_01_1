@@ -468,8 +468,27 @@ export default function ScoringScreen() {
       ? arrows.filter(a => a.targetIndex === targetIndex)
       : arrows;
 
-    const TargetContainer = Platform.OS === 'web' ? View : TouchableOpacity;
-    
+    // For native, we use touch responder events for the magnifier zoom feature
+    const nativeTouchProps = Platform.OS !== 'web' ? {
+      onStartShouldSetResponder: () => true,
+      onMoveShouldSetResponder: () => true,
+      onResponderGrant: (e: any) => {
+        const { locationX, locationY } = e.nativeEvent;
+        handleTouchStart(locationX, locationY, size, targetIndex);
+      },
+      onResponderMove: (e: any) => {
+        const { locationX, locationY } = e.nativeEvent;
+        handleTouchMove(locationX, locationY, size);
+      },
+      onResponderRelease: () => {
+        handleTouchEnd(size);
+      },
+      onResponderTerminate: () => {
+        setIsTouching(false);
+      },
+    } : {};
+
+    // Web keeps the simple click behavior
     const handleClick = (e: any) => {
       e.stopPropagation?.();
       handleTargetClick(e, targetIndex, size);
@@ -489,17 +508,13 @@ export default function ScoringScreen() {
       }
     } : {};
 
-    const nativeProps = Platform.OS !== 'web' ? {
-      onPress: (e: any) => handleTargetClick(e, targetIndex, size),
-      activeOpacity: 0.9,
-      style: {
-        width: size,
-        height: size,
-        backgroundColor: '#1a1a1a',
-        borderRadius: size / 2,
-        alignItems: 'center' as const,
-        justifyContent: 'center' as const,
-      }
+    const nativeStyle = Platform.OS !== 'web' ? {
+      width: size,
+      height: size,
+      backgroundColor: '#1a1a1a',
+      borderRadius: size / 2,
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
     } : {};
 
     return (
@@ -512,43 +527,102 @@ export default function ScoringScreen() {
           overflow: 'hidden',
         }}
       >
-        <TargetContainer {...webProps} {...nativeProps}>
-          {ringElements}
-          
-          <View style={styles.centerMark} pointerEvents="none">
-            <View style={styles.centerHorizontal} />
-            <View style={styles.centerVertical} />
-          </View>
+        {Platform.OS === 'web' ? (
+          <View {...webProps}>
+            {ringElements}
+            
+            <View style={styles.centerMark} pointerEvents="none">
+              <View style={styles.centerHorizontal} />
+              <View style={styles.centerVertical} />
+            </View>
 
-          {targetArrows.map((arrow) => {
-            const globalIndex = arrows.findIndex(a => a.id === arrow.id);
-            return (
-              <TouchableOpacity
-                key={arrow.id}
-                style={[
-                  {
-                    position: 'absolute',
-                    width: markerSize,
-                    height: markerSize,
-                    borderRadius: markerSize / 2,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: markerBorderWidth,
-                    borderColor: '#000',
-                    left: arrow.x * size - markerSize / 2,
-                    top: arrow.y * size - markerSize / 2,
-                    backgroundColor: getScoreColor(arrow.score),
-                  },
-                ]}
-                onPress={() => handleEditArrow(globalIndex)}
-              >
-                <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
-                  {getScoreDisplay(arrow.score)}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </TargetContainer>
+            {targetArrows.map((arrow) => {
+              const globalIndex = arrows.findIndex(a => a.id === arrow.id);
+              return (
+                <TouchableOpacity
+                  key={arrow.id}
+                  style={[
+                    {
+                      position: 'absolute',
+                      width: markerSize,
+                      height: markerSize,
+                      borderRadius: markerSize / 2,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: markerBorderWidth,
+                      borderColor: '#000',
+                      left: arrow.x * size - markerSize / 2,
+                      top: arrow.y * size - markerSize / 2,
+                      backgroundColor: getScoreColor(arrow.score),
+                    },
+                  ]}
+                  onPress={() => handleEditArrow(globalIndex)}
+                >
+                  <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
+                    {getScoreDisplay(arrow.score)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        ) : (
+          <View style={nativeStyle} {...nativeTouchProps}>
+            {ringElements}
+            
+            <View style={styles.centerMark} pointerEvents="none">
+              <View style={styles.centerHorizontal} />
+              <View style={styles.centerVertical} />
+            </View>
+
+            {targetArrows.map((arrow) => {
+              const globalIndex = arrows.findIndex(a => a.id === arrow.id);
+              return (
+                <TouchableOpacity
+                  key={arrow.id}
+                  style={[
+                    {
+                      position: 'absolute',
+                      width: markerSize,
+                      height: markerSize,
+                      borderRadius: markerSize / 2,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: markerBorderWidth,
+                      borderColor: '#000',
+                      left: arrow.x * size - markerSize / 2,
+                      top: arrow.y * size - markerSize / 2,
+                      backgroundColor: getScoreColor(arrow.score),
+                    },
+                  ]}
+                  onPress={() => handleEditArrow(globalIndex)}
+                >
+                  <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
+                    {getScoreDisplay(arrow.score)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+            
+            {/* Show preview marker while touching */}
+            {isTouching && activeTargetIndex === targetIndex && (
+              <View
+                style={{
+                  position: 'absolute',
+                  width: markerSize * 1.5,
+                  height: markerSize * 1.5,
+                  borderRadius: markerSize * 0.75,
+                  borderWidth: 3,
+                  borderColor: '#fff',
+                  borderStyle: 'dashed',
+                  left: touchPosition.x - markerSize * 0.75,
+                  top: touchPosition.y - markerSize * 0.75,
+                  backgroundColor: 'rgba(255,255,255,0.3)',
+                }}
+                pointerEvents="none"
+              />
+            )}
+          </View>
+        )}
       </View>
     );
   };
