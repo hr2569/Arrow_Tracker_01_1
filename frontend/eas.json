@@ -28,6 +28,13 @@
       },
       "node": "22.12.0"
     },
+    "aab": {
+      "android": {
+        "buildType": "app-bundle",
+        "withoutCredentials": true
+      },
+      "node": "22.12.0"
+    },
     "playstore": {
       "android": {
         "buildType": "app-bundle",
