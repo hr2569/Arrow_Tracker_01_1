@@ -337,9 +337,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   versionText: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
     color: '#555',
     fontSize: 12,
     textAlign: 'center',
-    paddingBottom: 16,
   },
 });
