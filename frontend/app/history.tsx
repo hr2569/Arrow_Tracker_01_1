@@ -1002,12 +1002,20 @@ export default function HistoryScreen() {
                               <Text style={styles.roundNumber}>
                                 Round {round.round_number || index + 1}
                               </Text>
-                              <TouchableOpacity
-                                style={styles.roundDeleteBtn}
-                                onPress={() => handleDeleteRound(session.id, round.id)}
-                              >
-                                <Ionicons name="trash-outline" size={16} color="#ff6b6b" />
-                              </TouchableOpacity>
+                              <View style={styles.roundActions}>
+                                <TouchableOpacity
+                                  style={styles.roundEditBtn}
+                                  onPress={() => openEditRoundModal(session.id, round)}
+                                >
+                                  <Ionicons name="create-outline" size={16} color="#8B0000" />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  style={styles.roundDeleteBtn}
+                                  onPress={() => handleDeleteRound(session.id, round.id)}
+                                >
+                                  <Ionicons name="trash-outline" size={16} color="#ff6b6b" />
+                                </TouchableOpacity>
+                              </View>
                             </View>
                             <View style={styles.roundShots}>
                               {round.shots?.map((shot: any, shotIndex: number) => (
