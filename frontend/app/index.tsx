@@ -138,13 +138,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#1e1e1e',
   },
-  content: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 20,
-  },
   hero: {
     alignItems: 'center',
     marginBottom: 40,
