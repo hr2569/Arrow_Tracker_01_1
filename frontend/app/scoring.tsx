@@ -249,11 +249,72 @@ export default function ScoringScreen() {
 
   const targetRefs = useRef<{ [key: number]: View | null }>({});
 
-  const handleTargetClick = useCallback((event: any, targetIndex: number, targetSize: number) => {
-    let x: number;
-    let y: number;
+  // Place arrow at current position
+  const placeArrow = useCallback((normalizedX: number, normalizedY: number, targetIndex: number) => {
+    const score = calculateScore(normalizedX, normalizedY);
+    
+    // Haptic feedback when placing arrow
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    
+    const newArrow: Arrow = {
+      id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      x: normalizedX,
+      y: normalizedY,
+      score,
+      targetIndex: isMultiTarget ? targetIndex : undefined,
+    };
 
+    setArrows(prev => [...prev, newArrow]);
+  }, [isMultiTarget, calculateScore]);
+
+  // Handle touch start - show magnifier
+  const handleTouchStart = useCallback((x: number, y: number, targetSize: number, targetIndex: number) => {
+    const normalizedX = Math.max(0, Math.min(1, x / targetSize));
+    const normalizedY = Math.max(0, Math.min(1, y / targetSize));
+    const score = calculateScore(normalizedX, normalizedY);
+    
+    // Light haptic on touch start
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    setIsTouching(true);
+    setTouchPosition({ x, y });
+    setActiveTargetIndex(targetIndex);
+    setPreviewScore(score);
+  }, [calculateScore]);
+
+  // Handle touch move - update magnifier position
+  const handleTouchMove = useCallback((x: number, y: number, targetSize: number) => {
+    const clampedX = Math.max(0, Math.min(targetSize, x));
+    const clampedY = Math.max(0, Math.min(targetSize, y));
+    const normalizedX = clampedX / targetSize;
+    const normalizedY = clampedY / targetSize;
+    const score = calculateScore(normalizedX, normalizedY);
+    
+    setTouchPosition({ x: clampedX, y: clampedY });
+    setPreviewScore(score);
+  }, [calculateScore]);
+
+  // Handle touch end - place arrow and hide magnifier
+  const handleTouchEnd = useCallback((targetSize: number) => {
+    if (isTouching) {
+      const normalizedX = Math.max(0, Math.min(1, touchPosition.x / targetSize));
+      const normalizedY = Math.max(0, Math.min(1, touchPosition.y / targetSize));
+      placeArrow(normalizedX, normalizedY, activeTargetIndex);
+    }
+    setIsTouching(false);
+  }, [isTouching, touchPosition, activeTargetIndex, placeArrow]);
+
+  // Legacy click handler for web
+  const handleTargetClick = useCallback((event: any, targetIndex: number, targetSize: number) => {
+    // On web, just place directly on click (no magnifier)
     if (Platform.OS === 'web') {
+      let x: number;
+      let y: number;
+
       const nativeEvent = event.nativeEvent || event;
       if (typeof nativeEvent.offsetX === 'number' && typeof nativeEvent.offsetY === 'number') {
         x = nativeEvent.offsetX;
@@ -271,28 +332,12 @@ export default function ScoringScreen() {
         x = targetSize / 2;
         y = targetSize / 2;
       }
-    } else {
-      const { locationX, locationY } = event.nativeEvent || {};
-      x = locationX ?? targetSize / 2;
-      y = locationY ?? targetSize / 2;
+      
+      const normalizedX = Math.max(0, Math.min(1, x / targetSize));
+      const normalizedY = Math.max(0, Math.min(1, y / targetSize));
+      placeArrow(normalizedX, normalizedY, targetIndex);
     }
-    
-    const normalizedX = Math.max(0, Math.min(1, x / targetSize));
-    const normalizedY = Math.max(0, Math.min(1, y / targetSize));
-    const score = calculateScore(normalizedX, normalizedY);
-    
-    console.log(`Arrow placed: x=${x.toFixed(1)}, y=${y.toFixed(1)}, normalized=(${normalizedX.toFixed(2)}, ${normalizedY.toFixed(2)}), score=${score}`);
-    
-    const newArrow: Arrow = {
-      id: `arrow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      x: normalizedX,
-      y: normalizedY,
-      score,
-      targetIndex: isMultiTarget ? targetIndex : undefined,
-    };
-
-    setArrows(prev => [...prev, newArrow]);
-  }, [isMultiTarget, calculateScore]);
+  }, [placeArrow]);
 
   const handleEditArrow = (index: number) => {
     setSelectedArrowIndex(index);
