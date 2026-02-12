@@ -160,21 +160,26 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
     <>
       {/* Blue outer ring (6) */}
       <Circle cx={center} cy={center} r={maxRingRadius} fill="#00BFFF" />
-      {/* Red rings (7, 8) */}
+      {/* Red ring 1 (7) */}
       <Circle cx={center} cy={center} r={maxRingRadius * 0.833} fill="#FF0000" />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.833} fill="none" stroke="#333" strokeWidth={1} />
+      {/* Red ring 2 (8) */}
       <Circle cx={center} cy={center} r={maxRingRadius * 0.666} fill="#FF0000" />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.666} fill="none" stroke="#333" strokeWidth={1} />
-      {/* Gold rings (9, 10, X) */}
+      {/* Gold ring 1 (9) */}
       <Circle cx={center} cy={center} r={maxRingRadius * 0.50} fill="#FFD700" />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.50} fill="none" stroke="#333" strokeWidth={1} />
+      {/* Gold ring 2 (10) */}
       <Circle cx={center} cy={center} r={maxRingRadius * 0.333} fill="#FFD700" />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.333} fill="none" stroke="#333" strokeWidth={1} />
+      {/* Gold ring 3 (X) */}
       <Circle cx={center} cy={center} r={maxRingRadius * 0.166} fill="#FFD700" />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.166} fill="none" stroke="#333" strokeWidth={1} />
-      {/* Crosshair */}
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.05} fill="none" stroke="#333" strokeWidth={1} />
-      <Circle cx={center} cy={center} r={2} fill="#333" />
+      {/* Ring separator lines - drawn on top */}
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.833} fill="none" stroke="#000" strokeWidth={1.5} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.666} fill="none" stroke="#000" strokeWidth={1.5} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.50} fill="none" stroke="#000" strokeWidth={1.5} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.333} fill="none" stroke="#000" strokeWidth={1.5} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.166} fill="none" stroke="#000" strokeWidth={1.5} />
+      {/* Crosshair in center */}
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.06} fill="none" stroke="#000" strokeWidth={1.5} />
+      <Line x1={center - 4} y1={center} x2={center + 4} y2={center} stroke="#000" strokeWidth={1.5} />
+      <Line x1={center} y1={center - 4} x2={center} y2={center + 4} stroke="#000" strokeWidth={1.5} />
     </>
   );
   
