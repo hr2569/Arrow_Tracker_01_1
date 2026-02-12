@@ -109,7 +109,9 @@ export default function HomeScreen() {
         </View>
         
         {/* Version Number */}
-        <Text style={styles.versionText} data-testid="version-text">v1.1.01</Text>
+        <View style={styles.versionContainer}>
+          <Text style={styles.versionText}>v1.1.01</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -344,11 +346,14 @@ const styles = StyleSheet.create({
     marginTop: 2,
     textAlign: 'center',
   },
-  versionText: {
-    color: '#aaa',
-    fontSize: 14,
-    textAlign: 'center',
+  versionContainer: {
     marginTop: 32,
     paddingBottom: 20,
+    alignItems: 'center',
+  },
+  versionText: {
+    color: '#666',
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
