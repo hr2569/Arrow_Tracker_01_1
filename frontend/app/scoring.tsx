@@ -479,14 +479,26 @@ export default function ScoringScreen() {
           borderRadius: size / 2,
           overflow: 'hidden',
         }}
-        // @ts-ignore - web-specific event handlers
-        onMouseDown={Platform.OS === 'web' ? handleWebMouseDown : undefined}
-        onMouseMove={Platform.OS === 'web' ? handleWebMouseMove : undefined}
-        onMouseUp={Platform.OS === 'web' ? handleWebMouseUp : undefined}
-        onMouseLeave={Platform.OS === 'web' ? handleWebMouseUp : undefined}
       >
         {Platform.OS === 'web' ? (
-          <View
+          <TouchableOpacity
+            activeOpacity={1}
+            onPressIn={(e: any) => {
+              const nativeEvent = e.nativeEvent;
+              const rect = e.target?.getBoundingClientRect?.();
+              if (rect && nativeEvent.pageX !== undefined) {
+                const x = nativeEvent.pageX - rect.left;
+                const y = nativeEvent.pageY - rect.top;
+                console.log('PressIn:', x, y);
+                handleTouchStart(x, y, size, targetIndex);
+              }
+            }}
+            onPressOut={() => {
+              console.log('PressOut');
+              if (isTouching) {
+                handleTouchEnd(size);
+              }
+            }}
             style={{
               width: size,
               height: size,
