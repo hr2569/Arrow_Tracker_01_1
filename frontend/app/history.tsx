@@ -1608,16 +1608,23 @@ const styles = StyleSheet.create({
   roundHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: 80,
+    width: 100,
   },
   roundNumber: {
     fontSize: 12,
     color: '#888888',
     flex: 1,
   },
+  roundActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  roundEditBtn: {
+    padding: 4,
+  },
   roundDeleteBtn: {
     padding: 4,
-    marginLeft: 4,
   },
   roundShots: {
     flexDirection: 'row',
