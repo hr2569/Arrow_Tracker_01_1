@@ -22,6 +22,8 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.4);
 const SMALL_TARGET_SIZE = Math.min((SCREEN_WIDTH - 60) / 3, 110);
 const CONTAINER_HEIGHT = 350;
+const ZOOM_SCALE = 2.5; // How much to zoom when placing arrow
+const MAGNIFIER_SIZE = 150; // Size of the magnifier circle
 
 interface Arrow {
   id: string;
@@ -30,6 +32,76 @@ interface Arrow {
   score: number;
   targetIndex?: number;
 }
+
+// Magnifier overlay component for precise arrow placement
+interface MagnifierProps {
+  visible: boolean;
+  touchX: number;
+  touchY: number;
+  targetSize: number;
+  targetContent: React.ReactNode;
+  currentScore: number;
+  getScoreColor: (score: number) => string;
+}
+
+const Magnifier: React.FC<MagnifierProps> = ({ 
+  visible, 
+  touchX, 
+  touchY, 
+  targetSize, 
+  targetContent,
+  currentScore,
+  getScoreColor
+}) => {
+  const opacity = useSharedValue(0);
+  
+  React.useEffect(() => {
+    opacity.value = withTiming(visible ? 1 : 0, { duration: 150 });
+  }, [visible]);
+  
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+  
+  if (!visible) return null;
+  
+  // Calculate the offset to show the touched area in the magnifier
+  const scale = ZOOM_SCALE;
+  const offsetX = -(touchX * scale) + MAGNIFIER_SIZE / 2;
+  const offsetY = -(touchY * scale) + MAGNIFIER_SIZE / 2;
+  
+  return (
+    <Animated.View style={[styles.magnifierContainer, animatedStyle]}>
+      <View style={styles.magnifierOuter}>
+        <View style={styles.magnifierInner}>
+          <View style={{
+            transform: [
+              { translateX: offsetX },
+              { translateY: offsetY },
+              { scale: scale }
+            ],
+            width: targetSize,
+            height: targetSize,
+          }}>
+            {targetContent}
+          </View>
+          {/* Crosshair in center of magnifier */}
+          <View style={styles.magnifierCrosshair}>
+            <View style={styles.crosshairH} />
+            <View style={styles.crosshairV} />
+          </View>
+        </View>
+        {/* Score indicator */}
+        <View style={[styles.scoreIndicator, { backgroundColor: getScoreColor(currentScore) }]}>
+          <Text style={styles.scoreIndicatorText}>
+            {currentScore === 11 ? 'X' : currentScore === 0 ? 'M' : currentScore}
+          </Text>
+        </View>
+      </View>
+      <Text style={styles.magnifierHint}>Drag to adjust • Release to place</Text>
+    </Animated.View>
+  );
+};
 
 // Zoomable Target Component with gesture-based panning in all directions
 interface ZoomableTargetProps {
