@@ -780,6 +780,9 @@ export default function ScoringScreen() {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* Magnifier overlay when touching (native only) */}
+      {renderMagnifier(isMultiTarget ? SMALL_TARGET_SIZE : BASE_TARGET_SIZE)}
+
       {/* Score picker modal */}
       <Modal visible={showScorePicker} transparent animationType="fade">
         <View style={styles.modalOverlay}>
