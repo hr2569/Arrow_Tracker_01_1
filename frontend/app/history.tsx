@@ -155,13 +155,26 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   
   const isIndoor = targetType === 'vegas_3spot' || targetType === 'nfaa_indoor';
   
-  // Indoor target: Blue(6) - Red(7) - Red(8) - Gold(9,10,X)
-  // Simplified: 1 Blue band, 1 Red band, 1 Gold center
+  // Indoor target: Blue(6) - Red(7,8) - Gold(9,10,X) with ring separators
   const renderIndoorTarget = () => (
     <>
+      {/* Blue outer ring (6) */}
       <Circle cx={center} cy={center} r={maxRingRadius} fill="#00BFFF" />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.75} fill="#FF0000" />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.45} fill="#FFD700" />
+      {/* Red rings (7, 8) */}
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.833} fill="#FF0000" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.833} fill="none" stroke="#333" strokeWidth={1} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.666} fill="#FF0000" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.666} fill="none" stroke="#333" strokeWidth={1} />
+      {/* Gold rings (9, 10, X) */}
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.50} fill="#FFD700" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.50} fill="none" stroke="#333" strokeWidth={1} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.333} fill="#FFD700" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.333} fill="none" stroke="#333" strokeWidth={1} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.166} fill="#FFD700" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.166} fill="none" stroke="#333" strokeWidth={1} />
+      {/* Crosshair */}
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.05} fill="none" stroke="#333" strokeWidth={1} />
+      <Circle cx={center} cy={center} r={2} fill="#333" />
     </>
   );
   
