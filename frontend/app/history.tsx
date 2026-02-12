@@ -20,7 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getSessions, updateSession, deleteSession, deleteRound, updateRound, Session, Round, Shot } from '../utils/localStorage';
-import Svg, { Circle, Defs, RadialGradient, Stop, G } from 'react-native-svg';
+import Svg, { Circle, Defs, RadialGradient, Stop, G, Line } from 'react-native-svg';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHART_WIDTH = SCREEN_WIDTH - 72;
