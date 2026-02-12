@@ -14,7 +14,7 @@
         "projectId": "deab2ec5-dd6f-49aa-9dbc-ea4663997ba5"
       }
     },
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "arrowtracker",
@@ -28,7 +28,7 @@
     },
     "android": {
       "package": "com.arrowtracker.app",
-      "versionCode": 5,
+      "versionCode": 6,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
