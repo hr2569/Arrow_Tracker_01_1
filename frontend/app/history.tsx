@@ -1025,41 +1025,74 @@ export default function HistoryScreen() {
                         )}
 
                         <Text style={styles.roundsTitle}>Round Details</Text>
-                        {session.rounds.map((round, index) => (
-                          <View key={round.id || index} style={styles.roundItem}>
-                            <View style={styles.roundHeader}>
-                              <Text style={styles.roundNumber}>
-                                Round {round.round_number || index + 1}
-                              </Text>
-                              <View style={styles.roundActions}>
-                                <TouchableOpacity
-                                  style={styles.roundEditBtn}
-                                  onPress={() => openEditRoundModal(session.id, round)}
-                                >
-                                  <Ionicons name="create-outline" size={16} color="#8B0000" />
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                  style={styles.roundDeleteBtn}
-                                  onPress={() => handleDeleteRound(session.id, round.id)}
-                                >
-                                  <Ionicons name="trash-outline" size={16} color="#ff6b6b" />
-                                </TouchableOpacity>
-                              </View>
-                            </View>
-                            <View style={styles.roundShots}>
-                              {round.shots?.map((shot: any, shotIndex: number) => (
-                                <View key={shotIndex} style={styles.shotBadge}>
-                                  <Text style={styles.shotBadgeText}>
-                                    {shot.ring || 0}
-                                  </Text>
+                        {session.rounds.map((round, index) => {
+                          // Sort shots from highest to lowest score
+                          const sortedShots = [...(round.shots || [])].sort((a, b) => (b.ring || 0) - (a.ring || 0));
+                          
+                          // Get badge colors based on ring score (target colors)
+                          const getShotBadgeStyle = (ring: number) => {
+                            if (ring >= 10) return { backgroundColor: '#fff200', borderColor: '#c0a000' }; // Gold (X, 10)
+                            if (ring >= 9) return { backgroundColor: '#fff200', borderColor: '#c0a000' }; // Gold (9)
+                            if (ring >= 7) return { backgroundColor: '#ed1c24', borderColor: '#a01018' }; // Red (7-8)
+                            if (ring >= 5) return { backgroundColor: '#00a2e8', borderColor: '#0077b3' }; // Blue (5-6)
+                            if (ring >= 3) return { backgroundColor: '#222222', borderColor: '#444444' }; // Black (3-4)
+                            if (ring >= 1) return { backgroundColor: '#f5f5f0', borderColor: '#cccccc' }; // White (1-2)
+                            return { backgroundColor: '#666666', borderColor: '#444444' }; // Miss (0)
+                          };
+                          
+                          const getShotTextColor = (ring: number) => {
+                            if (ring >= 9) return '#000'; // Dark text on gold
+                            if (ring >= 1 && ring <= 2) return '#000'; // Dark text on white
+                            return '#fff'; // Light text on other colors
+                          };
+                          
+                          return (
+                            <View key={round.id || index} style={styles.roundItem}>
+                              <View style={styles.roundHeader}>
+                                <Text style={styles.roundNumber}>
+                                  Round {round.round_number || index + 1}
+                                </Text>
+                                <View style={styles.roundActions}>
+                                  <TouchableOpacity
+                                    style={styles.roundEditBtn}
+                                    onPress={() => openEditRoundModal(session.id, round)}
+                                  >
+                                    <Ionicons name="create-outline" size={16} color="#8B0000" />
+                                  </TouchableOpacity>
+                                  <TouchableOpacity
+                                    style={styles.roundDeleteBtn}
+                                    onPress={() => handleDeleteRound(session.id, round.id)}
+                                  >
+                                    <Ionicons name="trash-outline" size={16} color="#ff6b6b" />
+                                  </TouchableOpacity>
                                 </View>
-                              ))}
+                              </View>
+                              <View style={styles.roundShots}>
+                                {sortedShots.map((shot: any, shotIndex: number) => {
+                                  const ringScore = shot.ring || 0;
+                                  const badgeStyle = getShotBadgeStyle(ringScore);
+                                  const textColor = getShotTextColor(ringScore);
+                                  return (
+                                    <View 
+                                      key={shotIndex} 
+                                      style={[
+                                        styles.shotBadge, 
+                                        { backgroundColor: badgeStyle.backgroundColor, borderWidth: 1, borderColor: badgeStyle.borderColor }
+                                      ]}
+                                    >
+                                      <Text style={[styles.shotBadgeText, { color: textColor }]}>
+                                        {ringScore === 0 ? 'M' : ringScore}
+                                      </Text>
+                                    </View>
+                                  );
+                                })}
+                              </View>
+                              <Text style={styles.roundTotal}>
+                                {round.total_score || 0}
+                              </Text>
                             </View>
-                            <Text style={styles.roundTotal}>
-                              {round.total_score || 0}
-                            </Text>
-                          </View>
-                        ))}
+                          );
+                        })}
                       </View>
                     )}
 
