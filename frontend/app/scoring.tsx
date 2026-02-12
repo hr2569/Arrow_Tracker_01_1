@@ -864,8 +864,8 @@ const styles = StyleSheet.create({
   // Magnifier styles (MyTargets-style zoom box)
   magnifierContainer: {
     position: 'absolute',
-    right: -MAGNIFIER_SIZE - 20,
-    top: 0,
+    top: 120,
+    right: 16,
     alignItems: 'center',
     zIndex: 1000,
   },
