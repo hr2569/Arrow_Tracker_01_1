@@ -52,6 +52,7 @@ const needsBorder = (ring: number): boolean => {
 
 export default function SummaryScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const { 
     currentRound, 
     clearCurrentRound, 
@@ -70,6 +71,34 @@ export default function SummaryScreen() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const isCompetition = sessionType === 'competition';
+
+  // Handle back button press - show confirmation modal
+  const handleBackPress = useCallback(() => {
+    setShowConfirmModal(true);
+    return true; // Prevent default back behavior
+  }, []);
+
+  // Set custom header back button that triggers the modal
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity 
+          onPress={handleBackPress}
+          style={{ marginLeft: 10, padding: 8, minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' }}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, handleBackPress]);
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    return () => backHandler.remove();
+  }, [handleBackPress]);
 
   useEffect(() => {
     // Add current round to session rounds if it exists and hasn't been added yet
