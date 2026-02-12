@@ -1514,12 +1514,12 @@ export default function ReportScreen() {
       // Blue(6) - Red(7) - Red(8) - Gold(9) - Gold(10) - Gold(X)
       // 1 Blue, 2 Red, 3 Gold
       const ringDefinitions = [
-        { radiusPercent: 1.0, fill: '#00a2e8', strokeColor: '#005090' },    // Blue (6) - only one blue
-        { radiusPercent: 0.833, fill: '#ed1c24', strokeColor: '#901015' },  // Red (7)
-        { radiusPercent: 0.666, fill: '#ed1c24', strokeColor: '#901015' },  // Red (8)
-        { radiusPercent: 0.50, fill: '#fff200', strokeColor: '#907000' },   // Gold (9)
-        { radiusPercent: 0.333, fill: '#fff200', strokeColor: '#907000' },  // Gold (10)
-        { radiusPercent: 0.166, fill: '#fff200', strokeColor: '#907000' },  // Gold (X)
+        { radiusPercent: 1.0, fill: '#00a2e8', strokeColor: '#a01018' },    // Blue (6) - only one blue
+        { radiusPercent: 0.833, fill: '#ed1c24', strokeColor: '#a01018' },  // Red (7)
+        { radiusPercent: 0.666, fill: '#ed1c24', strokeColor: '#c0a000' },  // Red (8)
+        { radiusPercent: 0.50, fill: '#fff200', strokeColor: '#c0a000' },   // Gold (9)
+        { radiusPercent: 0.333, fill: '#fff200', strokeColor: '#c0a000' },  // Gold (10)
+        { radiusPercent: 0.166, fill: '#fff200', strokeColor: '#c0a000' },  // Gold (X)
       ];
       
       const centerPos = singleSpotSize / 2;
@@ -1554,8 +1554,8 @@ export default function ReportScreen() {
                 ))}
               </G>
               
-              {/* Ring separator lines (on top of heatmap) */}
-              {ringDefinitions.map((ring, i) => (
+              {/* Ring separator lines (on top of heatmap) - very subtle */}
+              {ringDefinitions.slice(1).map((ring, i) => (
                 <Circle
                   key={`ring-line-${i}`}
                   cx={centerPos}
@@ -1563,9 +1563,12 @@ export default function ReportScreen() {
                   r={centerPos * ring.radiusPercent}
                   fill="none"
                   stroke={ring.strokeColor}
-                  strokeWidth={1.5}
+                  strokeWidth={0.5}
                 />
               ))}
+              
+              {/* Small center dot */}
+              <Circle cx={centerPos} cy={centerPos} r={1.5} fill="#000" />
             </Svg>
           </View>
         </View>
