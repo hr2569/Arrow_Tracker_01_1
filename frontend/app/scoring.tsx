@@ -782,18 +782,7 @@ export default function ScoringScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Score indicator while touching (native only) */}
-      {isTouching && Platform.OS !== 'web' && (
-        <View style={styles.touchScoreIndicator}>
-          <View style={[styles.touchScoreBadge, { backgroundColor: getScoreColor(previewScore) }]}>
-            <Text style={[styles.touchScoreText, { color: getScoreTextColor(previewScore) }]}>
-              {getScoreDisplay(previewScore)}
-            </Text>
-          </View>
-          <Text style={styles.touchHintText}>Drag to adjust • Release to place</Text>
-        </View>
-      )}
-
+      {/* Score picker modal */}
       <Modal visible={showScorePicker} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
