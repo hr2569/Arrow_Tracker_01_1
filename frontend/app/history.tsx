@@ -155,23 +155,24 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   
   const isIndoor = targetType === 'vegas_3spot' || targetType === 'nfaa_indoor';
   
-  // Indoor target: Blue(6) - Red(7,8) - Gold(9,10,X) matching reference image
+  // Indoor target: 1 Blue - 2 Red - 3 Gold (matching reference image)
   const renderIndoorTarget = () => (
     <>
-      {/* Color fills - from outside to inside */}
-      <Circle cx={center} cy={center} r={maxRingRadius} fill="#00BFFF" />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.85} fill="#FF0000" />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.55} fill="#FFD700" />
-      {/* Thin separator lines */}
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.85} fill="none" stroke="#333" strokeWidth={0.8} />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.70} fill="none" stroke="#333" strokeWidth={0.8} />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.55} fill="none" stroke="#333" strokeWidth={0.8} />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.40} fill="none" stroke="#333" strokeWidth={0.8} />
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.25} fill="none" stroke="#333" strokeWidth={0.8} />
-      {/* Crosshair */}
-      <Circle cx={center} cy={center} r={maxRingRadius * 0.10} fill="none" stroke="#333" strokeWidth={0.8} />
-      <Line x1={center - 3} y1={center} x2={center + 3} y2={center} stroke="#333" strokeWidth={0.8} />
-      <Line x1={center} y1={center - 3} x2={center} y2={center + 3} stroke="#333" strokeWidth={0.8} />
+      {/* 6 color bands from outside to inside: Blue(1) - Red(2) - Gold(3) */}
+      <Circle cx={center} cy={center} r={maxRingRadius} fill="#00a2e8" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.833} fill="#ed1c24" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.666} fill="#ed1c24" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.50} fill="#fff200" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.333} fill="#fff200" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.166} fill="#fff200" />
+      {/* Subtle separator lines between rings - very thin and matching ring edge colors */}
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.833} fill="none" stroke="#a01018" strokeWidth={0.5} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.666} fill="none" stroke="#a01018" strokeWidth={0.5} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.50} fill="none" stroke="#c0a000" strokeWidth={0.5} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.333} fill="none" stroke="#c0a000" strokeWidth={0.5} />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.166} fill="none" stroke="#c0a000" strokeWidth={0.5} />
+      {/* Small center dot only */}
+      <Circle cx={center} cy={center} r={1.5} fill="#000" />
     </>
   );
   
