@@ -657,7 +657,6 @@ export default function ScoringScreen() {
 
   const renderTargetContent = () => {
     const targetSize = isMultiTarget ? SMALL_TARGET_SIZE : BASE_TARGET_SIZE;
-    const zoomStyle = isTouching && Platform.OS !== 'web' ? getZoomTransform(targetSize) : {};
     
     const content = (() => {
       if (isVegas) {
@@ -688,16 +687,13 @@ export default function ScoringScreen() {
       }
     })();
     
-    // Apply zoom transform when touching on native
-    if (isTouching && Platform.OS !== 'web') {
-      return (
-        <View style={[{ overflow: 'visible' }, zoomStyle]}>
-          {content}
-        </View>
-      );
-    }
-    
-    return content;
+    return (
+      <View>
+        {content}
+        {/* Magnifier box appears on the right when touching */}
+        {renderMagnifier(targetSize)}
+      </View>
+    );
   };
 
   return (
