@@ -103,6 +103,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
+        </View>
         
         {/* Version Number */}
         <Text style={styles.versionText}>v1.1.01</Text>
