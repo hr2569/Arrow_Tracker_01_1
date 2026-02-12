@@ -607,32 +607,48 @@ export default function ScoringScreen() {
   };
 
   const renderTargetContent = () => {
-    if (isVegas) {
-      return (
-        <View style={styles.triangleContainer}>
-          <View style={styles.triangleTop}>
-            {renderTargetFace(0, SMALL_TARGET_SIZE)}
+    const targetSize = isMultiTarget ? SMALL_TARGET_SIZE : BASE_TARGET_SIZE;
+    const zoomStyle = isTouching && Platform.OS !== 'web' ? getZoomTransform(targetSize) : {};
+    
+    const content = (() => {
+      if (isVegas) {
+        return (
+          <View style={styles.triangleContainer}>
+            <View style={styles.triangleTop}>
+              {renderTargetFace(0, SMALL_TARGET_SIZE)}
+            </View>
+            <View style={styles.triangleBottom}>
+              {renderTargetFace(1, SMALL_TARGET_SIZE)}
+              <View style={{ width: 20 }} />
+              {renderTargetFace(2, SMALL_TARGET_SIZE)}
+            </View>
           </View>
-          <View style={styles.triangleBottom}>
+        );
+      } else if (isNFAA) {
+        return (
+          <View style={styles.verticalContainer}>
+            {renderTargetFace(0, SMALL_TARGET_SIZE)}
+            <View style={{ height: 12 }} />
             {renderTargetFace(1, SMALL_TARGET_SIZE)}
-            <View style={{ width: 20 }} />
+            <View style={{ height: 12 }} />
             {renderTargetFace(2, SMALL_TARGET_SIZE)}
           </View>
-        </View>
-      );
-    } else if (isNFAA) {
+        );
+      } else {
+        return renderTargetFace(0, BASE_TARGET_SIZE);
+      }
+    })();
+    
+    // Apply zoom transform when touching on native
+    if (isTouching && Platform.OS !== 'web') {
       return (
-        <View style={styles.verticalContainer}>
-          {renderTargetFace(0, SMALL_TARGET_SIZE)}
-          <View style={{ height: 12 }} />
-          {renderTargetFace(1, SMALL_TARGET_SIZE)}
-          <View style={{ height: 12 }} />
-          {renderTargetFace(2, SMALL_TARGET_SIZE)}
+        <View style={[{ overflow: 'visible' }, zoomStyle]}>
+          {content}
         </View>
       );
-    } else {
-      return renderTargetFace(0, BASE_TARGET_SIZE);
     }
+    
+    return content;
   };
 
   return (
