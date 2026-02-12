@@ -481,24 +481,7 @@ export default function ScoringScreen() {
         }}
       >
         {Platform.OS === 'web' ? (
-          <TouchableOpacity
-            activeOpacity={1}
-            onPressIn={(e: any) => {
-              const nativeEvent = e.nativeEvent;
-              const rect = e.target?.getBoundingClientRect?.();
-              if (rect && nativeEvent.pageX !== undefined) {
-                const x = nativeEvent.pageX - rect.left;
-                const y = nativeEvent.pageY - rect.top;
-                console.log('PressIn:', x, y);
-                handleTouchStart(x, y, size, targetIndex);
-              }
-            }}
-            onPressOut={() => {
-              console.log('PressOut');
-              if (isTouching) {
-                handleTouchEnd(size);
-              }
-            }}
+          <View
             style={{
               width: size,
               height: size,
