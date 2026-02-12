@@ -127,9 +127,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingTop: 40,
+    paddingBottom: 20,
   },
   hero: {
     alignItems: 'center',
