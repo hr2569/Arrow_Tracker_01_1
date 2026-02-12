@@ -479,13 +479,14 @@ export default function ScoringScreen() {
           borderRadius: size / 2,
           overflow: 'hidden',
         }}
+        // @ts-ignore - web-specific event handlers
+        onMouseDown={Platform.OS === 'web' ? handleWebMouseDown : undefined}
+        onMouseMove={Platform.OS === 'web' ? handleWebMouseMove : undefined}
+        onMouseUp={Platform.OS === 'web' ? handleWebMouseUp : undefined}
+        onMouseLeave={Platform.OS === 'web' ? handleWebMouseUp : undefined}
       >
         {Platform.OS === 'web' ? (
-          <div
-            onMouseDown={handleWebMouseDown}
-            onMouseMove={handleWebMouseMove}
-            onMouseUp={handleWebMouseUp}
-            onMouseLeave={handleWebMouseUp}
+          <View
             style={{
               width: size,
               height: size,
