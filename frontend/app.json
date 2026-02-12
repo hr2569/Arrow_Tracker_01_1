@@ -27,7 +27,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "android": {
-      "package": "com.jc.arrowtracker",
+      "package": "com.arrowtracker.app",
       "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
