@@ -205,8 +205,8 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
             cy={center}
             r={maxRingRadius * ring.r}
             fill={ring.fill}
-            stroke={ring.stroke}
-            strokeWidth={ring.strokeWidth || 0.5}
+            stroke={ring.stroke || 'none'}
+            strokeWidth={ring.strokeWidth || 0}
           />
         ))}
         {allShots.map((shot, i) => {
