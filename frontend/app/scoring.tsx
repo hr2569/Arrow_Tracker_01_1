@@ -422,8 +422,7 @@ export default function ScoringScreen() {
       : arrows;
 
     // For native, we use touch responder events for the magnifier zoom feature
-    // Only apply touch handlers to the main target, not the magnifier view
-    const nativeTouchProps = Platform.OS !== 'web' && !isMagnifierView ? {
+    const nativeTouchProps = Platform.OS !== 'web' ? {
       onStartShouldSetResponder: () => true,
       onMoveShouldSetResponder: () => true,
       onResponderGrant: (e: any) => {
