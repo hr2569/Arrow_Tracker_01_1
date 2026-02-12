@@ -737,38 +737,15 @@ export default function ScoringScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Magnifier overlay for precise arrow placement (native only) */}
+      {/* Score indicator while touching (native only) */}
       {isTouching && Platform.OS !== 'web' && (
-        <View style={styles.magnifierOverlay}>
-          <View style={styles.magnifierBox}>
-            <View style={styles.magnifierContent}>
-              {/* Zoomed view of touch area */}
-              <View style={[styles.magnifierClip, { overflow: 'hidden' }]}>
-                <View style={{
-                  transform: [
-                    { translateX: -(touchPosition.x * ZOOM_SCALE) + MAGNIFIER_SIZE / 2 },
-                    { translateY: -(touchPosition.y * ZOOM_SCALE) + MAGNIFIER_SIZE / 2 },
-                    { scale: ZOOM_SCALE }
-                  ],
-                }}>
-                  {renderTargetFace(activeTargetIndex, isMultiTarget ? SMALL_TARGET_SIZE : BASE_TARGET_SIZE)}
-                </View>
-              </View>
-              {/* Crosshair overlay */}
-              <View style={styles.magnifierCrosshairOverlay}>
-                <View style={styles.crosshairLineH} />
-                <View style={styles.crosshairLineV} />
-                <View style={[styles.crosshairDot, { backgroundColor: getScoreColor(previewScore) }]} />
-              </View>
-            </View>
-            {/* Score indicator */}
-            <View style={[styles.magnifierScoreBadge, { backgroundColor: getScoreColor(previewScore) }]}>
-              <Text style={[styles.magnifierScoreText, { color: getScoreTextColor(previewScore) }]}>
-                {getScoreDisplay(previewScore)}
-              </Text>
-            </View>
+        <View style={styles.touchScoreIndicator}>
+          <View style={[styles.touchScoreBadge, { backgroundColor: getScoreColor(previewScore) }]}>
+            <Text style={[styles.touchScoreText, { color: getScoreTextColor(previewScore) }]}>
+              {getScoreDisplay(previewScore)}
+            </Text>
           </View>
-          <Text style={styles.magnifierHintText}>Drag to adjust • Release to place</Text>
+          <Text style={styles.touchHintText}>Drag to adjust • Release to place</Text>
         </View>
       )}
 
