@@ -342,8 +342,9 @@ const styles = StyleSheet.create({
     bottom: 24,
     left: 0,
     right: 0,
-    color: '#666',
+    color: '#999',
     fontSize: 12,
     textAlign: 'center',
+    zIndex: 100,
   },
 });
