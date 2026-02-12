@@ -610,25 +610,48 @@ export default function ScoringScreen() {
     );
   };
 
-  // Calculate transform for zoomed-in target (MyTargets-style)
-  const getZoomTransform = (targetSize: number) => {
-    if (!isTouching || Platform.OS === 'web') {
-      return {};
-    }
+  // Render magnifier component (MyTargets-style magnifying glass)
+  const renderMagnifier = (targetSize: number) => {
+    if (!isTouching || Platform.OS === 'web') return null;
     
-    // Center the zoom on the touch point, offset upward
-    const centerX = targetSize / 2;
-    const centerY = targetSize / 2;
-    const offsetX = (centerX - touchPosition.x) * (TARGET_ZOOM_FACTOR - 1);
-    const offsetY = (centerY - touchPosition.y) * (TARGET_ZOOM_FACTOR - 1) + POINTER_OFFSET_Y;
+    // Calculate the offset to center the magnifier on the touch point
+    const zoomedAreaSize = MAGNIFIER_SIZE / MAGNIFIER_ZOOM;
+    const offsetX = -(touchPosition.x - zoomedAreaSize / 2) * MAGNIFIER_ZOOM;
+    const offsetY = -(touchPosition.y - zoomedAreaSize / 2) * MAGNIFIER_ZOOM;
     
-    return {
-      transform: [
-        { scale: TARGET_ZOOM_FACTOR },
-        { translateX: offsetX / TARGET_ZOOM_FACTOR },
-        { translateY: offsetY / TARGET_ZOOM_FACTOR },
-      ],
-    };
+    return (
+      <View style={styles.magnifierContainer}>
+        <View style={styles.magnifierBox}>
+          {/* Clipped and zoomed target inside magnifier */}
+          <View style={{ overflow: 'hidden', width: MAGNIFIER_SIZE, height: MAGNIFIER_SIZE }}>
+            <View style={{
+              transform: [
+                { translateX: offsetX },
+                { translateY: offsetY },
+                { scale: MAGNIFIER_ZOOM },
+              ],
+              transformOrigin: 'top left',
+            }}>
+              {renderTargetFace(activeTargetIndex, targetSize, true)}
+            </View>
+          </View>
+          
+          {/* Crosshair in center of magnifier */}
+          <View style={styles.magnifierCrosshair}>
+            <View style={styles.crosshairHorizontal} />
+            <View style={styles.crosshairVertical} />
+          </View>
+        </View>
+        
+        {/* Score preview below magnifier */}
+        <View style={[styles.magnifierScoreBadge, { backgroundColor: getScoreColor(previewScore) }]}>
+          <Text style={[styles.magnifierScoreText, { color: getScoreTextColor(previewScore) }]}>
+            {getScoreDisplay(previewScore)}
+          </Text>
+        </View>
+        <Text style={styles.magnifierHintText}>Drag to adjust</Text>
+      </View>
+    );
   };
 
   const renderTargetContent = () => {
