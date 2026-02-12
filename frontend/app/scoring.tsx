@@ -549,7 +549,7 @@ export default function ScoringScreen() {
                 pointerEvents="none"
               />
             )}
-          </TouchableOpacity>
+          </View>
         ) : (
           <View style={nativeStyle} {...nativeTouchProps}>
             {ringElements}
