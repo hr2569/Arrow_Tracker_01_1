@@ -1048,7 +1048,6 @@ export default function HistoryScreen() {
           </View>
         )}
       </ScrollView>
-      )}
 
       {/* FAB */}
       <TouchableOpacity
