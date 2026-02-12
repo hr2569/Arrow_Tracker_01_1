@@ -561,23 +561,49 @@ export default function ScoringScreen() {
               <View
                 style={{
                   position: 'absolute',
-                  width: markerSize * 1.5,
-                  height: markerSize * 1.5,
-                  borderRadius: markerSize * 0.75,
-                  borderWidth: 3,
-                  borderColor: '#fff',
-                  borderStyle: 'dashed',
-                  left: touchPosition.x - markerSize * 0.75,
-                  top: touchPosition.y - markerSize * 0.75,
-                  backgroundColor: 'rgba(255,255,255,0.3)',
+                  width: markerSize * 1.2,
+                  height: markerSize * 1.2,
+                  borderRadius: markerSize * 0.6,
+                  borderWidth: 2,
+                  borderColor: '#FFD700',
+                  left: touchPosition.x - markerSize * 0.6,
+                  top: touchPosition.y - markerSize * 0.6,
+                  backgroundColor: getScoreColor(previewScore),
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
                 pointerEvents="none"
-              />
+              >
+                <Text style={{ fontSize: markerFontSize * 0.9, fontWeight: 'bold', color: getScoreTextColor(previewScore) }}>
+                  {getScoreDisplay(previewScore)}
+                </Text>
+              </View>
             )}
           </View>
         )}
       </View>
     );
+  };
+
+  // Calculate transform for zoomed-in target (MyTargets-style)
+  const getZoomTransform = (targetSize: number) => {
+    if (!isTouching || Platform.OS === 'web') {
+      return {};
+    }
+    
+    // Center the zoom on the touch point, offset upward
+    const centerX = targetSize / 2;
+    const centerY = targetSize / 2;
+    const offsetX = (centerX - touchPosition.x) * (TARGET_ZOOM_FACTOR - 1);
+    const offsetY = (centerY - touchPosition.y) * (TARGET_ZOOM_FACTOR - 1) + POINTER_OFFSET_Y;
+    
+    return {
+      transform: [
+        { scale: TARGET_ZOOM_FACTOR },
+        { translateX: offsetX / TARGET_ZOOM_FACTOR },
+        { translateY: offsetY / TARGET_ZOOM_FACTOR },
+      ],
+    };
   };
 
   const renderTargetContent = () => {
