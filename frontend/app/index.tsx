@@ -25,21 +25,22 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        {/* Hero Section with Logo */}
-        <View style={styles.hero}>
-          <Image 
-            source={require('../assets/images/logo.png')} 
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>Arrow Tracker</Text>
-          <Text style={styles.subtitle}>
-            Track your shots and improve your aim
-          </Text>
-        </View>
+        <View style={styles.mainContent}>
+          {/* Hero Section with Logo */}
+          <View style={styles.hero}>
+            <Image 
+              source={require('../assets/images/logo.png')} 
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Arrow Tracker</Text>
+            <Text style={styles.subtitle}>
+              Track your shots and improve your aim
+            </Text>
+          </View>
 
-        {/* Main Actions */}
-        <View style={styles.actionsContainer}>
+          {/* Main Actions */}
+          <View style={styles.actionsContainer}>
           {/* Two Primary Buttons Row */}
           <View style={styles.primaryRow}>
             <TouchableOpacity
@@ -130,6 +131,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 20,
+  },
+  mainContent: {
+    flex: 1,
+    justifyContent: 'center',
   },
   hero: {
     alignItems: 'center',
