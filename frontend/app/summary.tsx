@@ -293,13 +293,15 @@ export default function SummaryScreen() {
             <View style={styles.quickStatsGrid}>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
-                  {Math.max(...currentRound.shots.map((s: any) => s.ring))}
+                  {getDisplayScore(Math.max(...currentRound.shots.map((s: any) => s.ring)))}
                 </Text>
                 <Text style={styles.quickStatLabel}>Best Shot</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
-                  {Math.min(...currentRound.shots.filter((s: any) => s.ring > 0).map((s: any) => s.ring)) || '-'}
+                  {currentRound.shots.filter((s: any) => s.ring > 0).length > 0 
+                    ? getDisplayScore(Math.min(...currentRound.shots.filter((s: any) => s.ring > 0).map((s: any) => s.ring))) 
+                    : '-'}
                 </Text>
                 <Text style={styles.quickStatLabel}>Worst Shot</Text>
               </View>
