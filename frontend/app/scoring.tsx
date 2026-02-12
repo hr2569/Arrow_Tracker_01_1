@@ -418,15 +418,32 @@ export default function ScoringScreen() {
       },
     } : {};
 
-    // Web mouse events for magnifier
-    const handleWebMouseDown = (e: any) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      console.log('Mouse down on target:', x, y, 'size:', size, 'targetIndex:', targetIndex);
-      handleTouchStart(x, y, size, targetIndex);
+    // Web uses simpler click-to-place (magnifier is for native only)
+    const handleWebClick = (e: any) => {
+      const nativeEvent = e.nativeEvent || e;
+      let x: number;
+      let y: number;
+      
+      if (typeof nativeEvent.offsetX === 'number' && typeof nativeEvent.offsetY === 'number') {
+        x = nativeEvent.offsetX;
+        y = nativeEvent.offsetY;
+      } else if (typeof nativeEvent.clientX === 'number' && typeof nativeEvent.clientY === 'number') {
+        const rect = e.target?.getBoundingClientRect?.();
+        if (rect) {
+          x = nativeEvent.clientX - rect.left;
+          y = nativeEvent.clientY - rect.top;
+        } else {
+          x = size / 2;
+          y = size / 2;
+        }
+      } else {
+        x = size / 2;
+        y = size / 2;
+      }
+      
+      const normalizedX = Math.max(0, Math.min(1, x / size));
+      const normalizedY = Math.max(0, Math.min(1, y / size));
+      placeArrow(normalizedX, normalizedY, targetIndex);
     };
 
     const handleWebMouseMove = (e: any) => {
