@@ -827,20 +827,22 @@ const styles = StyleSheet.create({
   deleteButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   cancelButton: { paddingVertical: 12, alignItems: 'center' },
   cancelButtonText: { color: '#888', fontSize: 16 },
-  // Magnifier styles
-  magnifierOverlay: {
+  // Touch score indicator styles (shows current score while dragging)
+  touchScoreIndicator: {
     position: 'absolute',
-    top: 100,
+    top: 80,
     left: 0,
     right: 0,
     alignItems: 'center',
     zIndex: 1000,
   },
-  magnifierBox: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    padding: 8,
-    borderWidth: 2,
+  touchScoreBadge: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
     borderColor: '#FFD700',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -848,67 +850,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 10,
   },
-  magnifierContent: {
-    width: MAGNIFIER_SIZE,
-    height: MAGNIFIER_SIZE,
-    borderRadius: MAGNIFIER_SIZE / 2,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  magnifierClip: {
-    width: MAGNIFIER_SIZE,
-    height: MAGNIFIER_SIZE,
-    borderRadius: MAGNIFIER_SIZE / 2,
-    backgroundColor: '#1a1a1a',
-  },
-  magnifierCrosshairOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  crosshairLineH: {
-    position: 'absolute',
-    width: '100%',
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.5)',
-  },
-  crosshairLineV: {
-    position: 'absolute',
-    width: 1,
-    height: '100%',
-    backgroundColor: 'rgba(255,255,255,0.5)',
-  },
-  crosshairDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  magnifierScoreBadge: {
-    position: 'absolute',
-    bottom: -12,
-    right: -12,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  magnifierScoreText: {
-    fontSize: 16,
+  touchScoreText: {
+    fontSize: 24,
     fontWeight: 'bold',
   },
-  magnifierHintText: {
+  touchHintText: {
     color: '#aaa',
     fontSize: 12,
-    marginTop: 16,
+    marginTop: 12,
     textAlign: 'center',
   },
 });
