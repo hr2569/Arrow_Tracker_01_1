@@ -321,6 +321,13 @@ const scatterStyles = StyleSheet.create({
     backgroundColor: '#1a1a1a',
     borderRadius: 70,
   },
+  arrowCount: {
+    color: '#8B0000',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 6,
+    textAlign: 'center',
+  },
   heatmapGrid: {
     backgroundColor: '#1a1a1a',
     borderRadius: 70,
