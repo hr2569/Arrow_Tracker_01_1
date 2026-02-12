@@ -102,10 +102,10 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
+        
+        {/* Version Number */}
+        <Text style={styles.versionText}>v1.1.01</Text>
       </View>
-      
-      {/* Version Number */}
-      <Text style={styles.versionText}>v1.1.01</Text>
     </SafeAreaView>
   );
 }
@@ -338,13 +338,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   versionText: {
-    position: 'absolute',
-    bottom: 24,
-    left: 0,
-    right: 0,
-    color: '#999',
+    color: '#666',
     fontSize: 12,
     textAlign: 'center',
-    zIndex: 100,
+    marginTop: 24,
+    paddingBottom: 16,
   },
 });
