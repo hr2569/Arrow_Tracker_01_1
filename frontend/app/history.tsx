@@ -137,6 +137,7 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   const allShots = session.rounds.flatMap(r => r.shots || []);
   if (allShots.length === 0) return null;
   
+  const targetType = session.target_type || 'wa_standard';
   const center = size / 2;
   const maxRingRadius = size * 0.48;
   
@@ -151,7 +152,8 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
     return { x, y };
   };
   
-  const ringColors = [
+  // WA Standard - 10 ring target
+  const waRingColors = [
     { r: 1.0, color: '#FFFFFF' },
     { r: 0.9, color: '#FFFFFF' },
     { r: 0.8, color: '#000000' },
@@ -164,23 +166,93 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
     { r: 0.1, color: '#FFFF00' },
   ];
   
+  // Indoor 5-ring target (Vegas 3-spot / WA Indoor)
+  const indoorRingColors = [
+    { r: 1.0, color: '#00BFFF' },
+    { r: 0.8, color: '#00BFFF' },
+    { r: 0.6, color: '#FF0000' },
+    { r: 0.4, color: '#FF0000' },
+    { r: 0.2, color: '#FFFF00' },
+  ];
+  
+  const isIndoor = targetType === 'vegas_3spot' || targetType === 'nfaa_indoor';
+  const ringColors = isIndoor ? indoorRingColors : waRingColors;
+  
+  // For multi-spot targets, render spots in correct positions
+  const renderMultiSpotTarget = () => {
+    const spotRadius = size * 0.14;
+    const spotRings = [
+      { r: 1.0, color: '#00BFFF' },
+      { r: 0.6, color: '#FF0000' },
+      { r: 0.3, color: '#FFFF00' },
+    ];
+    
+    // Vegas 3-spot: triangle arrangement (1 top, 2 bottom)
+    // WA Indoor: vertical arrangement (3 in a column)
+    const getSpotPositions = () => {
+      if (targetType === 'vegas_3spot') {
+        return [
+          { x: center, y: center - spotRadius * 1.2 },           // top
+          { x: center - spotRadius * 1.3, y: center + spotRadius * 0.8 }, // bottom left
+          { x: center + spotRadius * 1.3, y: center + spotRadius * 0.8 }, // bottom right
+        ];
+      } else {
+        // WA Indoor - vertical
+        return [
+          { x: center, y: center - spotRadius * 1.5 },  // top
+          { x: center, y: center },                      // middle
+          { x: center, y: center + spotRadius * 1.5 },  // bottom
+        ];
+      }
+    };
+    
+    const spots = getSpotPositions();
+    
+    return (
+      <>
+        {/* Background */}
+        <Circle cx={center} cy={center} r={maxRingRadius} fill="#1a1a1a" />
+        {/* Render each spot */}
+        {spots.map((spot, spotIndex) => (
+          <G key={`spot-${spotIndex}`}>
+            {spotRings.map((ring, ringIndex) => (
+              <Circle
+                key={`spot-${spotIndex}-ring-${ringIndex}`}
+                cx={spot.x}
+                cy={spot.y}
+                r={spotRadius * ring.r}
+                fill={ring.color}
+                stroke="#333"
+                strokeWidth={0.5}
+              />
+            ))}
+          </G>
+        ))}
+      </>
+    );
+  };
+  
   return (
     <View style={scatterStyles.container}>
       <Text style={scatterStyles.title}>
         <Ionicons name="radio-button-on" size={14} color="#8B0000" /> Shot Distribution
       </Text>
       <Svg width={size} height={size} style={scatterStyles.svg}>
-        {ringColors.map((ring, i) => (
-          <Circle
-            key={`ring-${i}`}
-            cx={center}
-            cy={center}
-            r={maxRingRadius * ring.r}
-            fill={ring.color}
-            stroke={ring.color === '#FFFFFF' ? '#ccc' : ring.color === '#000000' ? '#444' : '#333'}
-            strokeWidth={0.5}
-          />
-        ))}
+        {isIndoor ? (
+          renderMultiSpotTarget()
+        ) : (
+          ringColors.map((ring, i) => (
+            <Circle
+              key={`ring-${i}`}
+              cx={center}
+              cy={center}
+              r={maxRingRadius * ring.r}
+              fill={ring.color}
+              stroke={ring.color === '#FFFFFF' ? '#ccc' : ring.color === '#000000' ? '#444' : '#333'}
+              strokeWidth={0.5}
+            />
+          ))
+        )}
         {allShots.map((shot, i) => {
           const pos = getShotPosition(shot);
           return (
