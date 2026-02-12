@@ -82,9 +82,36 @@ An AI-powered mobile application for archery target scoring that uses computer v
 - `MONGO_URL` - MongoDB connection string
 - `EXPO_PUBLIC_BACKEND_URL` - Backend API URL
 
+## Implemented Features (Latest Updates)
+
+### Target Types
+- WA Standard (10-ring target)
+- Vegas 3-Spot
+- WA Indoor (formerly NFAA Indoor)
+
+### Session Management
+- Create/save scoring sessions
+- Multiple rounds per session
+- Delete individual rounds
+- Session history with statistics
+- Individual session selection for reports
+
+### PDF Report Generation
+- Comprehensive scoring reports with page breaks
+- Shot Distribution graphs
+- Impact Heat Maps with transparency
+- Scatter maps with target face background
+- Build configurations for APK and AAB
+
+### Recent Changes (Dec 2025)
+- Renamed "NFAA Indoor" to "WA Indoor" throughout the app
+- Fixed shot centering issues on visualizations
+- Resolved Android crash with "Generate Report" button
+- Configured EAS build profiles (preview/production/playstore)
+
 ## Future Enhancements
+- Edit round functionality (deletion exists, editing doesn't)
 - User authentication
 - Cloud sync across devices
 - Score analytics and trends
-- Multiple target types support
 - Competition mode with timers
