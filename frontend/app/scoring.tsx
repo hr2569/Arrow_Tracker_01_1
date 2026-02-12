@@ -366,7 +366,7 @@ export default function ScoringScreen() {
     }
   };
 
-  const renderTargetFace = (targetIndex: number, size: number, isMagnifierView: boolean = false) => {
+  const renderTargetFace = (targetIndex: number, size: number) => {
     const rings = targetConfig.rings;
     const colors = targetConfig.colors;
     const ringElements = [];
