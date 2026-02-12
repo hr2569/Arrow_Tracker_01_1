@@ -30,11 +30,13 @@ Archery scoring application for tracking shots, viewing history, and generating 
 - Navigation fixes (back button, save/discard modal)
 - PDF report generation
 - Transparent app icon
-- **NEW**: Zoom-on-touch magnifier for precise arrow placement (Android native)
-  - 2.5x zoom magnifier overlay
-  - Drag to adjust position
-  - Real-time score preview
-  - Haptic feedback
+- **NEW v1.1.0**: MyTargets-style zoom-on-touch for precise arrow placement
+  - 2.5x zoom when touching target (Android native)
+  - Target view transforms centered on touch point
+  - -80dp vertical offset so finger doesn't block view
+  - Score indicator badge at top during placement
+  - Haptic feedback on touch and release
+  - Drag to adjust, release to place
 
 ### Configuration
 - Package name: `com.arrowtracker.app`
@@ -49,7 +51,7 @@ Archery scoring application for tracking shots, viewing history, and generating 
 - `frontend/eas.json` - EAS build profiles
 - `frontend/credentials.json` - Keystore credentials for signing
 - `frontend/arrow-tracker.jks` - Android signing keystore
-- `frontend/app/scoring.tsx` - Scoring screen with magnifier feature
+- `frontend/app/scoring.tsx` - Scoring screen with zoom feature
 
 ## Deployment Instructions
 1. Trigger EAS build: `eas build --platform android --profile production`
@@ -60,8 +62,16 @@ Archery scoring application for tracking shots, viewing history, and generating 
 - None - application is feature complete
 
 ## Platform-Specific Behavior
-- **Android (native)**: Full zoom-on-touch magnifier experience
-- **Web**: Simple click-to-place (magnifier requires native touch events)
+- **Android (native)**: Full zoom-on-touch experience (like MyTargets app)
+  - Touch target → 2.5x zoom with upward offset
+  - Drag → Adjust position in zoomed view
+  - Release → Place arrow
+- **Web**: Simple click-to-place (no zoom needed for mouse)
+
+## Reference Implementation
+Zoom feature modeled after MyTargets open-source app:
+- https://github.com/DreierF/MyTargets
+- Key concepts: `TARGET_ZOOM_FACTOR`, `POINTER_OFFSET_Y`, transform centered on touch point
 
 ## Last Updated
-December 2025 - Version 1.1.0 with zoom-on-touch magnifier
+December 2025 - Version 1.1.0 with MyTargets-style zoom placement
