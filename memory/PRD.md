@@ -1,77 +1,59 @@
 # Arrow Tracker - Product Requirements Document
 
-## Original Problem Statement
-Archery scoring application for tracking shots, viewing history, and generating reports. The app targets archers who want to record and analyze their practice sessions.
+## Overview
+Arrow Tracker is a React Native (Expo) archery scoring application for Android and iOS. It allows archers to track their shots, record scores, and analyze their performance.
 
-## Core Requirements
-- Score archery rounds with accurate target visualization
-- View round history with shot details
-- Generate PDF reports
-- Deploy to Google Play Store
+## Core Features
 
-## User Personas
-- Recreational and competitive archers
-- Users who want to track their progress over time
+### Session Management
+- Create training and competition sessions
+- Record rounds with multiple arrow shots
+- Support for different target types:
+  - WA Standard (10-ring target)
+  - Vegas 3-Spot
+  - WA Indoor (NFAA Indoor)
 
-## Tech Stack
+### Scoring
+- Touch-to-place arrows on target faces
+- **Zoom-on-touch feature (v1.1.0)**: On native platforms, touching the target zooms in for easier arrow placement (similar to MyTargets app)
+- Score calculation based on ring position
+- X-ring tracking (inner 10)
+
+### Equipment Tracking
+- Manage multiple bows with specifications
+- Associate bows with sessions
+
+### History & Analytics
+- View session history with filtering
+- Shot distribution visualization (scatter plot)
+- Score trends over time
+
+## Technical Stack
 - **Frontend**: React Native with Expo
-- **Routing**: Expo Router
-- **State Management**: Zustand
-- **Local Storage**: AsyncStorage
-- **Build/Deployment**: Expo Application Services (EAS)
+- **Storage**: AsyncStorage (client-side)
+- **Navigation**: Expo Router
 
-## Current Version: 1.1.0 (versionCode: 7)
+## Version History
 
-### Completed Features
-- Indoor target visualization (1 blue, 2 red, 3 gold rings)
-- Shot centering on target visualizations
-- Round Details view with sorted shots and color-coded badges
-- Round Summary with "X" score handling
-- Navigation fixes (back button, save/discard modal)
-- PDF report generation
-- Transparent app icon
-- **NEW v1.1.0**: MyTargets-style zoom-on-touch for precise arrow placement
-  - 2.5x zoom when touching target (Android native)
-  - Target view transforms centered on touch point
-  - -80dp vertical offset so finger doesn't block view
-  - Score indicator badge at top during placement
-  - Haptic feedback on touch and release
-  - Drag to adjust, release to place
+### v1.1.0 (Current)
+- Added zoom-on-touch feature for native arrow placement
+- Fixed double-click bug in gesture handling (stale closure issue with useRef solution)
+- Updated app icon with transparent background
 
-### Configuration
+### v1.0.6
+- App icon updates
+- Version code updates for Play Store
+
+## App Configuration
 - Package name: `com.arrowtracker.app`
-- Version: `1.1.0`
-- versionCode: `7`
 - Owner: `hraimundo`
 - Project ID: `deab2ec5-dd6f-49aa-9dbc-ea4663997ba5`
-- Signing: Local keystore (`arrow-tracker.jks`)
 
 ## Key Files
-- `frontend/app.json` - Expo config with package name and version
-- `frontend/eas.json` - EAS build profiles
-- `frontend/credentials.json` - Keystore credentials for signing
-- `frontend/arrow-tracker.jks` - Android signing keystore
-- `frontend/app/scoring.tsx` - Scoring screen with zoom feature
+- `frontend/app/scoring.tsx` - Main scoring screen with zoom-on-touch feature
+- `frontend/app/history.tsx` - Session history and statistics
+- `frontend/app.json` - Expo configuration
 
-## Deployment Instructions
-1. Trigger EAS build: `eas build --platform android --profile production`
-2. Download AAB from Expo dashboard
-3. Upload to Google Play Console
-
-## P0/P1/P2 Features Remaining
-- None - application is feature complete
-
-## Platform-Specific Behavior
-- **Android (native)**: Full zoom-on-touch experience (like MyTargets app)
-  - Touch target → 2.5x zoom with upward offset
-  - Drag → Adjust position in zoomed view
-  - Release → Place arrow
-- **Web**: Simple click-to-place (no zoom needed for mouse)
-
-## Reference Implementation
-Zoom feature modeled after MyTargets open-source app:
-- https://github.com/DreierF/MyTargets
-- Key concepts: `TARGET_ZOOM_FACTOR`, `POINTER_OFFSET_Y`, transform centered on touch point
-
-## Last Updated
-December 2025 - Version 1.1.0 with MyTargets-style zoom placement
+## Known Technical Notes
+- Zoom-on-touch is native-only; web uses simple click-to-place
+- Uses refs alongside state to avoid stale closure issues in responder callbacks
