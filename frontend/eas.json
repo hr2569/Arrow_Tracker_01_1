@@ -38,7 +38,7 @@
     "playstore": {
       "android": {
         "buildType": "app-bundle",
-        "credentialsSource": "remote"
+        "credentialsSource": "local"
       },
       "node": "22.12.0"
     }
