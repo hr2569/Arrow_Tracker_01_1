@@ -126,9 +126,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   hero: {
     alignItems: 'center',
