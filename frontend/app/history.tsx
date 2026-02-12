@@ -155,42 +155,29 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   
   const isIndoor = targetType === 'vegas_3spot' || targetType === 'nfaa_indoor';
   
-  // Indoor target rings: Blue(6) - Red(7) - Red(8) - Gold(9) - Gold(10) - Gold(X)
-  // 1 Blue, 2 Red, 3 Gold - equal spacing, no stroke lines
-  const indoorRings = [
-    { r: 1.0, fill: '#00BFFF' },   // Blue (6)
-    { r: 0.833, fill: '#FF0000' }, // Red (7)
-    { r: 0.666, fill: '#FF0000' }, // Red (8)
-    { r: 0.50, fill: '#FFD700' },  // Gold (9)
-    { r: 0.333, fill: '#FFD700' }, // Gold (10)
-    { r: 0.166, fill: '#FFD700' }, // Gold (X)
-  ];
+  // Indoor target: Blue(6) - Red(7) - Red(8) - Gold(9,10,X)
+  // Simplified: 1 Blue band, 1 Red band, 1 Gold center
+  const renderIndoorTarget = () => (
+    <>
+      <Circle cx={center} cy={center} r={maxRingRadius} fill="#00BFFF" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.75} fill="#FF0000" />
+      <Circle cx={center} cy={center} r={maxRingRadius * 0.45} fill="#FFD700" />
+    </>
+  );
   
   // WA Standard - 10 ring target
   const waRings = [
-    { r: 1.0, fill: '#FFFFFF', stroke: '#cccccc' },
-    { r: 0.9, fill: '#FFFFFF', stroke: '#cccccc' },
-    { r: 0.8, fill: '#000000', stroke: '#444444' },
-    { r: 0.7, fill: '#000000', stroke: '#444444' },
-    { r: 0.6, fill: '#00BFFF', stroke: '#FFFFFF', strokeWidth: 1 },
-    { r: 0.5, fill: '#00BFFF', stroke: '#FFFFFF', strokeWidth: 1 },
-    { r: 0.4, fill: '#FF0000', stroke: '#FFFFFF', strokeWidth: 1 },
-    { r: 0.3, fill: '#FF0000', stroke: '#FFFFFF', strokeWidth: 1 },
-    { r: 0.2, fill: '#FFFF00', stroke: '#FFFFFF', strokeWidth: 1 },
-    { r: 0.1, fill: '#FFFF00', stroke: '#FFFF00' },
+    { r: 1.0, fill: '#FFFFFF' },
+    { r: 0.9, fill: '#FFFFFF' },
+    { r: 0.8, fill: '#000000' },
+    { r: 0.7, fill: '#000000' },
+    { r: 0.6, fill: '#00BFFF' },
+    { r: 0.5, fill: '#00BFFF' },
+    { r: 0.4, fill: '#FF0000' },
+    { r: 0.3, fill: '#FF0000' },
+    { r: 0.2, fill: '#FFFF00' },
+    { r: 0.1, fill: '#FFFF00' },
   ];
-  
-  const rings = isIndoor ? indoorRings : waRings;
-  
-  // Crosshair for center (indoor targets) - dark color for contrast against gold
-  const renderCrosshair = () => {
-    const crosshairSize = maxRingRadius * 0.08;
-    return (
-      <G>
-        <Circle cx={center} cy={center} r={crosshairSize} fill="none" stroke="#333333" strokeWidth={1} />
-      </G>
-    );
-  };
   
   return (
     <View style={scatterStyles.container}>
@@ -198,17 +185,17 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
         <Ionicons name="radio-button-on" size={14} color="#8B0000" /> Shot Distribution
       </Text>
       <Svg width={size} height={size} style={scatterStyles.svg}>
-        {rings.map((ring, i) => (
-          <Circle
-            key={`ring-${i}`}
-            cx={center}
-            cy={center}
-            r={maxRingRadius * ring.r}
-            fill={ring.fill}
-            stroke={ring.stroke || 'none'}
-            strokeWidth={ring.strokeWidth || 0}
-          />
-        ))}
+        {isIndoor ? renderIndoorTarget() : (
+          waRings.map((ring, i) => (
+            <Circle
+              key={`ring-${i}`}
+              cx={center}
+              cy={center}
+              r={maxRingRadius * ring.r}
+              fill={ring.fill}
+            />
+          ))
+        )}
         {allShots.map((shot, i) => {
           const pos = getShotPosition(shot);
           return (
