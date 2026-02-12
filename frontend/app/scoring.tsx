@@ -22,8 +22,8 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.4);
 const SMALL_TARGET_SIZE = Math.min((SCREEN_WIDTH - 60) / 3, 110);
 const CONTAINER_HEIGHT = 350;
-const ZOOM_SCALE = 2.5; // How much to zoom when placing arrow
-const MAGNIFIER_SIZE = 150; // Size of the magnifier circle
+const TARGET_ZOOM_FACTOR = 2.5; // How much to zoom when placing arrow (like MyTargets)
+const POINTER_OFFSET_Y = -80; // Offset the zoomed view upward so finger doesn't block it
 
 interface Arrow {
   id: string;
