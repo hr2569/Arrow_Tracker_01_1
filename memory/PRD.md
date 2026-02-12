@@ -15,7 +15,7 @@ Arrow Tracker is a React Native (Expo) archery scoring application for Android a
 
 ### Scoring
 - Touch-to-place arrows on target faces
-- **Zoom-on-touch feature (v1.1.0)**: On native platforms, touching the target zooms in for easier arrow placement (similar to MyTargets app)
+- **Zoom-on-touch feature (v1.1.0+)**: On native platforms, touching the target zooms in for easier arrow placement (similar to MyTargets app)
 - Score calculation based on ring position
 - X-ring tracking (inner 10)
 
@@ -35,7 +35,10 @@ Arrow Tracker is a React Native (Expo) archery scoring application for Android a
 
 ## Version History
 
-### v1.1.0 (Current)
+### v1.1.01 (Current)
+- Added version number display on home screen (bottom, gray text)
+
+### v1.1.0
 - Added zoom-on-touch feature for native arrow placement
 - Fixed double-click bug in gesture handling (stale closure issue with useRef solution)
 - Updated app icon with transparent background
@@ -50,6 +53,7 @@ Arrow Tracker is a React Native (Expo) archery scoring application for Android a
 - Project ID: `deab2ec5-dd6f-49aa-9dbc-ea4663997ba5`
 
 ## Key Files
+- `frontend/app/index.tsx` - Home screen with version display
 - `frontend/app/scoring.tsx` - Main scoring screen with zoom-on-touch feature
 - `frontend/app/history.tsx` - Session history and statistics
 - `frontend/app.json` - Expo configuration
@@ -57,3 +61,4 @@ Arrow Tracker is a React Native (Expo) archery scoring application for Android a
 ## Known Technical Notes
 - Zoom-on-touch is native-only; web uses simple click-to-place
 - Uses refs alongside state to avoid stale closure issues in responder callbacks
+- Metro bundler may need restart for changes to reflect in React Native Web
