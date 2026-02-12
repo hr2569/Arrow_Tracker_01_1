@@ -517,25 +517,6 @@ export default function ScoringScreen() {
                 </TouchableOpacity>
               );
             })}
-            
-            {/* Show preview marker while touching on web */}
-            {isTouching && activeTargetIndex === targetIndex && (
-              <View
-                style={{
-                  position: 'absolute',
-                  width: markerSize * 1.5,
-                  height: markerSize * 1.5,
-                  borderRadius: markerSize * 0.75,
-                  borderWidth: 3,
-                  borderColor: '#fff',
-                  borderStyle: 'dashed',
-                  left: touchPosition.x - markerSize * 0.75,
-                  top: touchPosition.y - markerSize * 0.75,
-                  backgroundColor: 'rgba(255,255,255,0.3)',
-                }}
-                pointerEvents="none"
-              />
-            )}
           </View>
         ) : (
           <View style={nativeStyle} {...nativeTouchProps}>
