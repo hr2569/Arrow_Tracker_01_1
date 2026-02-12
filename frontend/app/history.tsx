@@ -1166,6 +1166,95 @@ export default function HistoryScreen() {
           </Pressable>
         </Pressable>
       </Modal>
+
+      {/* Edit Round Modal */}
+      <Modal
+        visible={editingRound !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={closeEditRoundModal}
+      >
+        <Pressable style={styles.modalOverlay} onPress={closeEditRoundModal}>
+          <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                Edit Round {editingRound?.round.round_number}
+              </Text>
+              <TouchableOpacity onPress={closeEditRoundModal}>
+                <Ionicons name="close" size={24} color="#888888" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.editRoundSubtitle}>
+              Tap on a score to change it
+            </Text>
+
+            <ScrollView style={styles.editShotsContainer} showsVerticalScrollIndicator={false}>
+              {editedShots.map((shot, index) => (
+                <View key={index} style={styles.editShotRow}>
+                  <Text style={styles.editShotLabel}>Shot {index + 1}</Text>
+                  <View style={styles.scoreSelector}>
+                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
+                      <TouchableOpacity
+                        key={score}
+                        style={[
+                          styles.scoreOption,
+                          shot.ring === score && styles.scoreOptionSelected,
+                        ]}
+                        onPress={() => updateShotScore(index, score)}
+                      >
+                        <Text
+                          style={[
+                            styles.scoreOptionText,
+                            shot.ring === score && styles.scoreOptionTextSelected,
+                          ]}
+                        >
+                          {score === 0 ? 'M' : score}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  {editedShots.length > 3 && (
+                    <TouchableOpacity
+                      style={styles.removeShotBtn}
+                      onPress={() => removeShot(index)}
+                    >
+                      <Ionicons name="close-circle" size={20} color="#ff6b6b" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity style={styles.addShotButton} onPress={addShot}>
+              <Ionicons name="add-circle-outline" size={20} color="#8B0000" />
+              <Text style={styles.addShotButtonText}>Add Shot</Text>
+            </TouchableOpacity>
+
+            <View style={styles.editRoundTotal}>
+              <Text style={styles.editRoundTotalLabel}>Round Total:</Text>
+              <Text style={styles.editRoundTotalValue}>
+                {editedShots.reduce((sum, s) => sum + s.ring, 0)}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+              onPress={saveRoundEdit}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <ActivityIndicator size="small" color="#ffffff" />
+              ) : (
+                <>
+                  <Ionicons name="checkmark" size={20} color="#ffffff" />
+                  <Text style={styles.saveButtonText}>Save Round</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
