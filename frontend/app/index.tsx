@@ -109,7 +109,7 @@ export default function HomeScreen() {
         </View>
         
         {/* Version Number */}
-        <Text style={styles.versionText}>v1.1.01</Text>
+        <Text style={styles.versionText} data-testid="version-text">v1.1.01</Text>
       </ScrollView>
     </SafeAreaView>
   );
