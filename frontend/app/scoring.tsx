@@ -893,6 +893,19 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 10,
   },
+  magnifierInner: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  magnifierRing: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: 'rgba(0,0,0,0.3)',
+  },
   magnifierCrosshair: {
     position: 'absolute',
     top: 0,
@@ -904,15 +917,23 @@ const styles = StyleSheet.create({
   },
   crosshairHorizontal: {
     position: 'absolute',
-    width: 20,
+    width: 30,
     height: 2,
-    backgroundColor: '#FFD700',
+    backgroundColor: '#000',
   },
   crosshairVertical: {
     position: 'absolute',
     width: 2,
-    height: 20,
-    backgroundColor: '#FFD700',
+    height: 30,
+    backgroundColor: '#000',
+  },
+  crosshairDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#000',
+    borderWidth: 1,
+    borderColor: '#fff',
   },
   magnifierScoreBadge: {
     marginTop: 8,
