@@ -159,20 +159,29 @@ export default function SummaryScreen() {
               <View style={styles.shotsBreakdown}>
                 <Text style={styles.breakdownTitle}>Shots</Text>
                 <View style={styles.shotsList}>
-                  {currentRound.shots.map((shot: any, index: number) => (
-                    <View key={index} style={styles.shotItem}>
-                      <View
-                        style={[
-                          styles.shotRingColor,
-                          { backgroundColor: shot.ring > 0 ? RING_COLORS[shot.ring - 1] : '#666' },
-                        ]}
-                      />
-                      <Text style={styles.shotNumber}>#{index + 1}</Text>
-                      <Text style={styles.shotScore}>
-                        {shot.ring > 0 ? shot.ring : 'M'}
-                      </Text>
-                    </View>
-                  ))}
+                  {currentRound.shots.map((shot: any, index: number) => {
+                    const ringColor = getRingColor(shot.ring);
+                    const displayScore = getDisplayScore(shot.ring);
+                    const hasBorder = needsBorder(shot.ring);
+                    return (
+                      <View key={index} style={styles.shotItem}>
+                        <View
+                          style={[
+                            styles.shotRingColor,
+                            { 
+                              backgroundColor: ringColor,
+                              borderWidth: hasBorder ? 2 : 0,
+                              borderColor: hasBorder ? '#666666' : 'transparent',
+                            },
+                          ]}
+                        />
+                        <Text style={styles.shotNumber}>#{index + 1}</Text>
+                        <Text style={styles.shotScore}>
+                          {displayScore}
+                        </Text>
+                      </View>
+                    );
+                  })}
                 </View>
               </View>
             </>
