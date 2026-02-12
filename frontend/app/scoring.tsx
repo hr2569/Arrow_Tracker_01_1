@@ -437,6 +437,8 @@ export default function ScoringScreen() {
         handleTouchEnd(size);
       },
       onResponderTerminate: () => {
+        // Reset refs and state when touch is terminated (e.g., scroll takes over)
+        isTouchingRef.current = false;
         setIsTouching(false);
       },
     } : {};
