@@ -182,19 +182,12 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   
   const rings = isIndoor ? indoorRings : waRings;
   
-  // Crosshair for center (indoor targets)
+  // Crosshair for center (indoor targets) - dark color for contrast against gold
   const renderCrosshair = () => {
     const crosshairSize = maxRingRadius * 0.08;
     return (
       <G>
-        <Circle cx={center} cy={center} r={crosshairSize} fill="none" stroke="#B8860B" strokeWidth={1} />
-        <Circle cx={center} cy={center} r={crosshairSize * 0.3} fill="none" stroke="#B8860B" strokeWidth={1} />
-        {/* Horizontal line */}
-        <Circle cx={center - crosshairSize} cy={center} r={0} fill="none" stroke="#B8860B" strokeWidth={1} />
-        {/* Cross lines */}
-        <G stroke="#B8860B" strokeWidth={1}>
-          <Circle cx={center} cy={center - crosshairSize * 1.3} r={0} />
-        </G>
+        <Circle cx={center} cy={center} r={crosshairSize} fill="none" stroke="#333333" strokeWidth={1} />
       </G>
     );
   };
