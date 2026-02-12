@@ -803,22 +803,24 @@ export default function ReportScreen() {
       
       // Generate target face rings based on target type
       let targetRings = '';
-      if (targetType === 'vegas_3spot') {
+      if (targetType === 'vegas_3spot' || targetType === 'nfaa_indoor') {
+        // Indoor targets: 1 Blue - 2 Red - 3 Gold (matching reference)
         const ringSize = maxRadius;
         targetRings = `
           <circle cx="${center}" cy="${center}" r="${ringSize}" fill="#00a2e8" />
-          <circle cx="${center}" cy="${center}" r="${ringSize * 0.7}" fill="#ed1c24" />
-          <circle cx="${center}" cy="${center}" r="${ringSize * 0.4}" fill="#fff200" />
-          <circle cx="${center}" cy="${center}" r="${ringSize * 0.2}" fill="#fff200" stroke="#000" stroke-width="1" />
-        `;
-      } else if (targetType === 'nfaa_indoor') {
-        const ringSize = maxRadius;
-        targetRings = `
-          <circle cx="${center}" cy="${center}" r="${ringSize}" fill="#00a2e8" />
-          <circle cx="${center}" cy="${center}" r="${ringSize * 0.75}" fill="#00a2e8" stroke="#fff" stroke-width="2" />
-          <circle cx="${center}" cy="${center}" r="${ringSize * 0.5}" fill="#ed1c24" />
-          <circle cx="${center}" cy="${center}" r="${ringSize * 0.3}" fill="#fff200" />
-          <circle cx="${center}" cy="${center}" r="${ringSize * 0.15}" fill="#fff" stroke="#000" stroke-width="1" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.833}" fill="#ed1c24" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.666}" fill="#ed1c24" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.50}" fill="#fff200" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.333}" fill="#fff200" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.166}" fill="#fff200" />
+          <!-- Subtle separator lines -->
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.833}" fill="none" stroke="#a01018" stroke-width="0.8" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.666}" fill="none" stroke="#a01018" stroke-width="0.8" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.50}" fill="none" stroke="#c0a000" stroke-width="0.8" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.333}" fill="none" stroke="#c0a000" stroke-width="0.8" />
+          <circle cx="${center}" cy="${center}" r="${ringSize * 0.166}" fill="none" stroke="#c0a000" stroke-width="0.8" />
+          <!-- Small center dot -->
+          <circle cx="${center}" cy="${center}" r="3" fill="#000" />
         `;
       } else {
         // WA Standard (default)
