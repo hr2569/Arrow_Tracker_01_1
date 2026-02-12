@@ -215,6 +215,12 @@ export default function ScoringScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
+    // Update refs immediately for responder callbacks
+    isTouchingRef.current = true;
+    touchPositionRef.current = { x, y };
+    activeTargetIndexRef.current = targetIndex;
+    
+    // Update state for UI rendering
     setIsTouching(true);
     setTouchPosition({ x, y });
     setActiveTargetIndex(targetIndex);
@@ -229,19 +235,31 @@ export default function ScoringScreen() {
     const normalizedY = clampedY / targetSize;
     const score = calculateScore(normalizedX, normalizedY);
     
+    // Update ref immediately
+    touchPositionRef.current = { x: clampedX, y: clampedY };
+    
+    // Update state for UI rendering
     setTouchPosition({ x: clampedX, y: clampedY });
     setPreviewScore(score);
   }, [calculateScore]);
 
   // Handle touch end - place arrow and hide magnifier
+  // Uses refs to avoid stale closure issues in responder callbacks
   const handleTouchEnd = useCallback((targetSize: number) => {
-    if (isTouching) {
-      const normalizedX = Math.max(0, Math.min(1, touchPosition.x / targetSize));
-      const normalizedY = Math.max(0, Math.min(1, touchPosition.y / targetSize));
-      placeArrow(normalizedX, normalizedY, activeTargetIndex);
+    // Check ref (always current) instead of state (possibly stale in callback)
+    if (isTouchingRef.current) {
+      const currentPosition = touchPositionRef.current;
+      const currentTargetIndex = activeTargetIndexRef.current;
+      
+      const normalizedX = Math.max(0, Math.min(1, currentPosition.x / targetSize));
+      const normalizedY = Math.max(0, Math.min(1, currentPosition.y / targetSize));
+      placeArrow(normalizedX, normalizedY, currentTargetIndex);
     }
+    
+    // Reset refs and state
+    isTouchingRef.current = false;
     setIsTouching(false);
-  }, [isTouching, touchPosition, activeTargetIndex, placeArrow]);
+  }, [placeArrow]);
 
   // Legacy click handler for web
   const handleTargetClick = useCallback((event: any, targetIndex: number, targetSize: number) => {
