@@ -612,35 +612,44 @@ export default function ScoringScreen() {
   };
 
   // Render magnifier component (MyTargets-style magnifying glass)
+  // Shows a zoomed preview with crosshair and score while touching
   const renderMagnifier = (targetSize: number) => {
     if (!isTouching || Platform.OS === 'web') return null;
     
-    // Calculate the offset to center the magnifier on the touch point
-    const zoomedAreaSize = MAGNIFIER_SIZE / MAGNIFIER_ZOOM;
-    const offsetX = -(touchPosition.x - zoomedAreaSize / 2) * MAGNIFIER_ZOOM;
-    const offsetY = -(touchPosition.y - zoomedAreaSize / 2) * MAGNIFIER_ZOOM;
+    // Calculate normalized position for visual indicator
+    const normalizedX = touchPosition.x / targetSize;
+    const normalizedY = touchPosition.y / targetSize;
+    
+    // Determine ring color based on position (approximate visualization)
+    const getRingColorAtPosition = () => {
+      const dx = normalizedX - 0.5;
+      const dy = normalizedY - 0.5;
+      const dist = Math.sqrt(dx * dx + dy * dy) / 0.475;
+      
+      if (dist <= 0.1) return '#FFD700'; // X/10 - Gold
+      if (dist <= 0.3) return '#FFD700'; // 9-10 - Gold
+      if (dist <= 0.5) return '#ed1c24'; // 7-8 - Red
+      if (dist <= 0.7) return '#00a2e8'; // 5-6 - Blue
+      if (dist <= 0.9) return '#2a2a2a'; // 3-4 - Black
+      return '#f5f5f0'; // 1-2 - White
+    };
+    
+    const ringColor = getRingColorAtPosition();
     
     return (
-      <View style={styles.magnifierContainer}>
+      <View style={styles.magnifierContainer} pointerEvents="none">
         <View style={styles.magnifierBox}>
-          {/* Clipped and zoomed target inside magnifier */}
-          <View style={{ overflow: 'hidden', width: MAGNIFIER_SIZE, height: MAGNIFIER_SIZE }}>
-            <View style={{
-              transform: [
-                { translateX: offsetX },
-                { translateY: offsetY },
-                { scale: MAGNIFIER_ZOOM },
-              ],
-              transformOrigin: 'top left',
-            }}>
-              {renderTargetFace(activeTargetIndex, targetSize, true)}
+          {/* Simulated zoomed area with ring color */}
+          <View style={[styles.magnifierInner, { backgroundColor: ringColor }]}>
+            {/* Concentric rings for visual context */}
+            <View style={[styles.magnifierRing, { backgroundColor: previewScore >= 9 ? '#FFD700' : 'transparent' }]} />
+            
+            {/* Center crosshair */}
+            <View style={styles.magnifierCrosshair}>
+              <View style={styles.crosshairHorizontal} />
+              <View style={styles.crosshairVertical} />
+              <View style={styles.crosshairDot} />
             </View>
-          </View>
-          
-          {/* Crosshair in center of magnifier */}
-          <View style={styles.magnifierCrosshair}>
-            <View style={styles.crosshairHorizontal} />
-            <View style={styles.crosshairVertical} />
           </View>
         </View>
         
