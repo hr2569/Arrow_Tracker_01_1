@@ -706,13 +706,6 @@ export default function HistoryScreen() {
           <Text style={[styles.tabButtonText, activeTab === 'history' && styles.tabButtonTextActive]}>Sessions</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'stats' && styles.tabButtonActive]}
-          onPress={() => router.push('/stats')}
-        >
-          <Ionicons name="stats-chart-outline" size={18} color={activeTab === 'stats' ? '#fff' : '#888'} />
-          <Text style={[styles.tabButtonText, activeTab === 'stats' && styles.tabButtonTextActive]}>Stats</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           style={[styles.tabButton, activeTab === 'report' && styles.tabButtonActive]}
           onPress={() => router.push('/report')}
         >
