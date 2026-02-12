@@ -695,8 +695,8 @@ export default function ScoringScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Magnifier overlay for precise arrow placement */}
-      {isTouching && (
+      {/* Magnifier overlay for precise arrow placement (native only) */}
+      {isTouching && Platform.OS !== 'web' && (
         <View style={styles.magnifierOverlay}>
           <View style={styles.magnifierBox}>
             <View style={styles.magnifierContent}>
