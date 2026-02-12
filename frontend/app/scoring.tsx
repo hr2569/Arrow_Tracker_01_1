@@ -479,7 +479,24 @@ export default function ScoringScreen() {
         }}
       >
         {Platform.OS === 'web' ? (
-          <View {...webProps}>
+          <div
+            onMouseDown={handleWebMouseDown}
+            onMouseMove={handleWebMouseMove}
+            onMouseUp={handleWebMouseUp}
+            onMouseLeave={handleWebMouseUp}
+            style={{
+              width: size,
+              height: size,
+              backgroundColor: '#1a1a1a',
+              borderRadius: size / 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'crosshair',
+              position: 'relative' as const,
+              userSelect: 'none' as const,
+            }}
+          >
             {ringElements}
             
             <View style={styles.centerMark} pointerEvents="none">
@@ -534,7 +551,7 @@ export default function ScoringScreen() {
                 pointerEvents="none"
               />
             )}
-          </View>
+          </div>
         ) : (
           <View style={nativeStyle} {...nativeTouchProps}>
             {ringElements}
