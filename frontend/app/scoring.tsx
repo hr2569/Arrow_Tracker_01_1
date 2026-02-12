@@ -418,14 +418,34 @@ export default function ScoringScreen() {
       },
     } : {};
 
-    // Web keeps the simple click behavior
-    const handleClick = (e: any) => {
-      e.stopPropagation?.();
-      handleTargetClick(e, targetIndex, size);
+    // Web mouse events for magnifier
+    const handleWebMouseDown = (e: any) => {
+      e.preventDefault();
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      handleTouchStart(x, y, size, targetIndex);
+    };
+
+    const handleWebMouseMove = (e: any) => {
+      if (!isTouching) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      handleTouchMove(x, y, size);
+    };
+
+    const handleWebMouseUp = () => {
+      if (isTouching) {
+        handleTouchEnd(size);
+      }
     };
 
     const webProps = Platform.OS === 'web' ? {
-      onClick: handleClick,
+      onMouseDown: handleWebMouseDown,
+      onMouseMove: handleWebMouseMove,
+      onMouseUp: handleWebMouseUp,
+      onMouseLeave: handleWebMouseUp,
       style: {
         width: size,
         height: size,
@@ -435,6 +455,7 @@ export default function ScoringScreen() {
         justifyContent: 'center',
         cursor: 'crosshair',
         position: 'relative' as const,
+        userSelect: 'none' as const,
       }
     } : {};
 
