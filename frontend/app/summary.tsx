@@ -380,6 +380,13 @@ export default function SummaryScreen() {
                 <Text style={styles.modalSaveText}>Save</Text>
               </TouchableOpacity>
             </View>
+            
+            <TouchableOpacity
+              style={styles.modalCancelButton}
+              onPress={() => setShowConfirmModal(false)}
+            >
+              <Text style={styles.modalCancelText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
