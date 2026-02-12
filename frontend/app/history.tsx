@@ -580,6 +580,62 @@ export default function HistoryScreen() {
     }
   };
 
+  // Edit round functions
+  const openEditRoundModal = (sessionId: string, round: Round) => {
+    setEditingRound({ sessionId, round });
+    setEditedShots(round.shots.map(s => ({ ring: s.ring, x: s.x, y: s.y })));
+  };
+
+  const closeEditRoundModal = () => {
+    setEditingRound(null);
+    setEditedShots([]);
+  };
+
+  const updateShotScore = (shotIndex: number, newScore: number) => {
+    const newShots = [...editedShots];
+    newShots[shotIndex] = { ...newShots[shotIndex], ring: newScore };
+    setEditedShots(newShots);
+  };
+
+  const addShot = () => {
+    setEditedShots([...editedShots, { ring: 0, x: 0.5, y: 0.5 }]);
+  };
+
+  const removeShot = (index: number) => {
+    if (editedShots.length <= 3) {
+      Alert.alert('Cannot Remove', 'Rounds must have at least 3 shots.');
+      return;
+    }
+    const newShots = editedShots.filter((_, i) => i !== index);
+    setEditedShots(newShots);
+  };
+
+  const saveRoundEdit = async () => {
+    if (!editingRound) return;
+    
+    setIsSaving(true);
+    try {
+      const updatedSession = await updateRound(
+        editingRound.sessionId,
+        editingRound.round.id,
+        editedShots
+      );
+      
+      if (updatedSession) {
+        setSessions(sessions.map(s => 
+          s.id === editingRound.sessionId ? updatedSession : s
+        ));
+      }
+      
+      closeEditRoundModal();
+    } catch (err) {
+      console.error('Save round error:', err);
+      Alert.alert('Error', 'Failed to save round changes');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const getAverageScore = (session: Session) => {
     if (!session.rounds || session.rounds.length === 0) return 0;
     return Math.round(session.total_score / session.rounds.length);
