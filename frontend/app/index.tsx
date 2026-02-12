@@ -41,7 +41,6 @@ export default function HomeScreen() {
           <Text style={styles.subtitle}>
             Track your shots and improve your aim
           </Text>
-          <Text style={styles.versionInline}>v1.1.01</Text>
         </View>
 
         {/* Main Actions */}
@@ -346,12 +345,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 2,
     textAlign: 'center',
-  },
-  versionInline: {
-    color: '#666',
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 8,
   },
   versionContainer: {
     paddingVertical: 12,
