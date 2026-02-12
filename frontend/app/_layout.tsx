@@ -7,22 +7,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 function HeaderBackButton() {
   const router = useRouter();
-  const pathname = usePathname();
   
   const handleBack = () => {
-    console.log('HeaderBackButton pressed, pathname:', pathname);
-    console.log('canGoBack:', router.canGoBack());
-    
-    // On native, try back() first without checking canGoBack
-    // canGoBack() can sometimes return false even when back navigation is possible
-    try {
-      router.back();
-      console.log('router.back() called');
-    } catch (error) {
-      console.log('Back navigation error:', error);
-      // Fallback: navigate to home
-      router.replace('/');
-    }
+    // Simple back: always go to home screen
+    router.replace('/');
   };
   
   return (
