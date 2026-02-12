@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, useRouter, usePathname } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
