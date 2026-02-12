@@ -283,7 +283,7 @@ export default function SessionSetupScreen() {
                   </View>
                 </View>
                 <Text style={[styles.targetTypeName, selectedTargetType === 'nfaa_indoor' && styles.targetTypeNameSelected]}>
-                  NFAA Indoor
+                  WA Indoor
                 </Text>
                 <Text style={styles.targetTypeDesc}>3-spot vertical</Text>
                 {selectedTargetType === 'nfaa_indoor' && (

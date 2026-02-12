@@ -79,7 +79,7 @@ export const TARGET_CONFIGS = {
     layout: 'triple_vertical',
   },
   nfaa_indoor: {
-    name: 'NFAA Indoor',
+    name: 'WA Indoor',
     description: '3-spot vertical strip',
     rings: 5,
     maxScore: 10,

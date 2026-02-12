@@ -27,7 +27,7 @@ type ReportPeriod = 'week' | 'month' | 'year' | 'custom' | 'all';
 const getTargetTypeName = (type?: string): string => {
   switch (type) {
     case 'vegas_3spot': return 'Vegas 3-Spot';
-    case 'nfaa_indoor': return 'NFAA Indoor';
+    case 'nfaa_indoor': return 'WA Indoor';
     case 'wa_standard': 
     default: return 'WA Standard';
   }
