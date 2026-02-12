@@ -13,7 +13,8 @@ expo-env.d.ts
 # Native
 .kotlin/
 *.orig.*
-*.jks
+# Allow arrow-tracker.jks for signing
+!arrow-tracker.jks
 *.p8
 *.p12
 *.key
