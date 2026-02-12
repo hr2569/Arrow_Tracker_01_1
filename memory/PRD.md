@@ -105,12 +105,12 @@ An AI-powered mobile application for archery target scoring that uses computer v
 
 ### Recent Changes (Dec 2025)
 - Renamed "NFAA Indoor" to "WA Indoor" throughout the app
+- Implemented Edit Round functionality - users can now modify shot scores within rounds
 - Fixed shot centering issues on visualizations
 - Resolved Android crash with "Generate Report" button
 - Configured EAS build profiles (preview/production/playstore)
 
 ## Future Enhancements
-- Edit round functionality (deletion exists, editing doesn't)
 - User authentication
 - Cloud sync across devices
 - Score analytics and trends
