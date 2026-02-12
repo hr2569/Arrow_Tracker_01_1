@@ -690,8 +690,6 @@ export default function ScoringScreen() {
     return (
       <View>
         {content}
-        {/* Magnifier box appears on the right when touching */}
-        {renderMagnifier(targetSize)}
       </View>
     );
   };
