@@ -25,22 +25,21 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <View style={styles.mainContent}>
-          {/* Hero Section with Logo */}
-          <View style={styles.hero}>
-            <Image 
-              source={require('../assets/images/logo.png')} 
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={styles.title}>Arrow Tracker</Text>
-            <Text style={styles.subtitle}>
-              Track your shots and improve your aim
-            </Text>
-          </View>
+        {/* Hero Section with Logo */}
+        <View style={styles.hero}>
+          <Image 
+            source={require('../assets/images/logo.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Arrow Tracker</Text>
+          <Text style={styles.subtitle}>
+            Track your shots and improve your aim
+          </Text>
+        </View>
 
-          {/* Main Actions */}
-          <View style={styles.actionsContainer}>
+        {/* Main Actions */}
+        <View style={styles.actionsContainer}>
           {/* Two Primary Buttons Row */}
           <View style={styles.primaryRow}>
             <TouchableOpacity
@@ -103,11 +102,10 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        </View>
-        
-        {/* Version Number */}
-        <Text style={styles.versionText}>v1.1.01</Text>
       </View>
+      
+      {/* Version Number */}
+      <Text style={styles.versionText}>v1.1.01</Text>
     </SafeAreaView>
   );
 }
@@ -128,14 +126,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
-  },
-  mainContent: {
-    flex: 1,
     justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   hero: {
     alignItems: 'center',
@@ -344,9 +337,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   versionText: {
-    color: '#555',
+    position: 'absolute',
+    bottom: 24,
+    left: 0,
+    right: 0,
+    color: '#666',
     fontSize: 12,
     textAlign: 'center',
-    marginTop: 32,
   },
 });
