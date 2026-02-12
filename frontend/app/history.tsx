@@ -333,6 +333,10 @@ export default function HistoryScreen() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Edit round state
+  const [editingRound, setEditingRound] = useState<{ sessionId: string; round: Round } | null>(null);
+  const [editedShots, setEditedShots] = useState<{ ring: number; x: number; y: number }[]>([]);
+
   // Get unique bows and distances for filters
   const availableBows = useMemo(() => {
     const bows = sessions
