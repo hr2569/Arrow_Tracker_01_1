@@ -15,19 +15,39 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../store/appStore';
 import { createSession, addRoundToSession } from '../utils/localStorage';
 
-// Ring colors for FITA target
-const RING_COLORS = [
-  '#f0f0f0', // 1 - White outer
-  '#f0f0f0', // 2 - White inner
-  '#111111', // 3 - Black outer
-  '#111111', // 4 - Black inner
-  '#4169E1', // 5 - Blue outer
-  '#4169E1', // 6 - Blue inner
-  '#DC143C', // 7 - Red outer
-  '#DC143C', // 8 - Red inner
-  '#FFD700', // 9 - Gold outer
-  '#FFD700', // 10 - Gold inner/center
-];
+// Ring colors for FITA target - with better visibility
+const getRingColor = (ring: number): string => {
+  if (ring >= 11) return '#FFD700'; // X - Gold (inner 10)
+  if (ring === 10) return '#FFD700'; // 10 - Gold
+  if (ring === 9) return '#FFD700'; // 9 - Gold
+  if (ring === 8) return '#DC143C'; // 8 - Red
+  if (ring === 7) return '#DC143C'; // 7 - Red
+  if (ring === 6) return '#4169E1'; // 6 - Blue
+  if (ring === 5) return '#4169E1'; // 5 - Blue
+  if (ring === 4) return '#222222'; // 4 - Black
+  if (ring === 3) return '#222222'; // 3 - Black
+  if (ring === 2) return '#f0f0f0'; // 2 - White
+  if (ring === 1) return '#f0f0f0'; // 1 - White
+  return '#666666'; // Miss
+};
+
+// Get display value for shot (X for inner 10, M for miss)
+const getDisplayScore = (ring: number): string => {
+  if (ring >= 11) return 'X';
+  if (ring === 0) return 'M';
+  return ring.toString();
+};
+
+// Get actual point value (X = 10, not 11)
+const getPointValue = (ring: number): number => {
+  if (ring >= 11) return 10; // X is worth 10 points
+  return ring;
+};
+
+// Check if ring needs a border (for black rings on dark background)
+const needsBorder = (ring: number): boolean => {
+  return ring === 3 || ring === 4;
+};
 
 export default function SummaryScreen() {
   const router = useRouter();
