@@ -110,6 +110,13 @@ An AI-powered mobile application for archery target scoring that uses computer v
 - Resolved Android crash with "Generate Report" button
 - Configured EAS build profiles (preview/production/playstore)
 
+### Recent Changes (Feb 2026)
+- **Fixed Indoor Target Visualization (P0)**:
+  - Updated target rings to match WA Indoor standard: 1 Blue ring, 2 Red rings, 3 Gold rings
+  - Changed separator lines to be very subtle (0.5 stroke width) with matching ring edge colors
+  - Replaced prominent crosshair with small center dot
+  - Applied consistent changes to both history.tsx (ScatterMap) and report.tsx (PDF generation)
+
 ## Future Enhancements
 - User authentication
 - Cloud sync across devices
