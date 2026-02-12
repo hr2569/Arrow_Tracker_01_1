@@ -155,14 +155,15 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   
   const isIndoor = targetType === 'vegas_3spot' || targetType === 'nfaa_indoor';
   
-  // Indoor target rings (like reference image: black border, blue, red, yellow, white center)
+  // Indoor target rings: Blue(6) - Red(7) - Red(8) - Gold(9) - Gold(10) - Gold(X)
   const indoorRings = [
     { r: 1.0, fill: '#000000', stroke: '#000000' },   // Black outer border
-    { r: 0.95, fill: '#00BFFF', stroke: '#00BFFF' },  // Blue outer
-    { r: 0.70, fill: '#00BFFF', stroke: '#FFFFFF', strokeWidth: 1 },  // Blue with white ring line
-    { r: 0.50, fill: '#FF0000', stroke: '#FFFFFF', strokeWidth: 1 },  // Red
-    { r: 0.30, fill: '#FFFF00', stroke: '#FFFFFF', strokeWidth: 1 },  // Yellow
-    { r: 0.12, fill: '#FFFFFF', stroke: '#FFFFFF' },  // White X ring
+    { r: 0.95, fill: '#00BFFF', stroke: '#FFFFFF', strokeWidth: 1 },  // Blue (6)
+    { r: 0.75, fill: '#FF0000', stroke: '#FFFFFF', strokeWidth: 1 },  // Red (7)
+    { r: 0.55, fill: '#FF0000', stroke: '#FFFFFF', strokeWidth: 1 },  // Red (8)
+    { r: 0.40, fill: '#FFD700', stroke: '#FFFFFF', strokeWidth: 1 },  // Gold (9)
+    { r: 0.25, fill: '#FFD700', stroke: '#FFFFFF', strokeWidth: 1 },  // Gold (10)
+    { r: 0.12, fill: '#FFD700', stroke: '#FFD700' },  // Gold (X)
   ];
   
   // WA Standard - 10 ring target
