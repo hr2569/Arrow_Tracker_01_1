@@ -63,7 +63,6 @@ export default function RootLayout() {
           options={{ 
             title: 'Round Summary',
             headerBackVisible: false,
-            headerLeft: () => <HeaderBackButton />,
           }} 
         />
         <Stack.Screen 
