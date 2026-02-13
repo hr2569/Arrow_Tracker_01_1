@@ -880,7 +880,7 @@ export default function ScoringScreen() {
               ))}
             </View>
           ) : (
-            <Text style={styles.noArrowsText}>Tap on target to mark arrows</Text>
+            <Text style={styles.noArrowsText}>{t('scoring.tapToPlace')}</Text>
           )}
         </View>
 
