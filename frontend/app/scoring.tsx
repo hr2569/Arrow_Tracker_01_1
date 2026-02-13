@@ -123,6 +123,7 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
 
 export default function ScoringScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { 
     setCurrentRound, 
     sessionType, 
