@@ -886,7 +886,7 @@ export default function ScoringScreen() {
 
         <TouchableOpacity style={styles.finishButton} onPress={handleFinishRound}>
           <Ionicons name="checkmark-circle" size={24} color="#fff" />
-          <Text style={styles.finishButtonText}>Finish Round</Text>
+          <Text style={styles.finishButtonText}>{t('scoring.finishRound')}</Text>
         </TouchableOpacity>
       </ScrollView>
 
