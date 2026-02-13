@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import Svg, { Defs, RadialGradient, Stop, Circle, G } from 'react-native-svg';
 import { getSessions, Session } from '../utils/localStorage';
 
@@ -464,11 +464,11 @@ export default function StatsScreen() {
 
           <View style={styles.avgSection}>
             <View style={styles.avgItem}>
-              <Ionicons name="analytics" size={20} color="#8B0000" />
+              <Icon name="analytics" size={20} color="#8B0000" />
               <Text style={styles.avgText}>Avg per Arrow: <Text style={styles.avgValue}>{stats.avgPerArrow}</Text></Text>
             </View>
             <View style={styles.avgItem}>
-              <Ionicons name="layers" size={20} color="#8B0000" />
+              <Icon name="layers" size={20} color="#8B0000" />
               <Text style={styles.avgText}>Avg per Round: <Text style={styles.avgValue}>{stats.avgPerRound}</Text></Text>
             </View>
           </View>
@@ -477,7 +477,7 @@ export default function StatsScreen() {
         {/* Ring Breakdown */}
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>
-            <Ionicons name="bar-chart" size={18} color="#8B0000" /> Score Breakdown
+            <Icon name="bar-chart" size={18} color="#8B0000" /> Score Breakdown
           </Text>
           <RingDistribution />
         </View>
@@ -485,7 +485,7 @@ export default function StatsScreen() {
         {/* Stats by Target Type */}
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>
-            <Ionicons name="apps" size={18} color="#8B0000" /> Stats by Target Type
+            <Icon name="apps" size={18} color="#8B0000" /> Stats by Target Type
           </Text>
           <View style={styles.targetTypeStats}>
             {['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map((targetType) => {
@@ -524,7 +524,7 @@ export default function StatsScreen() {
         {stats.totalArrows > 0 && (
           <View style={styles.sectionCard} key={`heatmap-${targetTypeFilter}`}>
             <Text style={styles.sectionTitle}>
-              <Ionicons name="locate" size={18} color="#8B0000" /> Shot Distribution ({getTargetTypeName(targetTypeFilter)})
+              <Icon name="locate" size={18} color="#8B0000" /> Shot Distribution ({getTargetTypeName(targetTypeFilter)})
             </Text>
             <View style={styles.heatmapContainer}>
               <Svg key={`svg-${targetTypeFilter}`} width={SCREEN_WIDTH - 80} height={SCREEN_WIDTH - 80} viewBox="0 0 200 200">
@@ -587,7 +587,7 @@ export default function StatsScreen() {
         {/* Empty State */}
         {stats.totalArrows === 0 && (
           <View style={styles.emptyState}>
-            <Ionicons name="analytics-outline" size={64} color="#888888" />
+            <Icon name="analytics-outline" size={64} color="#888888" />
             <Text style={styles.emptyTitle}>No Data Yet</Text>
             <Text style={styles.emptyText}>
               Complete some scoring sessions to see your statistics!
@@ -596,7 +596,7 @@ export default function StatsScreen() {
               style={styles.startButton}
               onPress={() => router.push('/sessionSetup')}
             >
-              <Ionicons name="add" size={20} color="#fff" />
+              <Icon name="add" size={20} color="#fff" />
               <Text style={styles.startButtonText}>Start Session</Text>
             </TouchableOpacity>
           </View>

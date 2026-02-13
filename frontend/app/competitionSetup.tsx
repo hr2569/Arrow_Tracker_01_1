@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { useFocusEffect } from '@react-navigation/native';
 import { TARGET_CONFIGS } from '../store/appStore';
 import { getBowIcon } from '../utils/bowIcons';
@@ -134,12 +134,12 @@ export default function CompetitionSetupScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
             <Text style={styles.headerTitle}>New Competition</Text>
             <View style={styles.headerBadge}>
-              <Ionicons name="trophy" size={14} color="#FFD700" />
+              <Icon name="trophy" size={14} color="#FFD700" />
               <Text style={styles.headerBadgeText}>10 Rounds × 3 Arrows</Text>
             </View>
           </View>
@@ -179,7 +179,7 @@ export default function CompetitionSetupScreen() {
                 </Text>
                 {selectedTargetType === 'wa_standard' && (
                   <View style={styles.targetCheckmark}>
-                    <Ionicons name="checkmark" size={12} color="#000" />
+                    <Icon name="checkmark" size={12} color="#000" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -208,7 +208,7 @@ export default function CompetitionSetupScreen() {
                 </Text>
                 {selectedTargetType === 'vegas_3spot' && (
                   <View style={styles.targetCheckmark}>
-                    <Ionicons name="checkmark" size={12} color="#000" />
+                    <Icon name="checkmark" size={12} color="#000" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -237,7 +237,7 @@ export default function CompetitionSetupScreen() {
                 </Text>
                 {selectedTargetType === 'nfaa_indoor' && (
                   <View style={styles.targetCheckmark}>
-                    <Ionicons name="checkmark" size={12} color="#000" />
+                    <Icon name="checkmark" size={12} color="#000" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -299,7 +299,7 @@ export default function CompetitionSetupScreen() {
                 style={styles.addBowCard}
                 onPress={() => router.push('/bows')}
               >
-                <Ionicons name="add-circle-outline" size={24} color="#FFD700" />
+                <Icon name="add-circle-outline" size={24} color="#FFD700" />
                 <Text style={styles.addBowCardText}>Add a bow first</Text>
               </TouchableOpacity>
             ) : (
@@ -333,7 +333,7 @@ export default function CompetitionSetupScreen() {
             onPress={handleStartCompetition}
             disabled={!newParticipantName.trim() || !newParticipantBowId}
           >
-            <Ionicons name="trophy" size={24} color="#000" />
+            <Icon name="trophy" size={24} color="#000" />
             <Text style={styles.startButtonText}>Start Competition</Text>
           </TouchableOpacity>
         </View>

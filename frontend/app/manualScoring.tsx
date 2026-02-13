@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import * as Print from 'expo-print';
 import * as FileSystem from '../utils/fileSystemLegacy';
 import * as Sharing from 'expo-sharing';
@@ -445,7 +445,7 @@ export default function ManualScoring() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#FFD700" />
+          <Icon name="arrow-back" size={24} color="#FFD700" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Manual Scoring</Text>
         <View style={styles.placeholder} />
@@ -472,7 +472,7 @@ export default function ManualScoring() {
               style={styles.addButton}
               onPress={() => setShowAddArcher(true)}
             >
-              <Ionicons name="add" size={20} color="#000" />
+              <Icon name="add" size={20} color="#000" />
               <Text style={styles.addButtonText}>Add Archer</Text>
             </TouchableOpacity>
           </View>
@@ -497,7 +497,7 @@ export default function ManualScoring() {
                     style={styles.removeButton}
                     onPress={() => removeArcher(archerIndex)}
                   >
-                    <Ionicons name="trash-outline" size={18} color="#ed1c24" />
+                    <Icon name="trash-outline" size={18} color="#ed1c24" />
                   </TouchableOpacity>
                 </View>
 
@@ -540,7 +540,7 @@ export default function ManualScoring() {
               <Text style={styles.generateButtonText}>Generating...</Text>
             ) : (
               <>
-                <Ionicons name="document-text" size={20} color="#000" />
+                <Icon name="document-text" size={20} color="#000" />
                 <Text style={styles.generateButtonText}>
                   {isCompetitionComplete() ? 'Save & Generate PDF' : 'Complete All Scores'}
                 </Text>

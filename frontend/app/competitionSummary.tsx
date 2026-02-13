@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { useFocusEffect } from '@react-navigation/native';
 import { 
   getActiveCompetition, 
@@ -671,7 +671,7 @@ export default function CompetitionSummaryScreen() {
         {/* Header Section */}
         <View style={styles.headerSection}>
           <View style={styles.trophyContainer}>
-            <Ionicons name="trophy" size={56} color="#FFD700" />
+            <Icon name="trophy" size={56} color="#FFD700" />
           </View>
           <Text style={styles.completedLabel}>Competition Complete!</Text>
           <Text style={styles.archerName}>{archer.name}</Text>
@@ -691,17 +691,17 @@ export default function CompetitionSummaryScreen() {
         {/* Competition Info */}
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
-            <Ionicons name="calendar-outline" size={16} color="#888" />
+            <Icon name="calendar-outline" size={16} color="#888" />
             <Text style={styles.infoText}>
               {new Date(competition.completedAt || competition.createdAt).toLocaleDateString()}
             </Text>
           </View>
           <View style={styles.infoItem}>
-            <Ionicons name="locate-outline" size={16} color="#888" />
+            <Icon name="locate-outline" size={16} color="#888" />
             <Text style={styles.infoText}>{competition.distance}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Ionicons name="apps-outline" size={16} color="#888" />
+            <Icon name="apps-outline" size={16} color="#888" />
             <Text style={styles.infoText}>{competition.maxRounds} rounds</Text>
           </View>
         </View>
@@ -752,13 +752,13 @@ export default function CompetitionSummaryScreen() {
             <Text style={styles.reportButtonText}>Saving...</Text>
           ) : (
             <>
-              <Ionicons name="download-outline" size={20} color="#000" />
+              <Icon name="download-outline" size={20} color="#000" />
               <Text style={styles.reportButtonText}>Save PDF</Text>
             </>
           )}
         </TouchableOpacity>
         <TouchableOpacity style={styles.finishButton} onPress={handleFinish}>
-          <Ionicons name="home" size={20} color="#fff" />
+          <Icon name="home" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>

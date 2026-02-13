@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Print from 'expo-print';
 import * as FileSystem from '../utils/fileSystemLegacy';
@@ -366,10 +366,10 @@ export default function CompetitionHistory() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#FFD700" />
+          <Icon name="arrow-back" size={24} color="#FFD700" />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
-          <Ionicons name="time" size={24} color="#FFD700" />
+          <Icon name="time" size={24} color="#FFD700" />
           <Text style={styles.headerTitle}>Competition History</Text>
         </View>
         <View style={styles.placeholder} />
@@ -386,7 +386,7 @@ export default function CompetitionHistory() {
           <Text style={styles.loadingText}>Loading...</Text>
         ) : competitions.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="trophy-outline" size={64} color="#333" />
+            <Icon name="trophy-outline" size={64} color="#333" />
             <Text style={styles.emptyTitle}>No Competitions Yet</Text>
             <Text style={styles.emptySubtitle}>
               Complete a manual scoring competition to see it here
@@ -395,7 +395,7 @@ export default function CompetitionHistory() {
               style={styles.emptyButton}
               onPress={() => router.push('/manualScoring')}
             >
-              <Ionicons name="add" size={20} color="#000" />
+              <Icon name="add" size={20} color="#000" />
               <Text style={styles.emptyButtonText}>Start Manual Scoring</Text>
             </TouchableOpacity>
           </View>
@@ -406,7 +406,7 @@ export default function CompetitionHistory() {
               return (
                 <View key={competition.id} style={styles.competitionCard}>
                   <View style={styles.sourceTag}>
-                    <Ionicons name="locate" size={12} color="#FFD700" />
+                    <Icon name="locate" size={12} color="#FFD700" />
                     <Text style={styles.sourceTagText}>Compete</Text>
                   </View>
                   <View style={styles.competitionHeader}>
@@ -432,7 +432,7 @@ export default function CompetitionHistory() {
                       style={styles.deleteButton}
                       onPress={() => handleDeleteCompetition(competition)}
                     >
-                      <Ionicons name="trash-outline" size={20} color="#ed1c24" />
+                      <Icon name="trash-outline" size={20} color="#ed1c24" />
                     </TouchableOpacity>
                   </View>
 
@@ -440,7 +440,7 @@ export default function CompetitionHistory() {
                     style={styles.pdfButton}
                     onPress={() => viewCompeteCompetition(competition)}
                   >
-                    <Ionicons name="eye" size={18} color="#000" />
+                    <Icon name="eye" size={18} color="#000" />
                     <Text style={styles.pdfButtonText}>View Results & PDF</Text>
                   </TouchableOpacity>
                 </View>
@@ -452,7 +452,7 @@ export default function CompetitionHistory() {
               return (
                 <View key={competition.id} style={styles.competitionCard}>
                   <View style={[styles.sourceTag, { backgroundColor: '#1a3a1a' }]}>
-                    <Ionicons name="clipboard" size={12} color="#4CAF50" />
+                    <Icon name="clipboard" size={12} color="#4CAF50" />
                     <Text style={[styles.sourceTagText, { color: '#4CAF50' }]}>Score Keeping</Text>
                   </View>
                   <View style={styles.competitionHeader}>
@@ -469,7 +469,7 @@ export default function CompetitionHistory() {
                       style={styles.deleteButton}
                       onPress={() => handleDeleteCompetition(competition)}
                     >
-                      <Ionicons name="trash-outline" size={20} color="#ed1c24" />
+                      <Icon name="trash-outline" size={20} color="#ed1c24" />
                     </TouchableOpacity>
                   </View>
 
@@ -498,7 +498,7 @@ export default function CompetitionHistory() {
                     style={styles.pdfButton}
                     onPress={() => regenerateManualPdf(competition)}
                   >
-                    <Ionicons name="document-text" size={18} color="#000" />
+                    <Icon name="document-text" size={18} color="#000" />
                     <Text style={styles.pdfButtonText}>View/Download PDF</Text>
                   </TouchableOpacity>
                 </View>

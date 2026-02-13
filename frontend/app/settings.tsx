@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { languages, saveLanguage } from '../i18n';
 
@@ -43,7 +43,7 @@ export default function SettingsScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('settings.title')}</Text>
         <View style={styles.headerSpacer} />
@@ -56,13 +56,13 @@ export default function SettingsScreen() {
           onPress={() => setShowLanguageModal(true)}
         >
           <View style={styles.settingIconContainer}>
-            <Ionicons name="language" size={24} color="#8B0000" />
+            <Icon name="language" size={24} color="#8B0000" />
           </View>
           <View style={styles.settingInfo}>
             <Text style={styles.settingTitle}>{t('settings.language')}</Text>
             <Text style={styles.settingValue}>{getCurrentLanguageName()}</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#666" />
+          <Icon name="chevron-forward" size={20} color="#666" />
         </TouchableOpacity>
 
         {/* Backup Option */}
@@ -71,13 +71,13 @@ export default function SettingsScreen() {
           onPress={() => router.push('/backup')}
         >
           <View style={styles.settingIconContainer}>
-            <Ionicons name="cloud-upload-outline" size={24} color="#8B0000" />
+            <Icon name="cloud-upload-outline" size={24} color="#8B0000" />
           </View>
           <View style={styles.settingInfo}>
             <Text style={styles.settingTitle}>{t('settings.backup')}</Text>
             <Text style={styles.settingDescription}>{t('settings.backupDescription')}</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#666" />
+          <Icon name="chevron-forward" size={20} color="#666" />
         </TouchableOpacity>
 
         {/* About Section */}
@@ -105,7 +105,7 @@ export default function SettingsScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t('settings.selectLanguage')}</Text>
               <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
-                <Ionicons name="close" size={24} color="#888" />
+                <Icon name="close" size={24} color="#888" />
               </TouchableOpacity>
             </View>
             
@@ -129,7 +129,7 @@ export default function SettingsScreen() {
                     <Text style={styles.languageEnglishName}>{lang.name}</Text>
                   </View>
                   {currentLanguage === lang.code && (
-                    <Ionicons name="checkmark-circle" size={24} color="#8B0000" />
+                    <Icon name="checkmark-circle" size={24} color="#8B0000" />
                   )}
                 </TouchableOpacity>
               ))}

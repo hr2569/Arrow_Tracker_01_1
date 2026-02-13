@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Svg, { Circle, G } from 'react-native-svg';
 import * as Print from 'expo-print';
@@ -1308,7 +1308,7 @@ export default function ReportScreen() {
     if (!shots || shots.length === 0) {
       return (
         <View style={[heatmapStyles.emptyContainer, { width: size, height: size }]}>
-          <Ionicons name="flame-outline" size={48} color="#888888" />
+          <Icon name="flame-outline" size={48} color="#888888" />
           <Text style={heatmapStyles.emptyText}>No shots in this period</Text>
         </View>
       );
@@ -1660,7 +1660,7 @@ export default function ReportScreen() {
     if (!shots || shots.length === 0) {
       return (
         <View style={[heatmapStyles.emptyContainer, { width: size, height: size }]}>
-          <Ionicons name="radio-button-on" size={48} color="#888888" />
+          <Icon name="radio-button-on" size={48} color="#888888" />
           <Text style={heatmapStyles.emptyText}>No shots in this period</Text>
         </View>
       );
@@ -1751,7 +1751,7 @@ export default function ReportScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Report</Text>
           <View style={styles.headerSpacer} />
@@ -1770,7 +1770,7 @@ export default function ReportScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Generate Report</Text>
           <View style={styles.headerSpacer} />
@@ -1780,7 +1780,7 @@ export default function ReportScreen() {
           {/* Icon and Title */}
           <View style={styles.selectionHeader}>
             <View style={styles.iconCircle}>
-              <Ionicons name="document-text" size={48} color="#8B0000" />
+              <Icon name="document-text" size={48} color="#8B0000" />
             </View>
             <Text style={styles.selectionTitle}>Configure Report</Text>
             <Text style={styles.selectionSubtitle}>
@@ -1874,7 +1874,7 @@ export default function ReportScreen() {
                 style={[styles.modeToggleButton, selectionMode === 'dateRange' && styles.modeToggleButtonActive]}
                 onPress={() => setSelectionMode('dateRange')}
               >
-                <Ionicons name="calendar" size={18} color={selectionMode === 'dateRange' ? '#fff' : '#8B0000'} />
+                <Icon name="calendar" size={18} color={selectionMode === 'dateRange' ? '#fff' : '#8B0000'} />
                 <Text style={[styles.modeToggleText, selectionMode === 'dateRange' && styles.modeToggleTextActive]}>
                   Date Range
                 </Text>
@@ -1883,7 +1883,7 @@ export default function ReportScreen() {
                 style={[styles.modeToggleButton, selectionMode === 'sessions' && styles.modeToggleButtonActive]}
                 onPress={() => setSelectionMode('sessions')}
               >
-                <Ionicons name="list" size={18} color={selectionMode === 'sessions' ? '#fff' : '#8B0000'} />
+                <Icon name="list" size={18} color={selectionMode === 'sessions' ? '#fff' : '#8B0000'} />
                 <Text style={[styles.modeToggleText, selectionMode === 'sessions' && styles.modeToggleTextActive]}>
                   Individual Sessions
                 </Text>
@@ -1917,7 +1917,7 @@ export default function ReportScreen() {
                       onPress={() => toggleSessionSelection(session.id)}
                     >
                       <View style={[styles.sessionCheckbox, isSelected && styles.sessionCheckboxChecked]}>
-                        {isSelected && <Ionicons name="checkmark" size={16} color="#fff" />}
+                        {isSelected && <Icon name="checkmark" size={16} color="#fff" />}
                       </View>
                       <View style={styles.sessionSelectInfo}>
                         <Text style={styles.sessionSelectDate}>
@@ -1958,7 +1958,7 @@ export default function ReportScreen() {
                       ]}
                       onPress={() => setSelectedPeriod(item.key as ReportPeriod)}
                     >
-                      <Ionicons 
+                      <Icon 
                         name={item.icon as any} 
                         size={24} 
                         color={selectedPeriod === item.key ? '#fff' : '#8B0000'} 
@@ -2003,7 +2003,7 @@ export default function ReportScreen() {
                   style={styles.dateButton}
                   onPress={() => setShowStartPicker(true)}
                 >
-                  <Ionicons name="calendar-outline" size={20} color="#8B0000" />
+                  <Icon name="calendar-outline" size={20} color="#8B0000" />
                   <Text style={styles.dateButtonText}>
                     {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </Text>
@@ -2036,7 +2036,7 @@ export default function ReportScreen() {
                   style={styles.dateButton}
                   onPress={() => setShowEndPicker(true)}
                 >
-                  <Ionicons name="calendar-outline" size={20} color="#8B0000" />
+                  <Icon name="calendar-outline" size={20} color="#8B0000" />
                   <Text style={styles.dateButtonText}>
                     {endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </Text>
@@ -2072,15 +2072,15 @@ export default function ReportScreen() {
           <View style={styles.previewCard}>
             <Text style={styles.previewTitle}>Report Preview</Text>
             <View style={styles.previewRow}>
-              <Ionicons name="calendar" size={18} color="#888" />
+              <Icon name="calendar" size={18} color="#888" />
               <Text style={styles.previewText}>{formatDateRange()}</Text>
             </View>
             <View style={styles.previewRow}>
-              <Ionicons name="options" size={18} color="#888" />
+              <Icon name="options" size={18} color="#888" />
               <Text style={styles.previewText}>{getFilterSummary()}</Text>
             </View>
             <View style={styles.previewRow}>
-              <Ionicons name="layers" size={18} color="#888" />
+              <Icon name="layers" size={18} color="#888" />
               <Text style={styles.previewText}>
                 {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} found
               </Text>
@@ -2092,7 +2092,7 @@ export default function ReportScreen() {
             style={styles.generateButton}
             onPress={() => setShowReport(true)}
           >
-            <Ionicons name="document-text" size={24} color="#fff" />
+            <Icon name="document-text" size={24} color="#fff" />
             <Text style={styles.generateButtonText}>Generate Report</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -2105,7 +2105,7 @@ export default function ReportScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => setShowReport(false)}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Report</Text>
         <View style={{ width: 40 }} />
@@ -2114,12 +2114,12 @@ export default function ReportScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Report Header */}
         <View style={styles.reportHeader}>
-          <Ionicons name="document-text" size={32} color="#8B0000" />
+          <Icon name="document-text" size={32} color="#8B0000" />
           <Text style={styles.reportTitle}>Performance Report</Text>
           <Text style={styles.reportDate}>{formatDateRange()}</Text>
           {(selectedBow || selectedDistance || selectedTargetType) && (
             <View style={styles.filterBadge}>
-              <Ionicons name="filter" size={14} color="#8B0000" />
+              <Icon name="filter" size={14} color="#8B0000" />
               <Text style={styles.filterBadgeText}>{getFilterSummary()}</Text>
             </View>
           )}
@@ -2128,7 +2128,7 @@ export default function ReportScreen() {
         {/* Overview Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>
-            <Ionicons name="stats-chart" size={18} color="#8B0000" /> Overview
+            <Icon name="stats-chart" size={18} color="#8B0000" /> Overview
           </Text>
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
@@ -2153,7 +2153,7 @@ export default function ReportScreen() {
         {/* Averages Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>
-            <Ionicons name="analytics" size={18} color="#8B0000" /> Averages
+            <Icon name="analytics" size={18} color="#8B0000" /> Averages
           </Text>
           <View style={styles.avgList}>
             <View style={styles.avgRow}>
@@ -2174,7 +2174,7 @@ export default function ReportScreen() {
         {/* Stats by Target Type */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>
-            <Ionicons name="apps" size={18} color="#8B0000" /> By Target Type
+            <Icon name="apps" size={18} color="#8B0000" /> By Target Type
           </Text>
           <View style={styles.targetTypeList}>
             {['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map((targetType) => {
@@ -2217,7 +2217,7 @@ export default function ReportScreen() {
         {reportStats.totalSessions > 0 && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>
-              <Ionicons name="trophy" size={18} color="#8B0000" /> Highlights
+              <Icon name="trophy" size={18} color="#8B0000" /> Highlights
             </Text>
             <View style={styles.highlightRow}>
               <View style={styles.highlightItem}>
@@ -2238,7 +2238,7 @@ export default function ReportScreen() {
         {reportStats.totalArrows > 0 && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>
-              <Ionicons name="bar-chart" size={18} color="#8B0000" /> Score Distribution
+              <Icon name="bar-chart" size={18} color="#8B0000" /> Score Distribution
             </Text>
             <View style={styles.distributionList}>
               {((selectedTargetType || 'wa_standard') === 'wa_standard' 
@@ -2264,7 +2264,7 @@ export default function ReportScreen() {
         {/* Empty State */}
         {reportStats.totalSessions === 0 && (
           <View style={styles.emptyState}>
-            <Ionicons name="document-outline" size={64} color="#888888" />
+            <Icon name="document-outline" size={64} color="#888888" />
             <Text style={styles.emptyTitle}>No Data</Text>
             <Text style={styles.emptyText}>
               No sessions found for this period. Try selecting a different date range or filters.
@@ -2274,7 +2274,7 @@ export default function ReportScreen() {
 
         {/* Save PDF Button */}
         <TouchableOpacity style={styles.downloadPdfButton} onPress={handleDownloadPdf}>
-          <Ionicons name="download-outline" size={24} color="#fff" />
+          <Icon name="download-outline" size={24} color="#fff" />
           <Text style={styles.shareButtonText}>Save PDF</Text>
         </TouchableOpacity>
 
@@ -2283,7 +2283,7 @@ export default function ReportScreen() {
           style={styles.editRangeButton} 
           onPress={() => setShowReport(false)}
         >
-          <Ionicons name="options-outline" size={20} color="#8B0000" />
+          <Icon name="options-outline" size={20} color="#8B0000" />
           <Text style={styles.editRangeButtonText}>Change Filters</Text>
         </TouchableOpacity>
       </ScrollView>

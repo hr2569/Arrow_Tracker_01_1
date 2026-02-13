@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { loadSavedLanguage } from '../i18n';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
@@ -809,12 +809,12 @@ export default function ScoringScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={28} color="#fff" />
+          <Icon name="chevron-back" size={28} color="#fff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>{targetConfig.name}</Text>
           <View style={[styles.roundBadge, isCompetition ? styles.competitionBadge : styles.trainingBadge]}>
-            <Ionicons name={isCompetition ? "trophy" : "fitness"} size={12} color={isCompetition ? "#FFD700" : "#ff4444"} />
+            <Icon name={isCompetition ? "trophy" : "fitness"} size={12} color={isCompetition ? "#FFD700" : "#ff4444"} />
             <Text style={styles.roundText}>Round {currentRoundNumber}</Text>
           </View>
         </View>
@@ -828,21 +828,21 @@ export default function ScoringScreen() {
             style={styles.zoomButton} 
             onPress={() => setZoomLevel(prev => Math.min(prev + 0.5, 3))}
           >
-            <Ionicons name="add" size={20} color="#fff" />
+            <Icon name="add" size={20} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.zoomText}>{Math.round(zoomLevel * 100)}%</Text>
           <TouchableOpacity 
             style={styles.zoomButton} 
             onPress={() => setZoomLevel(prev => Math.max(prev - 0.5, 1))}
           >
-            <Ionicons name="remove" size={20} color="#fff" />
+            <Icon name="remove" size={20} color="#fff" />
           </TouchableOpacity>
           {zoomLevel > 1 && (
             <TouchableOpacity 
               style={styles.zoomButton} 
               onPress={() => setZoomLevel(1)}
             >
-              <Ionicons name="contract-outline" size={20} color="#fff" />
+              <Icon name="contract-outline" size={20} color="#fff" />
             </TouchableOpacity>
           )}
         </View>
@@ -886,7 +886,7 @@ export default function ScoringScreen() {
         </View>
 
         <TouchableOpacity style={styles.finishButton} onPress={handleFinishRound}>
-          <Ionicons name="checkmark-circle" size={24} color="#fff" />
+          <Icon name="checkmark-circle" size={24} color="#fff" />
           <Text style={styles.finishButtonText}>{t('scoring.finishRound')}</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -913,7 +913,7 @@ export default function ScoringScreen() {
               ))}
             </View>
             <TouchableOpacity style={styles.deleteButton} onPress={() => selectedArrowIndex !== null && handleDeleteArrow(selectedArrowIndex)}>
-              <Ionicons name="trash" size={20} color="#fff" />
+              <Icon name="trash" size={20} color="#fff" />
               <Text style={styles.deleteButtonText}>Delete Arrow</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelButton} onPress={() => setShowScorePicker(false)}>

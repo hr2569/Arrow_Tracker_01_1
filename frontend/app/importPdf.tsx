@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as IntentLauncher from 'expo-intent-launcher';
@@ -294,7 +294,7 @@ export default function ImportPdf() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => setShowPreview(false)}>
-            <Ionicons name="arrow-back" size={24} color="#FFD700" />
+            <Icon name="arrow-back" size={24} color="#FFD700" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Preview Results</Text>
           <View style={styles.placeholder} />
@@ -349,7 +349,7 @@ export default function ImportPdf() {
               <ActivityIndicator color="#000" />
             ) : (
               <>
-                <Ionicons name="document-text" size={20} color="#000" />
+                <Icon name="document-text" size={20} color="#000" />
                 <Text style={styles.generateButtonText}>Generate Results PDF</Text>
               </>
             )}
@@ -364,7 +364,7 @@ export default function ImportPdf() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#FFD700" />
+          <Icon name="arrow-back" size={24} color="#FFD700" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Import Scores</Text>
         <View style={styles.placeholder} />
@@ -385,14 +385,14 @@ export default function ImportPdf() {
                   </Text>
                 </View>
                 <TouchableOpacity onPress={() => removeArcher(index)} style={styles.removeButton}>
-                  <Ionicons name="trash-outline" size={20} color="#ed1c24" />
+                  <Icon name="trash-outline" size={20} color="#ed1c24" />
                 </TouchableOpacity>
               </View>
             ))}
           </View>
         ) : (
           <View style={styles.emptyState}>
-            <Ionicons name="document-text-outline" size={64} color="#444" />
+            <Icon name="document-text-outline" size={64} color="#444" />
             <Text style={styles.emptyStateTitle}>No Archers Imported</Text>
             <Text style={styles.emptyStateText}>
               Archers will appear here when imported from competition results.
@@ -408,7 +408,7 @@ export default function ImportPdf() {
             style={styles.previewButton}
             onPress={() => setShowPreview(true)}
           >
-            <Ionicons name="eye" size={20} color="#000" />
+            <Icon name="eye" size={20} color="#000" />
             <Text style={styles.previewButtonText}>
               Preview & Generate Results
             </Text>

@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { LineChart } from 'react-native-chart-kit';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
@@ -194,7 +194,7 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   return (
     <View style={scatterStyles.container}>
       <Text style={scatterStyles.title}>
-        <Ionicons name="radio-button-on" size={14} color="#8B0000" /> Shot Distribution
+        <Icon name="radio-button-on" size={14} color="#8B0000" /> Shot Distribution
       </Text>
       <Svg width={size} height={size} style={scatterStyles.svg}>
         {isIndoor ? renderIndoorTarget() : (
@@ -346,7 +346,7 @@ const HeatMap = ({ session, size = 140 }: { session: Session, size?: number }) =
   return (
     <View style={scatterStyles.container}>
       <Text style={scatterStyles.title}>
-        <Ionicons name="flame" size={14} color="#8B0000" /> Impact Heatmap
+        <Icon name="flame" size={14} color="#8B0000" /> Impact Heatmap
       </Text>
       <View style={[scatterStyles.heatmapGrid, { width: size, height: size }]}>
         {/* Target rings */}
@@ -845,7 +845,7 @@ export default function HistoryScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('history.title')}</Text>
         <View style={styles.headerSpacer} />
@@ -857,14 +857,14 @@ export default function HistoryScreen() {
           style={[styles.tabButton, activeTab === 'history' && styles.tabButtonActive]}
           onPress={() => setActiveTab('history')}
         >
-          <Ionicons name="time-outline" size={18} color={activeTab === 'history' ? '#fff' : '#888'} />
+          <Icon name="time-outline" size={18} color={activeTab === 'history' ? '#fff' : '#888'} />
           <Text style={[styles.tabButtonText, activeTab === 'history' && styles.tabButtonTextActive]}>{t('history.sessions')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'report' && styles.tabButtonActive]}
           onPress={() => router.push('/report')}
         >
-          <Ionicons name="document-text-outline" size={18} color={activeTab === 'report' ? '#fff' : '#888'} />
+          <Icon name="document-text-outline" size={18} color={activeTab === 'report' ? '#fff' : '#888'} />
           <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>{t('history.report')}</Text>
         </TouchableOpacity>
       </View>
@@ -1009,7 +1009,7 @@ export default function HistoryScreen() {
         {/* Sessions List */}
         {sessions.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="trophy-outline" size={64} color="#888888" />
+            <Icon name="trophy-outline" size={64} color="#888888" />
             <Text style={styles.emptyTitle}>{t('history.noHistory')}</Text>
             <Text style={styles.emptyText}>
               {t('history.noHistoryDescription')}
@@ -1018,7 +1018,7 @@ export default function HistoryScreen() {
               style={styles.startButton}
               onPress={() => router.push('/sessionSetup')}
             >
-              <Ionicons name="add" size={20} color="#fff" />
+              <Icon name="add" size={20} color="#fff" />
               <Text style={styles.startButtonText}>{t('history.startSession')}</Text>
             </TouchableOpacity>
           </View>
@@ -1028,7 +1028,7 @@ export default function HistoryScreen() {
               <View key={group.label} style={styles.groupContainer}>
                 <View style={styles.groupHeader}>
                   <View style={styles.groupTitleRow}>
-                    <Ionicons 
+                    <Icon 
                       name={selectedPeriod === 'day' ? 'today' : selectedPeriod === 'week' ? 'calendar' : selectedPeriod === 'month' ? 'calendar-outline' : 'time'} 
                       size={18} 
                       color="#8B0000" 
@@ -1065,7 +1065,7 @@ export default function HistoryScreen() {
                             <Text style={styles.sessionDate}>
                               {formatDate(session.created_at)}
                             </Text>
-                            <Ionicons name="create-outline" size={14} color="#888888" style={styles.editIcon} />
+                            <Icon name="create-outline" size={14} color="#888888" style={styles.editIcon} />
                           </TouchableOpacity>
                         </View>
                         <View style={styles.sessionScore}>
@@ -1078,13 +1078,13 @@ export default function HistoryScreen() {
                         <View style={styles.sessionEquipment}>
                           {session.bow_name && (
                             <View style={styles.equipmentItem}>
-                              <Ionicons name="fitness-outline" size={14} color="#8B0000" />
+                              <Icon name="fitness-outline" size={14} color="#8B0000" />
                               <Text style={styles.equipmentText}>{session.bow_name}</Text>
                             </View>
                           )}
                           {session.distance && (
                             <View style={styles.equipmentItem}>
-                              <Ionicons name="locate-outline" size={14} color="#8B0000" />
+                              <Icon name="locate-outline" size={14} color="#8B0000" />
                               <Text style={styles.equipmentText}>{session.distance}</Text>
                             </View>
                           )}
@@ -1093,13 +1093,13 @@ export default function HistoryScreen() {
 
                       <View style={styles.sessionMeta}>
                         <View style={styles.metaItem}>
-                          <Ionicons name="layers" size={16} color="#888888" />
+                          <Icon name="layers" size={16} color="#888888" />
                           <Text style={styles.metaText}>
                             {session.rounds?.length || 0} rounds
                           </Text>
                         </View>
                         <View style={styles.metaItem}>
-                          <Ionicons name="analytics" size={16} color="#888888" />
+                          <Icon name="analytics" size={16} color="#888888" />
                           <Text style={styles.metaText}>
                             Avg: {getAverageScore(session)}/round
                           </Text>
@@ -1115,7 +1115,7 @@ export default function HistoryScreen() {
                       }}
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                      <Ionicons name="trash" size={18} color="#ff6b6b" />
+                      <Icon name="trash" size={18} color="#ff6b6b" />
                     </Pressable>
 
                     {/* Report button for individual session */}
@@ -1130,7 +1130,7 @@ export default function HistoryScreen() {
                       }}
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                      <Ionicons name="document-text" size={18} color="#fff" />
+                      <Icon name="document-text" size={18} color="#fff" />
                     </Pressable>
 
                     {expandedSession === session.id && session.rounds && (
@@ -1146,7 +1146,7 @@ export default function HistoryScreen() {
                         {getRoundChartData(session) && session.rounds.length > 1 && (
                           <View style={styles.chartSection}>
                             <Text style={styles.chartTitle}>
-                              <Ionicons name="trending-up" size={16} color="#8B0000" /> Score by Round
+                              <Icon name="trending-up" size={16} color="#8B0000" /> Score by Round
                             </Text>
                             <LineChart
                               data={getRoundChartData(session)!}
@@ -1197,13 +1197,13 @@ export default function HistoryScreen() {
                                     style={styles.roundEditBtn}
                                     onPress={() => openEditRoundModal(session.id, round)}
                                   >
-                                    <Ionicons name="create-outline" size={16} color="#8B0000" />
+                                    <Icon name="create-outline" size={16} color="#8B0000" />
                                   </TouchableOpacity>
                                   <TouchableOpacity
                                     style={styles.roundDeleteBtn}
                                     onPress={() => handleDeleteRound(session.id, round.id)}
                                   >
-                                    <Ionicons name="trash-outline" size={16} color="#ff6b6b" />
+                                    <Icon name="trash-outline" size={16} color="#ff6b6b" />
                                   </TouchableOpacity>
                                 </View>
                               </View>
@@ -1256,7 +1256,7 @@ export default function HistoryScreen() {
         style={styles.fab}
         onPress={() => router.push('/sessionSetup')}
       >
-        <Ionicons name="add" size={28} color="#fff" />
+        <Icon name="add" size={28} color="#fff" />
       </TouchableOpacity>
 
       {/* Edit Session Modal */}
@@ -1271,7 +1271,7 @@ export default function HistoryScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t('history.editSession')}</Text>
               <TouchableOpacity onPress={closeEditModal}>
-                <Ionicons name="close" size={24} color="#888888" />
+                <Icon name="close" size={24} color="#888888" />
               </TouchableOpacity>
             </View>
 
@@ -1301,7 +1301,7 @@ export default function HistoryScreen() {
                     style={styles.dateButton}
                     onPress={() => setShowDatePicker(true)}
                   >
-                    <Ionicons name="calendar-outline" size={20} color="#8B0000" />
+                    <Icon name="calendar-outline" size={20} color="#8B0000" />
                     <Text style={styles.dateButtonText}>
                       {editDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </Text>
@@ -1333,7 +1333,7 @@ export default function HistoryScreen() {
                     style={styles.dateButton}
                     onPress={() => setShowTimePicker(true)}
                   >
-                    <Ionicons name="time-outline" size={20} color="#8B0000" />
+                    <Icon name="time-outline" size={20} color="#8B0000" />
                     <Text style={styles.dateButtonText}>
                       {editDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                     </Text>
@@ -1359,7 +1359,7 @@ export default function HistoryScreen() {
                 <ActivityIndicator size="small" color="#ffffff" />
               ) : (
                 <>
-                  <Ionicons name="checkmark" size={20} color="#ffffff" />
+                  <Icon name="checkmark" size={20} color="#ffffff" />
                   <Text style={styles.saveButtonText}>{t('history.saveChanges')}</Text>
                 </>
               )}
@@ -1382,7 +1382,7 @@ export default function HistoryScreen() {
                 Edit Round {editingRound?.round.round_number}
               </Text>
               <TouchableOpacity onPress={closeEditRoundModal}>
-                <Ionicons name="close" size={24} color="#888888" />
+                <Icon name="close" size={24} color="#888888" />
               </TouchableOpacity>
             </View>
 
@@ -1420,7 +1420,7 @@ export default function HistoryScreen() {
                       style={styles.removeShotBtn}
                       onPress={() => removeShot(index)}
                     >
-                      <Ionicons name="close-circle" size={20} color="#ff6b6b" />
+                      <Icon name="close-circle" size={20} color="#ff6b6b" />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -1428,7 +1428,7 @@ export default function HistoryScreen() {
             </ScrollView>
 
             <TouchableOpacity style={styles.addShotButton} onPress={addShot}>
-              <Ionicons name="add-circle-outline" size={20} color="#8B0000" />
+              <Icon name="add-circle-outline" size={20} color="#8B0000" />
               <Text style={styles.addShotButtonText}>Add Shot</Text>
             </TouchableOpacity>
 
@@ -1448,7 +1448,7 @@ export default function HistoryScreen() {
                 <ActivityIndicator size="small" color="#ffffff" />
               ) : (
                 <>
-                  <Ionicons name="checkmark" size={20} color="#ffffff" />
+                  <Icon name="checkmark" size={20} color="#ffffff" />
                   <Text style={styles.saveButtonText}>Save Round</Text>
                 </>
               )}

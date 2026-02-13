@@ -7,7 +7,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 
 export default function CompetitionMenu() {
   const router = useRouter();
@@ -17,10 +17,10 @@ export default function CompetitionMenu() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#FFD700" />
+          <Icon name="arrow-back" size={24} color="#FFD700" />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
-          <Ionicons name="trophy" size={28} color="#FFD700" />
+          <Icon name="trophy" size={28} color="#FFD700" />
           <Text style={styles.headerTitle}>Competition</Text>
         </View>
         <View style={styles.placeholder} />
@@ -35,13 +35,13 @@ export default function CompetitionMenu() {
           activeOpacity={0.8}
         >
           <View style={styles.menuIconContainer}>
-            <Ionicons name="locate" size={40} color="#FFD700" />
+            <Icon name="locate" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
             <Text style={styles.menuButtonTitle}>Compete</Text>
             <Text style={styles.menuButtonSubtitle}>Start a new competition round</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
+          <Icon name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
 
         {/* Score Keeping Button */}
@@ -51,13 +51,13 @@ export default function CompetitionMenu() {
           activeOpacity={0.8}
         >
           <View style={[styles.menuIconContainer, { backgroundColor: '#2a1a1a' }]}>
-            <Ionicons name="clipboard" size={40} color="#FFD700" />
+            <Icon name="clipboard" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
             <Text style={styles.menuButtonTitle}>Score Keeping</Text>
             <Text style={styles.menuButtonSubtitle}>Record scores for other archers</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
+          <Icon name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
 
         {/* Competition History Button */}
@@ -67,13 +67,13 @@ export default function CompetitionMenu() {
           activeOpacity={0.8}
         >
           <View style={[styles.menuIconContainer, { backgroundColor: '#1a1a2a' }]}>
-            <Ionicons name="time" size={40} color="#FFD700" />
+            <Icon name="time" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
             <Text style={styles.menuButtonTitle}>Competition History</Text>
             <Text style={styles.menuButtonSubtitle}>View past competition results</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
+          <Icon name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>

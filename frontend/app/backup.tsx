@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { createBackup, restoreBackup } from '../utils/googleDriveBackup';
 import { getLastBackupDate, getSessions, getBows } from '../utils/localStorage';
 
@@ -86,7 +86,7 @@ export default function BackupScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Google Drive Sync</Text>
         <View style={styles.headerSpacer} />
@@ -132,7 +132,7 @@ export default function BackupScreen() {
             <ActivityIndicator color="#fff" size="small" />
           ) : (
             <>
-              <Ionicons name="cloud-upload" size={28} color="#fff" />
+              <Icon name="cloud-upload" size={28} color="#fff" />
               <View style={styles.buttonTextContainer}>
                 <Text style={styles.buttonTitle}>Backup to Google Drive</Text>
                 <Text style={styles.buttonSubtitle}>Save your data to the cloud</Text>
@@ -151,7 +151,7 @@ export default function BackupScreen() {
             <ActivityIndicator color="#8B0000" size="small" />
           ) : (
             <>
-              <Ionicons name="cloud-download" size={28} color="#8B0000" />
+              <Icon name="cloud-download" size={28} color="#8B0000" />
               <View style={styles.buttonTextContainer}>
                 <Text style={styles.restoreButtonTitle}>Restore from Google Drive</Text>
                 <Text style={styles.buttonSubtitle}>Load data from a backup file</Text>
@@ -162,7 +162,7 @@ export default function BackupScreen() {
 
         {/* Info Note */}
         <View style={styles.infoCard}>
-          <Ionicons name="information-circle-outline" size={20} color="#666" />
+          <Icon name="information-circle-outline" size={20} color="#666" />
           <Text style={styles.infoText}>
             Backups are saved automatically after each session. Tap "Backup" to manually save, or "Restore" to recover your data.
           </Text>

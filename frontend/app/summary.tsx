@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useNavigation } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store/appStore';
 import { createSession, addRoundToSession } from '../utils/localStorage';
@@ -89,7 +89,7 @@ export default function SummaryScreen() {
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           activeOpacity={0.7}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
       ),
     });
@@ -277,7 +277,7 @@ export default function SummaryScreen() {
 
         {/* Session Type Badge */}
         <View style={[styles.sessionTypeBadge, isCompetition ? styles.competitionBadge : styles.trainingBadge]}>
-          <Ionicons 
+          <Icon 
             name={isCompetition ? "trophy" : "fitness"} 
             size={16} 
             color={isCompetition ? "#FFD700" : "#ff4444"} 
@@ -297,7 +297,7 @@ export default function SummaryScreen() {
             style={styles.addRoundButton}
             onPress={handleAddRound}
           >
-            <Ionicons name="add-circle" size={24} color="#fff" />
+            <Icon name="add-circle" size={24} color="#fff" />
             <Text style={styles.addRoundText}>Add Another Round</Text>
           </TouchableOpacity>
 
@@ -310,7 +310,7 @@ export default function SummaryScreen() {
               <ActivityIndicator color="#8B0000" />
             ) : (
               <>
-                <Ionicons name="checkmark-done" size={24} color="#8B0000" />
+                <Icon name="checkmark-done" size={24} color="#8B0000" />
                 <Text style={styles.finishText}>Finish & Save</Text>
               </>
             )}
@@ -362,7 +362,7 @@ export default function SummaryScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Ionicons name="help-circle" size={48} color="#8B0000" />
+            <Icon name="help-circle" size={48} color="#8B0000" />
             <Text style={styles.modalTitle}>Finish Session?</Text>
             <Text style={styles.modalMessage}>Do you want to save this session?</Text>
             

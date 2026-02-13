@@ -7,7 +7,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 
 export default function ScoreKeeping() {
   const router = useRouter();
@@ -17,10 +17,10 @@ export default function ScoreKeeping() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#FFD700" />
+          <Icon name="arrow-back" size={24} color="#FFD700" />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
-          <Ionicons name="clipboard" size={28} color="#FFD700" />
+          <Icon name="clipboard" size={28} color="#FFD700" />
           <Text style={styles.headerTitle}>Score Keeping</Text>
         </View>
         <View style={styles.placeholder} />
@@ -35,13 +35,13 @@ export default function ScoreKeeping() {
           activeOpacity={0.8}
         >
           <View style={styles.menuIconContainer}>
-            <Ionicons name="create" size={40} color="#FFD700" />
+            <Icon name="create" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
             <Text style={styles.menuButtonTitle}>Manual</Text>
             <Text style={styles.menuButtonSubtitle}>Manually enter scores for archers</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
+          <Icon name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
 
         {/* Import PDFs Button */}
@@ -51,13 +51,13 @@ export default function ScoreKeeping() {
           activeOpacity={0.8}
         >
           <View style={[styles.menuIconContainer, { backgroundColor: '#2a1a1a' }]}>
-            <Ionicons name="document-text" size={40} color="#FFD700" />
+            <Icon name="document-text" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
             <Text style={styles.menuButtonTitle}>Import Scores</Text>
             <Text style={styles.menuButtonSubtitle}>Batch import scores from competition PDFs</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#8B0000" />
+          <Icon name="chevron-forward" size={24} color="#8B0000" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>

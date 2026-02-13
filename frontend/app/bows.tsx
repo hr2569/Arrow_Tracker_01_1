@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { getBowIcon } from '../utils/bowIcons';
@@ -172,20 +172,20 @@ export default function BowsScreen() {
           style={styles.deleteButton}
           onPress={() => handleDelete(bow)}
         >
-          <Ionicons name="trash-outline" size={20} color="#ff4444" />
+          <Icon name="trash-outline" size={20} color="#ff4444" />
         </TouchableOpacity>
       </View>
       
       <View style={styles.bowSpecs}>
         {bow.draw_weight && (
           <View style={styles.specItem}>
-            <Ionicons name="fitness-outline" size={16} color="#666" />
+            <Icon name="fitness-outline" size={16} color="#666" />
             <Text style={styles.specText}>{bow.draw_weight} lbs</Text>
           </View>
         )}
         {bow.draw_length && (
           <View style={styles.specItem}>
-            <Ionicons name="resize-outline" size={16} color="#666" />
+            <Icon name="resize-outline" size={16} color="#666" />
             <Text style={styles.specText}>{bow.draw_length}"</Text>
           </View>
         )}
@@ -207,14 +207,14 @@ export default function BowsScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('bows.title')}</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={openAddModal}
         >
-          <Ionicons name="add" size={28} color="#fff" />
+          <Icon name="add" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -227,7 +227,7 @@ export default function BowsScreen() {
       ) : bows.length === 0 ? (
         <View style={styles.centerContainer}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="arrow-forward-outline" size={64} color="#333" />
+            <Icon name="arrow-forward-outline" size={64} color="#333" />
           </View>
           <Text style={styles.emptyTitle}>{t('bows.noBows')}</Text>
           <Text style={styles.emptySubtitle}>
@@ -237,7 +237,7 @@ export default function BowsScreen() {
             style={styles.emptyAddButton}
             onPress={openAddModal}
           >
-            <Ionicons name="add" size={24} color="#fff" />
+            <Icon name="add" size={24} color="#fff" />
             <Text style={styles.emptyAddButtonText}>{t('bows.addBow')}</Text>
           </TouchableOpacity>
         </View>
@@ -271,7 +271,7 @@ export default function BowsScreen() {
                 style={styles.modalCloseButton}
                 onPress={() => setModalVisible(false)}
               >
-                <Ionicons name="close" size={24} color="#fff" />
+                <Icon name="close" size={24} color="#fff" />
               </TouchableOpacity>
             </View>
 
@@ -373,7 +373,7 @@ export default function BowsScreen() {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <>
-                  <Ionicons name="checkmark" size={24} color="#fff" />
+                  <Icon name="checkmark" size={24} color="#fff" />
                   <Text style={styles.saveButtonText}>
                     {editingBow ? t('bows.updateBow') : t('bows.saveBow')}
                   </Text>

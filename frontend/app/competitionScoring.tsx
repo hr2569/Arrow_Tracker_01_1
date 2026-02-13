@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { useFocusEffect } from '@react-navigation/native';
 import { TARGET_CONFIGS } from '../store/appStore';
 import { 
@@ -536,12 +536,12 @@ export default function CompetitionScoringScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.headerButton} onPress={() => setShowLeaderboard(true)}>
-          <Ionicons name="podium" size={24} color="#FFD700" />
+          <Icon name="podium" size={24} color="#FFD700" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <Text style={styles.currentParticipant}>{currentParticipant.name}</Text>
           <View style={styles.roundBadge}>
-            <Ionicons name="trophy" size={12} color="#FFD700" />
+            <Icon name="trophy" size={12} color="#FFD700" />
             <Text style={styles.roundText}>Round {competition.currentRound} of {competition.maxRounds}</Text>
           </View>
         </View>
@@ -571,18 +571,18 @@ export default function CompetitionScoringScreen() {
           style={styles.zoomButton} 
           onPress={() => setZoomLevel(prev => Math.min(prev + 0.5, 3))}
         >
-          <Ionicons name="add" size={20} color="#fff" />
+          <Icon name="add" size={20} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.zoomText}>{Math.round(zoomLevel * 100)}%</Text>
         <TouchableOpacity 
           style={styles.zoomButton} 
           onPress={() => setZoomLevel(prev => Math.max(prev - 0.5, 1))}
         >
-          <Ionicons name="remove" size={20} color="#fff" />
+          <Icon name="remove" size={20} color="#fff" />
         </TouchableOpacity>
         {zoomLevel > 1 && (
           <TouchableOpacity style={styles.zoomButton} onPress={() => setZoomLevel(1)}>
-            <Ionicons name="contract-outline" size={20} color="#fff" />
+            <Icon name="contract-outline" size={20} color="#fff" />
           </TouchableOpacity>
         )}
       </View>
@@ -634,7 +634,7 @@ export default function CompetitionScoringScreen() {
           style={styles.commitButton}
           onPress={handleCommitRound}
         >
-          <Ionicons name="lock-closed" size={24} color="#000" />
+          <Icon name="lock-closed" size={24} color="#000" />
           <Text style={styles.commitButtonText}>
             Commit Round {arrows.length < 3 ? `(${3 - arrows.length} = M)` : ''}
           </Text>
@@ -669,7 +669,7 @@ export default function CompetitionScoringScreen() {
               style={styles.deleteButton} 
               onPress={() => selectedArrowIndex !== null && handleDeleteArrow(selectedArrowIndex)}
             >
-              <Ionicons name="trash" size={20} color="#fff" />
+              <Icon name="trash" size={20} color="#fff" />
               <Text style={styles.deleteButtonText}>Delete Arrow</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelButton} onPress={() => setShowScorePicker(false)}>
@@ -686,7 +686,7 @@ export default function CompetitionScoringScreen() {
             <View style={styles.leaderboardHeader}>
               <Text style={styles.leaderboardTitle}>Leaderboard</Text>
               <TouchableOpacity onPress={() => setShowLeaderboard(false)}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Icon name="close" size={24} color="#fff" />
               </TouchableOpacity>
             </View>
             <View style={styles.leaderboardList}>
@@ -725,7 +725,7 @@ export default function CompetitionScoringScreen() {
         <View style={styles.roundResultOverlay}>
           <View style={styles.roundResultContent}>
             <View style={styles.roundResultHeader}>
-              <Ionicons name="checkmark-circle" size={48} color="#4CAF50" />
+              <Icon name="checkmark-circle" size={48} color="#4CAF50" />
               <Text style={styles.roundResultTitle}>Round Complete!</Text>
             </View>
             

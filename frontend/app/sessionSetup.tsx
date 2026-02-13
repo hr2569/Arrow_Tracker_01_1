@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { loadSavedLanguage } from '../i18n';
@@ -133,7 +133,7 @@ export default function SessionSetupScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('sessionSetup.title')}</Text>
           <View style={styles.headerSpacer} />
@@ -141,7 +141,7 @@ export default function SessionSetupScreen() {
 
         <View style={styles.centerContainer}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="alert-circle-outline" size={64} color="#8B0000" />
+            <Icon name="alert-circle-outline" size={64} color="#8B0000" />
           </View>
           <Text style={styles.emptyTitle}>{t('sessionSetup.noBowsFound')}</Text>
           <Text style={styles.emptySubtitle}>
@@ -151,7 +151,7 @@ export default function SessionSetupScreen() {
             style={styles.addBowButton}
             onPress={navigateToAddBow}
           >
-            <Ionicons name="add" size={24} color="#fff" />
+            <Icon name="add" size={24} color="#fff" />
             <Text style={styles.addBowButtonText}>{t('sessionSetup.addFirstBow')}</Text>
           </TouchableOpacity>
         </View>
@@ -171,7 +171,7 @@ export default function SessionSetupScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('sessionSetup.title')}</Text>
           <View style={styles.headerSpacer} />
@@ -212,7 +212,7 @@ export default function SessionSetupScreen() {
                 <Text style={styles.targetTypeDesc}>{t('sessionSetup.waStandardDesc')}</Text>
                 {selectedTargetType === 'wa_standard' && (
                   <View style={styles.targetCheckmark}>
-                    <Ionicons name="checkmark" size={14} color="#fff" />
+                    <Icon name="checkmark" size={14} color="#fff" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -261,7 +261,7 @@ export default function SessionSetupScreen() {
                 <Text style={styles.targetTypeDesc}>{t('sessionSetup.vegas3SpotDesc')}</Text>
                 {selectedTargetType === 'vegas_3spot' && (
                   <View style={styles.targetCheckmark}>
-                    <Ionicons name="checkmark" size={14} color="#fff" />
+                    <Icon name="checkmark" size={14} color="#fff" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -292,7 +292,7 @@ export default function SessionSetupScreen() {
                 <Text style={styles.targetTypeDesc}>{t('sessionSetup.waIndoorDesc')}</Text>
                 {selectedTargetType === 'nfaa_indoor' && (
                   <View style={styles.targetCheckmark}>
-                    <Ionicons name="checkmark" size={14} color="#fff" />
+                    <Icon name="checkmark" size={14} color="#fff" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -339,7 +339,7 @@ export default function SessionSetupScreen() {
                   </View>
                   {selectedBowId === bow.id && (
                     <View style={styles.checkmarkBadge}>
-                      <Ionicons name="checkmark" size={16} color="#fff" />
+                      <Icon name="checkmark" size={16} color="#fff" />
                     </View>
                   )}
                 </TouchableOpacity>
@@ -426,7 +426,7 @@ export default function SessionSetupScreen() {
             onPress={handleStartSession}
             disabled={!selectedBowId || !distance}
           >
-            <Ionicons name="play" size={24} color="#fff" />
+            <Icon name="play" size={24} color="#fff" />
             <Text style={styles.startButtonText}>{t('sessionSetup.startSession')}</Text>
           </TouchableOpacity>
         </View>
