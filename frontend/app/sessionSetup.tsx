@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { loadSavedLanguage } from '../i18n';
 import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 import { getBowIcon } from '../utils/bowIcons';
 import { getBows, Bow } from '../utils/localStorage';
