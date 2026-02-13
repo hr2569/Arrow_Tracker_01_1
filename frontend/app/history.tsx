@@ -1237,7 +1237,7 @@ export default function HistoryScreen() {
                     )}
 
                     <View style={styles.expandIndicator}>
-                      <Ionicons
+                      <Icon
                         name={expandedSession === session.id ? 'chevron-up' : 'chevron-down'}
                         size={20}
                         color="#888888"

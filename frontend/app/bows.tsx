@@ -293,7 +293,7 @@ export default function BowsScreen() {
                 onPress={() => setShowTypePicker(!showTypePicker)}
               >
                 <Text style={styles.pickerButtonText}>{t(`bows.${formType.toLowerCase()}`)}</Text>
-                <Ionicons
+                <Icon
                   name={showTypePicker ? 'chevron-up' : 'chevron-down'}
                   size={20}
                   color="#fff"
