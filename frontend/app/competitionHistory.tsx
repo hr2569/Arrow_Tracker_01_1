@@ -137,12 +137,12 @@ export default function CompetitionHistory() {
 
   const handleDeleteCompetition = (competition: DisplayCompetition) => {
     Alert.alert(
-      'Delete Competition',
-      `Are you sure you want to delete "${competition.name}"?`,
+      t('competition.deleteCompetition'),
+      t('competition.deleteCompetitionConfirm', { name: competition.name }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -162,7 +162,7 @@ export default function CompetitionHistory() {
               await loadCompetitions();
             } catch (error) {
               console.error('Error deleting competition:', error);
-              Alert.alert('Error', 'Failed to delete competition');
+              Alert.alert(t('common.error'), t('competition.failedToDelete'));
             }
           },
         },
