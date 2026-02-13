@@ -24,6 +24,7 @@ type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
 
 export default function SessionSetupScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { sessionType, setSelectedBow, setSessionDistance, targetType, setTargetType } = useAppStore();
   
   const [bows, setBows] = useState<Bow[]>([]);
