@@ -117,10 +117,25 @@ Current: **v2.0.0**
 
 ## Known Issues
 - Backend issue: Firebase credentials file missing (`firebase-credentials.json`) - needed for backup/restore feature
+- Note: Icons on web use Unicode/emoji fallbacks due to Expo SDK 54 vector-icons bug
 
-## Future Enhancements (Backlog)
-- Export session data (PDF, CSV)
-- Social sharing of scores
-- Advanced analytics and trend charts
-- Multi-device sync
-- Offline-first improvements
+## File Structure
+```
+/app/frontend/
+├── app/
+│   ├── _layout.tsx       # Root layout with i18n initialization
+│   ├── index.tsx         # Home screen (translated)
+│   ├── settings.tsx      # Settings with language selector (translated)
+│   ├── history.tsx       # Session history (translated)
+│   ├── bows.tsx          # Bow management (translated)
+│   ├── scoring.tsx       # Scoring interface (translated)
+│   ├── sessionSetup.tsx  # Session configuration (translated)
+│   └── ...
+├── components/
+│   └── Icon.tsx          # Custom icon component with web fallback
+├── locales/
+│   ├── en.json           # English translations
+│   ├── pt.json           # Portuguese translations
+│   └── ... (7 more language files)
+└── i18n.ts               # i18n configuration with hybrid storage
+```
