@@ -182,7 +182,7 @@ export default function SessionSetupScreen() {
         >
           {/* Target Type Selection */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Target Face</Text>
+            <Text style={styles.sectionTitle}>{t('sessionSetup.targetFace')}</Text>
             <View style={styles.targetTypesGrid}>
               {/* WA Standard */}
               <TouchableOpacity
