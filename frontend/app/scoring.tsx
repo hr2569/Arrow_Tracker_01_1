@@ -350,7 +350,7 @@ export default function ScoringScreen() {
 
   const handleFinishRound = () => {
     if (arrows.length === 0) {
-      Alert.alert('No Arrows', 'Please mark at least one arrow before finishing.');
+      Alert.alert(t('scoring.noArrows'), t('scoring.noArrowsMessage'));
       return;
     }
     setCurrentRound({
