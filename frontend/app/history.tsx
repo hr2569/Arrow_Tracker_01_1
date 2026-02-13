@@ -717,7 +717,7 @@ export default function HistoryScreen() {
       closeEditModal();
     } catch (err) {
       console.error('Save error:', err);
-      Alert.alert('Error', 'Failed to save changes');
+      Alert.alert(t('common.error'), t('history.failedToSave'));
     } finally {
       setIsSaving(false);
     }
@@ -746,7 +746,7 @@ export default function HistoryScreen() {
 
   const removeShot = (index: number) => {
     if (editedShots.length <= 3) {
-      Alert.alert('Cannot Remove', 'Rounds must have at least 3 shots.');
+      Alert.alert(t('history.cannotRemove'), t('history.minShotsMessage'));
       return;
     }
     const newShots = editedShots.filter((_, i) => i !== index);
@@ -773,7 +773,7 @@ export default function HistoryScreen() {
       closeEditRoundModal();
     } catch (err) {
       console.error('Save round error:', err);
-      Alert.alert('Error', 'Failed to save round changes');
+      Alert.alert(t('common.error'), t('history.failedToSaveRound'));
     } finally {
       setIsSaving(false);
     }
