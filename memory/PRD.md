@@ -27,6 +27,7 @@ Current: **v2.0.0**
 - Add, edit, and delete bows
 - Track bow type, draw weight, draw length, and notes
 - Associate bows with scoring sessions
+- **FULLY TRANSLATED** in all 9 languages
 
 ### 5. Internationalization (i18n) - COMPLETED
 - **9 Supported Languages:**
@@ -41,6 +42,7 @@ Current: **v2.0.0**
   - Ukrainian (uk)
 - Language preference persists across sessions
 - All menus, buttons, labels, and messages translated
+- **All screens now use translations:** Home, Settings, History, Bows, Scoring, Session Setup
 
 ### 6. Backup & Restore
 - Google account integration for cloud backup
@@ -57,11 +59,12 @@ Current: **v2.0.0**
 /app/frontend/
 ├── app/
 │   ├── _layout.tsx       # Root layout with i18n initialization
-│   ├── index.tsx         # Home screen
-│   ├── settings.tsx      # Settings with language selector
-│   ├── history.tsx       # Session history
-│   ├── scoring.tsx       # Scoring interface
-│   ├── sessionSetup.tsx  # Session configuration
+│   ├── index.tsx         # Home screen (translated)
+│   ├── settings.tsx      # Settings with language selector (translated)
+│   ├── history.tsx       # Session history (translated)
+│   ├── bows.tsx          # Bow management (translated)
+│   ├── scoring.tsx       # Scoring interface (translated)
+│   ├── sessionSetup.tsx  # Session configuration (translated)
 │   └── ...
 ├── locales/
 │   ├── en.json           # English translations
@@ -73,10 +76,10 @@ Current: **v2.0.0**
 │   ├── sv.json           # Swedish translations
 │   ├── ru.json           # Russian translations
 │   └── uk.json           # Ukrainian translations
-└── i18n.ts               # i18n configuration
+└── i18n.ts               # i18n configuration with hybrid storage
 ```
 
-## Completed in Current Session
+## Completed Work
 
 ### Language Persistence Fix
 - **Issue:** Language changes did not persist when navigating between pages on web preview
@@ -86,9 +89,14 @@ Current: **v2.0.0**
   2. Created hybrid storage system (localStorage for web, AsyncStorage for native)
   3. Root layout waits for language to load before rendering children
 
-### Translations Verified
+### Bows Screen Translation
+- **Issue:** Bows screen was showing English text even after language change
+- **Solution:** Updated `bows.tsx` to use `t()` translation function for all UI text
+- **Verified:** Bows screen now displays correctly in Portuguese, Spanish, and all other languages
+
+### All Translations Verified
 - All 9 language files contain complete translations
-- Language switching works across all pages (Settings, History, Home, etc.)
+- Language switching works across all pages (Settings, History, Home, Bows, etc.)
 - Language preference persists correctly in localStorage
 
 ## Upcoming Tasks
@@ -96,6 +104,9 @@ Current: **v2.0.0**
 ### P0: Competition Menu
 - Implement new "Competition" mode (currently shows "Coming Soon")
 - Requirements to be gathered from user
+
+## Known Issues
+- Backend issue: Firebase credentials file missing (`firebase-credentials.json`) - needed for backup/restore feature
 
 ## Future Enhancements (Backlog)
 - Export session data (PDF, CSV)
