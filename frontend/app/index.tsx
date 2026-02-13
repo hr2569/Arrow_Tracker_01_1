@@ -147,6 +147,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#1e1e1e',
   },
+  settingsButton: {
+    position: 'absolute',
+    top: 50,
+    right: 16,
+    zIndex: 10,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: '#1e1e1e',
+  },
   hero: {
     alignItems: 'center',
     marginBottom: 40,
