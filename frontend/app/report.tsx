@@ -142,13 +142,16 @@ export default function ReportScreen() {
     }
     
     // Apply additional filters
-    return filtered.filter((session) => {
+    const result = filtered.filter((session) => {
       if (selectedBow && session.bow_id !== selectedBow) return false;
       if (selectedDistance && session.distance !== selectedDistance) return false;
       const sessionTargetType = session.target_type || 'wa_standard';
       if (selectedTargetType && sessionTargetType !== selectedTargetType) return false;
       return true;
     });
+    
+    // Sort by date - most recent first
+    return result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }, [sessions, startDate, endDate, selectedBow, selectedDistance, selectedTargetType, selectionMode, selectedSessionIds]);
 
   // Toggle session selection
