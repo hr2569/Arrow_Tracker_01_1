@@ -31,6 +31,7 @@ Arrow Tracker is a React Native (Expo) archery scoring application for Android a
 - View session history with filtering
 - Shot distribution visualization (scatter plot)
 - Score trends over time
+- **Dynamic Stats by Time Period**: Stats (Sessions, Ends, Arrows, Total Pts) filter based on selected period (Day/Week/Month/Year/All)
 
 ## Technical Stack
 - **Frontend**: React Native with Expo
@@ -39,7 +40,14 @@ Arrow Tracker is a React Native (Expo) archery scoring application for Android a
 
 ## Version History
 
-### v1.1.02 (Current - December 2025)
+### v1.1.03 (Current - December 2025)
+- **NEW**: Added "Arrows Shot" statistic to History Stats section
+- **IMPROVED**: History stats now filter by selected time period (Day/Week/Month/Year)
+  - Stats show data only for the current day, week, month, or year based on selection
+- **IMPROVED**: Session report button made more visible (solid dark red background with white icon)
+- **UPDATED**: Version displayed on home screen
+
+### v1.1.02 (December 2025)
 - **IMPROVED**: Magnifier now appears at touch position (like MyTargets app)
   - Circular magnifier follows finger position
   - Shows zoomed view of actual target rings
