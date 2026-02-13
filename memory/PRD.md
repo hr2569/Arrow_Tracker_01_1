@@ -39,14 +39,18 @@ Arrow Tracker is a React Native (Expo) archery scoring application for Android a
 
 ## Version History
 
-### v1.1.01 (Current - December 2025)
-- **NEW**: Implemented "Magnifying Glass" zoom feature for precise arrow placement
-  - Magnifier box appears on the right side when touching the target
-  - Shows color-coded ring preview with crosshair
-  - Displays current score while dragging
-  - Main target remains zoomed out for context
+### v1.1.02 (Current - December 2025)
+- **IMPROVED**: Magnifier now appears at touch position (like MyTargets app)
+  - Circular magnifier follows finger position
+  - Shows zoomed view of actual target rings
+  - Green diamond crosshair reticle for precise aiming
+  - Score badge shows current ring value
+  - Magnifier positioned above finger to avoid blocking view
+
+### v1.1.01
+- Implemented initial "Magnifying Glass" zoom feature (side panel approach)
 - Added version number display on home screen (bottom, gray text)
-- Removed old full-target zoom implementation (user feedback: blocked finger view)
+- Removed old full-target zoom implementation
 
 ### v1.1.0
 - Added zoom-on-touch feature for native arrow placement (REPLACED in v1.1.01)
