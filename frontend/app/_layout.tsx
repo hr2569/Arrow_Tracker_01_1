@@ -69,9 +69,7 @@ export default function RootLayout() {
         <Stack.Screen 
           name="history" 
           options={{ 
-            title: 'Score History',
-            headerBackVisible: false,
-            headerLeft: () => <HeaderBackButton />,
+            headerShown: false,
           }} 
         />
         <Stack.Screen 
