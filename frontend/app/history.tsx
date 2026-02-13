@@ -543,15 +543,56 @@ export default function HistoryScreen() {
     });
   }, [filteredSessions, selectedPeriod]);
 
+  // Filter sessions by time period for stats calculation
+  const sessionsForStats = useMemo(() => {
+    const now = new Date();
+    return filteredSessions.filter(session => {
+      const sessionDate = new Date(session.created_at);
+      
+      switch (selectedPeriod) {
+        case 'day': {
+          // Same day
+          return sessionDate.toDateString() === now.toDateString();
+        }
+        case 'week': {
+          // Current week (Sunday to Saturday)
+          const weekStart = new Date(now);
+          weekStart.setDate(now.getDate() - now.getDay());
+          weekStart.setHours(0, 0, 0, 0);
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekStart.getDate() + 7);
+          return sessionDate >= weekStart && sessionDate < weekEnd;
+        }
+        case 'month': {
+          // Same month and year
+          return sessionDate.getMonth() === now.getMonth() && 
+                 sessionDate.getFullYear() === now.getFullYear();
+        }
+        case 'year': {
+          // Same year
+          return sessionDate.getFullYear() === now.getFullYear();
+        }
+        case 'all':
+        default:
+          return true;
+      }
+    });
+  }, [filteredSessions, selectedPeriod]);
+
   // Calculate stats for selected period
   const periodStats = useMemo(() => {
-    const allSessionsInPeriod = groupedSessions.flatMap(g => g.sessions);
+    const totalArrows = sessionsForStats.reduce((sum, s) => {
+      const arrowsInSession = s.rounds?.reduce((roundSum, r) => roundSum + (r.shots?.length || 0), 0) || 0;
+      return sum + arrowsInSession;
+    }, 0);
+    
     return {
-      totalSessions: allSessionsInPeriod.length,
-      totalRounds: allSessionsInPeriod.reduce((sum, s) => sum + (s.rounds?.length || 0), 0),
-      totalPoints: allSessionsInPeriod.reduce((sum, s) => sum + (s.total_score || 0), 0),
+      totalSessions: sessionsForStats.length,
+      totalRounds: sessionsForStats.reduce((sum, s) => sum + (s.rounds?.length || 0), 0),
+      totalPoints: sessionsForStats.reduce((sum, s) => sum + (s.total_score || 0), 0),
+      totalArrows: totalArrows,
     };
-  }, [groupedSessions]);
+  }, [sessionsForStats]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
