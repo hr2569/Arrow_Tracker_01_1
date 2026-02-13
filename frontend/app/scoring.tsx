@@ -969,6 +969,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  crosshairHorizontal: {
+    position: 'absolute',
+    width: MAGNIFIER_SIZE * 0.6,
+    height: 2,
+    backgroundColor: '#00C853', // Green like MyTargets
+  },
+  crosshairVertical: {
+    position: 'absolute',
+    width: 2,
+    height: MAGNIFIER_SIZE * 0.6,
+    backgroundColor: '#00C853', // Green like MyTargets
+  },
   diamondReticle: {
     width: 16,
     height: 16,
