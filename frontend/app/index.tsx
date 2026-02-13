@@ -82,7 +82,7 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <View style={styles.buttonIconContainerSmall}>
-                <Ionicons name="time" size={36} color="#8B0000" />
+                <Icon name="time" size={36} color="#8B0000" />
               </View>
               <Text style={styles.secondaryButtonTextSmall}>{t('home.history')}</Text>
               <Text style={styles.buttonSubtextSecondarySmall}>
