@@ -28,6 +28,11 @@ function HeaderBackButton() {
 }
 
 export default function RootLayout() {
+  useEffect(() => {
+    // Load saved language preference at app startup
+    loadSavedLanguage();
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="light" />
