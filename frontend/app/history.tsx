@@ -846,7 +846,7 @@ export default function HistoryScreen() {
           onPress={() => setActiveTab('history')}
         >
           <Ionicons name="time-outline" size={18} color={activeTab === 'history' ? '#fff' : '#888'} />
-          <Text style={[styles.tabButtonText, activeTab === 'history' && styles.tabButtonTextActive]}>Sessions</Text>
+          <Text style={[styles.tabButtonText, activeTab === 'history' && styles.tabButtonTextActive]}>{t('history.sessions')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'report' && styles.tabButtonActive]}
