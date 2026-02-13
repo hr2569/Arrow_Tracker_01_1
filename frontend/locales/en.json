@@ -231,6 +231,27 @@
     "no": "No",
     "ok": "OK"
   },
+  "competition": {
+    "deleteCompetition": "Delete Competition",
+    "deleteCompetitionConfirm": "Are you sure you want to delete \"{{name}}\"?",
+    "failedToDelete": "Failed to delete competition",
+    "reportSaved": "Report Saved",
+    "savedAs": "Saved as {{fileName}}",
+    "failedToGenerateReport": "Failed to generate report",
+    "sharingNotAvailable": "Sharing not available on this device",
+    "failedToPDF": "Failed to generate PDF",
+    "saveSuccess": "Competition saved successfully!",
+    "failedToSave": "Failed to save competition",
+    "incomplete": "Incomplete",
+    "completeAllScores": "Please complete all scores before saving.",
+    "completeScoresReport": "Please complete all scores before generating report.",
+    "enterArcherName": "Please enter archer name",
+    "discardChanges": "Discard Changes",
+    "discardChangesConfirm": "Are you sure you want to discard all changes?",
+    "discard": "Discard",
+    "successSaved": "Success",
+    "savedAndGenerated": "Competition saved and report generated!"
+  },
   "targets": {
     "waStandard": "WA Standard",
     "vegas3Spot": "Vegas 3-Spot",
