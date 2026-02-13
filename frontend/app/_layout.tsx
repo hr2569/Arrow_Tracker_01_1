@@ -4,7 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity, Platform, View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import * as Font from 'expo-font';
 import '../i18n'; // Initialize i18n
 import { loadSavedLanguage } from '../i18n';
 
@@ -29,37 +28,19 @@ function HeaderBackButton() {
 }
 
 export default function RootLayout() {
-  const [isReady, setIsReady] = useState(false);
+  const [isLanguageLoaded, setIsLanguageLoaded] = useState(false);
 
   useEffect(() => {
-    // Load fonts and saved language preference at app startup
-    const initApp = async () => {
-      try {
-        // Load Ionicons font from local assets
-        await Font.loadAsync({
-          Ionicons: require('../assets/fonts/Ionicons.ttf'),
-        });
-      } catch (e) {
-        console.warn('Error loading Ionicons font:', e);
-        // Continue anyway - icons may not display but app should work
-      }
-      
+    // Load saved language preference at app startup
+    const initLanguage = async () => {
       await loadSavedLanguage();
-      setIsReady(true);
+      setIsLanguageLoaded(true);
     };
-    
-    // Add a timeout to prevent infinite loading
-    const timeout = setTimeout(() => {
-      setIsReady(true);
-    }, 5000);
-    
-    initApp().then(() => clearTimeout(timeout));
-    
-    return () => clearTimeout(timeout);
+    initLanguage();
   }, []);
 
-  // Show a loading screen until ready
-  if (!isReady) {
+  // Show a loading screen until the language is loaded
+  if (!isLanguageLoaded) {
     return (
       <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#121212' }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }}>
