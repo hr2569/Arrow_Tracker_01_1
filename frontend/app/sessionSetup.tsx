@@ -53,6 +53,7 @@ export default function SessionSetupScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      loadSavedLanguage();
       fetchBows();
     }, [])
   );
