@@ -425,7 +425,7 @@ export default function SessionSetupScreen() {
             disabled={!selectedBowId || !distance}
           >
             <Ionicons name="play" size={24} color="#fff" />
-            <Text style={styles.startButtonText}>Start Session</Text>
+            <Text style={styles.startButtonText}>{t('sessionSetup.startSession')}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
