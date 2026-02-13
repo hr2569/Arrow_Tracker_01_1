@@ -941,13 +941,13 @@ export default function HistoryScreen() {
             
             {availableDistances.length > 0 && (
               <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Distance:</Text>
+                <Text style={styles.filterLabel}>{t('filters.distance')}:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
                   <TouchableOpacity
                     style={[styles.filterChip, !distanceFilter && styles.filterChipActive]}
                     onPress={() => setDistanceFilter(null)}
                   >
-                    <Text style={[styles.filterChipText, !distanceFilter && styles.filterChipTextActive]}>All</Text>
+                    <Text style={[styles.filterChipText, !distanceFilter && styles.filterChipTextActive]}>{t('filters.all')}</Text>
                   </TouchableOpacity>
                   {availableDistances.map((distance) => (
                     <TouchableOpacity
