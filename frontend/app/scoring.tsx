@@ -628,6 +628,11 @@ export default function ScoringScreen() {
     const innerTranslateX = (MAGNIFIER_SIZE / 2) - (touchPosition.x * MAGNIFIER_ZOOM);
     const innerTranslateY = (MAGNIFIER_SIZE / 2) - (touchPosition.y * MAGNIFIER_ZOOM);
     
+    // Get arrows for the current target to show in magnifier
+    const currentTargetArrows = isMultiTarget 
+      ? arrows.filter(a => a.targetIndex === activeTargetIndex)
+      : arrows;
+    
     return (
       <View 
         style={[
@@ -651,8 +656,8 @@ export default function ScoringScreen() {
               transform: [{ scale: MAGNIFIER_ZOOM }],
               transformOrigin: 'top left',
             }}>
-              {/* Render mini target rings */}
-              {renderMagnifierTarget(targetSize)}
+              {/* Render mini target rings and existing arrows */}
+              {renderMagnifierTarget(targetSize, currentTargetArrows)}
             </View>
           </View>
           
