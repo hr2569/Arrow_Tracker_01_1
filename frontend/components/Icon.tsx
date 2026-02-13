@@ -4,9 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 
 // Icon mapping for web fallback using Unicode/Emoji
 const webIcons: Record<string, string> = {
-  'add-circle': '+',
+  'add-circle': '⊕',
   'trophy': '🏆',
-  'time': '⏱',
+  'time': '◷',
   'settings-outline': '⚙',
   'arrow-back': '←',
   'chevron-forward': '›',
