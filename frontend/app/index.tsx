@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -11,15 +11,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { loadSavedLanguage } from '../i18n';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    loadSavedLanguage();
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
