@@ -29,6 +29,7 @@ const BOW_TYPES = [
 
 export default function BowsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [bows, setBows] = useState<Bow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
