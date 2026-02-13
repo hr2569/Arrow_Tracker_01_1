@@ -133,7 +133,7 @@ export default function SessionSetupScreen() {
           >
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Session Setup</Text>
+          <Text style={styles.headerTitle}>{t('sessionSetup.title')}</Text>
           <View style={styles.headerSpacer} />
         </View>
 
@@ -141,16 +141,16 @@ export default function SessionSetupScreen() {
           <View style={styles.emptyIcon}>
             <Ionicons name="alert-circle-outline" size={64} color="#8B0000" />
           </View>
-          <Text style={styles.emptyTitle}>No Bows Found</Text>
+          <Text style={styles.emptyTitle}>{t('sessionSetup.noBowsFound')}</Text>
           <Text style={styles.emptySubtitle}>
-            You need to add at least one bow before starting a session.
+            {t('sessionSetup.noBowsMessage')}
           </Text>
           <TouchableOpacity
             style={styles.addBowButton}
             onPress={navigateToAddBow}
           >
             <Ionicons name="add" size={24} color="#fff" />
-            <Text style={styles.addBowButtonText}>Add Your First Bow</Text>
+            <Text style={styles.addBowButtonText}>{t('sessionSetup.addFirstBow')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -171,7 +171,7 @@ export default function SessionSetupScreen() {
           >
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Session Setup</Text>
+          <Text style={styles.headerTitle}>{t('sessionSetup.title')}</Text>
           <View style={styles.headerSpacer} />
         </View>
 
