@@ -1264,7 +1264,7 @@ export default function HistoryScreen() {
             </View>
 
             <View style={styles.modalField}>
-              <Text style={styles.modalLabel}>Session Name</Text>
+              <Text style={styles.modalLabel}>{t('history.sessionName')}</Text>
               <TextInput
                 style={styles.modalInput}
                 value={editName}
