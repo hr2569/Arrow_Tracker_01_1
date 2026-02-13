@@ -35,6 +35,7 @@ const getTargetTypeName = (type?: string): string => {
 
 export default function ReportScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ sessionId?: string }>();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [bows, setBows] = useState<Bow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,6 +65,15 @@ export default function ReportScreen() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Handle sessionId parameter - auto-select single session and show report
+  useEffect(() => {
+    if (params.sessionId && sessions.length > 0) {
+      setSelectionMode('sessions');
+      setSelectedSessionIds(new Set([params.sessionId]));
+      setShowReport(true);
+    }
+  }, [params.sessionId, sessions]);
 
   const fetchData = async () => {
     try {
