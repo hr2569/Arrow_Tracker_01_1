@@ -194,7 +194,7 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   return (
     <View style={scatterStyles.container}>
       <Text style={scatterStyles.title}>
-        <Ionicons name="radio-button-on" size={14} color="#8B0000" /> {t('history.shotDistribution')}
+        <Ionicons name="radio-button-on" size={14} color="#8B0000" /> Shot Distribution
       </Text>
       <Svg width={size} height={size} style={scatterStyles.svg}>
         {isIndoor ? renderIndoorTarget() : (
