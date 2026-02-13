@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity, Platform, View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useFonts } from 'expo-font';
+import * as Font from 'expo-font';
 import '../i18n'; // Initialize i18n
 import { loadSavedLanguage } from '../i18n';
 
