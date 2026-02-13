@@ -839,6 +839,18 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{t('history.title')}</Text>
+        <View style={styles.headerSpacer} />
+      </View>
+
       {/* Tab Selector - Row 1: Main Tabs */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
