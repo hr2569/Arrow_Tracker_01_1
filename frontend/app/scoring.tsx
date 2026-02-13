@@ -945,7 +945,7 @@ const styles = StyleSheet.create({
     borderRadius: MAGNIFIER_SIZE / 2,
     overflow: 'hidden',
     borderWidth: 3,
-    borderColor: '#4CAF50', // Green border like MyTargets
+    borderColor: '#8B0000', // App's primary red
     backgroundColor: '#0a0a0a',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -971,7 +971,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderWidth: 2,
-    borderColor: '#4CAF50', // Green diamond
+    borderColor: '#8B0000', // App's primary red
     backgroundColor: 'transparent',
     transform: [{ rotate: '45deg' }],
   },
@@ -983,7 +983,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#4CAF50',
+    borderColor: '#8B0000',
   },
   magnifierScoreText: {
     fontSize: 14,
