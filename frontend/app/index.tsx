@@ -24,7 +24,7 @@ export default function HomeScreen() {
         onPress={() => router.push('/settings')}
         activeOpacity={0.7}
       >
-        <Ionicons name="settings-outline" size={22} color="#888" />
+        <Icon name="settings-outline" size={22} color="#888" />
       </TouchableOpacity>
 
       <ScrollView 
