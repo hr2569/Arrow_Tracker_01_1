@@ -285,9 +285,9 @@ export default function SessionSetupScreen() {
                   </View>
                 </View>
                 <Text style={[styles.targetTypeName, selectedTargetType === 'nfaa_indoor' && styles.targetTypeNameSelected]}>
-                  WA Indoor
+                  {t('sessionSetup.waIndoor')}
                 </Text>
-                <Text style={styles.targetTypeDesc}>3-spot vertical</Text>
+                <Text style={styles.targetTypeDesc}>{t('sessionSetup.waIndoorDesc')}</Text>
                 {selectedTargetType === 'nfaa_indoor' && (
                   <View style={styles.targetCheckmark}>
                     <Ionicons name="checkmark" size={14} color="#fff" />
