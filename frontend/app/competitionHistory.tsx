@@ -355,11 +355,11 @@ export default function CompetitionHistory() {
           to: destinationUri,
         });
 
-        Alert.alert('Report Saved', `Saved as ${fileName}`);
+        Alert.alert(t('competition.reportSaved'), t('competition.savedAs', { fileName }));
       }
     } catch (error) {
       console.error('Error generating PDF:', error);
-      Alert.alert('Error', 'Failed to generate report');
+      Alert.alert(t('common.error'), t('competition.failedToGenerateReport'));
     }
   };
 
