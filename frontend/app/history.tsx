@@ -994,13 +994,29 @@ export default function HistoryScreen() {
                       <Ionicons name="trash" size={18} color="#ff6b6b" />
                     </Pressable>
 
+                    {/* Report button for individual session */}
+                    <Pressable
+                      style={styles.reportBtn}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        router.push({
+                          pathname: '/report',
+                          params: { sessionId: session.id }
+                        });
+                      }}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <Ionicons name="document-text" size={18} color="#8B0000" />
+                    </Pressable>
+
                     {expandedSession === session.id && session.rounds && (
                       <View style={styles.expandedContent}>
                         <View style={styles.expandedDivider} />
                         
-                        {/* Shot Distribution */}
+                        {/* Shot Distribution and Heatmap side by side */}
                         <View style={styles.visualizationsRow}>
-                          <ScatterMap session={session} size={160} />
+                          <ScatterMap session={session} size={140} />
+                          <HeatMap session={session} size={140} />
                         </View>
                         
                         {getRoundChartData(session) && session.rounds.length > 1 && (
