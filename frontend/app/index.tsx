@@ -67,7 +67,7 @@ export default function HomeScreen() {
               disabled={true}
             >
               <View style={styles.buttonIconContainerCompetitionDisabled}>
-                <Ionicons name="trophy" size={36} color="#666" />
+                <Icon name="trophy" size={36} color="#666" />
               </View>
               <Text style={styles.competitionButtonTextDisabled}>{t('home.competition')}</Text>
               <Text style={styles.competitionSubtextDisabled}>{t('home.comingSoon')}</Text>
