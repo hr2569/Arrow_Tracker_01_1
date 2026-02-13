@@ -9,40 +9,47 @@ The immediate focus is on completing the Language/Internationalization feature.
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a React Native (Expo) app for scoring archery rounds. The agent is in the middle of implementing the internationalization (i18n) feature for version .
-- A comprehensive set of translation keys has been created in .
-- All other language files (, , , , , , , ) have been updated with the same key structure, but mostly contain English placeholder text for their values.
-- The  hook has been implemented in the  and  screens, replacing hardcoded text with translation keys.
-- Other screens (, , , etc.) still contain hardcoded English strings.
+The application is a React Native (Expo) app for scoring archery rounds. The internationalization (i18n) feature is partially implemented.
+- Hardcoded text has been replaced with the  translation function in the following screens: , , , , and .
+- The translation key-value pairs are defined in .
+- Other language files (, , , etc.) exist but contain mostly English placeholder text.
+- A potential fix has been implemented in the root  to load the saved language on app startup, intended to solve an issue with translation persistence in the web preview.
 
 **Last working item**:
-- Last item agent was working: The agent was systematically applying the  hook and  function to all application screens to replace hardcoded text. It had just completed the  and  files.
-- Status: IN PROGRESS
+- Last item agent was working: The agent was attempting to resolve a bug where changing the language on the Settings page did not apply the translation to other screens when navigating in the web preview. The final attempted fix was to load the saved language in the root  file. The user has requested to see this fix working on the preview.
+- Status: USER VERIFICATION PENDING
 - Agent Testing Done: N
-- Which testing method agent to use? Frontend testing agent. The task involves UI changes across the entire application, which requires comprehensive testing to ensure all text elements are translated correctly when the language is changed in the settings.
+- Which testing method agent to use? Frontend testing agent. This is necessary to confirm that changing the language in Settings correctly and persistently translates text across ALL application screens (, , , , etc.).
 - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-- Issue 1: Incomplete translation implementation in app screens (P0)
-- Issue 2: Incomplete translations in language files (P1)
-- Issue 3: Incorrect Portuguese dialect (P1)
-
+  - Issue 1: Translation changes do not persist across pages in the web preview (P0)
+  - Issue 2: Incomplete translations in language files (P1)
+  - Issue 3: Verify and complete European Portuguese translations (P1)
+  
   Issues Detail:
-  - Issue 1:
-     - **Description**: Many screens still have hardcoded English text and do not use the i18n system. So far, only  and  have been updated.
-     - **Attempted fixes**: The agent has successfully integrated the  hook into  and .
+  - Issue 1: 
+     - **Description**: When the language is changed in Settings, navigating to another screen (e.g., History) shows English text instead of the selected language. This appears to be a state persistence problem in the Expo web preview.
+     - **Attempted fixes**: 
+       1. Added  calls to individual screen  hooks, which failed.
+       2. Moved the  call to the root  to ensure it runs once on app initialization. This fix has not been verified yet.
      - **Next debug checklist**:
-       1. Continue the process for the remaining files: , , , and any other components with user-facing text.
-       2. For each file, import  and replace hardcoded strings with .
-     - **Why fix this issue and what will be achieved with the fix?**: This is the main task required to complete the internationalization feature for the v2.0.0 release.
+       1. Start the application.
+       2. Navigate to the Settings screen.
+       3. Change the language to Português.
+       4. Verify the Settings screen UI updates to Portuguese.
+       5. Navigate to the History screen.
+       6. Verify if the History screen UI is displayed in Portuguese. Take a screenshot as proof for the user.
+       7. If it fails, investigate why  is not triggering a global state update or why the state is being reset on navigation.
+     - **Why fix this issue and what will be achieved with the fix?**: This is a critical blocker preventing the user from verifying the entire internationalization feature.
      - **Status**: IN PROGRESS
-     - **Is recurring issue?**: N
+     - **Is recurring issue?**: Y
      - **Should Test frontend/backend/both after fix?**: Frontend
      - **Blocked on other issue**: None
 
-  - Issue 2:
+  - Issue 2: 
      - **Description**: The translation files for Spanish, French, Italian, Finnish, Swedish, Russian, and Ukrainian contain the correct key structure but use English text as placeholder values.
-     - **Attempted fixes**: The agent created the file structures.
+     - **Attempted fixes**: The file structures were created.
      - **Next debug checklist**: Systematically translate the English placeholder values in each of the following files: , , , , , , .
      - **Why fix this issue and what will be achieved with the fix?**: To provide the complete set of promised languages for the v2.0.0 release.
      - **Status**: NOT STARTED
@@ -50,94 +57,98 @@ The application is a React Native (Expo) app for scoring archery rounds. The age
      - **Should Test frontend/backend/both after fix?**: Frontend
      - **Blocked on other issue**: None
 
-  - Issue 3:
-      - **Description**: The user specified European Portuguese, but the generated  file may be incomplete or use the wrong dialect for some keys. It currently contains many English placeholders.
-      - **Attempted fixes**: The agent created the  with the correct key structure and made an initial attempt to add some European Portuguese translations.
-      - **Next debug checklist**:
-        1.  Thoroughly review .
-        2.  Translate all remaining English placeholder values to European Portuguese.
-        3.  Verify the correctness of existing Portuguese translations.
-      - **Why fix this issue and what will be achieved with the fix?**: To meet the user's specific requirement for the Portuguese language.
-      - **Status**: IN PROGRESS
-      - **Is recurring issue?**: N
-      - **Should Test frontend/backend/both after fix?**: Frontend
-      - **Blocked on other issue**: None
+  - Issue 3: 
+     - **Description**: The user specified European Portuguese. The  file has some translations but may be incomplete or use the wrong dialect.
+     - **Attempted fixes**: The agent created the file and added initial translations.
+     - **Next debug checklist**:
+       1.  Thoroughly review .
+       2.  Translate all remaining English placeholder values to European Portuguese.
+       3.  Verify the correctness of existing Portuguese translations.
+     - **Why fix this issue and what will be achieved with the fix?**: To meet the user's specific requirement for the Portuguese language.
+     - **Status**: IN PROGRESS
+     - **Is recurring issue?**: N
+     - **Should Test frontend/backend/both after fix?**: Frontend
+     - **Blocked on other issue**: None
 
 **In progress Task List**:
-  - Task 1: Complete the internationalization of the entire application (P0)
-     - **Where to resume**: The agent just finished updating . The next file to modify is .
-     - **What will be achieved with this?**: A fully translatable application codebase.
+  - Task 1: Complete and verify the internationalization of the application (P0)
+     - **Where to resume**: Address the user's request: show me on the preview. The agent must execute the verification flow for Issue #1 to prove that the language persistence fix works.
+     - **What will be achieved with this?**: A fully translatable application, completing a major requirement for v2.0.0.
      - **Status**: IN PROGRESS
      - **Should Test frontend/backend/both after fix?**: Frontend
-     - **Blocked on something**: None
+     - **Blocked on something**: Blocked by Issue 1 (Translation persistence).
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-    - **Implement Competition Menu (P0)**: As part of the v2.0.0 release, create a new Competition menu. Requirements need to be gathered from the user for this feature.
+    - **Implement Competition Menu (P0)**: After the i18n feature is fully implemented and verified, gather requirements from the user for this new menu.
 - **Future Tasks**:
     - None specified.
 
 **Completed work in this session**
-- **i18n Scaffolding**:
-  - Created a comprehensive set of translation keys in .
-  - Standardized all 9 translation files to use the same key structure.
-- **i18n Implementation**:
-  - Applied translations (using  hook) to .
-  - Applied translations to .
+- **i18n Code Implementation**:
+  - Replaced hardcoded text with  translation calls in , , and .
+- **Bug Fix for Language Persistence**:
+  - Identified that language settings were not persisting across pages.
+  - Moved the language loading logic () to the root  to run on app startup.
+- **Layout Adjustments**:
+  - Hid the static header for the history tab in .
+  - Added a new, dynamic, and translatable header directly within .
 
 **Earlier issues found/mentioned but not fixed**
 - None.
 
 **Known issue recurrence from previous fork**
-- None for this session.
+- None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
 - **Frontend**: React Native (Expo)
-- **Internationalization (i18n)**:  and  for managing translations.
-- **State Management**: React state (, ).
-- **Navigation**: .
+- **Internationalization (i18n)**: , 
+- **State Management**: React state (, ). Language preference is persisted using .
+- **Navigation**: 
 
 **key DB schema**
 - N/A (Client-side storage via AsyncStorage)
 
 **changes in tech stack**
-- None in this session.
+- None.
 
 **All files of reference**
 - **Modified in this session**:
-  - : All 9 translation files were rewritten with a new, comprehensive key structure.
-  - : Updated to use .
-  - : Updated to use .
-- **Files Requiring Modification**:
   - 
   - 
   - 
-- **Core i18n Files**:
   - 
   - 
+- **Files Requiring Work**:
+  -  (Verify and complete)
+  -  (Translate from English)
 
 **Areas that need refactoring**:
-- Hardcoded strings in , , , and other components need to be replaced with the  function from .
+- None.
 
 **key api endpoints**
 - N/A
 
 **Critical Info for New Agent**
-- **Top Priority**: Your immediate task is to finish implementing the  hook across all remaining screens. The key structure is complete, so you just need to apply it. The next files to work on are , , and .
-- After updating the code, the next step is to populate the language files (, , , etc.) with correct translations, paying special attention to the user's request for European Portuguese.
-- Once the i18n feature is fully implemented and tested, you must ask the user for requirements for the Competition menu.
+- **Top Priority**: Your first action is to respond to the user's request: show me on the preview. You must verify the last fix for the language persistence issue.
+- **Verification Flow**: Use the screenshot tool to:
+    1. Navigate to Settings, change the language to Portuguese.
+    2. Navigate to the History tab.
+    3. Capture a screenshot to prove to the user that the History page is now translated.
+- **If the Fix Fails**: The issue is complex and related to the Expo web preview environment. You'll need to debug why the  instance isn't updating the UI across page navigations.
+- **Next Steps**: After verifying the i18n functionality, your next tasks are to populate the other language files with correct translations (Issues 2 & 3). Only after the entire i18n feature is complete should you engage the user for requirements on the Competition menu.
 
 **documents and test reports created in this job**
 - None.
 
-**Last 10 User Messages and any pending HUMAN messages**
--  (Status: **Completed**)
+**Last 10 User Messages and any pending HUMAN messages** 
+-  (Status: **Pending**)
 
 **Project Health Check:**
-- **Healthy**: The agent is making steady, systematic progress on the large internationalization task. The foundation is well-laid, and the work just needs to be completed.
+- **Broken**: The primary feature under development (internationalization) is not verifiable due to a language persistence bug in the preview environment. This is a critical blocker.
 
 **3rd Party Integrations**
 - None.
@@ -146,10 +157,11 @@ The application is a React Native (Expo) app for scoring archery rounds. The age
 - Testing agent used after significant changes: NO
 - Troubleshoot agent used after agent stuck in loop: NO
 - Test files created: None
-- Known regressions: None
+- Known regressions: The translation feature does not work correctly across different screens in the web preview.
 
 **Credentials to test flow:**
 - N/A
 
 **What agent forgot to execute**
-- The agent is in the middle of a large, multi-step task. Nothing has been forgotten, but it is critical to continue the work systematically until all screens are translated and all language files are populated.</analysis>
+- The agent did not visually verify its final fix for the language persistence bug before attempting to finish the task, which the user directly requested.
+- The agent has not yet started the work of translating the placeholder values in the non-English language files.</analysis>
