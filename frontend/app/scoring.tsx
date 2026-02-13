@@ -620,10 +620,18 @@ export default function ScoringScreen() {
     const magnifierX = touchPosition.x - MAGNIFIER_SIZE / 2;
     const magnifierY = touchPosition.y + MAGNIFIER_OFFSET_Y - MAGNIFIER_SIZE / 2;
     
-    // Calculate transform to show zoomed area centered on touch point
-    // The inner content is scaled up, then translated so touch point is centered
-    const innerTranslateX = (MAGNIFIER_SIZE / 2 - touchPosition.x * MAGNIFIER_ZOOM);
-    const innerTranslateY = (MAGNIFIER_SIZE / 2 - touchPosition.y * MAGNIFIER_ZOOM);
+    // Calculate the visible area in the magnifier
+    // We need to translate the content so the touch point appears in the center
+    // Since the target is rendered at (0,0) and has dimensions targetSize x targetSize
+    // The touch point is at (touchPosition.x, touchPosition.y)
+    // We want that point to appear at the center of the magnifier (MAGNIFIER_SIZE/2, MAGNIFIER_SIZE/2)
+    
+    // First scale, then translate:
+    // After scaling by MAGNIFIER_ZOOM, the touch point would be at (touchPosition.x * MAGNIFIER_ZOOM, touchPosition.y * MAGNIFIER_ZOOM)
+    // We want it at (MAGNIFIER_SIZE/2, MAGNIFIER_SIZE/2)
+    // So translateX = MAGNIFIER_SIZE/2 - touchPosition.x * MAGNIFIER_ZOOM
+    const innerTranslateX = MAGNIFIER_SIZE / 2 - touchPosition.x * MAGNIFIER_ZOOM;
+    const innerTranslateY = MAGNIFIER_SIZE / 2 - touchPosition.y * MAGNIFIER_ZOOM;
     
     return (
       <View 
@@ -640,18 +648,20 @@ export default function ScoringScreen() {
           {/* Zoomed target content */}
           <View style={styles.magnifierContent}>
             <View style={{
-              transform: [
-                { translateX: innerTranslateX },
-                { translateY: innerTranslateY },
-                { scale: MAGNIFIER_ZOOM },
-              ],
+              position: 'absolute',
+              left: innerTranslateX,
+              top: innerTranslateY,
+              width: targetSize * MAGNIFIER_ZOOM,
+              height: targetSize * MAGNIFIER_ZOOM,
+              transform: [{ scale: MAGNIFIER_ZOOM }],
+              transformOrigin: 'top left',
             }}>
               {/* Render mini target rings */}
               {renderMagnifierTarget(targetSize)}
             </View>
           </View>
           
-          {/* Green diamond crosshair reticle */}
+          {/* Red diamond crosshair reticle */}
           <View style={styles.magnifierCrosshair}>
             <View style={styles.diamondReticle} />
           </View>
