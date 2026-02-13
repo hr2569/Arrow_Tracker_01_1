@@ -22,8 +22,9 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_TARGET_SIZE = Math.min(SCREEN_WIDTH - 40, SCREEN_HEIGHT * 0.4);
 const SMALL_TARGET_SIZE = Math.min((SCREEN_WIDTH - 60) / 3, 110);
 const CONTAINER_HEIGHT = 350;
-const MAGNIFIER_SIZE = 140; // Size of the magnifier box
-const MAGNIFIER_ZOOM = 3; // How much to zoom inside magnifier
+const MAGNIFIER_SIZE = 120; // Size of the circular magnifier
+const MAGNIFIER_ZOOM = 2.5; // How much to zoom inside magnifier
+const MAGNIFIER_OFFSET_Y = -80; // Offset magnifier above finger so it's not blocked
 
 interface Arrow {
   id: string;
