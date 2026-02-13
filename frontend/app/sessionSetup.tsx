@@ -354,7 +354,7 @@ export default function SessionSetupScreen() {
                 style={styles.distanceInput}
                 value={distance}
                 onChangeText={setDistance}
-                placeholder="Enter distance"
+                placeholder={t('sessionSetup.distancePlaceholder')}
                 placeholderTextColor="#666"
                 keyboardType="decimal-pad"
               />
