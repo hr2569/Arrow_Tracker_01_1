@@ -616,8 +616,9 @@ export default function ScoringScreen() {
     if (!isTouching || Platform.OS === 'web') return null;
     
     // Position magnifier centered directly on the touch point (like MyTargets)
+    // Offset slightly down (closer to finger) to prevent clipping at screen edges
     const magnifierX = touchPosition.x - MAGNIFIER_SIZE / 2;
-    const magnifierY = touchPosition.y - MAGNIFIER_SIZE / 2;
+    const magnifierY = touchPosition.y - MAGNIFIER_SIZE / 2 + 35;
     
     // Calculate translation to center the touch point in the magnifier
     // The touch point is at (touchPosition.x, touchPosition.y) in the original target
