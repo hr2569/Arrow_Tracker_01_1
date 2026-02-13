@@ -611,7 +611,7 @@ export default function ScoringScreen() {
   };
 
   // Render magnifier component - appears at touch position showing zoomed target view
-  // Like MyTargets app: circular magnifier centered directly on finger with green crosshair
+  // Like MyTargets app: circular magnifier centered directly on finger with red crosshair
   const renderMagnifier = (targetSize: number) => {
     if (!isTouching || Platform.OS === 'web') return null;
     
@@ -619,10 +619,12 @@ export default function ScoringScreen() {
     const magnifierX = touchPosition.x - MAGNIFIER_SIZE / 2;
     const magnifierY = touchPosition.y - MAGNIFIER_SIZE / 2;
     
-    // Calculate the visible area in the magnifier
-    // We need to translate the content so the touch point appears in the center
-    const innerTranslateX = MAGNIFIER_SIZE / 2 - touchPosition.x * MAGNIFIER_ZOOM;
-    const innerTranslateY = MAGNIFIER_SIZE / 2 - touchPosition.y * MAGNIFIER_ZOOM;
+    // Calculate translation to center the touch point in the magnifier
+    // The touch point is at (touchPosition.x, touchPosition.y) in the original target
+    // After scaling by MAGNIFIER_ZOOM, we want this point at the center of the magnifier
+    // Center of magnifier content area = MAGNIFIER_SIZE / 2
+    const innerTranslateX = (MAGNIFIER_SIZE / 2) - (touchPosition.x * MAGNIFIER_ZOOM);
+    const innerTranslateY = (MAGNIFIER_SIZE / 2) - (touchPosition.y * MAGNIFIER_ZOOM);
     
     return (
       <View 
@@ -642,8 +644,8 @@ export default function ScoringScreen() {
               position: 'absolute',
               left: innerTranslateX,
               top: innerTranslateY,
-              width: targetSize * MAGNIFIER_ZOOM,
-              height: targetSize * MAGNIFIER_ZOOM,
+              width: targetSize,
+              height: targetSize,
               transform: [{ scale: MAGNIFIER_ZOOM }],
               transformOrigin: 'top left',
             }}>
@@ -652,7 +654,7 @@ export default function ScoringScreen() {
             </View>
           </View>
           
-          {/* Green crosshair like MyTargets app */}
+          {/* Red crosshair - centered in magnifier, shows where arrow will be placed */}
           <View style={styles.magnifierCrosshair}>
             <View style={styles.crosshairHorizontal} />
             <View style={styles.crosshairVertical} />
