@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { TouchableOpacity, Platform } from 'react-native';
+import { TouchableOpacity, Platform, View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '../i18n'; // Initialize i18n
@@ -28,10 +28,27 @@ function HeaderBackButton() {
 }
 
 export default function RootLayout() {
+  const [isLanguageLoaded, setIsLanguageLoaded] = useState(false);
+
   useEffect(() => {
-    // Load saved language preference at app startup
-    loadSavedLanguage();
+    // Load saved language preference at app startup and wait for it
+    const initLanguage = async () => {
+      await loadSavedLanguage();
+      setIsLanguageLoaded(true);
+    };
+    initLanguage();
   }, []);
+
+  // Show a loading screen until the language is loaded
+  if (!isLanguageLoaded) {
+    return (
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#121212' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }}>
+          <ActivityIndicator size="large" color="#8B0000" />
+        </View>
+      </GestureHandlerRootView>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
