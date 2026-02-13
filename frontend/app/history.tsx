@@ -966,7 +966,7 @@ export default function HistoryScreen() {
         {sessions.length > 0 && (
           <View style={styles.overviewCard}>
             <Text style={styles.overviewTitle}>
-              {selectedPeriod === 'all' ? 'All Time Stats' : `Stats - ${selectedPeriod}`}
+              {selectedPeriod === 'all' ? 'All Time Stats' : `Stats - ${selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)}`}
             </Text>
             <View style={styles.overviewStats}>
               <View style={styles.overviewStat}>
@@ -976,7 +976,12 @@ export default function HistoryScreen() {
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalRounds}</Text>
-                <Text style={styles.overviewLabel}>Rounds</Text>
+                <Text style={styles.overviewLabel}>Ends</Text>
+              </View>
+              <View style={styles.overviewDivider} />
+              <View style={styles.overviewStat}>
+                <Text style={styles.overviewValue}>{periodStats.totalArrows}</Text>
+                <Text style={styles.overviewLabel}>Arrows</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
