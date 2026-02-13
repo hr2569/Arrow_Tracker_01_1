@@ -968,27 +968,27 @@ export default function HistoryScreen() {
         {sessions.length > 0 && (
           <View style={styles.overviewCard}>
             <Text style={styles.overviewTitle}>
-              {selectedPeriod === 'all' ? 'All Time Stats' : `Stats - ${selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)}`}
+              {selectedPeriod === 'all' ? t('history.allTimeStats') : `${t('history.statsFor')} - ${t(`history.${selectedPeriod}`)}`}
             </Text>
             <View style={styles.overviewStats}>
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalSessions}</Text>
-                <Text style={styles.overviewLabel}>Sessions</Text>
+                <Text style={styles.overviewLabel}>{t('history.sessions')}</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalRounds}</Text>
-                <Text style={styles.overviewLabel}>Ends</Text>
+                <Text style={styles.overviewLabel}>{t('history.ends')}</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalArrows}</Text>
-                <Text style={styles.overviewLabel}>Arrows</Text>
+                <Text style={styles.overviewLabel}>{t('history.arrows')}</Text>
               </View>
               <View style={styles.overviewDivider} />
               <View style={styles.overviewStat}>
                 <Text style={styles.overviewValue}>{periodStats.totalPoints}</Text>
-                <Text style={styles.overviewLabel}>Total Pts</Text>
+                <Text style={styles.overviewLabel}>{t('history.totalPts')}</Text>
               </View>
             </View>
           </View>
