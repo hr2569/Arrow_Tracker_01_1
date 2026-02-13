@@ -1348,7 +1348,7 @@ export default function HistoryScreen() {
               ) : (
                 <>
                   <Ionicons name="checkmark" size={20} color="#ffffff" />
-                  <Text style={styles.saveButtonText}>Save Changes</Text>
+                  <Text style={styles.saveButtonText}>{t('history.saveChanges')}</Text>
                 </>
               )}
             </TouchableOpacity>
