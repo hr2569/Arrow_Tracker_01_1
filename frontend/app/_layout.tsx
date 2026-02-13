@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity, Platform, View, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/Icon';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '../i18n'; // Initialize i18n
 import { loadSavedLanguage } from '../i18n';
@@ -22,7 +22,7 @@ function HeaderBackButton() {
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       activeOpacity={0.7}
     >
-      <Ionicons name="arrow-back" size={24} color="#fff" />
+      <Icon name="arrow-back" size={24} color="#fff" />
     </TouchableOpacity>
   );
 }
