@@ -607,16 +607,16 @@ export default function HistoryScreen() {
         await deleteSession(sessionId);
         setSessions(sessions.filter(s => s.id !== sessionId));
       } catch (err) {
-        Alert.alert('Error', 'Failed to delete session');
+        Alert.alert(t('common.error'), t('history.failedToDeleteSession'));
       }
     };
 
     Alert.alert(
-      'Delete Session',
-      'Are you sure you want to delete this session?',
+      t('history.deleteSession'),
+      t('history.deleteSessionConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: performDelete },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.delete'), style: 'destructive', onPress: performDelete },
       ]
     );
   };
@@ -624,7 +624,7 @@ export default function HistoryScreen() {
   const handleDeleteRound = (sessionId: string, roundId: string) => {
     const session = sessions.find(s => s.id === sessionId);
     if (session?.rounds.length === 1) {
-      Alert.alert('Cannot Delete', 'Sessions must have at least one round. Delete the session instead.');
+      Alert.alert(t('history.cannotDelete'), t('history.minRoundsMessage'));
       return;
     }
     
@@ -635,16 +635,16 @@ export default function HistoryScreen() {
           setSessions(sessions.map(s => s.id === sessionId ? updatedSession : s));
         }
       } catch (err) {
-        Alert.alert('Error', 'Failed to delete round');
+        Alert.alert(t('common.error'), t('history.failedToDeleteRound'));
       }
     };
 
     Alert.alert(
-      'Delete Round',
-      'Are you sure you want to delete this round? This cannot be undone.',
+      t('history.deleteRound'),
+      t('history.deleteRoundConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: performDelete },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.delete'), style: 'destructive', onPress: performDelete },
       ]
     );
   };
