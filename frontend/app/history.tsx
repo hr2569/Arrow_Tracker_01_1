@@ -998,16 +998,16 @@ export default function HistoryScreen() {
         {sessions.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="trophy-outline" size={64} color="#888888" />
-            <Text style={styles.emptyTitle}>No History Yet</Text>
+            <Text style={styles.emptyTitle}>{t('history.noHistory')}</Text>
             <Text style={styles.emptyText}>
-              Complete scoring sessions to see your history here.
+              {t('history.noHistoryDescription')}
             </Text>
             <TouchableOpacity
               style={styles.startButton}
               onPress={() => router.push('/sessionSetup')}
             >
               <Ionicons name="add" size={20} color="#fff" />
-              <Text style={styles.startButtonText}>Start Session</Text>
+              <Text style={styles.startButtonText}>{t('history.startSession')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
