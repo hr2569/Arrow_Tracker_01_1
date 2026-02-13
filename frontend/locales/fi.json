@@ -9,7 +9,7 @@
     "competition": "Kilpailu",
     "comingSoon": "Tulossa Pian",
     "history": "Historia",
-    "sessionsStats": "Istunnot ja Tilastot",
+    "sessionsStats": "Sessiot ja Tilastot",
     "bows": "Jouset",
     "equipment": "Varusteet",
     "settings": "Asetukset"
@@ -25,7 +25,7 @@
   },
   "history": {
     "title": "Historia",
-    "sessions": "Istunnot",
+    "sessions": "Sessiot",
     "report": "Raportti",
     "noHistory": "Ei Historiaa",
     "noHistoryDescription": "Suorita pisteytyssessioja nähdäksesi historiasi täällä.",
@@ -49,7 +49,7 @@
     "cancel": "Peruuta",
     "delete": "Poista",
     "editSession": "Muokkaa Sessioa",
-    "sessionName": "Istunnon Nimi",
+    "sessionName": "Session Nimi",
     "date": "Päivämäärä",
     "time": "Aika",
     "saveChanges": "Tallenna Muutokset",
@@ -62,7 +62,7 @@
     "cannotRemove": "Ei Voi Poistaa",
     "minShotsRequired": "Päissä on oltava vähintään 3 laukausta.",
     "cannotDelete": "Ei Voi Poistaa",
-    "minRoundsRequired": "Istunnoissa on oltava vähintään yksi pää. Poista sessio sen sijaan.",
+    "minRoundsRequired": "Sessioissa on oltava vähintään yksi pää. Poista sessio sen sijaan.",
     "deleteRound": "Poista Pää",
     "deleteRoundConfirm": "Haluatko varmasti poistaa tämän pään? Tätä ei voi kumota.",
     "avg": "Ka",
@@ -95,8 +95,8 @@
     "deleteArrow": "Poista Nuoli"
   },
   "sessionSetup": {
-    "title": "Istunnon Asetukset",
-    "sessionName": "Istunnon Nimi",
+    "title": "Session Asetukset",
+    "sessionName": "Session Nimi",
     "sessionNamePlaceholder": "esim. Aamuharjoitus",
     "targetFace": "Taulun Kuva",
     "targetType": "Taulun Tyyppi",
