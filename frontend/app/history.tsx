@@ -1152,7 +1152,7 @@ export default function HistoryScreen() {
                           </View>
                         )}
 
-                        <Text style={styles.roundsTitle}>Round Details</Text>
+                        <Text style={styles.roundsTitle}>{t('history.roundDetails')}</Text>
                         {session.rounds.map((round, index) => {
                           // Sort shots from highest to lowest score
                           const sortedShots = [...(round.shots || [])].sort((a, b) => (b.ring || 0) - (a.ring || 0));
