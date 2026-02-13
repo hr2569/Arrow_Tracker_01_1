@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 import en from './locales/en.json';
 import pt from './locales/pt.json';
@@ -38,12 +39,47 @@ const resources = {
   uk: { translation: uk },
 };
 
-// Initialize i18n
+// Helper functions for storage that work on both web and native
+const getStoredLanguage = async (): Promise<string | null> => {
+  try {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem(LANGUAGE_KEY);
+    }
+    return await AsyncStorage.getItem(LANGUAGE_KEY);
+  } catch {
+    return null;
+  }
+};
+
+const setStoredLanguage = async (languageCode: string): Promise<void> => {
+  try {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(LANGUAGE_KEY, languageCode);
+    } else {
+      await AsyncStorage.setItem(LANGUAGE_KEY, languageCode);
+    }
+  } catch (error) {
+    console.error('Error storing language:', error);
+  }
+};
+
+// Get initial language synchronously for web
+const getInitialLanguage = (): string => {
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+    const savedLang = window.localStorage.getItem(LANGUAGE_KEY);
+    if (savedLang && languages.some(l => l.code === savedLang)) {
+      return savedLang;
+    }
+  }
+  return 'en';
+};
+
+// Initialize i18n with saved language for web
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en',
+    lng: getInitialLanguage(),
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
@@ -51,10 +87,10 @@ i18n
     compatibilityJSON: 'v4',
   });
 
-// Load saved language preference
+// Load saved language preference (for native or async loading)
 export const loadSavedLanguage = async () => {
   try {
-    const savedLanguage = await AsyncStorage.getItem(LANGUAGE_KEY);
+    const savedLanguage = await getStoredLanguage();
     if (savedLanguage && languages.some(l => l.code === savedLanguage)) {
       await i18n.changeLanguage(savedLanguage);
     }
@@ -66,7 +102,7 @@ export const loadSavedLanguage = async () => {
 // Save language preference
 export const saveLanguage = async (languageCode: string) => {
   try {
-    await AsyncStorage.setItem(LANGUAGE_KEY, languageCode);
+    await setStoredLanguage(languageCode);
     await i18n.changeLanguage(languageCode);
   } catch (error) {
     console.error('Error saving language preference:', error);
