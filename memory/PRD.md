@@ -81,6 +81,16 @@ Current: **v2.0.0**
 
 ## Completed Work
 
+### Icon Display Fix (December 2025)
+- **Issue:** Icons (Ionicons) not displaying on web preview - showing empty boxes/rectangles
+- **Root Cause:** `@expo/vector-icons` v14 has broken web compatibility in Expo SDK 54
+- **Solution:**
+  1. Created custom `Icon` component (`/app/frontend/components/Icon.tsx`) with platform-specific rendering
+  2. On web: Uses Unicode/emoji fallback characters that render correctly
+  3. On native: Uses Ionicons normally
+  4. Updated all 18 screen files to use the new Icon component
+- **Result:** All icons now display correctly across the entire application on web
+
 ### Language Persistence Fix
 - **Issue:** Language changes did not persist when navigating between pages on web preview
 - **Root Cause:** AsyncStorage on web is async, causing default language to render before saved language loaded
