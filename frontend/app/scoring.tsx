@@ -616,9 +616,21 @@ export default function ScoringScreen() {
   const renderMagnifier = (targetSize: number) => {
     if (!isTouching || Platform.OS === 'web') return null;
     
-    // Position magnifier above the touch point so finger doesn't block view
+    // Position magnifier - normally above the touch point, but flip below if near top edge
     const magnifierX = touchPosition.x - MAGNIFIER_SIZE / 2;
-    const magnifierY = touchPosition.y + MAGNIFIER_OFFSET_Y - MAGNIFIER_SIZE / 2;
+    
+    // Check if magnifier would go out of bounds at the top
+    const normalYPosition = touchPosition.y + MAGNIFIER_OFFSET_Y - MAGNIFIER_SIZE / 2;
+    const flipThreshold = MAGNIFIER_SIZE + 20; // If touch is within this distance from top, flip below
+    
+    let magnifierY;
+    if (touchPosition.y < flipThreshold) {
+      // Position below the finger when near top edge
+      magnifierY = touchPosition.y + 60; // Below finger
+    } else {
+      // Normal position above the finger
+      magnifierY = normalYPosition;
+    }
     
     // Calculate the visible area in the magnifier
     // We need to translate the content so the touch point appears in the center
