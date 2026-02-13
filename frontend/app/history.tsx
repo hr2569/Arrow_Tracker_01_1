@@ -895,7 +895,7 @@ export default function HistoryScreen() {
           <View style={styles.filterSection}>
             {availableTargetTypes.length > 0 && (
               <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Target:</Text>
+                <Text style={styles.filterLabel}>{t('filters.target')}:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
                   <TouchableOpacity
                     style={[styles.filterChip, !targetTypeFilter && styles.filterChipActive]}
