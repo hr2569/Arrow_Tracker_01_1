@@ -56,6 +56,32 @@ const webIcons: Record<string, string> = {
   'star-outline': '☆',
   'heart': '❤',
   'heart-outline': '♡',
+  'ellipsis-horizontal': '⋯',
+  'ellipsis-vertical': '⋮',
+  'images': '🖼',
+  'image': '🖼',
+  'folder': '📁',
+  'folder-open': '📂',
+  'clipboard': '📋',
+  'copy': '📋',
+  'cut': '✂',
+  'link': '🔗',
+  'unlink': '⛓',
+  'print': '🖨',
+  'battery-full': '🔋',
+  'wifi': '📶',
+  'bluetooth': '🔵',
+  'cloud': '☁',
+  'cloud-upload': '☁↑',
+  'cloud-download': '☁↓',
+  'sync': '🔄',
+  'flash': '⚡',
+  'moon': '🌙',
+  'sunny': '☀',
+  'partly-sunny': '⛅',
+  'rainy': '🌧',
+  'snow': '❄',
+  'thunderstorm': '⛈',
 };
 
 interface IconProps {
@@ -66,24 +92,9 @@ interface IconProps {
 }
 
 export function Icon({ name, size = 24, color = '#fff', style }: IconProps) {
-  // Always try to use Ionicons first
-  // If that fails on web, fall back to text
-  const [useFallback, setUseFallback] = React.useState(false);
-
-  // Check if Ionicons font is loaded by examining if the component renders properly
-  React.useEffect(() => {
-    if (Platform.OS === 'web') {
-      // Give Ionicons a chance to load, then check
-      const timer = setTimeout(() => {
-        // If the icon font isn't loaded, the character will render as a box
-        // We can't easily detect this, so we'll use the fallback for web
-        setUseFallback(true);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  if (Platform.OS === 'web' && useFallback) {
+  // On web, always use the fallback emoji/unicode characters
+  // since Ionicons font loading is broken in Expo SDK 54
+  if (Platform.OS === 'web') {
     const iconChar = webIcons[name as string] || '•';
     const isEmoji = iconChar.length > 1 || /[\u{1F300}-\u{1F9FF}]/u.test(iconChar);
     
@@ -102,6 +113,7 @@ export function Icon({ name, size = 24, color = '#fff', style }: IconProps) {
     );
   }
 
+  // On native platforms, use Ionicons normally
   return <Ionicons name={name} size={size} color={color} style={style} />;
 }
 
