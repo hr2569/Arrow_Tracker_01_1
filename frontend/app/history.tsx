@@ -1307,7 +1307,7 @@ export default function HistoryScreen() {
             </View>
 
             <View style={styles.modalField}>
-              <Text style={styles.modalLabel}>Time</Text>
+              <Text style={styles.modalLabel}>{t('history.time')}</Text>
               {Platform.OS === 'web' ? (
                 <TextInput
                   style={styles.modalInput}
