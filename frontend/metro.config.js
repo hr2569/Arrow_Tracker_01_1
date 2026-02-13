@@ -11,6 +11,8 @@ config.cacheStores = [
   new FileStore({ root: path.join(root, 'cache') }),
 ];
 
+// Fix for @expo/vector-icons not loading on web - disable package exports
+config.resolver.unstable_enablePackageExports = false;
 
 // // Exclude unnecessary directories from file watching
 // config.watchFolders = [__dirname];
