@@ -29,20 +29,33 @@ function HeaderBackButton() {
 }
 
 export default function RootLayout() {
-  const [isLanguageLoaded, setIsLanguageLoaded] = useState(false);
-  
-  // Load Ionicons font from the local assets folder
-  const [fontsLoaded] = useFonts({
-    Ionicons: require('../assets/fonts/Ionicons.ttf'),
-  });
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Load saved language preference at app startup
-    const initLanguage = async () => {
+    // Load fonts and saved language preference at app startup
+    const initApp = async () => {
+      try {
+        // Load Ionicons font from local assets
+        await Font.loadAsync({
+          Ionicons: require('../assets/fonts/Ionicons.ttf'),
+        });
+      } catch (e) {
+        console.warn('Error loading Ionicons font:', e);
+        // Continue anyway - icons may not display but app should work
+      }
+      
       await loadSavedLanguage();
-      setIsLanguageLoaded(true);
+      setIsReady(true);
     };
-    initLanguage();
+    
+    // Add a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      setIsReady(true);
+    }, 5000);
+    
+    initApp().then(() => clearTimeout(timeout));
+    
+    return () => clearTimeout(timeout);
   }, []);
 
   // Show a loading screen until the language and fonts are loaded
