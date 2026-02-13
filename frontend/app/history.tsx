@@ -918,13 +918,13 @@ export default function HistoryScreen() {
             
             {availableBows.length > 0 && (
               <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Bow:</Text>
+                <Text style={styles.filterLabel}>{t('filters.bow')}:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
                   <TouchableOpacity
                     style={[styles.filterChip, !bowFilter && styles.filterChipActive]}
                     onPress={() => setBowFilter(null)}
                   >
-                    <Text style={[styles.filterChipText, !bowFilter && styles.filterChipTextActive]}>All</Text>
+                    <Text style={[styles.filterChipText, !bowFilter && styles.filterChipTextActive]}>{t('filters.all')}</Text>
                   </TouchableOpacity>
                   {availableBows.map((bow) => (
                     <TouchableOpacity
