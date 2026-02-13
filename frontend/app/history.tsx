@@ -1642,6 +1642,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     zIndex: 100,
   },
+  reportBtn: {
+    position: 'absolute',
+    top: 54,
+    right: 16,
+    padding: 8,
+    backgroundColor: 'rgba(139, 0, 0, 0.2)',
+    borderRadius: 8,
+    zIndex: 100,
+  },
   expandedContent: {
     marginTop: 12,
   },
