@@ -254,9 +254,9 @@ export default function SessionSetupScreen() {
                   </View>
                 </View>
                 <Text style={[styles.targetTypeName, selectedTargetType === 'vegas_3spot' && styles.targetTypeNameSelected]}>
-                  Vegas 3-Spot
+                  {t('sessionSetup.vegas3Spot')}
                 </Text>
-                <Text style={styles.targetTypeDesc}>Indoor, triangle</Text>
+                <Text style={styles.targetTypeDesc}>{t('sessionSetup.vegas3SpotDesc')}</Text>
                 {selectedTargetType === 'vegas_3spot' && (
                   <View style={styles.targetCheckmark}>
                     <Ionicons name="checkmark" size={14} color="#fff" />
