@@ -897,7 +897,7 @@ export default function ScoringScreen() {
       <Modal visible={showScorePicker} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Score</Text>
+            <Text style={styles.modalTitle}>{t('scoring.editScore')}</Text>
             <View style={styles.scoreGrid}>
               {getAvailableScores().map((score) => (
                 <TouchableOpacity
