@@ -67,6 +67,7 @@ const ARROWS_PER_ROUND = 3;
 
 export default function CompetitionHistory() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [competitions, setCompetitions] = useState<DisplayCompetition[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
