@@ -166,11 +166,12 @@ export function Icon({ name, size = 24, color = '#fff', style }: IconProps) {
   if (Platform.OS === 'web') {
     const iconName = name as string;
     
-    // First try SVG icons (best quality)
-    if (SvgIcons[iconName]) {
+    // First try SVG icon components (best quality)
+    const SvgIconComponent = SvgIconMap[iconName];
+    if (SvgIconComponent) {
       return (
         <View style={[{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }, style]}>
-          {SvgIcons[iconName](size, color)}
+          <SvgIconComponent size={size} color={color} />
         </View>
       );
     }
