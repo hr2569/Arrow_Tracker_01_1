@@ -611,55 +611,117 @@ export default function ScoringScreen() {
     );
   };
 
-  // Render magnifier component (MyTargets-style magnifying glass)
-  // Shows a zoomed preview with crosshair and score while touching
+  // Render magnifier component - appears at touch position showing zoomed target view
+  // Similar to MyTargets app: circular magnifier with crosshair, follows finger
   const renderMagnifier = (targetSize: number) => {
     if (!isTouching || Platform.OS === 'web') return null;
     
-    // Calculate normalized position for visual indicator
-    const normalizedX = touchPosition.x / targetSize;
-    const normalizedY = touchPosition.y / targetSize;
+    // Position magnifier above the touch point so finger doesn't block view
+    const magnifierX = touchPosition.x - MAGNIFIER_SIZE / 2;
+    const magnifierY = touchPosition.y + MAGNIFIER_OFFSET_Y - MAGNIFIER_SIZE / 2;
     
-    // Determine ring color based on position (approximate visualization)
-    const getRingColorAtPosition = () => {
-      const dx = normalizedX - 0.5;
-      const dy = normalizedY - 0.5;
-      const dist = Math.sqrt(dx * dx + dy * dy) / 0.475;
-      
-      if (dist <= 0.1) return '#FFD700'; // X/10 - Gold
-      if (dist <= 0.3) return '#FFD700'; // 9-10 - Gold
-      if (dist <= 0.5) return '#ed1c24'; // 7-8 - Red
-      if (dist <= 0.7) return '#00a2e8'; // 5-6 - Blue
-      if (dist <= 0.9) return '#2a2a2a'; // 3-4 - Black
-      return '#f5f5f0'; // 1-2 - White
-    };
-    
-    const ringColor = getRingColorAtPosition();
+    // Calculate transform to show zoomed area centered on touch point
+    // The inner content is scaled up, then translated so touch point is centered
+    const innerTranslateX = (MAGNIFIER_SIZE / 2 - touchPosition.x * MAGNIFIER_ZOOM);
+    const innerTranslateY = (MAGNIFIER_SIZE / 2 - touchPosition.y * MAGNIFIER_ZOOM);
     
     return (
-      <View style={styles.magnifierContainer} pointerEvents="none">
-        <View style={styles.magnifierBox}>
-          {/* Simulated zoomed area with ring color */}
-          <View style={[styles.magnifierInner, { backgroundColor: ringColor }]}>
-            {/* Concentric rings for visual context */}
-            <View style={[styles.magnifierRing, { backgroundColor: previewScore >= 9 ? '#FFD700' : 'transparent' }]} />
-            
-            {/* Center crosshair */}
-            <View style={styles.magnifierCrosshair}>
-              <View style={styles.crosshairHorizontal} />
-              <View style={styles.crosshairVertical} />
-              <View style={styles.crosshairDot} />
+      <View 
+        style={[
+          styles.magnifierContainer,
+          {
+            left: magnifierX,
+            top: magnifierY,
+          }
+        ]} 
+        pointerEvents="none"
+      >
+        <View style={styles.magnifierCircle}>
+          {/* Zoomed target content */}
+          <View style={styles.magnifierContent}>
+            <View style={{
+              transform: [
+                { translateX: innerTranslateX },
+                { translateY: innerTranslateY },
+                { scale: MAGNIFIER_ZOOM },
+              ],
+            }}>
+              {/* Render mini target rings */}
+              {renderMagnifierTarget(targetSize)}
             </View>
+          </View>
+          
+          {/* Green diamond crosshair reticle */}
+          <View style={styles.magnifierCrosshair}>
+            <View style={styles.diamondReticle} />
           </View>
         </View>
         
-        {/* Score preview below magnifier */}
+        {/* Score indicator below magnifier */}
         <View style={[styles.magnifierScoreBadge, { backgroundColor: getScoreColor(previewScore) }]}>
           <Text style={[styles.magnifierScoreText, { color: getScoreTextColor(previewScore) }]}>
             {getScoreDisplay(previewScore)}
           </Text>
         </View>
-        <Text style={styles.magnifierHintText}>Drag to adjust</Text>
+      </View>
+    );
+  };
+  
+  // Render simplified target rings for magnifier view
+  const renderMagnifierTarget = (size: number) => {
+    const rings = targetConfig.rings;
+    const colors = targetConfig.colors;
+    const ringElements = [];
+    
+    for (let i = 0; i < rings; i++) {
+      const ringRatio = (rings - i) / rings;
+      const ringSize = size * ringRatio * 0.95;
+      const color = colors[i];
+      
+      ringElements.push(
+        <View
+          key={`mag-ring-${i}`}
+          style={{
+            position: 'absolute',
+            width: ringSize,
+            height: ringSize,
+            borderRadius: ringSize / 2,
+            backgroundColor: color?.bg || '#f5f5f0',
+            borderWidth: 1,
+            borderColor: color?.border || '#333',
+          }}
+        />
+      );
+    }
+    
+    // X ring
+    const xRingSize = size * 0.05 * 0.95;
+    const xRingColor = (targetConfig as any).xRingColor || { bg: '#fff200', border: '#b8860b' };
+    ringElements.push(
+      <View
+        key="mag-xring"
+        style={{
+          position: 'absolute',
+          width: xRingSize,
+          height: xRingSize,
+          borderRadius: xRingSize / 2,
+          backgroundColor: xRingColor.bg,
+          borderWidth: 2,
+          borderColor: xRingColor.border,
+        }}
+      />
+    );
+    
+    return (
+      <View style={{
+        width: size,
+        height: size,
+        backgroundColor: '#1a1a1a',
+        borderRadius: size / 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        {ringElements}
       </View>
     );
   };
