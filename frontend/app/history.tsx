@@ -1257,7 +1257,7 @@ export default function HistoryScreen() {
         <Pressable style={styles.modalOverlay} onPress={closeEditModal}>
           <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Edit Session</Text>
+              <Text style={styles.modalTitle}>{t('history.editSession')}</Text>
               <TouchableOpacity onPress={closeEditModal}>
                 <Ionicons name="close" size={24} color="#888888" />
               </TouchableOpacity>
