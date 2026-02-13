@@ -58,8 +58,8 @@ export default function RootLayout() {
     return () => clearTimeout(timeout);
   }, []);
 
-  // Show a loading screen until the language and fonts are loaded
-  if (!isLanguageLoaded || !fontsLoaded) {
+  // Show a loading screen until ready
+  if (!isReady) {
     return (
       <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#121212' }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }}>
