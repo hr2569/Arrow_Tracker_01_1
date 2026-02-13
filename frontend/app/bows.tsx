@@ -88,7 +88,7 @@ export default function BowsScreen() {
 
   const handleSave = async () => {
     if (!formName.trim()) {
-      Alert.alert('Error', 'Please enter a bow name');
+      Alert.alert(t('bows.error'), t('bows.enterBowName'));
       return;
     }
 
@@ -113,7 +113,7 @@ export default function BowsScreen() {
       fetchBows();
     } catch (error) {
       console.error('Error saving bow:', error);
-      Alert.alert('Error', 'Failed to save bow');
+      Alert.alert(t('bows.error'), t('bows.failedToSave'));
     } finally {
       setSaving(false);
     }
