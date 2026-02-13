@@ -209,7 +209,7 @@ export default function BowsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>My Bows</Text>
+        <Text style={styles.headerTitle}>{t('bows.title')}</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={openAddModal}
@@ -222,23 +222,23 @@ export default function BowsScreen() {
       {loading ? (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#8B0000" />
-          <Text style={styles.loadingText}>Loading bows...</Text>
+          <Text style={styles.loadingText}>{t('bows.loadingBows')}</Text>
         </View>
       ) : bows.length === 0 ? (
         <View style={styles.centerContainer}>
           <View style={styles.emptyIcon}>
             <Ionicons name="arrow-forward-outline" size={64} color="#333" />
           </View>
-          <Text style={styles.emptyTitle}>No Bows Yet</Text>
+          <Text style={styles.emptyTitle}>{t('bows.noBows')}</Text>
           <Text style={styles.emptySubtitle}>
-            Add your first bow to track your equipment
+            {t('bows.noBowsDescription')}
           </Text>
           <TouchableOpacity
             style={styles.emptyAddButton}
             onPress={openAddModal}
           >
             <Ionicons name="add" size={24} color="#fff" />
-            <Text style={styles.emptyAddButtonText}>Add Bow</Text>
+            <Text style={styles.emptyAddButtonText}>{t('bows.addBow')}</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -265,7 +265,7 @@ export default function BowsScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {editingBow ? 'Edit Bow' : 'Add New Bow'}
+                {editingBow ? t('bows.editBow') : t('bows.addNewBow')}
               </Text>
               <TouchableOpacity
                 style={styles.modalCloseButton}
@@ -277,22 +277,22 @@ export default function BowsScreen() {
 
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               {/* Bow Name */}
-              <Text style={styles.inputLabel}>Bow Name *</Text>
+              <Text style={styles.inputLabel}>{t('bows.bowNameRequired')}</Text>
               <TextInput
                 style={styles.textInput}
                 value={formName}
                 onChangeText={setFormName}
-                placeholder="e.g., My Competition Bow"
+                placeholder={t('bows.bowNamePlaceholder')}
                 placeholderTextColor="#666"
               />
 
               {/* Bow Type */}
-              <Text style={styles.inputLabel}>Bow Type</Text>
+              <Text style={styles.inputLabel}>{t('bows.bowType')}</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => setShowTypePicker(!showTypePicker)}
               >
-                <Text style={styles.pickerButtonText}>{formType}</Text>
+                <Text style={styles.pickerButtonText}>{t(`bows.${formType.toLowerCase()}`)}</Text>
                 <Ionicons
                   name={showTypePicker ? 'chevron-up' : 'chevron-down'}
                   size={20}
@@ -320,7 +320,7 @@ export default function BowsScreen() {
                           formType === type && styles.pickerOptionTextActive,
                         ]}
                       >
-                        {type}
+                        {t(`bows.${type.toLowerCase()}`)}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -328,34 +328,34 @@ export default function BowsScreen() {
               )}
 
               {/* Draw Weight */}
-              <Text style={styles.inputLabel}>Draw Weight (lbs)</Text>
+              <Text style={styles.inputLabel}>{t('bows.drawWeight')}</Text>
               <TextInput
                 style={styles.textInput}
                 value={formDrawWeight}
                 onChangeText={setFormDrawWeight}
-                placeholder="e.g., 40"
+                placeholder={t('bows.drawWeightPlaceholder')}
                 placeholderTextColor="#666"
                 keyboardType="decimal-pad"
               />
 
               {/* Draw Length */}
-              <Text style={styles.inputLabel}>Draw Length (inches)</Text>
+              <Text style={styles.inputLabel}>{t('bows.drawLength')}</Text>
               <TextInput
                 style={styles.textInput}
                 value={formDrawLength}
                 onChangeText={setFormDrawLength}
-                placeholder="e.g., 28"
+                placeholder={t('bows.drawLengthPlaceholder')}
                 placeholderTextColor="#666"
                 keyboardType="decimal-pad"
               />
 
               {/* Notes */}
-              <Text style={styles.inputLabel}>Notes</Text>
+              <Text style={styles.inputLabel}>{t('bows.notes')}</Text>
               <TextInput
                 style={[styles.textInput, styles.textAreaInput]}
                 value={formNotes}
                 onChangeText={setFormNotes}
-                placeholder="Any additional notes about this bow..."
+                placeholder={t('bows.notesPlaceholder')}
                 placeholderTextColor="#666"
                 multiline
                 numberOfLines={4}
@@ -375,7 +375,7 @@ export default function BowsScreen() {
                 <>
                   <Ionicons name="checkmark" size={24} color="#fff" />
                   <Text style={styles.saveButtonText}>
-                    {editingBow ? 'Update Bow' : 'Save Bow'}
+                    {editingBow ? t('bows.updateBow') : t('bows.saveBow')}
                   </Text>
                 </>
               )}
