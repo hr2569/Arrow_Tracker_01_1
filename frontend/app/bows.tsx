@@ -121,12 +121,12 @@ export default function BowsScreen() {
 
   const handleDelete = (bow: Bow) => {
     Alert.alert(
-      'Delete Bow',
-      `Are you sure you want to delete "${bow.name}"?`,
+      t('bows.deleteBow'),
+      `${t('bows.deleteBowConfirm')} "${bow.name}"?`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('bows.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('bows.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -134,7 +134,7 @@ export default function BowsScreen() {
               fetchBows();
             } catch (error) {
               console.error('Error deleting bow:', error);
-              Alert.alert('Error', 'Failed to delete bow');
+              Alert.alert(t('bows.error'), t('bows.failedToDelete'));
             }
           },
         },
