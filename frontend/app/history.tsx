@@ -416,6 +416,7 @@ interface GroupedSessions {
 
 export default function HistoryScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'history' | 'report'>('history');
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
