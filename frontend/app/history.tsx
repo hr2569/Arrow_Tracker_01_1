@@ -901,7 +901,7 @@ export default function HistoryScreen() {
                     style={[styles.filterChip, !targetTypeFilter && styles.filterChipActive]}
                     onPress={() => setTargetTypeFilter(null)}
                   >
-                    <Text style={[styles.filterChipText, !targetTypeFilter && styles.filterChipTextActive]}>All</Text>
+                    <Text style={[styles.filterChipText, !targetTypeFilter && styles.filterChipTextActive]}>{t('filters.all')}</Text>
                   </TouchableOpacity>
                   {availableTargetTypes.map((type) => (
                     <TouchableOpacity
