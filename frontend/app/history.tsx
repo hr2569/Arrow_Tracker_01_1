@@ -1116,7 +1116,7 @@ export default function HistoryScreen() {
                       }}
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                      <Ionicons name="document-text" size={18} color="#8B0000" />
+                      <Ionicons name="document-text" size={18} color="#fff" />
                     </Pressable>
 
                     {expandedSession === session.id && session.rounds && (
