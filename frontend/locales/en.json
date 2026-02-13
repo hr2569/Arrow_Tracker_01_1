@@ -215,7 +215,8 @@
     "training": "Training",
     "competition": "Competition",
     "shots": "Shots",
-    "points": "points"
+    "points": "points",
+    "failedToSave": "Failed to save session"
   },
   "common": {
     "loading": "Loading...",
