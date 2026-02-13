@@ -55,7 +55,7 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <View style={styles.buttonIconContainerPrimary}>
-                <Ionicons name="add-circle" size={36} color="#fff" />
+                <Icon name="add-circle" size={36} color="#fff" />
               </View>
               <Text style={styles.primaryButtonTextSmall}>{t('home.newSession')}</Text>
               <Text style={styles.buttonSubtextSmall}>{t('home.practiceTraining')}</Text>
