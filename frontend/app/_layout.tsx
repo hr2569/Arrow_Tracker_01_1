@@ -30,14 +30,26 @@ function HeaderBackButton() {
 
 export default function RootLayout() {
   const [isLanguageLoaded, setIsLanguageLoaded] = useState(false);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
 
   useEffect(() => {
-    // Load saved language preference at app startup and wait for it
-    const initLanguage = async () => {
+    // Load fonts and saved language preference at app startup
+    const initApp = async () => {
+      try {
+        // Load Ionicons font for web
+        await Font.loadAsync({
+          ...Ionicons.font,
+        });
+        setFontsLoaded(true);
+      } catch (e) {
+        console.warn('Error loading fonts:', e);
+        setFontsLoaded(true); // Continue even if fonts fail
+      }
+      
       await loadSavedLanguage();
       setIsLanguageLoaded(true);
     };
-    initLanguage();
+    initApp();
   }, []);
 
   // Show a loading screen until the language is loaded
