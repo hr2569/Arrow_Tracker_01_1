@@ -884,7 +884,7 @@ export default function HistoryScreen() {
                   selectedPeriod === period && styles.periodButtonTextActive,
                 ]}
               >
-                {period.charAt(0).toUpperCase() + period.slice(1)}
+                {t(`history.${period}`)}
               </Text>
             </TouchableOpacity>
           ))}
