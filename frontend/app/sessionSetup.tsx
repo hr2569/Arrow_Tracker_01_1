@@ -300,9 +300,9 @@ export default function SessionSetupScreen() {
           {/* Bow Selection */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Select Bow</Text>
+              <Text style={styles.sectionTitle}>{t('sessionSetup.selectBow')}</Text>
               <TouchableOpacity onPress={navigateToAddBow}>
-                <Text style={styles.manageLink}>Manage Bows</Text>
+                <Text style={styles.manageLink}>{t('sessionSetup.manageBows')}</Text>
               </TouchableOpacity>
             </View>
             
