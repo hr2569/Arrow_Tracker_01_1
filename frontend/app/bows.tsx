@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { getBowIcon } from '../utils/bowIcons';
 import { getBows, createBow, updateBow, deleteBow, Bow } from '../utils/localStorage';
 

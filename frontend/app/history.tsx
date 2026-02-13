@@ -19,6 +19,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useTranslation } from 'react-i18next';
 import { getSessions, updateSession, deleteSession, deleteRound, updateRound, Session, Round, Shot } from '../utils/localStorage';
 import Svg, { Circle, Defs, RadialGradient, Stop, G, Line } from 'react-native-svg';
 
