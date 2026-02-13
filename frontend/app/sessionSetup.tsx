@@ -116,7 +116,7 @@ export default function SessionSetupScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#8B0000" />
-          <Text style={styles.loadingText}>Loading...</Text>
+          <Text style={styles.loadingText}>{t('sessionSetup.loading')}</Text>
         </View>
       </SafeAreaView>
     );
