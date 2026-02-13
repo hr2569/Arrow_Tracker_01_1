@@ -611,36 +611,16 @@ export default function ScoringScreen() {
   };
 
   // Render magnifier component - appears at touch position showing zoomed target view
-  // Similar to MyTargets app: circular magnifier with crosshair, follows finger
+  // Like MyTargets app: circular magnifier centered directly on finger with green crosshair
   const renderMagnifier = (targetSize: number) => {
     if (!isTouching || Platform.OS === 'web') return null;
     
-    // Position magnifier - normally above the touch point, but flip below if near top edge
+    // Position magnifier centered directly on the touch point (like MyTargets)
     const magnifierX = touchPosition.x - MAGNIFIER_SIZE / 2;
-    
-    // Check if magnifier would go out of bounds at the top
-    const normalYPosition = touchPosition.y + MAGNIFIER_OFFSET_Y - MAGNIFIER_SIZE / 2;
-    const flipThreshold = MAGNIFIER_SIZE + 20; // If touch is within this distance from top, flip below
-    
-    let magnifierY;
-    if (touchPosition.y < flipThreshold) {
-      // Position below the finger when near top edge
-      magnifierY = touchPosition.y + 60; // Below finger
-    } else {
-      // Normal position above the finger
-      magnifierY = normalYPosition;
-    }
+    const magnifierY = touchPosition.y - MAGNIFIER_SIZE / 2;
     
     // Calculate the visible area in the magnifier
     // We need to translate the content so the touch point appears in the center
-    // Since the target is rendered at (0,0) and has dimensions targetSize x targetSize
-    // The touch point is at (touchPosition.x, touchPosition.y)
-    // We want that point to appear at the center of the magnifier (MAGNIFIER_SIZE/2, MAGNIFIER_SIZE/2)
-    
-    // First scale, then translate:
-    // After scaling by MAGNIFIER_ZOOM, the touch point would be at (touchPosition.x * MAGNIFIER_ZOOM, touchPosition.y * MAGNIFIER_ZOOM)
-    // We want it at (MAGNIFIER_SIZE/2, MAGNIFIER_SIZE/2)
-    // So translateX = MAGNIFIER_SIZE/2 - touchPosition.x * MAGNIFIER_ZOOM
     const innerTranslateX = MAGNIFIER_SIZE / 2 - touchPosition.x * MAGNIFIER_ZOOM;
     const innerTranslateY = MAGNIFIER_SIZE / 2 - touchPosition.y * MAGNIFIER_ZOOM;
     
@@ -672,9 +652,10 @@ export default function ScoringScreen() {
             </View>
           </View>
           
-          {/* Red diamond crosshair reticle */}
+          {/* Green crosshair like MyTargets app */}
           <View style={styles.magnifierCrosshair}>
-            <View style={styles.diamondReticle} />
+            <View style={styles.crosshairHorizontal} />
+            <View style={styles.crosshairVertical} />
           </View>
         </View>
         
