@@ -678,8 +678,8 @@ export default function ScoringScreen() {
     );
   };
   
-  // Render simplified target rings for magnifier view
-  const renderMagnifierTarget = (size: number) => {
+  // Render simplified target rings for magnifier view (includes existing arrows)
+  const renderMagnifierTarget = (size: number, existingArrows: Arrow[] = []) => {
     const rings = targetConfig.rings;
     const colors = targetConfig.colors;
     const ringElements = [];
@@ -723,6 +723,31 @@ export default function ScoringScreen() {
       />
     );
     
+    // Render existing arrow markers in magnifier
+    const arrowMarkerSize = 12; // Smaller markers for magnifier view
+    const arrowElements = existingArrows.map((arrow, index) => (
+      <View
+        key={`mag-arrow-${index}`}
+        style={{
+          position: 'absolute',
+          width: arrowMarkerSize,
+          height: arrowMarkerSize,
+          borderRadius: arrowMarkerSize / 2,
+          backgroundColor: getScoreColor(arrow.score),
+          borderWidth: 1,
+          borderColor: '#000',
+          left: arrow.x * size - arrowMarkerSize / 2,
+          top: arrow.y * size - arrowMarkerSize / 2,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ fontSize: 6, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
+          {getScoreDisplay(arrow.score)}
+        </Text>
+      </View>
+    ));
+    
     return (
       <View style={{
         width: size,
@@ -733,6 +758,7 @@ export default function ScoringScreen() {
         justifyContent: 'center',
       }}>
         {ringElements}
+        {arrowElements}
       </View>
     );
   };
