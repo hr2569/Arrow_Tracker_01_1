@@ -347,7 +347,7 @@ export default function SessionSetupScreen() {
 
           {/* Distance Input */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Shooting Distance</Text>
+            <Text style={styles.sectionTitle}>{t('sessionSetup.shootingDistance')}</Text>
             
             <View style={styles.distanceInputContainer}>
               <TextInput
