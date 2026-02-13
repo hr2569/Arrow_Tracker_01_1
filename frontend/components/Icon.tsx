@@ -123,10 +123,21 @@ interface IconProps {
 }
 
 export function Icon({ name, size = 24, color = '#fff', style }: IconProps) {
-  // On web, always use the fallback emoji/unicode characters
-  // since Ionicons font loading is broken in Expo SDK 54
+  // On web, use SVG icons for better display
   if (Platform.OS === 'web') {
-    const iconChar = webIcons[name as string] || '•';
+    const iconName = name as string;
+    
+    // First try SVG icons (best quality)
+    if (SvgIcons[iconName]) {
+      return (
+        <View style={[{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }, style]}>
+          {SvgIcons[iconName](size, color)}
+        </View>
+      );
+    }
+    
+    // Fallback to unicode/emoji
+    const iconChar = webIconsFallback[iconName] || '•';
     const isEmoji = iconChar.length > 1 || /[\u{1F300}-\u{1F9FF}]/u.test(iconChar);
     
     return (
