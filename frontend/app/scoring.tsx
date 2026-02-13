@@ -573,6 +573,7 @@ export default function ScoringScreen() {
                     },
                   ]}
                   onPress={() => handleEditArrow(globalIndex)}
+                  pointerEvents={isTouching ? 'none' : 'auto'}
                 >
                   <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
                     {getScoreDisplay(arrow.score)}
