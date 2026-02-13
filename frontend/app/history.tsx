@@ -853,7 +853,7 @@ export default function HistoryScreen() {
           onPress={() => router.push('/report')}
         >
           <Ionicons name="document-text-outline" size={18} color={activeTab === 'report' ? '#fff' : '#888'} />
-          <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>Report</Text>
+          <Text style={[styles.tabButtonText, activeTab === 'report' && styles.tabButtonTextActive]}>{t('history.report')}</Text>
         </TouchableOpacity>
       </View>
 
