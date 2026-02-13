@@ -404,21 +404,6 @@ const scatterStyles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
-  targetOutline: {
-    position: 'absolute',
-    borderWidth: 2,
-    borderColor: '#333',
-    top: 0,
-    left: 0,
-  },
-  heatmapRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  heatmapCell: {
-    borderWidth: 0.5,
-    borderColor: 'rgba(51, 51, 51, 0.3)',
-  },
 });
 
 interface GroupedSessions {
