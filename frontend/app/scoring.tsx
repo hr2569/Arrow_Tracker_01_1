@@ -855,8 +855,8 @@ export default function ScoringScreen() {
 
         <View style={styles.arrowList}>
           <View style={styles.arrowListHeader}>
-            <Text style={styles.arrowListTitle}>Arrows ({arrows.length})</Text>
-            <Text style={styles.totalScore}>Total: {getTotalScore()}</Text>
+            <Text style={styles.arrowListTitle}>{t('scoring.arrows')} ({arrows.length})</Text>
+            <Text style={styles.totalScore}>{t('scoring.total')}: {getTotalScore()}</Text>
           </View>
           
           {arrows.length > 0 ? (
