@@ -973,13 +973,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: MAGNIFIER_SIZE * 0.6,
     height: 2,
-    backgroundColor: '#00C853', // Green like MyTargets
+    backgroundColor: '#8B0000', // Red to match app style
   },
   crosshairVertical: {
     position: 'absolute',
     width: 2,
     height: MAGNIFIER_SIZE * 0.6,
-    backgroundColor: '#00C853', // Green like MyTargets
+    backgroundColor: '#8B0000', // Red to match app style
   },
   diamondReticle: {
     width: 16,
