@@ -142,7 +142,7 @@ export default function SummaryScreen() {
       router.replace('/');
     } catch (err) {
       console.error('Save error:', err);
-      Alert.alert('Error', 'Failed to save session');
+      Alert.alert(t('common.error'), t('summary.failedToSave'));
     } finally {
       setIsSaving(false);
     }
