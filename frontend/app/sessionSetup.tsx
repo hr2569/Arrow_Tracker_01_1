@@ -205,9 +205,9 @@ export default function SessionSetupScreen() {
                   </View>
                 </View>
                 <Text style={[styles.targetTypeName, selectedTargetType === 'wa_standard' && styles.targetTypeNameSelected]}>
-                  WA Standard
+                  {t('sessionSetup.waStandard')}
                 </Text>
-                <Text style={styles.targetTypeDesc}>10-ring, outdoor</Text>
+                <Text style={styles.targetTypeDesc}>{t('sessionSetup.waStandardDesc')}</Text>
                 {selectedTargetType === 'wa_standard' && (
                   <View style={styles.targetCheckmark}>
                     <Ionicons name="checkmark" size={14} color="#fff" />
