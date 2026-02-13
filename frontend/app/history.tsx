@@ -235,32 +235,111 @@ const HeatMap = ({ session, size = 140 }: { session: Session, size?: number }) =
   const allShots = session.rounds.flatMap(r => r.shots || []);
   if (allShots.length === 0) return null;
   
-  const center = size / 2;
-  const gridSize = 7; // 7x7 grid
+  const targetType = session.target_type || 'wa_standard';
+  const gridSize = 20; // Higher resolution for smoother gradient
   const cellSize = size / gridSize;
   
-  // Create grid and count shots in each cell
-  const grid: number[][] = Array(gridSize).fill(0).map(() => Array(gridSize).fill(0));
-  let maxCount = 0;
+  // Create grid and calculate density with blur
+  const densityGrid: number[][] = Array(gridSize).fill(0).map(() => Array(gridSize).fill(0));
+  let maxDensity = 0;
   
   allShots.forEach(shot => {
-    // Shots are 0-1 from top-left, convert directly to grid indices
     const gridX = Math.floor(shot.x * gridSize);
     const gridY = Math.floor(shot.y * gridSize);
-    const clampedX = Math.max(0, Math.min(gridSize - 1, gridX));
-    const clampedY = Math.max(0, Math.min(gridSize - 1, gridY));
-    grid[clampedY][clampedX]++;
-    maxCount = Math.max(maxCount, grid[clampedY][clampedX]);
+    
+    // Apply gaussian blur for smoother heatmap
+    const blurRadius = 2;
+    for (let dx = -blurRadius; dx <= blurRadius; dx++) {
+      for (let dy = -blurRadius; dy <= blurRadius; dy++) {
+        const nx = gridX + dx;
+        const ny = gridY + dy;
+        if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const weight = Math.exp(-distance * distance / 2);
+          densityGrid[ny][nx] += weight;
+        }
+      }
+    }
   });
   
-  // Get color based on intensity - more transparent
-  const getHeatColor = (count: number) => {
-    if (count === 0) return 'transparent';
-    const intensity = count / maxCount;
-    if (intensity < 0.25) return 'rgba(139, 0, 0, 0.15)';
-    if (intensity < 0.5) return 'rgba(139, 0, 0, 0.3)';
-    if (intensity < 0.75) return 'rgba(139, 0, 0, 0.45)';
-    return 'rgba(139, 0, 0, 0.65)';
+  // Find max density
+  densityGrid.forEach(row => {
+    row.forEach(val => {
+      if (val > maxDensity) maxDensity = val;
+    });
+  });
+  
+  // Get heat color - green → yellow → orange → red gradient
+  const getHeatColor = (density: number) => {
+    if (density === 0) return 'transparent';
+    const normalizedValue = density / maxDensity;
+    
+    const colors = [
+      { pos: 0, r: 0, g: 200, b: 0 },       // Green
+      { pos: 0.33, r: 255, g: 255, b: 0 },  // Yellow
+      { pos: 0.66, r: 255, g: 165, b: 0 },  // Orange
+      { pos: 1, r: 255, g: 0, b: 0 },       // Red
+    ];
+    
+    let lower = colors[0];
+    let upper = colors[colors.length - 1];
+    
+    for (let i = 0; i < colors.length - 1; i++) {
+      if (normalizedValue >= colors[i].pos && normalizedValue <= colors[i + 1].pos) {
+        lower = colors[i];
+        upper = colors[i + 1];
+        break;
+      }
+    }
+    
+    const range = upper.pos - lower.pos;
+    const t = range === 0 ? 0 : (normalizedValue - lower.pos) / range;
+    
+    const r = Math.round(lower.r + (upper.r - lower.r) * t);
+    const g = Math.round(lower.g + (upper.g - lower.g) * t);
+    const b = Math.round(lower.b + (upper.b - lower.b) * t);
+    const alpha = 0.2 + normalizedValue * 0.5; // 0.2 to 0.7 opacity
+    
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+  
+  // Render target rings based on target type
+  const renderTargetRings = () => {
+    const ringColors = [
+      { bg: '#f5f5f0', border: '#ddd' }, // 1-2 (white)
+      { bg: '#f5f5f0', border: '#ddd' }, // 
+      { bg: '#2a2a2a', border: '#444' }, // 3-4 (black)
+      { bg: '#2a2a2a', border: '#444' },
+      { bg: '#00a2e8', border: '#0077b3' }, // 5-6 (blue)
+      { bg: '#00a2e8', border: '#0077b3' },
+      { bg: '#ed1c24', border: '#b31217' }, // 7-8 (red)
+      { bg: '#ed1c24', border: '#b31217' },
+      { bg: '#fff200', border: '#ccaa00' }, // 9-10 (gold)
+      { bg: '#fff200', border: '#ccaa00' },
+    ];
+    
+    const rings = [];
+    for (let i = 0; i < 10; i++) {
+      const ringRatio = (10 - i) / 10;
+      const ringSize = size * ringRatio * 0.95;
+      rings.push(
+        <View
+          key={`ring-${i}`}
+          style={{
+            position: 'absolute',
+            width: ringSize,
+            height: ringSize,
+            borderRadius: ringSize / 2,
+            backgroundColor: ringColors[i].bg,
+            borderWidth: 0.5,
+            borderColor: ringColors[i].border,
+            left: (size - ringSize) / 2,
+            top: (size - ringSize) / 2,
+          }}
+        />
+      );
+    }
+    return rings;
   };
   
   return (
@@ -269,26 +348,26 @@ const HeatMap = ({ session, size = 140 }: { session: Session, size?: number }) =
         <Ionicons name="flame" size={14} color="#8B0000" /> Impact Heatmap
       </Text>
       <View style={[scatterStyles.heatmapGrid, { width: size, height: size }]}>
-        {/* Target outline */}
-        <View style={[scatterStyles.targetOutline, { width: size, height: size, borderRadius: size / 2 }]} />
-        {/* Heat cells */}
-        {grid.map((row, y) => (
-          <View key={`row-${y}`} style={scatterStyles.heatmapRow}>
-            {row.map((count, x) => (
-              <View
-                key={`cell-${x}-${y}`}
-                style={[
-                  scatterStyles.heatmapCell,
-                  {
+        {/* Target rings */}
+        {renderTargetRings()}
+        
+        {/* Heat overlay */}
+        <View style={{ position: 'absolute', top: 0, left: 0, width: size, height: size }}>
+          {densityGrid.map((row, y) => (
+            <View key={`row-${y}`} style={{ flexDirection: 'row' }}>
+              {row.map((density, x) => (
+                <View
+                  key={`cell-${x}-${y}`}
+                  style={{
                     width: cellSize,
                     height: cellSize,
-                    backgroundColor: getHeatColor(count),
-                  }
-                ]}
-              />
-            ))}
-          </View>
-        ))}
+                    backgroundColor: getHeatColor(density),
+                  }}
+                />
+              ))}
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );
