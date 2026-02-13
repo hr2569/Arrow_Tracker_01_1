@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,19 +10,26 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import { loadSavedLanguage } from '../i18n';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    loadSavedLanguage();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Backup Button - Top Right */}
+      {/* Settings Button - Top Right */}
       <TouchableOpacity
-        style={styles.backupButton}
-        onPress={() => router.push('/backup')}
+        style={styles.settingsButton}
+        onPress={() => router.push('/settings')}
         activeOpacity={0.7}
       >
-        <Ionicons name="cloud-upload-outline" size={22} color="#888" />
+        <Ionicons name="settings-outline" size={22} color="#888" />
       </TouchableOpacity>
 
       <ScrollView 
@@ -37,9 +44,9 @@ export default function HomeScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.title}>Arrow Tracker</Text>
+          <Text style={styles.title}>{t('app.name')}</Text>
           <Text style={styles.subtitle}>
-            Track your shots and improve your aim
+            {t('app.subtitle')}
           </Text>
         </View>
 
@@ -55,8 +62,8 @@ export default function HomeScreen() {
               <View style={styles.buttonIconContainerPrimary}>
                 <Ionicons name="add-circle" size={36} color="#fff" />
               </View>
-              <Text style={styles.primaryButtonTextSmall}>New Session</Text>
-              <Text style={styles.buttonSubtextSmall}>Practice & Training</Text>
+              <Text style={styles.primaryButtonTextSmall}>{t('home.newSession')}</Text>
+              <Text style={styles.buttonSubtextSmall}>{t('home.practiceTraining')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -67,8 +74,8 @@ export default function HomeScreen() {
               <View style={styles.buttonIconContainerCompetitionDisabled}>
                 <Ionicons name="trophy" size={36} color="#666" />
               </View>
-              <Text style={styles.competitionButtonTextDisabled}>Competition</Text>
-              <Text style={styles.competitionSubtextDisabled}>Coming Soon</Text>
+              <Text style={styles.competitionButtonTextDisabled}>{t('home.competition')}</Text>
+              <Text style={styles.competitionSubtextDisabled}>{t('home.comingSoon')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -82,9 +89,9 @@ export default function HomeScreen() {
               <View style={styles.buttonIconContainerSmall}>
                 <Ionicons name="time" size={36} color="#8B0000" />
               </View>
-              <Text style={styles.secondaryButtonTextSmall}>History</Text>
+              <Text style={styles.secondaryButtonTextSmall}>{t('home.history')}</Text>
               <Text style={styles.buttonSubtextSecondarySmall}>
-                Sessions & Stats
+                {t('home.sessionsStats')}
               </Text>
             </TouchableOpacity>
 
@@ -100,9 +107,9 @@ export default function HomeScreen() {
                   resizeMode="contain"
                 />
               </View>
-              <Text style={styles.secondaryButtonTextSmall}>Bows</Text>
+              <Text style={styles.secondaryButtonTextSmall}>{t('home.bows')}</Text>
               <Text style={styles.buttonSubtextSecondarySmall}>
-                Equipment
+                {t('home.equipment')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -111,7 +118,7 @@ export default function HomeScreen() {
       
       {/* Version Number - Fixed at bottom */}
       <View style={styles.versionContainer}>
-        <Text style={styles.versionText}>v1.1.05</Text>
+        <Text style={styles.versionText}>v2.0.0</Text>
       </View>
     </SafeAreaView>
   );
