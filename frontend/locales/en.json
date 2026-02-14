@@ -123,7 +123,13 @@
     "noBowsFound": "No Bows Found",
     "noBowsMessage": "You need to add at least one bow before starting a session.",
     "addFirstBow": "Add Your First Bow",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "selectBowTitle": "Select a Bow",
+    "selectBowMessage": "Please select a bow before starting the session.",
+    "enterDistanceTitle": "Enter Distance",
+    "enterDistanceMessage": "Please enter the shooting distance.",
+    "invalidDistanceTitle": "Invalid Distance",
+    "invalidDistanceMessage": "Please enter a valid distance."
   },
   "bows": {
     "title": "My Bows",

@@ -241,5 +241,26 @@
     "bow": "Arco",
     "distance": "Distância",
     "all": "Tudo"
+  },
+  "competition": {
+    "deleteCompetition": "Eliminar Competição",
+    "deleteCompetitionConfirm": "Tem a certeza que pretende eliminar \"{{name}}\"?",
+    "failedToDelete": "Falha ao eliminar competição",
+    "reportSaved": "Relatório Guardado",
+    "savedAs": "Guardado como {{fileName}}",
+    "failedToGenerateReport": "Falha ao gerar relatório",
+    "sharingNotAvailable": "Partilha não disponível neste dispositivo",
+    "failedToPDF": "Falha ao gerar PDF",
+    "saveSuccess": "Competição guardada com sucesso!",
+    "failedToSave": "Falha ao guardar competição",
+    "incomplete": "Incompleto",
+    "completeAllScores": "Por favor, complete todas as pontuações antes de guardar.",
+    "completeScoresReport": "Por favor, complete todas as pontuações antes de gerar o relatório.",
+    "enterArcherName": "Por favor, introduza o nome do arqueiro",
+    "discardChanges": "Descartar Alterações",
+    "discardChangesConfirm": "Tem a certeza que pretende descartar todas as alterações?",
+    "discard": "Descartar",
+    "successSaved": "Sucesso",
+    "savedAndGenerated": "Competição guardada e relatório gerado!"
   }
 }
