@@ -19,6 +19,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as IntentLauncher from 'expo-intent-launcher';
 import * as FileSystem from 'expo-file-system/legacy';
+import { useTranslation } from 'react-i18next';
 import { getSessions, getBows, Session, Bow } from '../utils/localStorage';
 
 type ReportPeriod = 'week' | 'month' | 'year' | 'custom' | 'all';
