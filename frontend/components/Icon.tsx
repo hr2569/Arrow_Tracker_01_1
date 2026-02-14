@@ -108,6 +108,258 @@ const CloudUploadIcon = ({ size, color }: { size: number; color: string }) => (
   </Svg>
 );
 
+const CloudDownloadIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M8 17L12 21L16 17M12 12V21" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M20.39 18.39C21.4 17.54 22 16.33 22 15C22 12.24 19.76 10 17 10H15.74C14.67 6.38 11.16 4 7.5 4C3.36 4 0 7.36 0 11.5C0 14.13 1.4 16.44 3.5 17.7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const DocumentTextIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M14 2V8H20M16 13H8M16 17H8M10 9H8" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const CalendarIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M16 2V6M8 2V6M3 10H21" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const CheckmarkCircleIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2" fill="none"/>
+    <Path d="M9 12L11 14L15 10" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const AnalyticsIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M18 20V10M12 20V4M6 20V14" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const BarChartIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M12 20V10M18 20V4M6 20V16" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const StatsChartIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M3 3V21H21" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M7 14L12 9L16 13L21 8" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const LocateIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="4" stroke={color} strokeWidth="2" fill="none"/>
+    <Path d="M12 2V4M12 20V22M2 12H4M20 12H22" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none"/>
+  </Svg>
+);
+
+const LayersIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M12 2L2 7L12 12L22 7L12 2Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M2 17L12 22L22 17" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M2 12L12 17L22 12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const ClipboardIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M16 4H18C18.5304 4 19.0391 4.21071 19.4142 4.58579C19.7893 4.96086 20 5.46957 20 6V20C20 20.5304 19.7893 21.0391 19.4142 21.4142C19.0391 21.7893 18.5304 22 18 22H6C5.46957 22 4.96086 21.7893 4.58579 21.4142C4.21071 21.0391 4 20.5304 4 20V6C4 5.46957 4.21071 4.96086 4.58579 4.58579C4.96086 4.21071 5.46957 4 6 4H8" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M15 2H9C8.44772 2 8 2.44772 8 3V5C8 5.55228 8.44772 6 9 6H15C15.5523 6 16 5.55228 16 5V3C16 2.44772 15.5523 2 15 2Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const FlameIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M12 22C16.4183 22 20 18.4183 20 14C20 10.5 17 7.5 16 5C15 7 14 8 12 8C10 8 8.5 6 8 4C7 6.5 4 10 4 14C4 18.4183 7.58172 22 12 22Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M12 22C14.2091 22 16 19.5 16 17C16 14.5 14 13 12 11C10 13 8 14.5 8 17C8 19.5 9.79086 22 12 22Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const CreateIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const DownloadIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M7 10L12 15L17 10M12 15V3" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const ChevronBackIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M15 18L9 12L15 6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const AppsIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M4 4H10V10H4V4ZM14 4H20V10H14V4ZM4 14H10V20H4V14ZM14 14H20V20H14V14Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const RemoveIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M5 12H19" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none"/>
+  </Svg>
+);
+
+const EyeIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Circle cx="12" cy="12" r="3" stroke={color} strokeWidth="2" fill="none"/>
+  </Svg>
+);
+
+const PlayIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M5 3L19 12L5 21V3Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const FilterIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const HomeIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M9 22V12H15V22" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const ListIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M8 6H21M8 12H21M8 18H21M3 6H3.01M3 12H3.01M3 18H3.01" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const OptionsIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M4 21V14M4 10V3M12 21V12M12 8V3M20 21V16M20 12V3" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Circle cx="4" cy="12" r="2" stroke={color} strokeWidth="2" fill="none"/>
+    <Circle cx="12" cy="10" r="2" stroke={color} strokeWidth="2" fill="none"/>
+    <Circle cx="20" cy="14" r="2" stroke={color} strokeWidth="2" fill="none"/>
+  </Svg>
+);
+
+const PodiumIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M5 11H9V21H5V11ZM10 6H14V21H10V6ZM15 14H19V21H15V14Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const TrendingUpIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M23 6L13.5 15.5L8.5 10.5L1 18" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M17 6H23V12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const FitnessIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M20.84 4.61C19.72 3.49 17.94 3.49 16.82 4.61L12 9.43L7.18 4.61C6.06 3.49 4.28 3.49 3.16 4.61C2.04 5.73 2.04 7.51 3.16 8.63L8 13.45V20H10V13.45L12 11.45L14 13.45V20H16V13.45L20.84 8.63C21.96 7.51 21.96 5.73 20.84 4.61Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const ContractIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M4 14H10V20M20 10H14V4M14 10L21 3M3 21L10 14" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const ResizeIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M21 21L15 15M21 21V15M21 21H15M3 3L9 9M3 3V9M3 3H9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const RadioButtonOnIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2" fill="none"/>
+    <Circle cx="12" cy="12" r="5" fill={color}/>
+  </Svg>
+);
+
+const CloseCircleIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2" fill="none"/>
+    <Path d="M15 9L9 15M9 9L15 15" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none"/>
+  </Svg>
+);
+
+const AlertCircleIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2" fill="none"/>
+    <Path d="M12 8V12M12 16H12.01" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none"/>
+  </Svg>
+);
+
+const InformationCircleIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2" fill="none"/>
+    <Path d="M12 16V12M12 8H12.01" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none"/>
+  </Svg>
+);
+
+const HelpCircleIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2" fill="none"/>
+    <Path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M12 17H12.01" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none"/>
+  </Svg>
+);
+
+const LanguageIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2" fill="none"/>
+    <Path d="M2 12H22M12 2C14.5 4.5 16 8 16 12C16 16 14.5 19.5 12 22C9.5 19.5 8 16 8 12C8 8 9.5 4.5 12 2Z" stroke={color} strokeWidth="2" fill="none"/>
+  </Svg>
+);
+
+const ShareIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="18" cy="5" r="3" stroke={color} strokeWidth="2" fill="none"/>
+    <Circle cx="6" cy="12" r="3" stroke={color} strokeWidth="2" fill="none"/>
+    <Circle cx="18" cy="19" r="3" stroke={color} strokeWidth="2" fill="none"/>
+    <Path d="M8.59 13.51L15.42 17.49M15.41 6.51L8.59 10.49" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none"/>
+  </Svg>
+);
+
+const ArrowForwardIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M5 12H19M12 5L19 12L12 19" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
+const AddCircleOutlineIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2" fill="none"/>
+    <Path d="M12 8V16M8 12H16" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none"/>
+  </Svg>
+);
+
+const CheckmarkDoneIcon = ({ size, color }: { size: number; color: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M18 6L7 17L2 12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <Path d="M22 10L13 19" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </Svg>
+);
+
 // Map icon names to components
 const SvgIconMap: Record<string, React.FC<{ size: number; color: string }>> = {
   'add-circle': AddCircleIcon,
