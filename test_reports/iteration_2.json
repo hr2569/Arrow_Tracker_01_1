@@ -1,0 +1,102 @@
+{
+  "summary": "Frontend i18n translation testing - Portuguese 'Turno' translations verified but Report screen has critical untranslated strings",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "translation_issues": [
+      {
+        "component": "Report Screen (report.tsx)",
+        "issue": "Multiple hardcoded English strings not using t() function for translation",
+        "priority": "HIGH",
+        "affected_strings": [
+          "Line 2075: 'Report Preview' - should use t('report.reportPreview') or similar",
+          "Line 2087: '{filteredSessions.length} session{s} found' - should be translated",
+          "Line 2098: 'Generate Report' button text - should use t('report.generateReport')",
+          "Line 2112: 'Report' header - should use t('report.title')",
+          "Line 2120: 'Performance Report' - should be translated",
+          "Line 2133: 'Overview' - should be translated",
+          "Line 2138: 'Sessions' label - should use t('report.totalSessions')",
+          "Line 2142: 'Rounds' label - should use t('report.totalRounds')",
+          "Line 2146: 'Arrows' label - should use t('report.totalArrows')",
+          "Line 2150: 'Total Points' label - should use t('report.totalPoints')",
+          "Line 2158: 'Averages' - should be translated",
+          "Line 2162: 'Per Arrow' - should use t('report.averagePerArrow')",
+          "Line 2166: 'Per Round' - should use t('report.averagePerRound')",
+          "Line 2170: 'Per Session' - should be translated",
+          "Line 2179: 'By Target Type' - should be translated",
+          "Line 2189: '/arrow' suffix - should be translated",
+          "Line 2194, 2198, 2202, 2206: 'Sessions', 'Rounds', 'Arrows', 'Points' labels",
+          "Line 2213: 'No data for any target type in selected period' - should be translated"
+        ]
+      }
+    ]
+  },
+  "test_report_links": ["/app/test_reports/iteration_2.json"],
+  "action_items": [
+    "CRITICAL: Replace all hardcoded English strings in report.tsx with t() function calls",
+    "Add missing translation keys to en.json and pt.json if they don't exist (e.g., 'reportPreview', 'sessionsFound', 'performanceReport', 'overview', 'averages', 'byTargetType', 'perSession', 'noTargetData')",
+    "Verify report.tsx lines 2070-2250 use proper i18n translation calls"
+  ],
+  "critical_code_review_comments": [
+    "The pt.json file correctly uses 'Turno' instead of 'Volta' for round translations - this part is CORRECT",
+    "The Report screen (report.tsx) was partially translated - t() function is imported and used in some places but NOT in the report display section",
+    "Need to audit report.tsx lines 2073-2250 for all English strings and replace with t() calls",
+    "Translation keys exist in pt.json under 'report' namespace but are not being utilized in the code"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A - frontend only test",
+    "frontend": "70%"
+  },
+  "tested_features": {
+    "turno_vs_volta_translation": {
+      "status": "PASS",
+      "details": "pt.json correctly uses 'Turno' (not 'Volta') for all round-related translations: scoring.round='Turno', history.round='Turno', summary.round='Turno', sessionSetup.arrowsPerRound='Flechas por Turno', etc."
+    },
+    "home_screen_translation": {
+      "status": "PASS",
+      "details": "Verified: 'Nova Sessão', 'Treino e Prática', 'Competição', 'Histórico', 'Arcos' all display correctly in Portuguese"
+    },
+    "history_screen_translation": {
+      "status": "PASS",
+      "details": "Header shows 'Histórico', tabs show 'Sessões' and 'Relatório', filters show 'Dia/Semana/Mês/Ano/Tudo'"
+    },
+    "bows_screen_translation": {
+      "status": "PASS",
+      "details": "'Os Meus Arcos', 'Sem Arcos', 'Adicionar Arco', 'Tipo de Arco', 'Recurvo', 'Guardar Arco' all correct"
+    },
+    "report_screen_translation": {
+      "status": "FAIL",
+      "details": "Report screen shows English labels: 'Generate Report', 'Configure Report', 'Date Range', 'Last Week/Month/Year', 'Report Preview', 'sessions found'. Translation keys exist in pt.json but t() function not used for these strings in report.tsx"
+    },
+    "summary_screen_header": {
+      "status": "PASS (code review)",
+      "details": "pt.json has summary.title='Resumo do Turno' - translation key exists and should display correctly"
+    }
+  },
+  "screenshots_taken": [
+    "08_home_portuguese.png - Home page correctly showing Portuguese translations",
+    "09_history_page_pt.png - History page with 'Histórico', 'Sessões', 'Relatório' tabs",
+    "10_report_page_pt.png - Report screen showing ENGLISH labels (bug)",
+    "11_bows_page_pt.png - Bows page with Portuguese translations"
+  ],
+  "seed_data_creation": "Attempted to create test bow 'Arco de Teste' for session flow testing",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "The Report screen (report.tsx) has translation keys defined in pt.json but the component is NOT using t() function for many UI strings in the report display section (lines 2073-2250). Main agent needs to replace hardcoded strings with t() calls. Other screens (Home, History, Bows, Session Setup) translate correctly.",
+  "rca_of_the_issue": {
+    "root_cause": "report.tsx was partially translated - the initial selection screen uses some t() calls but the report display screen (lines 2073-2250) has many hardcoded English strings",
+    "reproduction_steps": [
+      "1. Set language to Portuguese via Settings or localStorage.setItem('@arrow_tracker_language', 'pt')",
+      "2. Navigate to History -> Relatório tab (or direct to /report)",
+      "3. Observe that labels like 'Generate Report', 'Date Range', 'Last Week', 'Report Preview' are in English",
+      "4. Compare with pt.json which has proper translations under 'report' namespace"
+    ],
+    "mitigation": "Replace all hardcoded English strings in report.tsx with appropriate t() function calls using the existing translation keys from pt.json"
+  }
+}
