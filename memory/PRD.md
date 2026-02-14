@@ -1,139 +1,72 @@
-# Arrow Tracker - Product Requirements Document
+# Archery Scoring App - PRD
 
-## Overview
-Arrow Tracker is a React Native (Expo) archery scoring application designed to help archers track their shots, analyze performance, and improve their aim.
-
-## Version
-Current: **v2.0.2**
+## Original Problem Statement
+React Native Expo archery scoring application with target visualization, arrow placement, and round/session management.
 
 ## Core Features
+- Target visualization (WA Standard, Vegas 3-spot, NFAA Indoor)
+- Touch-to-place arrow scoring with magnifier zoom
+- Round and session tracking
+- Competition and training modes
+- Internationalization (i18n) support
+- Cloud backup via Firebase
 
-### 1. Scoring System
-- Real-time arrow placement on target faces
-- Support for multiple target types (WA Standard, Vegas 3-Spot, WA Indoor)
-- Round-based scoring with customizable arrows per round
-- Zoom and pan functionality for precise arrow placement
+## Current Version
+- App Version: 2.0.3
+- Version Code: 13
 
-### 2. Session Management
-- Create and configure scoring sessions
-- Select bow, distance, and target type
-- Save and review completed sessions
+---
 
-### 3. History & Statistics
-- View all past sessions
-- Filter by day, week, month, year, or all time
-- Detailed statistics including averages, shot distribution, and heatmaps
+## Changelog
 
-### 4. Equipment Management (Bows)
-- Add, edit, and delete bows
-- Track bow type, draw weight, draw length, and notes
-- Associate bows with scoring sessions
-- **FULLY TRANSLATED** in all 9 languages
+### Session - December 2025
 
-### 5. Internationalization (i18n) - COMPLETED
-- **9 Supported Languages:**
-  - English (en)
-  - Portuguese - European (pt)
-  - Spanish (es)
-  - French (fr)
-  - Italian (it)
-  - Finnish (fi)
-  - Swedish (sv)
-  - Russian (ru)
-  - Ukrainian (uk)
-- Language preference persists across sessions
-- All menus, buttons, labels, and messages translated
-- **All screens now use dynamic translations including navigation headers**
+#### Completed
+- [x] Fixed i18n translations on report.tsx screen
+- [x] Implemented SVG icon system (replaced emoji/unicode icons with consistent SVGs in `Icon.tsx`)
+- [x] Fixed version display across app (index.tsx, settings.tsx)
+- [x] Fixed rogue modal issue in summary.tsx (added blur listener)
+- [x] Updated app.json to version 2.0.3, versionCode 13
+- [x] **Jump bug fix attempt**: 
+  - Added `scrollEnabled` state to disable ScrollView during arrow placement
+  - Enhanced ZoomableTarget pan gesture with `isPanning` tracking
+  - Increased minDistance threshold to 30px
+- [x] **Magnifier arrows 50% bigger**: Changed from ~5.6px to 21px
 
-### 6. Backup & Restore
-- Google account integration for cloud backup
-- Manual backup and restore functionality
+---
 
-## Technical Stack
-- **Frontend:** React Native (Expo)
-- **Internationalization:** i18next, react-i18next
-- **Storage:** AsyncStorage (native), localStorage (web)
-- **Navigation:** expo-router
-- **Gestures:** react-native-gesture-handler
+## Roadmap
 
-## Recent Fixes (December 2025)
+### P0 (Critical) - In Progress
+- [ ] Verify jump bug fix on physical device (user testing required)
 
-### Icon Consistency Improvements (v2.0.2)
-- **Issue:** Web platform was using emoji/unicode fallbacks for many icons due to Expo SDK vector-icons bug
-- **Solution:** Added 50+ new SVG icon components to `Icon.tsx`:
-  - Navigation icons: `chevron-back`, `arrow-forward-outline`, `home`
-  - Document icons: `document-text`, `document-outline`, `clipboard`
-  - Chart icons: `analytics`, `bar-chart`, `stats-chart`, `trending-up`
-  - Status icons: `checkmark-circle`, `alert-circle`, `information-circle`, `help-circle`
-  - Action icons: `create`, `download`, `share`, `filter`, `play`, `remove`
-  - UI icons: `calendar`, `locate`, `layers`, `flame`, `apps`, `options`, `list`
-  - And many more...
-- **Also fixed:** Backup screen now uses proper SVG icons for success/error status instead of unicode characters
-- **Result:** Consistent, high-quality SVG icons across all screens on web platform
+### P1 (High Priority)
+- [ ] Enable and finalize "Competition" menu for version 2.1.0
 
-### i18n Report Screen & Configuration Updates (v2.0.2)
-- **Issue:** Report screen and some filter text remained in English after language change
-- **Solution:** 
-  1. Fully translated `report.tsx` to use `t()` function throughout
-  2. Added comprehensive translation keys to `pt.json` and `en.json` for all report elements
-  3. Changed "Volta" to "Turno" in Portuguese translations per user request
-  4. Fixed `getFilterSummary()` to use `t('report.allBows')` instead of hardcoded "All Equipment"
-- **Configuration Updates:**
-  - Updated `app.json` owner to `hraimundo1`
-  - Updated projectId to `7789ca40-95f6-47d2-99d0-6dec6de9edfe`
-  - Version set to `2.0.2` (versionCode: 12)
-- **Verified:** All report screen elements translate correctly to Portuguese
+### P2 (Medium Priority)
+- [ ] EAS Build: User must "Save to GitHub" to sync app.json changes before next build
+- [ ] Final icon consistency review across app
 
-### i18n Navigation Header Fix (v2.0.1)
-- **Issue:** Navigation headers ("Round Summary", "Arrow Tracker") stayed in English after language change
-- **Root Cause:** Hardcoded titles in `_layout.tsx` Stack.Screen options
-- **Solution:**
-  1. Removed hardcoded `title` property from `_layout.tsx` for dynamic screens
-  2. Updated `summary.tsx` to use `navigation.setOptions({ title: t('summary.title') })` with `t` dependency
-  3. Updated `index.tsx` (Home) to dynamically set title via `navigation.setOptions()`
-  4. Fixed "Round X" text in `scoring.tsx` to use `t('scoring.round')`
-- **Verified:** All screen headers now translate correctly when language changes
+---
 
-### Zoom Pan Gesture Fix (v2.0.1)
-- **Issue:** View "jumped" when placing arrow near existing ones when zoomed in
-- **Root Cause:** Pan gesture activated too easily, conflicting with touch for arrow placement
-- **Solution:** Added `minDistance: 15` to pan gesture in `scoring.tsx` ZoomableTarget component
-- **Result:** Users must move finger 15px before pan activates, allowing precise arrow placement
+## Technical Architecture
 
-## File Structure
 ```
-/app/frontend/
-├── app/
-│   ├── _layout.tsx       # Root layout (no hardcoded titles)
-│   ├── index.tsx         # Home screen (dynamic title via navigation.setOptions)
-│   ├── settings.tsx      # Settings with language selector
-│   ├── history.tsx       # Session history
-│   ├── bows.tsx          # Bow management
-│   ├── scoring.tsx       # Scoring interface (zoom fix + i18n)
-│   ├── sessionSetup.tsx  # Session configuration
-│   ├── summary.tsx       # Round summary (dynamic title via navigation.setOptions)
-│   └── ...
-├── components/
-│   └── Icon.tsx          # Custom icon component with web fallback
-├── locales/
-│   ├── en.json           # English translations
-│   ├── pt.json           # Portuguese translations
-│   └── ... (7 more language files)
-└── i18n.ts               # i18n configuration with hybrid storage
+/app
+└── frontend/
+    ├── app/
+    │   ├── (tabs)/
+    │   │   └── index.tsx        # Home screen
+    │   ├── backup.tsx           # Cloud backup
+    │   ├── scoring.tsx          # MAIN SCORING SCREEN
+    │   ├── settings.tsx         # Settings
+    │   └── summary.tsx          # Round summary
+    ├── components/
+    │   └── Icon.tsx             # SVG icon system
+    └── app.json                 # App configuration
 ```
 
-## Upcoming Tasks
-
-### P0: Enable Competition Menu (v2.1.0)
-- Enable the "Competition" button on home screen (currently disabled)
-- Review and test existing competition flow
-- User requirements to be gathered
-
-### P1: Icon Consistency Review - COMPLETED
-- All icons now use proper SVG components on web platform
-- 50+ new icon components added to Icon.tsx
-- No more emoji/unicode fallbacks for critical icons
-
-## Known Issues
-- Backend: Firebase credentials file missing (`firebase-credentials.json`) - needed for backup/restore feature
-- Note: Web icons use Unicode/emoji fallbacks due to Expo SDK 54 vector-icons bug
+## Key Technical Notes
+- **Gesture Handling**: Uses react-native-gesture-handler (PanGestureHandler) + React Native Responder system
+- **Known conflict**: The two gesture systems can conflict, causing the "jump" issue
+- **Testing**: Gesture issues must be tested on physical devices
