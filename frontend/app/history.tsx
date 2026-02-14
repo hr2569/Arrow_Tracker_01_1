@@ -1139,14 +1139,14 @@ export default function HistoryScreen() {
                         
                         {/* Shot Distribution and Heatmap side by side */}
                         <View style={styles.visualizationsRow}>
-                          <ScatterMap session={session} size={140} />
-                          <HeatMap session={session} size={140} />
+                          <ScatterMap session={session} size={140} t={t} />
+                          <HeatMap session={session} size={140} t={t} />
                         </View>
                         
                         {getRoundChartData(session) && session.rounds.length > 1 && (
                           <View style={styles.chartSection}>
                             <Text style={styles.chartTitle}>
-                              <Icon name="trending-up" size={16} color="#8B0000" /> Score by Round
+                              <Icon name="trending-up" size={16} color="#8B0000" /> {t('history.scoreByRound')}
                             </Text>
                             <LineChart
                               data={getRoundChartData(session)!}
@@ -1190,7 +1190,7 @@ export default function HistoryScreen() {
                             <View key={round.id || index} style={styles.roundItem}>
                               <View style={styles.roundHeader}>
                                 <Text style={styles.roundNumber}>
-                                  Round {round.round_number || index + 1}
+                                  {t('history.round')} {round.round_number || index + 1}
                                 </Text>
                                 <View style={styles.roundActions}>
                                   <TouchableOpacity
