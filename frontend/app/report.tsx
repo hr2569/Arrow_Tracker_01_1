@@ -1819,13 +1819,13 @@ export default function ReportScreen() {
           {/* Distance Filter */}
           {availableDistances.length > 0 && (
             <View style={styles.filterSection}>
-              <Text style={styles.sectionLabel}>Filter by Distance</Text>
+              <Text style={styles.sectionLabel}>{t('report.distance')}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <TouchableOpacity
                   style={[styles.filterChip, !selectedDistance && styles.filterChipActive]}
                   onPress={() => setSelectedDistance(null)}
                 >
-                  <Text style={[styles.filterChipText, !selectedDistance && styles.filterChipTextActive]}>All Distances</Text>
+                  <Text style={[styles.filterChipText, !selectedDistance && styles.filterChipTextActive]}>{t('report.allDistances')}</Text>
                 </TouchableOpacity>
                 {availableDistances.map((distance) => (
                   <TouchableOpacity
