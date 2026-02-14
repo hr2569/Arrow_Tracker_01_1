@@ -2219,17 +2219,17 @@ export default function ReportScreen() {
         {reportStats.totalSessions > 0 && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>
-              <Icon name="trophy" size={18} color="#8B0000" /> Highlights
+              <Icon name="trophy" size={18} color="#8B0000" /> {t('report.highlights')}
             </Text>
             <View style={styles.highlightRow}>
               <View style={styles.highlightItem}>
-                <Text style={styles.highlightLabel}>Best Session</Text>
-                <Text style={styles.highlightValue}>{reportStats.bestSession.score} pts</Text>
+                <Text style={styles.highlightLabel}>{t('report.bestSession')}</Text>
+                <Text style={styles.highlightValue}>{reportStats.bestSession.score} {t('report.pts')}</Text>
                 <Text style={styles.highlightDate}>{reportStats.bestSession.date}</Text>
               </View>
               <View style={styles.highlightItem}>
-                <Text style={styles.highlightLabel}>Lowest Session</Text>
-                <Text style={styles.highlightValueLow}>{reportStats.worstSession.score} pts</Text>
+                <Text style={styles.highlightLabel}>{t('report.lowestSession')}</Text>
+                <Text style={styles.highlightValueLow}>{reportStats.worstSession.score} {t('report.pts')}</Text>
                 <Text style={styles.highlightDate}>{reportStats.worstSession.date}</Text>
               </View>
             </View>
@@ -2240,7 +2240,7 @@ export default function ReportScreen() {
         {reportStats.totalArrows > 0 && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>
-              <Icon name="bar-chart" size={18} color="#8B0000" /> Score Distribution
+              <Icon name="bar-chart" size={18} color="#8B0000" /> {t('report.scoreDistribution')}
             </Text>
             <View style={styles.distributionList}>
               {((selectedTargetType || 'wa_standard') === 'wa_standard' 
