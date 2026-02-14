@@ -85,7 +85,6 @@ export default function RootLayout() {
         <Stack.Screen 
           name="summary" 
           options={{ 
-            title: 'Round Summary',
             headerBackVisible: false,
           }} 
         />
@@ -98,7 +97,6 @@ export default function RootLayout() {
         <Stack.Screen 
           name="stats" 
           options={{ 
-            title: 'Statistics',
             headerBackVisible: false,
             headerLeft: () => <HeaderBackButton />,
           }} 
