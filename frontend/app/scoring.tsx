@@ -584,37 +584,44 @@ export default function ScoringScreen() {
               <View style={styles.centerVertical} />
             </View>
 
-            {targetArrows.map((arrow) => {
-              const globalIndex = arrows.findIndex(a => a.id === arrow.id);
-              return (
-                <TouchableOpacity
-                  key={arrow.id}
-                  style={[
-                    {
-                      position: 'absolute',
-                      width: markerSize,
-                      height: markerSize,
-                      borderRadius: markerSize / 2,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderWidth: markerBorderWidth,
-                      borderColor: '#000',
-                      left: arrow.x * size - markerSize / 2,
-                      top: arrow.y * size - markerSize / 2,
-                      backgroundColor: getScoreColor(arrow.score),
-                    },
-                  ]}
-                  onPress={() => handleEditArrow(globalIndex)}
-                  pointerEvents={isTouching ? 'none' : 'auto'}
-                  delayPressIn={100}
-                  activeOpacity={0.7}
-                >
-                  <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
-                    {getScoreDisplay(arrow.score)}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+            {/* Arrow markers - wrapped in a View that disables touch during placement */}
+            <View 
+              style={StyleSheet.absoluteFill} 
+              pointerEvents={isTouching ? 'none' : 'box-none'}
+            >
+              {targetArrows.map((arrow) => {
+                const globalIndex = arrows.findIndex(a => a.id === arrow.id);
+                return (
+                  <TouchableOpacity
+                    key={arrow.id}
+                    style={[
+                      {
+                        position: 'absolute',
+                        width: markerSize,
+                        height: markerSize,
+                        borderRadius: markerSize / 2,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderWidth: markerBorderWidth,
+                        borderColor: '#000',
+                        left: arrow.x * size - markerSize / 2,
+                        top: arrow.y * size - markerSize / 2,
+                        backgroundColor: getScoreColor(arrow.score),
+                      },
+                    ]}
+                    onPress={() => handleEditArrow(globalIndex)}
+                    delayPressIn={200}
+                    delayLongPress={500}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: -5, bottom: -5, left: -5, right: -5 }}
+                  >
+                    <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
+                      {getScoreDisplay(arrow.score)}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
             
             {/* Show preview marker while touching */}
             {isTouching && activeTargetIndex === targetIndex && (
