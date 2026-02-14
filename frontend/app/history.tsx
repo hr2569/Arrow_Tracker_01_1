@@ -194,7 +194,7 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
   return (
     <View style={scatterStyles.container}>
       <Text style={scatterStyles.title}>
-        <Icon name="radio-button-on" size={14} color="#8B0000" /> Shot Distribution
+        <Icon name="radio-button-on" size={14} color="#8B0000" /> {t('history.shotDistribution')}
       </Text>
       <Svg width={size} height={size} style={scatterStyles.svg}>
         {isIndoor ? renderIndoorTarget() : (
@@ -225,14 +225,14 @@ const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }
         })}
       </Svg>
       <Text style={scatterStyles.arrowCount}>
-        {allShots.length} arrow{allShots.length !== 1 ? 's' : ''}
+        {allShots.length} {allShots.length !== 1 ? t('history.arrows') : t('history.arrow')}
       </Text>
     </View>
   );
 };
 
 // Heatmap Component - shows density of arrow impacts
-const HeatMap = ({ session, size = 140 }: { session: Session, size?: number }) => {
+const HeatMap = ({ session, size = 140, t }: { session: Session, size?: number, t: (key: string) => string }) => {
   const allShots = session.rounds.flatMap(r => r.shots || []);
   if (allShots.length === 0) return null;
   
@@ -346,7 +346,7 @@ const HeatMap = ({ session, size = 140 }: { session: Session, size?: number }) =
   return (
     <View style={scatterStyles.container}>
       <Text style={scatterStyles.title}>
-        <Icon name="flame" size={14} color="#8B0000" /> Impact Heatmap
+        <Icon name="flame" size={14} color="#8B0000" /> {t('history.impactHeatmap')}
       </Text>
       <View style={[scatterStyles.heatmapGrid, { width: size, height: size }]}>
         {/* Target rings */}
