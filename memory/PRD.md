@@ -58,6 +58,19 @@ Current: **v2.0.2**
 
 ## Recent Fixes (December 2025)
 
+### Icon Consistency Improvements (v2.0.2)
+- **Issue:** Web platform was using emoji/unicode fallbacks for many icons due to Expo SDK vector-icons bug
+- **Solution:** Added 50+ new SVG icon components to `Icon.tsx`:
+  - Navigation icons: `chevron-back`, `arrow-forward-outline`, `home`
+  - Document icons: `document-text`, `document-outline`, `clipboard`
+  - Chart icons: `analytics`, `bar-chart`, `stats-chart`, `trending-up`
+  - Status icons: `checkmark-circle`, `alert-circle`, `information-circle`, `help-circle`
+  - Action icons: `create`, `download`, `share`, `filter`, `play`, `remove`
+  - UI icons: `calendar`, `locate`, `layers`, `flame`, `apps`, `options`, `list`
+  - And many more...
+- **Also fixed:** Backup screen now uses proper SVG icons for success/error status instead of unicode characters
+- **Result:** Consistent, high-quality SVG icons across all screens on web platform
+
 ### i18n Report Screen & Configuration Updates (v2.0.2)
 - **Issue:** Report screen and some filter text remained in English after language change
 - **Solution:** 
