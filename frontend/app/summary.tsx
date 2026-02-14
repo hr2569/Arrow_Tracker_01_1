@@ -54,6 +54,7 @@ const needsBorder = (ring: number): boolean => {
 export default function SummaryScreen() {
   const router = useRouter();
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const { t } = useTranslation();
   const { 
     currentRound, 
