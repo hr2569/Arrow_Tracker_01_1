@@ -272,10 +272,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(244, 67, 54, 0.3)',
   },
+  statusContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   statusText: {
     color: '#fff',
     fontSize: 14,
-    textAlign: 'center',
+    flex: 1,
   },
   actionButton: {
     flexDirection: 'row',
