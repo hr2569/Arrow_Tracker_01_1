@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,21 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useNavigation } from 'expo-router';
 import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const { t } = useTranslation();
+
+  // Set dynamic title for the navigation header
+  useEffect(() => {
+    navigation.setOptions({
+      title: t('app.name'),
+    });
+  }, [navigation, t]);
 
   return (
     <SafeAreaView style={styles.container}>
