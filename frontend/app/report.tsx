@@ -1897,10 +1897,10 @@ export default function ReportScreen() {
           {selectionMode === 'sessions' && (
             <View style={styles.sessionSelectionContainer}>
               <View style={styles.sessionSelectionHeader}>
-                <Text style={styles.sectionLabel}>Select Sessions ({selectedSessionIds.size} selected)</Text>
+                <Text style={styles.sectionLabel}>{t('report.selectedSessions')} ({selectedSessionIds.size})</Text>
                 <TouchableOpacity onPress={toggleSelectAll} style={styles.selectAllButton}>
                   <Text style={styles.selectAllText}>
-                    {selectedSessionIds.size === sessions.length ? 'Deselect All' : 'Select All'}
+                    {selectedSessionIds.size === sessions.length ? t('report.deselectAll') : t('report.selectAll')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1908,7 +1908,7 @@ export default function ReportScreen() {
                 {sessions.slice().reverse().map((session) => {
                   const isSelected = selectedSessionIds.has(session.id);
                   const sessionDate = new Date(session.created_at);
-                  const bowName = session.bow_name || 'Unknown Bow';
+                  const bowName = session.bow_name || t('report.allBows');
                   const totalScore = session.total_score || 0;
                   const totalArrows = session.rounds.reduce((sum, r) => sum + (r.shots?.length || 0), 0);
                   
@@ -1923,15 +1923,15 @@ export default function ReportScreen() {
                       </View>
                       <View style={styles.sessionSelectInfo}>
                         <Text style={styles.sessionSelectDate}>
-                          {sessionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          {sessionDate.toLocaleDateString()}
                         </Text>
                         <Text style={styles.sessionSelectDetails}>
-                          {bowName} • {session.distance || 'No distance'} • {session.rounds.length} rounds
+                          {bowName} • {session.distance || '-'} • {session.rounds.length} {t('report.rounds')}
                         </Text>
                       </View>
                       <View style={styles.sessionSelectScore}>
                         <Text style={styles.sessionSelectScoreValue}>{totalScore}</Text>
-                        <Text style={styles.sessionSelectScoreLabel}>pts</Text>
+                        <Text style={styles.sessionSelectScoreLabel}>{t('report.pts')}</Text>
                       </View>
                     </TouchableOpacity>
                   );
