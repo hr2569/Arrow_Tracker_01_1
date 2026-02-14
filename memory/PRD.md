@@ -58,6 +58,19 @@ Current: **v2.0.2**
 
 ## Recent Fixes (December 2025)
 
+### i18n Report Screen & Configuration Updates (v2.0.2)
+- **Issue:** Report screen and some filter text remained in English after language change
+- **Solution:** 
+  1. Fully translated `report.tsx` to use `t()` function throughout
+  2. Added comprehensive translation keys to `pt.json` and `en.json` for all report elements
+  3. Changed "Volta" to "Turno" in Portuguese translations per user request
+  4. Fixed `getFilterSummary()` to use `t('report.allBows')` instead of hardcoded "All Equipment"
+- **Configuration Updates:**
+  - Updated `app.json` owner to `hraimundo1`
+  - Updated projectId to `7789ca40-95f6-47d2-99d0-6dec6de9edfe`
+  - Version set to `2.0.2` (versionCode: 12)
+- **Verified:** All report screen elements translate correctly to Portuguese
+
 ### i18n Navigation Header Fix (v2.0.1)
 - **Issue:** Navigation headers ("Round Summary", "Arrow Tracker") stayed in English after language change
 - **Root Cause:** Hardcoded titles in `_layout.tsx` Stack.Screen options
