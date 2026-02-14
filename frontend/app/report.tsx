@@ -1870,7 +1870,7 @@ export default function ReportScreen() {
 
           {/* Selection Mode Toggle */}
           <View style={styles.filterSection}>
-            <Text style={styles.sectionLabel}>Select Sessions By</Text>
+            <Text style={styles.sectionLabel}>{t('report.selectedSessions')}</Text>
             <View style={styles.modeToggleContainer}>
               <TouchableOpacity
                 style={[styles.modeToggleButton, selectionMode === 'dateRange' && styles.modeToggleButtonActive]}
@@ -1878,7 +1878,7 @@ export default function ReportScreen() {
               >
                 <Icon name="calendar" size={18} color={selectionMode === 'dateRange' ? '#fff' : '#8B0000'} />
                 <Text style={[styles.modeToggleText, selectionMode === 'dateRange' && styles.modeToggleTextActive]}>
-                  Date Range
+                  {t('report.selectByDateRange')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -1887,7 +1887,7 @@ export default function ReportScreen() {
               >
                 <Icon name="list" size={18} color={selectionMode === 'sessions' ? '#fff' : '#8B0000'} />
                 <Text style={[styles.modeToggleText, selectionMode === 'sessions' && styles.modeToggleTextActive]}>
-                  Individual Sessions
+                  {t('report.selectBySessions')}
                 </Text>
               </TouchableOpacity>
             </View>
