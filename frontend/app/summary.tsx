@@ -176,21 +176,21 @@ export default function SummaryScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Score Summary Card */}
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Round Summary</Text>
+          <Text style={styles.summaryTitle}>{t('summary.title')}</Text>
           
           {currentRound && (
             <>
               <View style={styles.scoreDisplay}>
                 <Text style={styles.roundLabel}>
-                  Round {sessionRounds.length}
+                  {t('summary.round')} {sessionRounds.length}
                 </Text>
                 <Text style={styles.roundScore}>{currentRound.total}</Text>
-                <Text style={styles.pointsLabel}>points</Text>
+                <Text style={styles.pointsLabel}>{t('summary.points')}</Text>
               </View>
 
               {/* Shot Breakdown */}
               <View style={styles.shotsBreakdown}>
-                <Text style={styles.breakdownTitle}>Shots</Text>
+                <Text style={styles.breakdownTitle}>{t('summary.shots')}</Text>
                 <View style={styles.shotsList}>
                   {currentRound.shots.map((shot: any, index: number) => {
                     const ringColor = getRingColor(shot.ring);
@@ -223,14 +223,14 @@ export default function SummaryScreen() {
 
         {/* Score Table */}
         <View style={styles.scoreTableCard}>
-          <Text style={styles.scoreTableTitle}>Score Table</Text>
+          <Text style={styles.scoreTableTitle}>{t('summary.scoreTable')}</Text>
           
           {/* Table Header */}
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, styles.roundColumn]}>Round</Text>
-            <Text style={[styles.tableHeaderCell, styles.arrowsColumn]}>Arrows</Text>
-            <Text style={[styles.tableHeaderCell, styles.scoreColumn]}>Score</Text>
-            <Text style={[styles.tableHeaderCell, styles.totalColumn]}>Total</Text>
+            <Text style={[styles.tableHeaderCell, styles.roundColumn]}>{t('summary.round')}</Text>
+            <Text style={[styles.tableHeaderCell, styles.arrowsColumn]}>{t('summary.arrows')}</Text>
+            <Text style={[styles.tableHeaderCell, styles.scoreColumn]}>{t('summary.score')}</Text>
+            <Text style={[styles.tableHeaderCell, styles.totalColumn]}>{t('summary.total')}</Text>
           </View>
           
           {/* Table Rows - Show all completed rounds */}
@@ -266,7 +266,7 @@ export default function SummaryScreen() {
           
           {/* Table Footer - Grand Total */}
           <View style={styles.tableFooter}>
-            <Text style={[styles.tableFooterCell, styles.roundColumn]}>Total</Text>
+            <Text style={[styles.tableFooterCell, styles.roundColumn]}>{t('summary.total')}</Text>
             <Text style={[styles.tableFooterCell, styles.arrowsColumn]}>
               {sessionRounds.reduce((sum, r) => sum + r.shots.length, 0)}
             </Text>
@@ -285,10 +285,10 @@ export default function SummaryScreen() {
             color={isCompetition ? "#FFD700" : "#ff4444"} 
           />
           <Text style={[styles.sessionTypeText, isCompetition ? styles.competitionText : styles.trainingText]}>
-            {isCompetition ? 'Competition' : 'Training'}
+            {isCompetition ? t('summary.competition') : t('summary.training')}
           </Text>
           <Text style={styles.roundProgress}>
-            Round {currentRoundNumber}
+            {t('summary.round')} {currentRoundNumber}
           </Text>
         </View>
 
@@ -300,7 +300,7 @@ export default function SummaryScreen() {
             onPress={handleAddRound}
           >
             <Icon name="add-circle" size={24} color="#fff" />
-            <Text style={styles.addRoundText}>Add Another Round</Text>
+            <Text style={styles.addRoundText}>{t('summary.addAnotherRound')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -313,7 +313,7 @@ export default function SummaryScreen() {
             ) : (
               <>
                 <Icon name="checkmark-done" size={24} color="#8B0000" />
-                <Text style={styles.finishText}>Finish & Save</Text>
+                <Text style={styles.finishText}>{t('summary.finishAndSave')}</Text>
               </>
             )}
           </TouchableOpacity>
@@ -322,13 +322,13 @@ export default function SummaryScreen() {
         {/* Quick Stats */}
         {currentRound && currentRound.shots.length > 0 && (
           <View style={styles.quickStats}>
-            <Text style={styles.quickStatsTitle}>Round Statistics</Text>
+            <Text style={styles.quickStatsTitle}>{t('summary.roundStatistics')}</Text>
             <View style={styles.quickStatsGrid}>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
                   {getDisplayScore(Math.max(...currentRound.shots.map((s: any) => s.ring)))}
                 </Text>
-                <Text style={styles.quickStatLabel}>Best Shot</Text>
+                <Text style={styles.quickStatLabel}>{t('summary.bestShot')}</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
@@ -336,19 +336,19 @@ export default function SummaryScreen() {
                     ? getDisplayScore(Math.min(...currentRound.shots.filter((s: any) => s.ring > 0).map((s: any) => s.ring))) 
                     : '-'}
                 </Text>
-                <Text style={styles.quickStatLabel}>Worst Shot</Text>
+                <Text style={styles.quickStatLabel}>{t('summary.worstShot')}</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
                   {currentRound.shots.filter((s: any) => s.ring >= 9).length}
                 </Text>
-                <Text style={styles.quickStatLabel}>Gold Hits</Text>
+                <Text style={styles.quickStatLabel}>{t('summary.goldHits')}</Text>
               </View>
               <View style={styles.quickStatItem}>
                 <Text style={styles.quickStatValue}>
                   {currentRound.shots.filter((s: any) => s.ring === 0).length}
                 </Text>
-                <Text style={styles.quickStatLabel}>Misses</Text>
+                <Text style={styles.quickStatLabel}>{t('summary.misses')}</Text>
               </View>
             </View>
           </View>
@@ -365,22 +365,22 @@ export default function SummaryScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Icon name="help-circle" size={48} color="#8B0000" />
-            <Text style={styles.modalTitle}>Finish Session?</Text>
-            <Text style={styles.modalMessage}>Do you want to save this session?</Text>
+            <Text style={styles.modalTitle}>{t('summary.finishSession')}</Text>
+            <Text style={styles.modalMessage}>{t('summary.saveQuestion')}</Text>
             
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={styles.modalDiscardButton}
                 onPress={handleDiscard}
               >
-                <Text style={styles.modalDiscardText}>Discard</Text>
+                <Text style={styles.modalDiscardText}>{t('summary.discard')}</Text>
               </TouchableOpacity>
               
               <TouchableOpacity
                 style={styles.modalSaveButton}
                 onPress={handleSaveAndClose}
               >
-                <Text style={styles.modalSaveText}>Save</Text>
+                <Text style={styles.modalSaveText}>{t('summary.save')}</Text>
               </TouchableOpacity>
             </View>
             
@@ -388,7 +388,7 @@ export default function SummaryScreen() {
               style={styles.modalCancelButton}
               onPress={() => setShowConfirmModal(false)}
             >
-              <Text style={styles.modalCancelText}>Cancel</Text>
+              <Text style={styles.modalCancelText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
