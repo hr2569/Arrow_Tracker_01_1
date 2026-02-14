@@ -856,10 +856,12 @@ export default function ScoringScreen() {
       </View>
 
       <ScrollView 
+        ref={scrollViewRef}
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContent}
-        scrollEnabled={!isTouching}
+        scrollEnabled={scrollEnabled}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         {/* Zoom Controls */}
         <View style={styles.zoomControls}>
