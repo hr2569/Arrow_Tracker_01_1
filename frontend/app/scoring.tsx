@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   Modal,
   Platform,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -46,6 +48,7 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
   const translateY = useSharedValue(0);
   const prevTranslateX = useSharedValue(0);
   const prevTranslateY = useSharedValue(0);
+  const isPanning = useSharedValue(false);
   
   const isZoomed = zoomLevel > 1;
   const scaledSize = (baseTargetSize + 40) * zoomLevel;
@@ -64,11 +67,19 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
     .minDistance(30) // Increased threshold to prevent accidental panning during arrow placement
     .minPointers(1)
     .maxPointers(1)
+    .shouldCancelWhenOutside(false) // Don't cancel if finger moves outside
+    .onBegin(() => {
+      // Mark that a potential pan is starting - but don't commit yet
+      isPanning.value = false;
+    })
     .onStart(() => {
+      // Pan gesture has officially started (minDistance threshold met)
+      isPanning.value = true;
       prevTranslateX.value = translateX.value;
       prevTranslateY.value = translateY.value;
     })
     .onUpdate((event) => {
+      if (!isPanning.value) return;
       // Calculate new position with bounds
       const newX = prevTranslateX.value + event.translationX;
       const newY = prevTranslateY.value + event.translationY;
@@ -78,6 +89,7 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
       translateY.value = Math.max(-maxPan, Math.min(maxPan, newY));
     })
     .onEnd((event) => {
+      if (!isPanning.value) return;
       // Add momentum/decay for smooth scrolling feel
       translateX.value = withDecay({
         velocity: event.velocityX,
@@ -87,6 +99,10 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
         velocity: event.velocityY,
         clamp: [-maxPan, maxPan],
       });
+      isPanning.value = false;
+    })
+    .onFinalize(() => {
+      isPanning.value = false;
     });
   
   const animatedStyle = useAnimatedStyle(() => ({
