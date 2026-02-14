@@ -227,11 +227,15 @@ export default function ScoringScreen() {
     setArrows(prev => [...prev, newArrow]);
   }, [isMultiTarget, calculateScore]);
 
-  // Handle touch start - show magnifier
+  // Handle touch start - show magnifier and disable scrolling
   const handleTouchStart = useCallback((x: number, y: number, targetSize: number, targetIndex: number) => {
     const normalizedX = Math.max(0, Math.min(1, x / targetSize));
     const normalizedY = Math.max(0, Math.min(1, y / targetSize));
     const score = calculateScore(normalizedX, normalizedY);
+    
+    // Disable scrolling IMMEDIATELY before any other state changes
+    // This prevents the ScrollView from trying to scroll during arrow placement
+    setScrollEnabled(false);
     
     // Light haptic on touch start
     if (Platform.OS !== 'web') {
@@ -282,6 +286,9 @@ export default function ScoringScreen() {
     // Reset refs and state
     isTouchingRef.current = false;
     setIsTouching(false);
+    
+    // Re-enable scrolling after touch ends
+    setScrollEnabled(true);
   }, [placeArrow]);
 
   // Legacy click handler for web
