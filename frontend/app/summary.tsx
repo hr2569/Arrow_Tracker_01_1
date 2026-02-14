@@ -81,9 +81,10 @@ export default function SummaryScreen() {
     return true; // Prevent default back behavior
   }, []);
 
-  // Set custom header back button that triggers the modal
+  // Set custom header title and back button that triggers the modal
   useEffect(() => {
     navigation.setOptions({
+      title: t('summary.title'),
       headerLeft: () => (
         <TouchableOpacity 
           onPress={handleBackPress}
@@ -95,7 +96,7 @@ export default function SummaryScreen() {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, handleBackPress]);
+  }, [navigation, handleBackPress, t]);
 
   // Handle Android hardware back button
   useEffect(() => {
