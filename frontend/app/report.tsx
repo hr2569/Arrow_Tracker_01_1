@@ -321,7 +321,7 @@ export default function ReportScreen() {
     }
     if (selectedDistance) parts.push(selectedDistance);
     if (selectedTargetType) parts.push(getTargetTypeName(selectedTargetType));
-    return parts.length > 0 ? parts.join(' • ') : 'All Equipment';
+    return parts.length > 0 ? parts.join(' • ') : t('report.allBows');
   };
 
   // Generate shareable report text
