@@ -61,10 +61,16 @@
     "saveRound": "Guardar Volta",
     "cannotRemove": "Não é Possível Remover",
     "minShotsRequired": "As voltas devem ter pelo menos 3 tiros.",
+    "minShotsMessage": "As voltas devem ter pelo menos 3 tiros.",
     "cannotDelete": "Não é Possível Eliminar",
     "minRoundsRequired": "As sessões devem ter pelo menos uma volta. Elimine a sessão em vez disso.",
+    "minRoundsMessage": "As sessões devem ter pelo menos uma volta. Elimine a sessão em vez disso.",
     "deleteRound": "Eliminar Volta",
     "deleteRoundConfirm": "Tem a certeza que pretende eliminar esta volta? Esta ação não pode ser desfeita.",
+    "failedToDeleteSession": "Falha ao eliminar sessão",
+    "failedToDeleteRound": "Falha ao eliminar volta",
+    "failedToSave": "Falha ao guardar alterações",
+    "failedToSaveRound": "Falha ao guardar alterações da volta",
     "avg": "Média",
     "perRound": "/volta",
     "session": "sessão",
@@ -217,7 +223,8 @@
     "training": "Treino",
     "competition": "Competição",
     "shots": "Tiros",
-    "points": "pontos"
+    "points": "pontos",
+    "failedToSave": "Falha ao guardar sessão"
   },
   "common": {
     "loading": "A carregar...",
