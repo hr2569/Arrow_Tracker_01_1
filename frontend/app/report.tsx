@@ -2155,19 +2155,19 @@ export default function ReportScreen() {
         {/* Averages Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>
-            <Icon name="analytics" size={18} color="#8B0000" /> Averages
+            <Icon name="analytics" size={18} color="#8B0000" /> {t('report.averages')}
           </Text>
           <View style={styles.avgList}>
             <View style={styles.avgRow}>
-              <Text style={styles.avgLabel}>Per Arrow</Text>
+              <Text style={styles.avgLabel}>{t('report.averagePerArrow')}</Text>
               <Text style={styles.avgValue}>{reportStats.avgPerArrow}</Text>
             </View>
             <View style={styles.avgRow}>
-              <Text style={styles.avgLabel}>Per Round</Text>
+              <Text style={styles.avgLabel}>{t('report.averagePerRound')}</Text>
               <Text style={styles.avgValue}>{reportStats.avgPerRound}</Text>
             </View>
             <View style={styles.avgRow}>
-              <Text style={styles.avgLabel}>Per Session</Text>
+              <Text style={styles.avgLabel}>{t('report.perSession')}</Text>
               <Text style={styles.avgValue}>{reportStats.avgPerSession}</Text>
             </View>
           </View>
@@ -2176,7 +2176,7 @@ export default function ReportScreen() {
         {/* Stats by Target Type */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>
-            <Icon name="apps" size={18} color="#8B0000" /> By Target Type
+            <Icon name="apps" size={18} color="#8B0000" /> {t('report.byTargetType')}
           </Text>
           <View style={styles.targetTypeList}>
             {['wa_standard', 'vegas_3spot', 'nfaa_indoor'].map((targetType) => {
@@ -2186,31 +2186,31 @@ export default function ReportScreen() {
                 <View key={targetType} style={styles.targetTypeCard}>
                   <View style={styles.targetTypeHeaderRow}>
                     <Text style={styles.targetTypeTitleText}>{getTargetTypeName(targetType)}</Text>
-                    <Text style={styles.targetTypeAvgText}>{typeStats.avgPerArrow}/arrow</Text>
+                    <Text style={styles.targetTypeAvgText}>{typeStats.avgPerArrow}{t('report.perArrow')}</Text>
                   </View>
                   <View style={styles.targetTypeStatsRow}>
                     <View style={styles.targetTypeStatBox}>
                       <Text style={styles.targetTypeStatValue}>{typeStats.sessions}</Text>
-                      <Text style={styles.targetTypeStatLabel}>Sessions</Text>
+                      <Text style={styles.targetTypeStatLabel}>{t('report.sessions')}</Text>
                     </View>
                     <View style={styles.targetTypeStatBox}>
                       <Text style={styles.targetTypeStatValue}>{typeStats.rounds}</Text>
-                      <Text style={styles.targetTypeStatLabel}>Rounds</Text>
+                      <Text style={styles.targetTypeStatLabel}>{t('report.totalRounds')}</Text>
                     </View>
                     <View style={styles.targetTypeStatBox}>
                       <Text style={styles.targetTypeStatValue}>{typeStats.arrows}</Text>
-                      <Text style={styles.targetTypeStatLabel}>Arrows</Text>
+                      <Text style={styles.targetTypeStatLabel}>{t('report.totalArrows')}</Text>
                     </View>
                     <View style={styles.targetTypeStatBox}>
                       <Text style={styles.targetTypeStatValue}>{typeStats.points}</Text>
-                      <Text style={styles.targetTypeStatLabel}>Points</Text>
+                      <Text style={styles.targetTypeStatLabel}>{t('report.totalPoints')}</Text>
                     </View>
                   </View>
                 </View>
               );
             })}
             {Object.values(statsByTargetType).every(s => s.sessions === 0) && (
-              <Text style={styles.noTargetDataText}>No data for any target type in selected period</Text>
+              <Text style={styles.noTargetDataText}>{t('report.noTargetData')}</Text>
             )}
           </View>
         </View>
