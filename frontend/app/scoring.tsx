@@ -62,6 +62,9 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
   
   const panGesture = Gesture.Pan()
     .enabled(isZoomed)
+    .minDistance(15) // Require 15px movement before pan activates - allows arrow placement
+    .minPointers(1)
+    .maxPointers(1)
     .onStart(() => {
       prevTranslateX.value = translateX.value;
       prevTranslateY.value = translateY.value;
