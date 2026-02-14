@@ -110,10 +110,16 @@ export default function SummaryScreen() {
 
   // Close modal when navigating away from this screen
   useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
+    const unsubscribeBlur = navigation.addListener('blur', () => {
       setShowConfirmModal(false);
     });
-    return unsubscribe;
+    const unsubscribeFocus = navigation.addListener('focus', () => {
+      setShowConfirmModal(false);
+    });
+    return () => {
+      unsubscribeBlur();
+      unsubscribeFocus();
+    };
   }, [navigation]);
 
   useEffect(() => {
