@@ -74,6 +74,11 @@ export default function SummaryScreen() {
 
   const isCompetition = sessionType === 'competition';
 
+  // Reset modal state on mount to prevent stale state
+  useEffect(() => {
+    setShowConfirmModal(false);
+  }, []);
+
   // Handle back button press - show confirmation modal
   const handleBackPress = useCallback(() => {
     setShowConfirmModal(true);
