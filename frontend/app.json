@@ -2,16 +2,16 @@
   "expo": {
     "name": "Arrow Tracker",
     "slug": "arrow-tracker",
-    "owner": "hraimundo",
+    "owner": "hraimundo1",
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/deab2ec5-dd6f-49aa-9dbc-ea4663997ba5"
+      "url": "https://u.expo.dev/7789ca40-95f6-47d2-99d0-6dec6de9edfe"
     },
     "extra": {
       "eas": {
-        "projectId": "deab2ec5-dd6f-49aa-9dbc-ea4663997ba5"
+        "projectId": "7789ca40-95f6-47d2-99d0-6dec6de9edfe"
       }
     },
     "version": "2.0.2",
