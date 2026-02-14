@@ -818,7 +818,7 @@ export default function ScoringScreen() {
           <Text style={styles.headerTitle}>{targetConfig.name}</Text>
           <View style={[styles.roundBadge, isCompetition ? styles.competitionBadge : styles.trainingBadge]}>
             <Icon name={isCompetition ? "trophy" : "fitness"} size={12} color={isCompetition ? "#FFD700" : "#ff4444"} />
-            <Text style={styles.roundText}>Round {currentRoundNumber}</Text>
+            <Text style={styles.roundText}>{t('scoring.round')} {currentRoundNumber}</Text>
           </View>
         </View>
         <View style={{ width: 40 }} />
