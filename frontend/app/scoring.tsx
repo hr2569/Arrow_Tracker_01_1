@@ -430,6 +430,7 @@ export default function ScoringScreen() {
     const nativeTouchProps = Platform.OS !== 'web' ? {
       onStartShouldSetResponder: () => true,
       onMoveShouldSetResponder: () => true,
+      onResponderTerminationRequest: () => false, // Don't give up responder to pan gesture while placing arrow
       onResponderGrant: (e: any) => {
         const { locationX, locationY } = e.nativeEvent;
         handleTouchStart(locationX, locationY, size, targetIndex);
