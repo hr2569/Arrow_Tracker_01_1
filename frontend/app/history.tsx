@@ -134,7 +134,7 @@ const miniTargetStyles = StyleSheet.create({
 });
 
 // Scatter Map Component - shows all arrow positions on target face
-const ScatterMap = ({ session, size = 140 }: { session: Session, size?: number }) => {
+const ScatterMap = ({ session, size = 140, t }: { session: Session, size?: number, t: (key: string) => string }) => {
   const allShots = session.rounds.flatMap(r => r.shots || []);
   if (allShots.length === 0) return null;
   
