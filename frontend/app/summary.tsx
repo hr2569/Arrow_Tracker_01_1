@@ -14,7 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useNavigation } from 'expo-router';
 import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
-import { loadSavedLanguage } from '../i18n';
 import { useAppStore } from '../store/appStore';
 import { createSession, addRoundToSession } from '../utils/localStorage';
 
