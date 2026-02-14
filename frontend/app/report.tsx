@@ -1944,13 +1944,13 @@ export default function ReportScreen() {
           {selectionMode === 'dateRange' && (
             <>
               <View style={styles.quickSelectContainer}>
-                <Text style={styles.sectionLabel}>Time Range</Text>
+                <Text style={styles.sectionLabel}>{t('report.selectByDateRange')}</Text>
                 <View style={styles.quickSelectGrid}>
                   {[
-                    { key: 'week', label: 'Last Week', icon: 'calendar-outline' },
-                    { key: 'month', label: 'Last Month', icon: 'calendar' },
-                    { key: 'year', label: 'Last Year', icon: 'albums-outline' },
-                    { key: 'all', label: 'All Time', icon: 'infinite' },
+                    { key: 'week', label: t('report.week'), icon: 'calendar-outline' },
+                    { key: 'month', label: t('report.month'), icon: 'calendar' },
+                    { key: 'year', label: t('report.year'), icon: 'albums-outline' },
+                    { key: 'all', label: t('report.all'), icon: 'infinite' },
                   ].map((item) => (
                     <TouchableOpacity
                       key={item.key}
@@ -1978,10 +1978,10 @@ export default function ReportScreen() {
 
               {/* Custom Date Range */}
               <View style={styles.customRangeContainer}>
-                <Text style={styles.sectionLabel}>Custom Date Range</Text>
+                <Text style={styles.sectionLabel}>{t('report.custom')}</Text>
             
             <View style={styles.dateRow}>
-              <Text style={styles.dateLabel}>From</Text>
+              <Text style={styles.dateLabel}>{t('report.startDate')}</Text>
               {Platform.OS === 'web' ? (
                 <input
                   type="date"
