@@ -4,7 +4,7 @@
 Arrow Tracker is a React Native (Expo) archery scoring application designed to help archers track their shots, analyze performance, and improve their aim.
 
 ## Version
-Current: **v2.0.0**
+Current: **v2.0.1**
 
 ## Core Features
 
@@ -12,6 +12,7 @@ Current: **v2.0.0**
 - Real-time arrow placement on target faces
 - Support for multiple target types (WA Standard, Vegas 3-Spot, WA Indoor)
 - Round-based scoring with customizable arrows per round
+- Zoom and pan functionality for precise arrow placement
 
 ### 2. Session Management
 - Create and configure scoring sessions
@@ -42,7 +43,7 @@ Current: **v2.0.0**
   - Ukrainian (uk)
 - Language preference persists across sessions
 - All menus, buttons, labels, and messages translated
-- **All screens now use translations:** Home, Settings, History, Bows, Scoring, Session Setup
+- **All screens now use dynamic translations including navigation headers**
 
 ### 6. Backup & Restore
 - Google account integration for cloud backup
@@ -53,83 +54,38 @@ Current: **v2.0.0**
 - **Internationalization:** i18next, react-i18next
 - **Storage:** AsyncStorage (native), localStorage (web)
 - **Navigation:** expo-router
+- **Gestures:** react-native-gesture-handler
+
+## Recent Fixes (December 2025)
+
+### i18n Navigation Header Fix (v2.0.1)
+- **Issue:** Navigation headers ("Round Summary", "Arrow Tracker") stayed in English after language change
+- **Root Cause:** Hardcoded titles in `_layout.tsx` Stack.Screen options
+- **Solution:**
+  1. Removed hardcoded `title` property from `_layout.tsx` for dynamic screens
+  2. Updated `summary.tsx` to use `navigation.setOptions({ title: t('summary.title') })` with `t` dependency
+  3. Updated `index.tsx` (Home) to dynamically set title via `navigation.setOptions()`
+  4. Fixed "Round X" text in `scoring.tsx` to use `t('scoring.round')`
+- **Verified:** All screen headers now translate correctly when language changes
+
+### Zoom Pan Gesture Fix (v2.0.1)
+- **Issue:** View "jumped" when placing arrow near existing ones when zoomed in
+- **Root Cause:** Pan gesture activated too easily, conflicting with touch for arrow placement
+- **Solution:** Added `minDistance: 15` to pan gesture in `scoring.tsx` ZoomableTarget component
+- **Result:** Users must move finger 15px before pan activates, allowing precise arrow placement
 
 ## File Structure
 ```
 /app/frontend/
 ├── app/
-│   ├── _layout.tsx       # Root layout with i18n initialization
-│   ├── index.tsx         # Home screen (translated)
-│   ├── settings.tsx      # Settings with language selector (translated)
-│   ├── history.tsx       # Session history (translated)
-│   ├── bows.tsx          # Bow management (translated)
-│   ├── scoring.tsx       # Scoring interface (translated)
-│   ├── sessionSetup.tsx  # Session configuration (translated)
-│   └── ...
-├── locales/
-│   ├── en.json           # English translations
-│   ├── pt.json           # Portuguese translations
-│   ├── es.json           # Spanish translations
-│   ├── fr.json           # French translations
-│   ├── it.json           # Italian translations
-│   ├── fi.json           # Finnish translations
-│   ├── sv.json           # Swedish translations
-│   ├── ru.json           # Russian translations
-│   └── uk.json           # Ukrainian translations
-└── i18n.ts               # i18n configuration with hybrid storage
-```
-
-## Completed Work
-
-### Icon Display Fix (December 2025)
-- **Issue:** Icons (Ionicons) not displaying on web preview - showing empty boxes/rectangles
-- **Root Cause:** `@expo/vector-icons` v14 has broken web compatibility in Expo SDK 54
-- **Solution:**
-  1. Created custom `Icon` component (`/app/frontend/components/Icon.tsx`) with platform-specific rendering
-  2. On web: Uses Unicode/emoji fallback characters that render correctly
-  3. On native: Uses Ionicons normally
-  4. Updated all 18 screen files to use the new Icon component
-- **Result:** All icons now display correctly across the entire application on web
-
-### Language Persistence Fix
-- **Issue:** Language changes did not persist when navigating between pages on web preview
-- **Root Cause:** AsyncStorage on web is async, causing default language to render before saved language loaded
-- **Solution:**
-  1. Added synchronous `getInitialLanguage()` that reads from localStorage on web before i18n initializes
-  2. Created hybrid storage system (localStorage for web, AsyncStorage for native)
-  3. Root layout waits for language to load before rendering children
-
-### Bows Screen Translation
-- **Issue:** Bows screen was showing English text even after language change
-- **Solution:** Updated `bows.tsx` to use `t()` translation function for all UI text
-- **Verified:** Bows screen now displays correctly in Portuguese, Spanish, and all other languages
-
-### All Translations Verified
-- All 9 language files contain complete translations
-- Language switching works across all pages (Settings, History, Home, Bows, etc.)
-- Language preference persists correctly in localStorage
-
-## Upcoming Tasks
-
-### P0: Competition Menu
-- Implement new "Competition" mode (currently shows "Coming Soon")
-- Requirements to be gathered from user
-
-## Known Issues
-- Backend issue: Firebase credentials file missing (`firebase-credentials.json`) - needed for backup/restore feature
-- Note: Icons on web use Unicode/emoji fallbacks due to Expo SDK 54 vector-icons bug
-
-## File Structure
-```
-/app/frontend/
-├── app/
-│   ├── _layout.tsx       # Root layout with i18n initialization
-│   ├── index.tsx         # Home screen (translated)
-│   ├── settings.tsx      # Settings with language selector (translated)
-│   ├── history.tsx       # Session history (translated)
-│   ├── bows.tsx          # Bow management (translated)
-│   ├── scoring.tsx       # Scoring interface (translated)
-│   ├── sessionSetup.tsx  # Session configuration (translated)
+│   ├── _layout.tsx       # Root layout (no hardcoded titles)
+│   ├── index.tsx         # Home screen (dynamic title via navigation.setOptions)
+│   ├── settings.tsx      # Settings with language selector
+│   ├── history.tsx       # Session history
+│   ├── bows.tsx          # Bow management
+│   ├── scoring.tsx       # Scoring interface (zoom fix + i18n)
+│   ├── sessionSetup.tsx  # Session configuration
+│   ├── summary.tsx       # Round summary (dynamic title via navigation.setOptions)
 │   └── ...
 ├── components/
 │   └── Icon.tsx          # Custom icon component with web fallback
@@ -139,3 +95,18 @@ Current: **v2.0.0**
 │   └── ... (7 more language files)
 └── i18n.ts               # i18n configuration with hybrid storage
 ```
+
+## Upcoming Tasks
+
+### P0: Enable Competition Menu (v2.1.0)
+- Enable the "Competition" button on home screen (currently disabled)
+- Review and test existing competition flow
+- User requirements to be gathered
+
+### P1: Icon Consistency Review
+- Replace any remaining text/emoji icons with proper SVGs
+- Ensure consistent icon styling across all screens
+
+## Known Issues
+- Backend: Firebase credentials file missing (`firebase-credentials.json`) - needed for backup/restore feature
+- Note: Web icons use Unicode/emoji fallbacks due to Expo SDK 54 vector-icons bug
