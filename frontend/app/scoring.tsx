@@ -914,10 +914,10 @@ export default function ScoringScreen() {
             </View>
             <TouchableOpacity style={styles.deleteButton} onPress={() => selectedArrowIndex !== null && handleDeleteArrow(selectedArrowIndex)}>
               <Icon name="trash" size={20} color="#fff" />
-              <Text style={styles.deleteButtonText}>Delete Arrow</Text>
+              <Text style={styles.deleteButtonText}>{t('scoring.deleteArrow')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelButton} onPress={() => setShowScorePicker(false)}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>

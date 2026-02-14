@@ -61,19 +61,19 @@ export default function SessionSetupScreen() {
   const handleStartSession = () => {
     // Validate bow selection
     if (!selectedBowId) {
-      Alert.alert('Select a Bow', 'Please select a bow before starting the session.');
+      Alert.alert(t('sessionSetup.selectBowTitle'), t('sessionSetup.selectBowMessage'));
       return;
     }
 
     // Validate distance
     if (!distance.trim()) {
-      Alert.alert('Enter Distance', 'Please enter the shooting distance.');
+      Alert.alert(t('sessionSetup.enterDistanceTitle'), t('sessionSetup.enterDistanceMessage'));
       return;
     }
 
     const distanceNum = parseFloat(distance);
     if (isNaN(distanceNum) || distanceNum <= 0) {
-      Alert.alert('Invalid Distance', 'Please enter a valid distance.');
+      Alert.alert(t('sessionSetup.invalidDistanceTitle'), t('sessionSetup.invalidDistanceMessage'));
       return;
     }
 
