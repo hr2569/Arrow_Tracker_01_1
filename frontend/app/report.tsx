@@ -36,6 +36,7 @@ const getTargetTypeName = (type?: string): string => {
 
 export default function ReportScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const params = useLocalSearchParams<{ sessionId?: string }>();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [bows, setBows] = useState<Bow[]>([]);
