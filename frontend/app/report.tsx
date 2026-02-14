@@ -1845,13 +1845,13 @@ export default function ReportScreen() {
           {/* Target Type Filter */}
           {availableTargetTypes.length > 0 && (
             <View style={styles.filterSection}>
-              <Text style={styles.sectionLabel}>Filter by Target</Text>
+              <Text style={styles.sectionLabel}>{t('report.targetType')}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <TouchableOpacity
                   style={[styles.filterChip, !selectedTargetType && styles.filterChipActive]}
                   onPress={() => setSelectedTargetType(null)}
                 >
-                  <Text style={[styles.filterChipText, !selectedTargetType && styles.filterChipTextActive]}>All Targets</Text>
+                  <Text style={[styles.filterChipText, !selectedTargetType && styles.filterChipTextActive]}>{t('report.allTargets')}</Text>
                 </TouchableOpacity>
                 {availableTargetTypes.map((type) => (
                   <TouchableOpacity
