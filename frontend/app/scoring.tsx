@@ -765,10 +765,9 @@ export default function ScoringScreen() {
     );
     
     // Render existing arrow markers in magnifier
-    // Make arrows 50% bigger than their base size for better visibility in magnifier
-    const baseArrowSize = 14;
-    const arrowMarkerSize = baseArrowSize * 1.5; // 50% bigger = 21px
-    const arrowFontSize = 10; // Larger font for readability
+    // Scale down arrows to be smaller in the magnifier view
+    const arrowMarkerSize = 8; // Smaller size for magnifier
+    const arrowFontSize = 6; // Smaller font
     const arrowElements = existingArrows.map((arrow, index) => (
       <View
         key={`mag-arrow-${index}`}
