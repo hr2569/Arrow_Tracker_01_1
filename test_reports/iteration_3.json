@@ -124,7 +124,7 @@
   "seed_data_creation": "Created test bow 'MyTestBow' for session flow testing",
   "retest_needed": false,
   "should_main_agent_self_test": false,
-  "context_for_next_testing_agent": "i18n implementation verified complete. All Portuguese translations working correctly including the key 'Turno' vs 'Volta' change. Report screen uses t() function throughout. One minor fix applied to getFilterSummary() to use t('report.allBows') instead of hardcoded 'All Equipment'. App accessible at https://archery-v202-test.preview.emergentagent.com",
+  "context_for_next_testing_agent": "i18n implementation verified complete. All Portuguese translations working correctly including the key 'Turno' vs 'Volta' change. Report screen uses t() function throughout. One minor fix applied to getFilterSummary() to use t('report.allBows') instead of hardcoded 'All Equipment'. App accessible at https://scoring-jump-fix.preview.emergentagent.com",
   "rca_of_the_issue": {
     "original_issue": "Several menus and alerts remained in English after changing language to Portuguese",
     "root_cause": "Report screen (report.tsx) was not using t() translation function for all UI strings",
