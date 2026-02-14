@@ -471,6 +471,7 @@ export default function ScoringScreen() {
         // Reset refs and state when touch is terminated (e.g., scroll takes over)
         isTouchingRef.current = false;
         setIsTouching(false);
+        setScrollEnabled(true); // Re-enable scrolling when touch is terminated
       },
     } : {};
 
