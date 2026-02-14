@@ -46,6 +46,7 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
   const translateY = useSharedValue(0);
   const prevTranslateX = useSharedValue(0);
   const prevTranslateY = useSharedValue(0);
+  const isPanning = useSharedValue(false);
   
   const isZoomed = zoomLevel > 1;
   const scaledSize = (baseTargetSize + 40) * zoomLevel;
@@ -61,14 +62,22 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
   
   const panGesture = Gesture.Pan()
     .enabled(isZoomed)
-    .minDistance(25) // Require 25px movement before pan activates - allows precise arrow placement near existing arrows
+    .minDistance(30) // Increased threshold to prevent accidental panning during arrow placement
     .minPointers(1)
     .maxPointers(1)
+    .shouldCancelWhenOutside(false) // Don't cancel if finger moves outside
+    .onBegin(() => {
+      // Mark that a potential pan is starting - but don't commit yet
+      isPanning.value = false;
+    })
     .onStart(() => {
+      // Pan gesture has officially started (minDistance threshold met)
+      isPanning.value = true;
       prevTranslateX.value = translateX.value;
       prevTranslateY.value = translateY.value;
     })
     .onUpdate((event) => {
+      if (!isPanning.value) return;
       // Calculate new position with bounds
       const newX = prevTranslateX.value + event.translationX;
       const newY = prevTranslateY.value + event.translationY;
@@ -78,6 +87,7 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
       translateY.value = Math.max(-maxPan, Math.min(maxPan, newY));
     })
     .onEnd((event) => {
+      if (!isPanning.value) return;
       // Add momentum/decay for smooth scrolling feel
       translateX.value = withDecay({
         velocity: event.velocityX,
@@ -87,6 +97,10 @@ const ZoomableTarget: React.FC<ZoomableTargetProps> = ({ zoomLevel, baseTargetSi
         velocity: event.velocityY,
         clamp: [-maxPan, maxPan],
       });
+      isPanning.value = false;
+    })
+    .onFinalize(() => {
+      isPanning.value = false;
     });
   
   const animatedStyle = useAnimatedStyle(() => ({
@@ -732,10 +746,10 @@ export default function ScoringScreen() {
     );
     
     // Render existing arrow markers in magnifier
-    // Scale down arrows proportionally to the magnifier zoom level
-    // so they appear at the same relative size as on the actual target
-    const arrowMarkerSize = Math.max(6, 14 / MAGNIFIER_ZOOM); // Scale markers down by zoom level, minimum 6px
-    const arrowFontSize = Math.max(4, 8 / MAGNIFIER_ZOOM); // Scale font proportionally
+    // Make arrows 50% bigger than their base size for better visibility in magnifier
+    const baseArrowSize = 14;
+    const arrowMarkerSize = baseArrowSize * 1.5; // 50% bigger = 21px
+    const arrowFontSize = 10; // Larger font for readability
     const arrowElements = existingArrows.map((arrow, index) => (
       <View
         key={`mag-arrow-${index}`}
