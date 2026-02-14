@@ -119,7 +119,13 @@
     "noBowsFound": "Nenhum Arco Encontrado",
     "noBowsMessage": "Precisa de adicionar pelo menos um arco antes de iniciar uma sessão.",
     "addFirstBow": "Adicionar o Seu Primeiro Arco",
-    "loading": "A carregar..."
+    "loading": "A carregar...",
+    "selectBowTitle": "Selecionar um Arco",
+    "selectBowMessage": "Por favor, selecione um arco antes de iniciar a sessão.",
+    "enterDistanceTitle": "Introduzir Distância",
+    "enterDistanceMessage": "Por favor, introduza a distância de tiro.",
+    "invalidDistanceTitle": "Distância Inválida",
+    "invalidDistanceMessage": "Por favor, introduza uma distância válida."
   },
   "bows": {
     "title": "Os Meus Arcos",
