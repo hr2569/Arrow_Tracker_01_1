@@ -247,7 +247,22 @@
     "rounds": "rounds",
     "score": "Score",
     "date": "Date",
-    "pts": "pts"
+    "pts": "pts",
+    "reportPreview": "Report Preview",
+    "sessionsFound": "sessions found",
+    "sessionFound": "session found",
+    "performanceReport": "Performance Report",
+    "overview": "Overview",
+    "sessions": "Sessions",
+    "averages": "Averages",
+    "perArrow": "/arrow",
+    "perSession": "Per Session",
+    "byTargetType": "By Target Type",
+    "noTargetData": "No data for any target type in selected period",
+    "highlights": "Highlights",
+    "bestSession": "Best Session",
+    "lowestSession": "Lowest Session",
+    "scoreDistribution": "Score Distribution"
   },
   "summary": {
     "title": "Round Summary",
