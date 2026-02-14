@@ -843,7 +843,12 @@ export default function ScoringScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent}
+        scrollEnabled={!isTouching}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Zoom Controls */}
         <View style={styles.zoomControls}>
           <TouchableOpacity 
