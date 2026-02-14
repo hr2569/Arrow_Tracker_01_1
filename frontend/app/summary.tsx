@@ -80,11 +80,12 @@ export default function SummaryScreen() {
     setShowConfirmModal(false);
   }, []);
 
-  // Handle back button press - show confirmation modal
+  // Handle back button press - show confirmation modal (only when screen is focused)
   const handleBackPress = useCallback(() => {
+    if (!isFocused) return false; // Let other screens handle it
     setShowConfirmModal(true);
     return true; // Prevent default back behavior
-  }, []);
+  }, [isFocused]);
 
   // Set custom header title and back button that triggers the modal
   useEffect(() => {
@@ -92,7 +93,7 @@ export default function SummaryScreen() {
       title: t('summary.title'),
       headerLeft: () => (
         <TouchableOpacity 
-          onPress={handleBackPress}
+          onPress={() => setShowConfirmModal(true)}
           style={{ marginLeft: 10, padding: 8, minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' }}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           activeOpacity={0.7}
@@ -101,26 +102,22 @@ export default function SummaryScreen() {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, handleBackPress, t]);
+  }, [navigation, t]);
 
-  // Handle Android hardware back button
+  // Handle Android hardware back button - only when focused
   useEffect(() => {
+    if (!isFocused) return;
+    
     const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
     return () => backHandler.remove();
-  }, [handleBackPress]);
+  }, [isFocused, handleBackPress]);
 
   // Close modal when navigating away from this screen
   useEffect(() => {
     const unsubscribeBlur = navigation.addListener('blur', () => {
       setShowConfirmModal(false);
     });
-    const unsubscribeFocus = navigation.addListener('focus', () => {
-      setShowConfirmModal(false);
-    });
-    return () => {
-      unsubscribeBlur();
-      unsubscribeFocus();
-    };
+    return unsubscribeBlur;
   }, [navigation]);
 
   useEffect(() => {
