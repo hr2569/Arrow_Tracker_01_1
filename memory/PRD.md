@@ -4,7 +4,7 @@
 Arrow Tracker is a React Native (Expo) archery scoring application designed to help archers track their shots, analyze performance, and improve their aim.
 
 ## Version
-Current: **v2.0.1**
+Current: **v2.0.2**
 
 ## Core Features
 
