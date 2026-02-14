@@ -160,11 +160,13 @@ export default function ScoringScreen() {
   const [touchPosition, setTouchPosition] = useState({ x: 0, y: 0 });
   const [activeTargetIndex, setActiveTargetIndex] = useState(0);
   const [previewScore, setPreviewScore] = useState(0);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
   
   // Use refs to track touch state to avoid stale closure issues in responder callbacks
   const isTouchingRef = useRef(false);
   const touchPositionRef = useRef({ x: 0, y: 0 });
   const activeTargetIndexRef = useRef(0);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   const isVegas = targetType === 'vegas_3spot';
