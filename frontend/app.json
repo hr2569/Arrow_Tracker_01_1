@@ -20,7 +20,10 @@
     "scheme": "arrowtracker",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "platforms": ["android", "web"],
+    "platforms": [
+      "android",
+      "web"
+    ],
     "web": {
       "bundler": "metro",
       "output": "single",
@@ -50,7 +53,10 @@
           "resizeMode": "contain",
           "backgroundColor": "#000000"
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker",
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
