@@ -43,12 +43,12 @@ export default function BackupScreen() {
       const result = await createBackup();
       if (result.success) {
         await loadStats();
-        setStatusMessage('✓ Backup ready - select Google Drive to save');
+        setStatusMessage('success:Backup ready - select Google Drive to save');
       } else {
-        setStatusMessage('✗ ' + (result.error || 'Failed to create backup'));
+        setStatusMessage('error:' + (result.error || 'Failed to create backup'));
       }
     } catch (error) {
-      setStatusMessage('✗ Failed to export data');
+      setStatusMessage('error:Failed to export data');
     } finally {
       setIsExporting(false);
     }
@@ -67,16 +67,20 @@ export default function BackupScreen() {
       
       if (result.success) {
         await loadStats();
-        setStatusMessage(`✓ Restored ${result.sessionsCount} sessions, ${result.bowsCount} bows`);
+        setStatusMessage(`success:Restored ${result.sessionsCount} sessions, ${result.bowsCount} bows`);
       } else {
-        setStatusMessage('✗ ' + (result.error || 'Failed to restore backup'));
+        setStatusMessage('error:' + (result.error || 'Failed to restore backup'));
       }
     } catch (error) {
-      setStatusMessage('✗ Failed to import backup');
+      setStatusMessage('error:Failed to import backup');
     } finally {
       setIsImporting(false);
     }
   };
+
+  // Helper to parse status message
+  const getStatusType = (msg: string | null) => msg?.startsWith('success:') ? 'success' : 'error';
+  const getStatusText = (msg: string | null) => msg?.replace(/^(success:|error:)/, '') || '';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -116,9 +120,16 @@ export default function BackupScreen() {
         {statusMessage && (
           <View style={[
             styles.statusCard,
-            statusMessage.startsWith('✓') ? styles.statusSuccess : styles.statusError
+            getStatusType(statusMessage) === 'success' ? styles.statusSuccess : styles.statusError
           ]}>
-            <Text style={styles.statusText}>{statusMessage}</Text>
+            <View style={styles.statusContent}>
+              <Icon 
+                name={getStatusType(statusMessage) === 'success' ? 'checkmark-circle' : 'alert-circle-outline'} 
+                size={20} 
+                color={getStatusType(statusMessage) === 'success' ? '#22c55e' : '#ef4444'} 
+              />
+              <Text style={styles.statusText}>{getStatusText(statusMessage)}</Text>
+            </View>
           </View>
         )}
 
