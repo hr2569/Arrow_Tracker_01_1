@@ -2072,7 +2072,7 @@ export default function ReportScreen() {
 
           {/* Summary Preview */}
           <View style={styles.previewCard}>
-            <Text style={styles.previewTitle}>Report Preview</Text>
+            <Text style={styles.previewTitle}>{t('report.reportPreview')}</Text>
             <View style={styles.previewRow}>
               <Icon name="calendar" size={18} color="#888" />
               <Text style={styles.previewText}>{formatDateRange()}</Text>
@@ -2084,7 +2084,7 @@ export default function ReportScreen() {
             <View style={styles.previewRow}>
               <Icon name="layers" size={18} color="#888" />
               <Text style={styles.previewText}>
-                {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} found
+                {filteredSessions.length} {filteredSessions.length !== 1 ? t('report.sessionsFound') : t('report.sessionFound')}
               </Text>
             </View>
           </View>
@@ -2095,7 +2095,7 @@ export default function ReportScreen() {
             onPress={() => setShowReport(true)}
           >
             <Icon name="document-text" size={24} color="#fff" />
-            <Text style={styles.generateButtonText}>Generate Report</Text>
+            <Text style={styles.generateButtonText}>{t('report.generateReport')}</Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
@@ -2109,7 +2109,7 @@ export default function ReportScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => setShowReport(false)}>
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Report</Text>
+        <Text style={styles.headerTitle}>{t('report.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -2117,7 +2117,7 @@ export default function ReportScreen() {
         {/* Report Header */}
         <View style={styles.reportHeader}>
           <Icon name="document-text" size={32} color="#8B0000" />
-          <Text style={styles.reportTitle}>Performance Report</Text>
+          <Text style={styles.reportTitle}>{t('report.performanceReport')}</Text>
           <Text style={styles.reportDate}>{formatDateRange()}</Text>
           {(selectedBow || selectedDistance || selectedTargetType) && (
             <View style={styles.filterBadge}>
@@ -2130,24 +2130,24 @@ export default function ReportScreen() {
         {/* Overview Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>
-            <Icon name="stats-chart" size={18} color="#8B0000" /> Overview
+            <Icon name="stats-chart" size={18} color="#8B0000" /> {t('report.overview')}
           </Text>
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{reportStats.totalSessions}</Text>
-              <Text style={styles.statLabel}>Sessions</Text>
+              <Text style={styles.statLabel}>{t('report.sessions')}</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{reportStats.totalRounds}</Text>
-              <Text style={styles.statLabel}>Rounds</Text>
+              <Text style={styles.statLabel}>{t('report.totalRounds')}</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{reportStats.totalArrows}</Text>
-              <Text style={styles.statLabel}>Arrows</Text>
+              <Text style={styles.statLabel}>{t('report.totalArrows')}</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{reportStats.totalPoints}</Text>
-              <Text style={styles.statLabel}>Total Points</Text>
+              <Text style={styles.statLabel}>{t('report.totalPoints')}</Text>
             </View>
           </View>
         </View>
