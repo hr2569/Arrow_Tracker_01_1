@@ -2267,9 +2267,9 @@ export default function ReportScreen() {
         {reportStats.totalSessions === 0 && (
           <View style={styles.emptyState}>
             <Icon name="document-outline" size={64} color="#888888" />
-            <Text style={styles.emptyTitle}>No Data</Text>
+            <Text style={styles.emptyTitle}>{t('report.noData')}</Text>
             <Text style={styles.emptyText}>
-              No sessions found for this period. Try selecting a different date range or filters.
+              {t('report.noDataMessage')}
             </Text>
           </View>
         )}
@@ -2277,7 +2277,7 @@ export default function ReportScreen() {
         {/* Save PDF Button */}
         <TouchableOpacity style={styles.downloadPdfButton} onPress={handleDownloadPdf}>
           <Icon name="download-outline" size={24} color="#fff" />
-          <Text style={styles.shareButtonText}>Save PDF</Text>
+          <Text style={styles.shareButtonText}>{t('report.savePDF')}</Text>
         </TouchableOpacity>
 
         {/* Edit Range Button */}
@@ -2286,7 +2286,7 @@ export default function ReportScreen() {
           onPress={() => setShowReport(false)}
         >
           <Icon name="options-outline" size={20} color="#8B0000" />
-          <Text style={styles.editRangeButtonText}>Change Filters</Text>
+          <Text style={styles.editRangeButtonText}>{t('report.changeFilters')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
