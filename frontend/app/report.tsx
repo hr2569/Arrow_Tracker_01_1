@@ -2014,7 +2014,7 @@ export default function ReportScreen() {
             </View>
 
             <View style={styles.dateRow}>
-              <Text style={styles.dateLabel}>To</Text>
+              <Text style={styles.dateLabel}>{t('report.endDate')}</Text>
               {Platform.OS === 'web' ? (
                 <input
                   type="date"
