@@ -732,7 +732,10 @@ export default function ScoringScreen() {
     );
     
     // Render existing arrow markers in magnifier
-    const arrowMarkerSize = 12; // Smaller markers for magnifier view
+    // Scale down arrows proportionally to the magnifier zoom level
+    // so they appear at the same relative size as on the actual target
+    const arrowMarkerSize = Math.max(6, 14 / MAGNIFIER_ZOOM); // Scale markers down by zoom level, minimum 6px
+    const arrowFontSize = Math.max(4, 8 / MAGNIFIER_ZOOM); // Scale font proportionally
     const arrowElements = existingArrows.map((arrow, index) => (
       <View
         key={`mag-arrow-${index}`}
@@ -750,7 +753,7 @@ export default function ScoringScreen() {
           justifyContent: 'center',
         }}
       >
-        <Text style={{ fontSize: 6, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
+        <Text style={{ fontSize: arrowFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
           {getScoreDisplay(arrow.score)}
         </Text>
       </View>
