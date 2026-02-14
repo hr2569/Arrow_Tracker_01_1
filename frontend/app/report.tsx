@@ -1755,12 +1755,12 @@ export default function ReportScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Report</Text>
+          <Text style={styles.headerTitle}>{t('report.title')}</Text>
           <View style={styles.headerSpacer} />
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#8B0000" />
-          <Text style={styles.loadingText}>Loading data...</Text>
+          <Text style={styles.loadingText}>{t('report.loading')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -1774,7 +1774,7 @@ export default function ReportScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Generate Report</Text>
+          <Text style={styles.headerTitle}>{t('report.generateReport')}</Text>
           <View style={styles.headerSpacer} />
         </View>
 
@@ -1784,22 +1784,22 @@ export default function ReportScreen() {
             <View style={styles.iconCircle}>
               <Icon name="document-text" size={48} color="#8B0000" />
             </View>
-            <Text style={styles.selectionTitle}>Configure Report</Text>
+            <Text style={styles.selectionTitle}>{t('report.generateReport')}</Text>
             <Text style={styles.selectionSubtitle}>
-              Select time range and filters for your report
+              {t('report.selectByDateRange')}
             </Text>
           </View>
 
           {/* Bow Filter */}
           {bows.length > 0 && (
             <View style={styles.filterSection}>
-              <Text style={styles.sectionLabel}>Filter by Bow</Text>
+              <Text style={styles.sectionLabel}>{t('report.bow')}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <TouchableOpacity
                   style={[styles.filterChip, !selectedBow && styles.filterChipActive]}
                   onPress={() => setSelectedBow(null)}
                 >
-                  <Text style={[styles.filterChipText, !selectedBow && styles.filterChipTextActive]}>All Bows</Text>
+                  <Text style={[styles.filterChipText, !selectedBow && styles.filterChipTextActive]}>{t('report.allBows')}</Text>
                 </TouchableOpacity>
                 {bows.map((bow) => (
                   <TouchableOpacity
