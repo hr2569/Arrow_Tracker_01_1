@@ -249,7 +249,22 @@
     "rounds": "turnos",
     "score": "Pontuação",
     "date": "Data",
-    "pts": "pts"
+    "pts": "pts",
+    "reportPreview": "Pré-visualização do Relatório",
+    "sessionsFound": "sessões encontradas",
+    "sessionFound": "sessão encontrada",
+    "performanceReport": "Relatório de Desempenho",
+    "overview": "Resumo",
+    "sessions": "Sessões",
+    "averages": "Médias",
+    "perArrow": "/seta",
+    "perSession": "Por Sessão",
+    "byTargetType": "Por Tipo de Alvo",
+    "noTargetData": "Sem dados para qualquer tipo de alvo no período selecionado",
+    "highlights": "Destaques",
+    "bestSession": "Melhor Sessão",
+    "lowestSession": "Pior Sessão",
+    "scoreDistribution": "Distribuição de Pontuação"
   },
   "summary": {
     "title": "Resumo do Turno",
