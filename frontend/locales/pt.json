@@ -264,7 +264,11 @@
     "highlights": "Destaques",
     "bestSession": "Melhor Sessão",
     "lowestSession": "Pior Sessão",
-    "scoreDistribution": "Distribuição de Pontuação"
+    "scoreDistribution": "Distribuição de Pontuação",
+    "savePDF": "Guardar PDF",
+    "changeFilters": "Alterar Filtros",
+    "noData": "Sem Dados",
+    "noDataMessage": "Nenhuma sessão encontrada para este período. Tente selecionar um período ou filtros diferentes."
   },
   "summary": {
     "title": "Resumo do Turno",
