@@ -103,6 +103,14 @@ export default function SummaryScreen() {
     return () => backHandler.remove();
   }, [handleBackPress]);
 
+  // Close modal when navigating away from this screen
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      setShowConfirmModal(false);
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   useEffect(() => {
     // Add current round to session rounds if it exists and hasn't been added yet
     if (currentRound && !roundAdded) {
