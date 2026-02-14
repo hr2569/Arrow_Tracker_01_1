@@ -1311,7 +1311,7 @@ export default function ReportScreen() {
       return (
         <View style={[heatmapStyles.emptyContainer, { width: size, height: size }]}>
           <Icon name="flame-outline" size={48} color="#888888" />
-          <Text style={heatmapStyles.emptyText}>No shots in this period</Text>
+          <Text style={heatmapStyles.emptyText}>{t('report.noShotsInPeriod')}</Text>
         </View>
       );
     }
