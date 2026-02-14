@@ -610,10 +610,8 @@ export default function ScoringScreen() {
                       },
                     ]}
                     onPress={() => handleEditArrow(globalIndex)}
-                    delayPressIn={200}
-                    delayLongPress={500}
+                    delayPressIn={150}
                     activeOpacity={0.7}
-                    hitSlop={{ top: -5, bottom: -5, left: -5, right: -5 }}
                   >
                     <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: getScoreTextColor(arrow.score) }}>
                       {getScoreDisplay(arrow.score)}
