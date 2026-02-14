@@ -24,7 +24,7 @@
   "seed_data_creation": "Created test bow 'Arco de Teste' for session testing",
   "retest_needed": false,
   "should_main_agent_self_test": false,
-  "context_for_next_testing_agent": "i18n translations verified working for Home, Settings, Session Setup, Scoring, and Summary screens. Modal buttons (Save/Discard/Cancel) translate correctly. Zoom pan gesture fix with minDistance:15 is in place. Testing was done on Expo web version at https://arrow-marker-zoom.preview.emergentagent.com",
+  "context_for_next_testing_agent": "i18n translations verified working for Home, Settings, Session Setup, Scoring, and Summary screens. Modal buttons (Save/Discard/Cancel) translate correctly. Zoom pan gesture fix with minDistance:15 is in place. Testing was done on Expo web version at https://archery-v202-test.preview.emergentagent.com",
   "tested_features": {
     "i18n_translations": {
       "home_screen": {
