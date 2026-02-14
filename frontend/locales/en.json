@@ -262,7 +262,11 @@
     "highlights": "Highlights",
     "bestSession": "Best Session",
     "lowestSession": "Lowest Session",
-    "scoreDistribution": "Score Distribution"
+    "scoreDistribution": "Score Distribution",
+    "savePDF": "Save PDF",
+    "changeFilters": "Change Filters",
+    "noData": "No Data",
+    "noDataMessage": "No sessions found for this period. Try selecting a different date range or filters."
   },
   "summary": {
     "title": "Round Summary",
