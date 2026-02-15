@@ -11,7 +11,8 @@ import {
   BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, useNavigation, useIsFocused } from 'expo-router';
+import { useRouter, useNavigation } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store/appStore';
