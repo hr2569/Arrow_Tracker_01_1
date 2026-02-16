@@ -327,6 +327,37 @@ export default function ReportScreen() {
   // Generate shareable report text
   // Generate PDF HTML content
   const generatePdfHtml = () => {
+    // Translation strings for PDF
+    const pdfStrings = {
+      performanceReport: t('report.performanceReport'),
+      generated: t('report.generated', { defaultValue: 'Generated' }),
+      bow: t('report.bow'),
+      bows: t('report.bows', { defaultValue: 'Bows' }),
+      distance: t('report.distance'),
+      distances: t('report.distances', { defaultValue: 'Distances' }),
+      target: t('report.target', { defaultValue: 'Target' }),
+      targets: t('report.targets', { defaultValue: 'Targets' }),
+      overview: t('report.overview'),
+      sessions: t('report.sessions'),
+      rounds: t('report.rounds', { defaultValue: 'Rounds' }),
+      arrows: t('report.arrows'),
+      totalPoints: t('report.totalPoints'),
+      averages: t('report.averages', { defaultValue: 'Averages' }),
+      perArrow: t('report.perArrow'),
+      perRound: t('report.perRound'),
+      perSession: t('report.perSession'),
+      highlights: t('report.highlights'),
+      bestSession: t('report.bestSession'),
+      lowestSession: t('report.lowestSession'),
+      scoreDistribution: t('report.scoreDistribution'),
+      noShotsInPeriod: t('report.noShotsInPeriod'),
+      horizontalAxis: t('report.horizontalAxis', { defaultValue: 'Horizontal (Left/Right)' }),
+      verticalAxis: t('report.verticalAxis', { defaultValue: 'Vertical (Up/Down)' }),
+      legend: t('report.legend', { defaultValue: 'Legend' }),
+      shotDistribution: t('report.shotDistribution'),
+      meanPointOfImpact: t('report.meanPointOfImpact', { defaultValue: 'Mean Point of Impact' }),
+    };
+
     // Generate date for title
     const reportDate = new Date().toLocaleDateString('en-US', { 
       year: 'numeric', 
