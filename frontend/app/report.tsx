@@ -806,10 +806,10 @@ export default function ReportScreen() {
           ${axisLabels}
           
           <!-- X axis title -->
-          <text x="${center}" y="${size - 15}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Horizontal (Left/Right)</text>
+          <text x="${center}" y="${size - 15}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">${pdfStrings.horizontalAxis}</text>
           
           <!-- Y axis title -->
-          <text x="15" y="${center}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333" transform="rotate(-90, 15, ${center})">Vertical (Up/Down)</text>
+          <text x="15" y="${center}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333" transform="rotate(-90, 15, ${center})">${pdfStrings.verticalAxis}</text>
           
           <!-- Shot dots -->
           ${shotDots}
@@ -819,7 +819,7 @@ export default function ReportScreen() {
           
           <!-- Legend -->
           <rect x="${size - 130}" y="${padding + 10}" width="120" height="90" fill="white" stroke="#ccc" rx="4" />
-          <text x="${size - 120}" y="${padding + 28}" font-size="11" font-weight="bold" fill="#333">Legend</text>
+          <text x="${size - 120}" y="${padding + 28}" font-size="11" font-weight="bold" fill="#333">${pdfStrings.legend}</text>
           <circle cx="${size - 115}" cy="${padding + 45}" r="5" fill="#FFD700" stroke="#000" stroke-width="1" />
           <text x="${size - 105}" y="${padding + 49}" font-size="10" fill="#333">9-10 (Gold)</text>
           <circle cx="${size - 115}" cy="${padding + 62}" r="5" fill="#ed1c24" stroke="#000" stroke-width="1" />
@@ -828,7 +828,7 @@ export default function ReportScreen() {
           <text x="${size - 105}" y="${padding + 83}" font-size="10" fill="#333">≤6 (Blue)</text>
           
           <!-- Mean POI label -->
-          <text x="${size - 120}" y="${padding + 95}" font-size="9" fill="#8B0000">● Mean POI: (${avgX.toFixed(2)}, ${(-avgY).toFixed(2)})</text>
+          <text x="${size - 120}" y="${padding + 95}" font-size="9" fill="#8B0000">● ${pdfStrings.meanPointOfImpact}: (${avgX.toFixed(2)}, ${(-avgY).toFixed(2)})</text>
         </svg>
       `;
     };
