@@ -729,7 +729,7 @@ export default function ReportScreen() {
       if (shots.length === 0) {
         return `
           <div style="width: 100%; height: ${size}px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-            <span style="color: #666; font-size: 16px;">No shot data available</span>
+            <span style="color: #666; font-size: 16px;">${pdfStrings.noShotsInPeriod}</span>
           </div>
         `;
       }
