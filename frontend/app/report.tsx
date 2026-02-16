@@ -1158,12 +1158,12 @@ export default function ReportScreen() {
                 <h3>${pdfStrings.highlights}</h3>
                 <div class="highlight-row">
                   <div class="highlight-item">
-                    <div class="highlight-label">Best Session</div>
+                    <div class="highlight-label">${pdfStrings.bestSession}</div>
                     <div class="highlight-value">${reportStats.bestSession.score} pts</div>
                     <div class="highlight-date">${reportStats.bestSession.date}</div>
                   </div>
                   <div class="highlight-item">
-                    <div class="highlight-label">Lowest Session</div>
+                    <div class="highlight-label">${pdfStrings.lowestSession}</div>
                     <div class="highlight-value-low">${reportStats.worstSession.score} pts</div>
                     <div class="highlight-date">${reportStats.worstSession.date}</div>
                   </div>
@@ -1180,8 +1180,8 @@ export default function ReportScreen() {
           <!-- Target Face Shot Map Page -->
           <div class="page">
             <div class="page-header">
-              <h2>${getTargetTypeName(targetType)} - Target Face Shot Map</h2>
-              <p>${shotsForType.length} arrows</p>
+              <h2>${getTargetTypeName(targetType)} - ${pdfStrings.shotDistribution}</h2>
+              <p>${shotsForType.length} ${pdfStrings.arrows}</p>
             </div>
             <div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
               ${generateTargetFaceScatterSvg(targetType, shotsForType)}
@@ -1191,8 +1191,8 @@ export default function ReportScreen() {
           <!-- Heat Map Page -->
           <div class="page">
             <div class="page-header">
-              <h2>${getTargetTypeName(targetType)} - Heat Map</h2>
-              <p>${shotsForType.length} arrows</p>
+              <h2>${getTargetTypeName(targetType)} - ${t('report.impactHeatmap')}</h2>
+              <p>${shotsForType.length} ${pdfStrings.arrows}</p>
             </div>
             <div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
               ${generateHeatmapSvg(targetType, shotsForType)}
@@ -1202,8 +1202,8 @@ export default function ReportScreen() {
           <!-- Cartesian Distribution Page -->
           <div class="page">
             <div class="page-header">
-              <h2>${getTargetTypeName(targetType)} - Cartesian Distribution</h2>
-              <p>${shotsForType.length} arrows</p>
+              <h2>${getTargetTypeName(targetType)} - ${t('report.cartesianDistribution', { defaultValue: 'Cartesian Distribution' })}</h2>
+              <p>${shotsForType.length} ${pdfStrings.arrows}</p>
             </div>
             <div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
               ${generateScatterPlotSvg(targetType, shotsForType)}
@@ -1216,8 +1216,8 @@ export default function ReportScreen() {
           ${reportStats.totalArrows > 0 ? `
           <div class="page">
             <div class="page-header">
-              <h2>Score Distribution</h2>
-              <p>${reportStats.totalArrows} total arrows</p>
+              <h2>${pdfStrings.scoreDistribution}</h2>
+              <p>${reportStats.totalArrows} ${pdfStrings.arrows}</p>
             </div>
             <table class="score-table">
               ${ringDistributionRows}
