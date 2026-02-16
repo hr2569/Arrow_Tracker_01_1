@@ -1105,57 +1105,57 @@ export default function ReportScreen() {
           <!-- Page 1: Overview & Stats -->
           <div class="page">
             <div class="header">
-              <h1>Arrow Tracker Performance Report</h1>
+              <h1>Arrow Tracker ${pdfStrings.performanceReport}</h1>
               <p style="font-size: 16px;">${formatDateRange()}</p>
-              <p style="font-size: 12px; color: #666;">Generated ${new Date().toLocaleDateString()}</p>
+              <p style="font-size: 12px; color: #666;">${pdfStrings.generated} ${new Date().toLocaleDateString()}</p>
               <div class="equipment-info">
-                ${usedBows.length > 0 ? `<div>Bow${usedBows.length > 1 ? 's' : ''}: ${usedBows.join(', ')}</div>` : ''}
-                ${usedDistances.length > 0 ? `<div>Distance${usedDistances.length > 1 ? 's' : ''}: ${usedDistances.join(', ')}</div>` : ''}
-                ${usedTargetTypes.length > 0 ? `<div>Target${usedTargetTypes.length > 1 ? 's' : ''}: ${usedTargetTypes.join(', ')}</div>` : ''}
+                ${usedBows.length > 0 ? `<div>${usedBows.length > 1 ? pdfStrings.bows : pdfStrings.bow}: ${usedBows.join(', ')}</div>` : ''}
+                ${usedDistances.length > 0 ? `<div>${usedDistances.length > 1 ? pdfStrings.distances : pdfStrings.distance}: ${usedDistances.join(', ')}</div>` : ''}
+                ${usedTargetTypes.length > 0 ? `<div>${usedTargetTypes.length > 1 ? pdfStrings.targets : pdfStrings.target}: ${usedTargetTypes.join(', ')}</div>` : ''}
               </div>
             </div>
 
             <div class="card">
-              <h3>Overview</h3>
+              <h3>${pdfStrings.overview}</h3>
               <div class="stats-grid">
                 <div class="stat-item">
                   <div class="stat-value">${reportStats.totalSessions}</div>
-                  <div class="stat-label">Sessions</div>
+                  <div class="stat-label">${pdfStrings.sessions}</div>
                 </div>
                 <div class="stat-item">
                   <div class="stat-value">${reportStats.totalRounds}</div>
-                  <div class="stat-label">Rounds</div>
+                  <div class="stat-label">${pdfStrings.rounds}</div>
                 </div>
                 <div class="stat-item">
                   <div class="stat-value">${reportStats.totalArrows}</div>
-                  <div class="stat-label">Arrows</div>
+                  <div class="stat-label">${pdfStrings.arrows}</div>
                 </div>
                 <div class="stat-item">
                   <div class="stat-value">${reportStats.totalPoints}</div>
-                  <div class="stat-label">Total Points</div>
+                  <div class="stat-label">${pdfStrings.totalPoints}</div>
                 </div>
               </div>
             </div>
 
             <div class="card">
-              <h3>Averages</h3>
+              <h3>${pdfStrings.averages}</h3>
               <div class="avg-row">
-                <span class="avg-label">Per Arrow</span>
+                <span class="avg-label">${pdfStrings.perArrow}</span>
                 <span class="avg-value">${reportStats.avgPerArrow}</span>
               </div>
               <div class="avg-row">
-                <span class="avg-label">Per Round</span>
+                <span class="avg-label">${pdfStrings.perRound}</span>
                 <span class="avg-value">${reportStats.avgPerRound}</span>
               </div>
               <div class="avg-row">
-                <span class="avg-label">Per Session</span>
+                <span class="avg-label">${pdfStrings.perSession}</span>
                 <span class="avg-value">${reportStats.avgPerSession}</span>
               </div>
             </div>
 
             ${reportStats.totalSessions > 0 ? `
               <div class="card">
-                <h3>Highlights</h3>
+                <h3>${pdfStrings.highlights}</h3>
                 <div class="highlight-row">
                   <div class="highlight-item">
                     <div class="highlight-label">Best Session</div>
