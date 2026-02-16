@@ -385,7 +385,7 @@ export default function ScoringScreen() {
       shots: arrows.map(a => ({ x: a.x, y: a.y, ring: a.score })),
       total: getTotalScore(),
     });
-    router.push('/summary');
+    router.replace('/summary');
   };
 
   const getAvailableScores = (): number[] => {
