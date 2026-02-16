@@ -91,8 +91,8 @@ export default function SessionSetupScreen() {
     setSessionDistance(`${distance}${distanceUnit}`);
     setTargetType(selectedTargetType);
     
-    // Navigate to manual scoring screen
-    router.push('/scoring');
+    // Navigate to scoring screen - use replace to prevent going back to setup
+    router.replace('/scoring');
   };
 
   const navigateToAddBow = () => {
