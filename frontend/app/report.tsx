@@ -401,7 +401,7 @@ export default function ReportScreen() {
       if (shots.length === 0) {
         return `
           <div style="width: 100%; height: 500px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid #ddd;">
-            <span style="color: #666; font-size: 18px;">No shots in this period</span>
+            <span style="color: #666; font-size: 18px;">${pdfStrings.noShotsInPeriod}</span>
           </div>
         `;
       }
