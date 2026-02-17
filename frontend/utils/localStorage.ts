@@ -31,6 +31,10 @@ export interface Session {
   total_score: number;
   created_at: string;
   updated_at: string;
+  // Competition-specific fields
+  session_type?: 'training' | 'competition';
+  archer_name?: string;
+  competition_bow_type?: string;
 }
 
 export interface Bow {
