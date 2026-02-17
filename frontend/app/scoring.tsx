@@ -215,6 +215,15 @@ export default function ScoringScreen() {
 
   // Place arrow at current position
   const placeArrow = useCallback((normalizedX: number, normalizedY: number, targetIndex: number) => {
+    // Check if we've reached the max arrows per round in competition mode
+    if (isCompetition && arrows.length >= maxArrowsPerRound) {
+      Alert.alert(
+        t('scoring.maxArrowsReached'),
+        t('scoring.maxArrowsMessage', { count: maxArrowsPerRound })
+      );
+      return;
+    }
+    
     const score = calculateScore(normalizedX, normalizedY);
     
     // Haptic feedback when placing arrow
@@ -231,7 +240,7 @@ export default function ScoringScreen() {
     };
 
     setArrows(prev => [...prev, newArrow]);
-  }, [isMultiTarget, calculateScore]);
+  }, [isMultiTarget, calculateScore, isCompetition, arrows.length, maxArrowsPerRound, t]);
 
   // Handle touch start - show magnifier and disable scrolling
   const handleTouchStart = useCallback((x: number, y: number, targetSize: number, targetIndex: number) => {
