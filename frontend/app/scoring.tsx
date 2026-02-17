@@ -1085,4 +1085,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
+  magnifierScoreBadgeCentered: {
+    position: 'absolute',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#000',
+  },
+  magnifierScoreTextCentered: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
 });
