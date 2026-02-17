@@ -40,7 +40,39 @@
     "rounds": "Turnos",
     "arrowsPerRound": "Flechas/Turno",
     "totalArrows": "Total Flechas",
-    "startCompetition": "Iniciar Competição"
+    "startCompetition": "Iniciar Competição",
+    "selectBow": "Selecionar Arco",
+    "manageBows": "Gerir Arcos",
+    "noBows": "Sem Arcos",
+    "tapToAddBow": "Toque para adicionar o seu primeiro arco",
+    "bowRequired": "Arco Obrigatório",
+    "other": "Outro"
+  },
+  "competitionMenu": {
+    "title": "Competição",
+    "newCompetition": "Nova Competição",
+    "newCompetitionDesc": "Iniciar uma nova sessão de pontuação oficial",
+    "scoreKeeping": "Gestão de Pontuações",
+    "scoreKeepingDesc": "Importar e compilar resultados de competições",
+    "infoText": "As sessões de competição são guardadas no histórico e podem ser compiladas em relatórios combinados."
+  },
+  "scoreKeeping": {
+    "title": "Gestão de Pontuações",
+    "importFiles": "Importar Ficheiros",
+    "selectFile": "Selecionar Ficheiro para Importar",
+    "supportedFormats": "CSV, PDF, TXT",
+    "fileSelected": "Ficheiro Selecionado",
+    "parseNotImplemented": "A análise de ficheiros estará disponível numa futura atualização.",
+    "importError": "Falha ao importar ficheiro",
+    "competitionSessions": "Sessões de Competição",
+    "selected": "selecionadas",
+    "noCompetitions": "Sem Sessões de Competição",
+    "noCompetitionsDesc": "Complete sessões de competição para as ver aqui.",
+    "pts": "pts",
+    "selectMore": "Selecionar Mais Sessões",
+    "selectMoreDesc": "Por favor selecione pelo menos 2 sessões para gerar um relatório combinado.",
+    "generateCombinedReport": "Gerar Relatório Combinado",
+    "infoText": "Selecione múltiplas sessões de competição para gerar um relatório de desempenho combinado. Também pode importar folhas de pontuação de outras fontes."
   },
   "settings": {
     "title": "Definições",
