@@ -486,11 +486,45 @@ export default function HistoryScreen() {
     fetchSessions();
   }, []);
 
-  // Group sessions by selected time period
+  // Group sessions by selected time period - ONLY sessions matching the time period filter
   const groupedSessions = useMemo(() => {
     const groups: { [key: string]: Session[] } = {};
+    const now = new Date();
 
-    filteredSessions.forEach((session) => {
+    // First, filter sessions by the selected time period
+    const periodFilteredSessions = filteredSessions.filter(session => {
+      const sessionDate = new Date(session.created_at);
+      
+      switch (selectedPeriod) {
+        case 'day': {
+          // Same day as today
+          return sessionDate.toDateString() === now.toDateString();
+        }
+        case 'week': {
+          // Current week (Sunday to Saturday)
+          const weekStart = new Date(now);
+          weekStart.setDate(now.getDate() - now.getDay());
+          weekStart.setHours(0, 0, 0, 0);
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekStart.getDate() + 7);
+          return sessionDate >= weekStart && sessionDate < weekEnd;
+        }
+        case 'month': {
+          // Same month and year
+          return sessionDate.getMonth() === now.getMonth() && 
+                 sessionDate.getFullYear() === now.getFullYear();
+        }
+        case 'year': {
+          // Same year
+          return sessionDate.getFullYear() === now.getFullYear();
+        }
+        case 'all':
+        default:
+          return true;
+      }
+    });
+
+    periodFilteredSessions.forEach((session) => {
       const sessionDate = new Date(session.created_at);
       let groupKey: string;
 
