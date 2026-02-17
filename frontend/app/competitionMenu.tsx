@@ -1,80 +1,84 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Icon } from '../components/Icon';
+import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { loadSavedLanguage } from '../i18n';
 
-export default function CompetitionMenu() {
+export default function CompetitionMenuScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedLanguage();
+    }, [])
+  );
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Icon name="arrow-back" size={24} color="#FFD700" />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <View style={styles.headerTitleContainer}>
+        <View style={styles.headerContent}>
           <Icon name="trophy" size={28} color="#FFD700" />
-          <Text style={styles.headerTitle}>Competition</Text>
+          <Text style={styles.headerTitle}>{t('competitionMenu.title')}</Text>
         </View>
         <View style={styles.placeholder} />
       </View>
 
-      {/* Menu Options */}
-      <View style={styles.menuContainer}>
-        {/* Compete Button */}
+      <View style={styles.content}>
+        {/* New Competition */}
         <TouchableOpacity
-          style={styles.menuButton}
+          style={styles.menuCard}
           onPress={() => router.push('/competitionSetup')}
           activeOpacity={0.8}
         >
           <View style={styles.menuIconContainer}>
-            <Icon name="locate" size={40} color="#FFD700" />
+            <Icon name="flag" size={40} color="#FFD700" />
           </View>
           <View style={styles.menuTextContainer}>
-            <Text style={styles.menuButtonTitle}>Compete</Text>
-            <Text style={styles.menuButtonSubtitle}>Start a new competition round</Text>
+            <Text style={styles.menuTitle}>{t('competitionMenu.newCompetition')}</Text>
+            <Text style={styles.menuSubtitle}>{t('competitionMenu.newCompetitionDesc')}</Text>
           </View>
-          <Icon name="chevron-forward" size={24} color="#8B0000" />
+          <Icon name="chevron-forward" size={24} color="#666" />
         </TouchableOpacity>
 
-        {/* Score Keeping Button */}
+        {/* Score Keeping - Import */}
         <TouchableOpacity
-          style={styles.menuButton}
+          style={styles.menuCard}
           onPress={() => router.push('/scoreKeeping')}
           activeOpacity={0.8}
         >
-          <View style={[styles.menuIconContainer, { backgroundColor: '#2a1a1a' }]}>
-            <Icon name="clipboard" size={40} color="#FFD700" />
+          <View style={styles.menuIconContainer}>
+            <Icon name="document-text" size={40} color="#4CAF50" />
           </View>
           <View style={styles.menuTextContainer}>
-            <Text style={styles.menuButtonTitle}>Score Keeping</Text>
-            <Text style={styles.menuButtonSubtitle}>Record scores for other archers</Text>
+            <Text style={styles.menuTitle}>{t('competitionMenu.scoreKeeping')}</Text>
+            <Text style={styles.menuSubtitle}>{t('competitionMenu.scoreKeepingDesc')}</Text>
           </View>
-          <Icon name="chevron-forward" size={24} color="#8B0000" />
+          <Icon name="chevron-forward" size={24} color="#666" />
         </TouchableOpacity>
 
-        {/* Competition History Button */}
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => router.push('/competitionHistory')}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.menuIconContainer, { backgroundColor: '#1a1a2a' }]}>
-            <Icon name="time" size={40} color="#FFD700" />
-          </View>
-          <View style={styles.menuTextContainer}>
-            <Text style={styles.menuButtonTitle}>Competition History</Text>
-            <Text style={styles.menuButtonSubtitle}>View past competition results</Text>
-          </View>
-          <Icon name="chevron-forward" size={24} color="#8B0000" />
-        </TouchableOpacity>
+        {/* Info Card */}
+        <View style={styles.infoCard}>
+          <Icon name="information-circle" size={20} color="#FFD700" />
+          <Text style={styles.infoText}>
+            {t('competitionMenu.infoText')}
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -90,60 +94,77 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#8B0000',
+    borderBottomColor: '#222',
   },
   backButton: {
     padding: 8,
   },
-  headerTitleContainer: {
+  headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#FFD700',
+    color: '#fff',
   },
   placeholder: {
     width: 40,
   },
-  menuContainer: {
+  content: {
     flex: 1,
-    padding: 20,
-    gap: 16,
+    padding: 16,
   },
-  menuButton: {
+  menuCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#111',
     borderRadius: 16,
-    padding: 16,
+    padding: 20,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#8B0000',
+    borderColor: '#222',
   },
   menuIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
-    backgroundColor: '#3a1a1a',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 16,
   },
   menuTextContainer: {
     flex: 1,
-    marginLeft: 16,
   },
-  menuButtonTitle: {
+  menuTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 4,
   },
-  menuButtonSubtitle: {
+  menuSubtitle: {
     fontSize: 14,
     color: '#888',
+  },
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 20,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+  },
+  infoText: {
+    flex: 1,
+    color: '#ccc',
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
