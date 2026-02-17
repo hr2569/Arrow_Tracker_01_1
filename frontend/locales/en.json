@@ -318,6 +318,8 @@
     "total": "Total",
     "addAnotherRound": "Add Another Round",
     "finishAndSave": "Finish & Save",
+    "finishCompetition": "Finish Competition",
+    "roundOfTotal": "Round {{current}}/{{total}}",
     "roundStatistics": "Round Statistics",
     "bestShot": "Best Shot",
     "worstShot": "Worst Shot",
