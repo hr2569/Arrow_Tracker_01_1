@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import { useRouter, useNavigation } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
-import { useAppStore } from '../store/appStore';
+import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
 import { createSession, addRoundToSession } from '../utils/localStorage';
 
 // Ring colors for FITA target - with better visibility
@@ -50,6 +50,124 @@ const getPointValue = (ring: number): number => {
 // Check if ring needs a border (for black rings on dark background)
 const needsBorder = (ring: number): boolean => {
   return ring === 3 || ring === 4;
+};
+
+// Session Target Face Component - displays all shots from the current session
+interface SessionTargetFaceProps {
+  shots: Array<{ x: number; y: number; ring: number }>;
+  targetType: string;
+  size?: number;
+}
+
+const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType, size = 200 }) => {
+  const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
+  const rings = targetConfig.rings;
+  const colors = targetConfig.colors;
+  
+  // Marker sizes
+  const markerSize = 16;
+  const markerFontSize = 8;
+  
+  // Render target rings
+  const renderRings = () => {
+    const ringElements = [];
+    for (let i = 0; i < rings; i++) {
+      const ringRatio = (rings - i) / rings;
+      const ringSize = size * ringRatio * 0.95;
+      const color = colors[i];
+      
+      ringElements.push(
+        <View
+          key={`ring-${i}`}
+          style={{
+            position: 'absolute',
+            width: ringSize,
+            height: ringSize,
+            borderRadius: ringSize / 2,
+            backgroundColor: color?.bg || '#f5f5f0',
+            borderWidth: 1,
+            borderColor: color?.border || '#333',
+          }}
+        />
+      );
+    }
+    
+    // X ring (innermost)
+    const xRingSize = size * 0.05 * 0.95;
+    const xRingColor = (targetConfig as any).xRingColor || { bg: '#fff200', border: '#b8860b' };
+    ringElements.push(
+      <View
+        key="xring"
+        style={{
+          position: 'absolute',
+          width: xRingSize,
+          height: xRingSize,
+          borderRadius: xRingSize / 2,
+          backgroundColor: xRingColor.bg,
+          borderWidth: 2,
+          borderColor: xRingColor.border,
+        }}
+      />
+    );
+    
+    return ringElements;
+  };
+  
+  // Render shot markers
+  const renderShots = () => {
+    return shots.map((shot, index) => {
+      const shotColor = getRingColor(shot.ring);
+      const textColor = shot.ring >= 3 && shot.ring <= 4 ? '#fff' : 
+                       shot.ring >= 9 || (shot.ring >= 1 && shot.ring <= 2) ? '#000' : '#fff';
+      
+      return (
+        <View
+          key={`shot-${index}`}
+          style={{
+            position: 'absolute',
+            width: markerSize,
+            height: markerSize,
+            borderRadius: markerSize / 2,
+            backgroundColor: '#8B0000',
+            borderWidth: 2,
+            borderColor: '#fff',
+            left: shot.x * size - markerSize / 2,
+            top: shot.y * size - markerSize / 2,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: '#fff' }}>
+            {getDisplayScore(shot.ring)}
+          </Text>
+        </View>
+      );
+    });
+  };
+  
+  if (shots.length === 0) {
+    return null;
+  }
+  
+  return (
+    <View style={{
+      width: size,
+      height: size,
+      backgroundColor: '#1a1a1a',
+      borderRadius: size / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      {renderRings()}
+      
+      {/* Center crosshair */}
+      <View style={{ position: 'absolute', width: 12, height: 2, backgroundColor: '#000' }} />
+      <View style={{ position: 'absolute', width: 2, height: 12, backgroundColor: '#000' }} />
+      
+      {/* Shot markers */}
+      {renderShots()}
+    </View>
+  );
 };
 
 export default function SummaryScreen() {
