@@ -40,7 +40,39 @@
     "rounds": "Rounds",
     "arrowsPerRound": "Arrows/Round",
     "totalArrows": "Total Arrows",
-    "startCompetition": "Start Competition"
+    "startCompetition": "Start Competition",
+    "selectBow": "Select Bow",
+    "manageBows": "Manage Bows",
+    "noBows": "No Bows Added",
+    "tapToAddBow": "Tap to add your first bow",
+    "bowRequired": "Bow Required",
+    "other": "Other"
+  },
+  "competitionMenu": {
+    "title": "Competition",
+    "newCompetition": "New Competition",
+    "newCompetitionDesc": "Start a new official scoring session",
+    "scoreKeeping": "Score Keeping",
+    "scoreKeepingDesc": "Import and compile competition results",
+    "infoText": "Competition sessions are saved to your history and can be compiled into combined reports."
+  },
+  "scoreKeeping": {
+    "title": "Score Keeping",
+    "importFiles": "Import Files",
+    "selectFile": "Select File to Import",
+    "supportedFormats": "CSV, PDF, TXT",
+    "fileSelected": "File Selected",
+    "parseNotImplemented": "File parsing will be available in a future update.",
+    "importError": "Failed to import file",
+    "competitionSessions": "Competition Sessions",
+    "selected": "selected",
+    "noCompetitions": "No Competition Sessions",
+    "noCompetitionsDesc": "Complete competition sessions to see them here.",
+    "pts": "pts",
+    "selectMore": "Select More Sessions",
+    "selectMoreDesc": "Please select at least 2 sessions to generate a combined report.",
+    "generateCombinedReport": "Generate Combined Report",
+    "infoText": "Select multiple competition sessions to generate a combined performance report. You can also import score sheets from other sources."
   },
   "settings": {
     "title": "Settings",
