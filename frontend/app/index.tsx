@@ -70,15 +70,15 @@ export default function HomeScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.competitionButton}
-              onPress={() => router.push('/competitionSetup')}
-              activeOpacity={0.8}
+              style={styles.competitionButtonDisabled}
+              activeOpacity={1}
+              disabled={true}
             >
-              <View style={styles.buttonIconContainerCompetition}>
-                <Icon name="trophy" size={36} color="#FFD700" />
+              <View style={styles.buttonIconContainerCompetitionDisabled}>
+                <Icon name="trophy" size={36} color="#666" />
               </View>
-              <Text style={styles.competitionButtonText}>{t('home.competition')}</Text>
-              <Text style={styles.competitionSubtext}>{t('home.officialScoring')}</Text>
+              <Text style={styles.competitionButtonTextDisabled}>{t('home.competition')}</Text>
+              <Text style={styles.competitionSubtextDisabled}>{t('home.comingSoon')}</Text>
             </TouchableOpacity>
           </View>
 
