@@ -1933,7 +1933,7 @@ export default function ReportScreen() {
                 </TouchableOpacity>
               </View>
               <View style={styles.sessionsList}>
-                {sessions.slice().reverse().map((session) => {
+                {sessions.map((session) => {
                   const isSelected = selectedSessionIds.has(session.id);
                   const sessionDate = new Date(session.created_at);
                   const bowName = session.bow_name || t('report.allBows');
