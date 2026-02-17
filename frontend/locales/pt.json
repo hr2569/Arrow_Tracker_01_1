@@ -284,6 +284,7 @@
     "scoreTable": "Tabela de Pontuação",
     "round": "Turno",
     "arrows": "Flechas",
+    "arrow": "Flecha",
     "score": "Pontuação",
     "total": "Total",
     "addAnotherRound": "Adicionar Outro Turno",
@@ -301,7 +302,8 @@
     "competition": "Competição",
     "shots": "Tiros",
     "points": "pontos",
-    "failedToSave": "Falha ao guardar sessão"
+    "failedToSave": "Falha ao guardar sessão",
+    "sessionShotMap": "Mapa de Tiros da Sessão"
   },
   "common": {
     "loading": "A carregar...",
