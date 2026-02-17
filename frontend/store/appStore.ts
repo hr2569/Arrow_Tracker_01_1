@@ -154,9 +154,21 @@ interface AppState {
   currentSession: SessionData | null;
   setCurrentSession: (session: SessionData | null) => void;
 
+  // Competition-specific data
+  competitionData: CompetitionData;
+  setCompetitionData: (data: Partial<CompetitionData>) => void;
+  clearCompetitionData: () => void;
+
   // Clear all data
   clearAll: () => void;
 }
+
+const DEFAULT_COMPETITION_DATA: CompetitionData = {
+  archerName: '',
+  bowType: 'recurve',
+  maxRounds: 10,
+  arrowsPerRound: 3,
+};
 
 export const useAppStore = create<AppState>((set) => ({
   targetType: 'wa_standard',
@@ -188,6 +200,12 @@ export const useAppStore = create<AppState>((set) => ({
   currentSession: null,
   setCurrentSession: (session) => set({ currentSession: session }),
 
+  competitionData: DEFAULT_COMPETITION_DATA,
+  setCompetitionData: (data) => set((state) => ({ 
+    competitionData: { ...state.competitionData, ...data } 
+  })),
+  clearCompetitionData: () => set({ competitionData: DEFAULT_COMPETITION_DATA }),
+
   clearAll: () =>
     set({
       targetType: 'wa_standard',
@@ -198,5 +216,6 @@ export const useAppStore = create<AppState>((set) => ({
       sessionRounds: [],
       currentRound: null,
       currentSession: null,
+      competitionData: DEFAULT_COMPETITION_DATA,
     }),
 }));
