@@ -148,7 +148,13 @@ export default function ScoringScreen() {
     sessionType, 
     currentRoundNumber, 
     targetType,
+    competitionData,
   } = useAppStore();
+  
+  // Competition mode: enforce 3 arrows per round
+  const isCompetition = sessionType === 'competition';
+  const maxArrowsPerRound = isCompetition ? competitionData.arrowsPerRound : Infinity;
+  const maxRounds = isCompetition ? competitionData.maxRounds : Infinity;
   
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [selectedArrowIndex, setSelectedArrowIndex] = useState<number | null>(null);
