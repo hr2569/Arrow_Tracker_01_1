@@ -927,9 +927,6 @@ export default function ReportScreen() {
           
           <!-- Mean Point of Impact -->
           ${meanMarker}
-          
-          <!-- Labels -->
-          <text x="${center}" y="${size - 15}" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Shot Distribution on Target - ${shots.length} arrows</text>
         </svg>
         <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
           <strong>Mean Point of Impact:</strong> (${poiDescription})
