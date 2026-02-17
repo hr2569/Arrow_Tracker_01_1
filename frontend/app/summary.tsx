@@ -896,4 +896,28 @@ const styles = StyleSheet.create({
     color: '#888888',
     fontSize: 14,
   },
+  sessionTargetCard: {
+    backgroundColor: '#111111',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  sessionTargetTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  sessionTargetContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sessionTargetStats: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#8B0000',
+    fontWeight: '600',
+  },
 });
