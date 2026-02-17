@@ -91,6 +91,9 @@ export const createSession = async (data: {
   bow_name?: string;
   distance?: string;
   target_type?: string;
+  session_type?: 'training' | 'competition';
+  archer_name?: string;
+  competition_bow_type?: string;
 }): Promise<Session> => {
   const now = new Date().toISOString();
   const session: Session = {
@@ -104,6 +107,10 @@ export const createSession = async (data: {
     total_score: 0,
     created_at: now,
     updated_at: now,
+    // Competition-specific fields
+    session_type: data.session_type,
+    archer_name: data.archer_name,
+    competition_bow_type: data.competition_bow_type,
   };
   
   const sessions = await getSessions();
