@@ -268,11 +268,17 @@ export default function SummaryScreen() {
     try {
       // Create session with bow, distance, and target type using local storage
       const session = await createSession({
-        name: `Session ${new Date().toLocaleDateString()}`,
+        name: isCompetition 
+          ? `Competition - ${competitionData.archerName}` 
+          : `Session ${new Date().toLocaleDateString()}`,
         bow_id: selectedBow?.id || undefined,
         bow_name: selectedBow?.name || undefined,
         distance: sessionDistance || undefined,
         target_type: targetType || 'wa_standard',
+        // Competition-specific fields
+        session_type: sessionType,
+        archer_name: isCompetition ? competitionData.archerName : undefined,
+        competition_bow_type: isCompetition ? competitionData.bowType : undefined,
       });
 
       // Add all rounds to session
@@ -295,6 +301,10 @@ export default function SummaryScreen() {
   };
 
   const handleAddRound = () => {
+    // Check if we've reached max rounds in competition
+    if (isCompetition && currentRoundNumber >= maxRounds) {
+      return; // Don't allow adding more rounds
+    }
     clearCurrentRound();
     incrementRoundNumber();
     router.push('/scoring');
