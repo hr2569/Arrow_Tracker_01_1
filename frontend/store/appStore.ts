@@ -26,8 +26,27 @@ interface BowData {
   draw_length: number | null;
 }
 
+// Competition-specific data
+interface CompetitionData {
+  archerName: string;
+  bowType: string;
+  maxRounds: number;
+  arrowsPerRound: number;
+}
+
 // Session type: 'competition' or 'training'
 type SessionType = 'competition' | 'training';
+
+// Bow types for competition
+export const COMPETITION_BOW_TYPES = [
+  'recurve',
+  'compound',
+  'barebow',
+  'traditional',
+  'longbow',
+] as const;
+
+export type CompetitionBowType = typeof COMPETITION_BOW_TYPES[number];
 
 // Target type definitions
 type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
