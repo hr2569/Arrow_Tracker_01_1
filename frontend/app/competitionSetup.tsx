@@ -7,124 +7,110 @@ import {
   ScrollView,
   TextInput,
   Alert,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Icon } from '../components/Icon';
 import { useFocusEffect } from '@react-navigation/native';
-import { TARGET_CONFIGS } from '../store/appStore';
-import { getBowIcon } from '../utils/bowIcons';
-import { getBows, Bow } from '../utils/localStorage';
-import { 
-  createCompetition, 
-  setActiveCompetition, 
-  startCompetition 
-} from '../utils/competitionStorage';
+import { useTranslation } from 'react-i18next';
+import { loadSavedLanguage } from '../i18n';
+import { useAppStore, TARGET_CONFIGS, COMPETITION_BOW_TYPES } from '../store/appStore';
 
 type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
 
+const BOW_TYPE_ICONS: { [key: string]: string } = {
+  recurve: 'bow-arrow',
+  compound: 'crosshairs',
+  barebow: 'circle-outline',
+  traditional: 'leaf-outline',
+  longbow: 'remove-outline',
+};
+
 export default function CompetitionSetupScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { 
+    setSessionType, 
+    setSessionDistance, 
+    setTargetType, 
+    competitionData, 
+    setCompetitionData,
+    clearSessionRounds,
+    setCurrentRoundNumber,
+  } = useAppStore();
   
-  const [bows, setBows] = useState<Bow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedTargetType, setSelectedTargetType] = useState<TargetType>('wa_standard');
-  const [distance, setDistance] = useState('18');
+  const [archerName, setArcherName] = useState(competitionData.archerName);
+  const [selectedBowType, setSelectedBowType] = useState(competitionData.bowType);
+  const [distance, setDistance] = useState('');
   const [distanceUnit, setDistanceUnit] = useState<'m' | 'yd'>('m');
-  const [newParticipantName, setNewParticipantName] = useState('');
-  const [newParticipantBowId, setNewParticipantBowId] = useState<string | null>(null);
-
-  const fetchBows = async () => {
-    try {
-      setLoading(true);
-      const data = await getBows();
-      setBows(data);
-    } catch (error) {
-      console.error('Error fetching bows:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [selectedTargetType, setSelectedTargetType] = useState<TargetType>('wa_standard');
 
   useFocusEffect(
     useCallback(() => {
-      fetchBows();
+      loadSavedLanguage();
     }, [])
   );
 
-  const handleStartCompetition = async () => {
-    if (!newParticipantName.trim()) {
-      Alert.alert('Name Required', 'Please enter your name.');
+  const handleStartCompetition = () => {
+    // Validate archer name
+    if (!archerName.trim()) {
+      Alert.alert(
+        t('competitionSetup.archerNameRequired'),
+        t('competitionSetup.enterArcherName')
+      );
       return;
     }
 
+    // Validate distance
     if (!distance.trim()) {
-      Alert.alert('Enter Distance', 'Please enter the shooting distance.');
+      Alert.alert(
+        t('competitionSetup.distanceRequired'),
+        t('competitionSetup.enterDistance')
+      );
       return;
     }
 
-    if (!newParticipantBowId) {
-      Alert.alert('Bow Required', 'Please select a bow.');
+    const distanceNum = parseFloat(distance);
+    if (isNaN(distanceNum) || distanceNum <= 0) {
+      Alert.alert(
+        t('competitionSetup.invalidDistance'),
+        t('competitionSetup.enterValidDistance')
+      );
       return;
     }
 
-    try {
-      const bow = bows.find(b => b.id === newParticipantBowId);
-      
-      const competition = await createCompetition({
-        name: `Competition ${new Date().toLocaleDateString()}`,
-        targetType: selectedTargetType,
-        distance: `${distance}${distanceUnit}`,
-        mode: 'local',
-        participants: [{
-          name: newParticipantName.trim(),
-          bowId: newParticipantBowId,
-          bowName: bow?.name,
-        }],
-      });
+    // Set session type to competition
+    setSessionType('competition');
+    
+    // Clear any previous session data
+    clearSessionRounds();
+    setCurrentRoundNumber(1);
+    
+    // Save competition data
+    setCompetitionData({
+      archerName: archerName.trim(),
+      bowType: selectedBowType,
+      maxRounds: 10,
+      arrowsPerRound: 3,
+    });
 
-      await setActiveCompetition(competition.id);
-      await startCompetition(competition.id);
-
-      router.push('/competitionScoring');
-    } catch (error) {
-      console.error('Error creating competition:', error);
-      Alert.alert('Error', 'Failed to create competition. Please try again.');
-    }
+    // Set session settings
+    setSessionDistance(`${distance}${distanceUnit}`);
+    setTargetType(selectedTargetType);
+    
+    // Navigate to scoring screen
+    router.replace('/scoring');
   };
 
-  const renderBowIcon = (bowType: string, isSelected: boolean) => {
-    const icon = getBowIcon(bowType);
-    return (
-      <Image 
-        source={icon.value} 
-        style={[
-          styles.bowIconImage,
-          isSelected && styles.bowIconImageSelected
-        ]} 
-        resizeMode="contain"
-      />
-    );
+  const getBowTypeLabel = (type: string) => {
+    return t(`competitionSetup.bowTypes.${type}`);
   };
-
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#FFD700" />
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
+      <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
@@ -136,207 +122,152 @@ export default function CompetitionSetupScreen() {
           >
             <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>New Competition</Text>
-            <View style={styles.headerBadge}>
-              <Icon name="trophy" size={14} color="#FFD700" />
-              <Text style={styles.headerBadgeText}>10 Rounds × 3 Arrows</Text>
-            </View>
+          <View style={styles.headerContent}>
+            <Icon name="trophy" size={28} color="#FFD700" />
+            <Text style={styles.headerTitle}>{t('competitionSetup.title')}</Text>
           </View>
-          <View style={styles.headerSpacer} />
+          <View style={styles.placeholder} />
         </View>
 
-        <ScrollView
+        <ScrollView 
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Target Type Selection */}
+          {/* Competition Info */}
+          <View style={styles.infoCard}>
+            <Icon name="information-circle" size={20} color="#FFD700" />
+            <Text style={styles.infoText}>
+              {t('competitionSetup.infoText')}
+            </Text>
+          </View>
+
+          {/* Archer Name */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Target Face</Text>
-            <View style={styles.targetTypesGrid}>
-              {/* WA Standard */}
-              <TouchableOpacity
-                style={[
-                  styles.targetTypeCard,
-                  selectedTargetType === 'wa_standard' && styles.targetTypeCardSelected,
-                ]}
-                onPress={() => setSelectedTargetType('wa_standard')}
-              >
-                <View style={styles.targetPreview}>
-                  <View style={[styles.targetRing, { backgroundColor: '#f5f5f0', width: 40, height: 40 }]}>
-                    <View style={[styles.targetRing, { backgroundColor: '#2a2a2a', width: 32, height: 32 }]}>
-                      <View style={[styles.targetRing, { backgroundColor: '#00a2e8', width: 24, height: 24 }]}>
-                        <View style={[styles.targetRing, { backgroundColor: '#ed1c24', width: 16, height: 16 }]}>
-                          <View style={[styles.targetRing, { backgroundColor: '#fff200', width: 8, height: 8 }]} />
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-                <Text style={[styles.targetTypeName, selectedTargetType === 'wa_standard' && styles.targetTypeNameSelected]}>
-                  WA Standard
-                </Text>
-                {selectedTargetType === 'wa_standard' && (
-                  <View style={styles.targetCheckmark}>
-                    <Icon name="checkmark" size={12} color="#000" />
-                  </View>
-                )}
-              </TouchableOpacity>
+            <Text style={styles.sectionTitle}>{t('competitionSetup.archerName')}</Text>
+            <TextInput
+              style={styles.textInput}
+              value={archerName}
+              onChangeText={setArcherName}
+              placeholder={t('competitionSetup.archerNamePlaceholder')}
+              placeholderTextColor="#666"
+              autoCapitalize="words"
+            />
+          </View>
 
-              {/* Vegas 3-Spot */}
-              <TouchableOpacity
-                style={[
-                  styles.targetTypeCard,
-                  selectedTargetType === 'vegas_3spot' && styles.targetTypeCardSelected,
-                ]}
-                onPress={() => setSelectedTargetType('vegas_3spot')}
-              >
-                <View style={styles.targetPreview}>
-                  <View style={styles.vegasPreviewContainer}>
-                    {[0, 1, 2].map((i) => (
-                      <View key={i} style={[styles.miniRing, { backgroundColor: '#00a2e8', width: 12, height: 12 }]}>
-                        <View style={[styles.miniRing, { backgroundColor: '#ed1c24', width: 8, height: 8 }]}>
-                          <View style={[styles.miniRing, { backgroundColor: '#fff200', width: 4, height: 4 }]} />
-                        </View>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-                <Text style={[styles.targetTypeName, selectedTargetType === 'vegas_3spot' && styles.targetTypeNameSelected]}>
-                  Vegas 3-Spot
-                </Text>
-                {selectedTargetType === 'vegas_3spot' && (
-                  <View style={styles.targetCheckmark}>
-                    <Icon name="checkmark" size={12} color="#000" />
-                  </View>
-                )}
-              </TouchableOpacity>
-
-              {/* NFAA Indoor */}
-              <TouchableOpacity
-                style={[
-                  styles.targetTypeCard,
-                  selectedTargetType === 'nfaa_indoor' && styles.targetTypeCardSelected,
-                ]}
-                onPress={() => setSelectedTargetType('nfaa_indoor')}
-              >
-                <View style={styles.targetPreview}>
-                  <View style={styles.nfaaPreviewContainer}>
-                    {[0, 1, 2].map((i) => (
-                      <View key={i} style={[styles.miniRing, { backgroundColor: '#00a2e8', width: 12, height: 12 }]}>
-                        <View style={[styles.miniRing, { backgroundColor: '#ed1c24', width: 8, height: 8 }]}>
-                          <View style={[styles.miniRing, { backgroundColor: '#fff200', width: 4, height: 4 }]} />
-                        </View>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-                <Text style={[styles.targetTypeName, selectedTargetType === 'nfaa_indoor' && styles.targetTypeNameSelected]}>
-                  WA Indoor
-                </Text>
-                {selectedTargetType === 'nfaa_indoor' && (
-                  <View style={styles.targetCheckmark}>
-                    <Icon name="checkmark" size={12} color="#000" />
-                  </View>
-                )}
-              </TouchableOpacity>
+          {/* Bow Type Selection */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('competitionSetup.bowType')}</Text>
+            <View style={styles.bowTypeGrid}>
+              {COMPETITION_BOW_TYPES.map((type) => (
+                <TouchableOpacity
+                  key={type}
+                  style={[
+                    styles.bowTypeButton,
+                    selectedBowType === type && styles.bowTypeButtonSelected,
+                  ]}
+                  onPress={() => setSelectedBowType(type)}
+                >
+                  <Text style={[
+                    styles.bowTypeText,
+                    selectedBowType === type && styles.bowTypeTextSelected,
+                  ]}>
+                    {getBowTypeLabel(type)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
-          {/* Distance Input */}
+          {/* Distance */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Shooting Distance</Text>
-            
-            <View style={styles.distanceInputContainer}>
+            <Text style={styles.sectionTitle}>{t('competitionSetup.distance')}</Text>
+            <View style={styles.distanceRow}>
               <TextInput
                 style={styles.distanceInput}
                 value={distance}
                 onChangeText={setDistance}
-                placeholder="Enter distance"
+                placeholder="18"
                 placeholderTextColor="#666"
-                keyboardType="decimal-pad"
+                keyboardType="numeric"
               />
-              
               <View style={styles.unitToggle}>
                 <TouchableOpacity
                   style={[styles.unitButton, distanceUnit === 'm' && styles.unitButtonActive]}
                   onPress={() => setDistanceUnit('m')}
                 >
-                  <Text style={[styles.unitButtonText, distanceUnit === 'm' && styles.unitButtonTextActive]}>
-                    m
-                  </Text>
+                  <Text style={[styles.unitText, distanceUnit === 'm' && styles.unitTextActive]}>m</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.unitButton, distanceUnit === 'yd' && styles.unitButtonActive]}
                   onPress={() => setDistanceUnit('yd')}
                 >
-                  <Text style={[styles.unitButtonText, distanceUnit === 'yd' && styles.unitButtonTextActive]}>
-                    yd
-                  </Text>
+                  <Text style={[styles.unitText, distanceUnit === 'yd' && styles.unitTextActive]}>yd</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
 
-          {/* Archer's Name Section */}
+          {/* Target Type */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Archer's Name</Text>
-            <TextInput
-              style={styles.textInput}
-              value={newParticipantName}
-              onChangeText={setNewParticipantName}
-              placeholder="Enter your name"
-              placeholderTextColor="#666"
-            />
+            <Text style={styles.sectionTitle}>{t('competitionSetup.targetFace')}</Text>
+            <View style={styles.targetGrid}>
+              {Object.entries(TARGET_CONFIGS).map(([key, config]) => (
+                <TouchableOpacity
+                  key={key}
+                  style={[
+                    styles.targetButton,
+                    selectedTargetType === key && styles.targetButtonSelected,
+                  ]}
+                  onPress={() => setSelectedTargetType(key as TargetType)}
+                >
+                  <Text style={[
+                    styles.targetName,
+                    selectedTargetType === key && styles.targetNameSelected,
+                  ]}>
+                    {config.name}
+                  </Text>
+                  <Text style={[
+                    styles.targetDesc,
+                    selectedTargetType === key && styles.targetDescSelected,
+                  ]}>
+                    {config.description}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
-          {/* Select Bow Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Select Bow</Text>
-            {bows.length === 0 ? (
-              <TouchableOpacity 
-                style={styles.addBowCard}
-                onPress={() => router.push('/bows')}
-              >
-                <Icon name="add-circle-outline" size={24} color="#FFD700" />
-                <Text style={styles.addBowCardText}>Add a bow first</Text>
-              </TouchableOpacity>
-            ) : (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View style={styles.bowsRowInline}>
-                  {bows.map((bow) => (
-                    <TouchableOpacity
-                      key={bow.id}
-                      style={[styles.bowOptionInline, newParticipantBowId === bow.id && styles.bowOptionInlineSelected]}
-                      onPress={() => setNewParticipantBowId(bow.id)}
-                    >
-                      {renderBowIcon(bow.bow_type, newParticipantBowId === bow.id)}
-                      <Text style={[styles.bowOptionTextInline, newParticipantBowId === bow.id && styles.bowOptionTextInlineSelected]}>
-                        {bow.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            )}
+          {/* Session Structure Info */}
+          <View style={styles.structureCard}>
+            <Text style={styles.structureTitle}>{t('competitionSetup.sessionStructure')}</Text>
+            <View style={styles.structureRow}>
+              <View style={styles.structureItem}>
+                <Text style={styles.structureValue}>10</Text>
+                <Text style={styles.structureLabel}>{t('competitionSetup.rounds')}</Text>
+              </View>
+              <View style={styles.structureDivider} />
+              <View style={styles.structureItem}>
+                <Text style={styles.structureValue}>3</Text>
+                <Text style={styles.structureLabel}>{t('competitionSetup.arrowsPerRound')}</Text>
+              </View>
+              <View style={styles.structureDivider} />
+              <View style={styles.structureItem}>
+                <Text style={styles.structureValue}>30</Text>
+                <Text style={styles.structureLabel}>{t('competitionSetup.totalArrows')}</Text>
+              </View>
+            </View>
           </View>
-        </ScrollView>
 
-        {/* Start Button */}
-        <View style={styles.footer}>
+          {/* Start Button */}
           <TouchableOpacity
-            style={[
-              styles.startButton,
-              (!newParticipantName.trim() || !newParticipantBowId) && styles.startButtonDisabled,
-            ]}
+            style={styles.startButton}
             onPress={handleStartCompetition}
-            disabled={!newParticipantName.trim() || !newParticipantBowId}
           >
-            <Icon name="trophy" size={24} color="#000" />
-            <Text style={styles.startButtonText}>Start Competition</Text>
+            <Icon name="flag" size={24} color="#000" />
+            <Text style={styles.startButtonText}>{t('competitionSetup.startCompetition')}</Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -362,62 +293,49 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
   },
-  headerCenter: {
+  headerContent: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
   },
-  headerBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 215, 0, 0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 4,
-    gap: 4,
-  },
-  headerBadgeText: {
-    color: '#FFD700',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  headerSpacer: {
+  placeholder: {
     width: 40,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#888',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 40,
+  },
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 20,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+  },
+  infoText: {
+    flex: 1,
+    color: '#ccc',
+    fontSize: 13,
+    lineHeight: 18,
   },
   section: {
     marginBottom: 24,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#fff',
     marginBottom: 12,
   },
@@ -430,119 +348,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
   },
-  modeContainer: {
+  bowTypeGrid: {
     flexDirection: 'row',
-    gap: 12,
-  },
-  modeCard: {
-    flex: 1,
-    backgroundColor: '#111',
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#222',
-  },
-  modeCardSelected: {
-    borderColor: '#FFD700',
-    backgroundColor: '#1a1500',
-  },
-  modeTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#666',
-    marginTop: 8,
-  },
-  modeTitleSelected: {
-    color: '#FFD700',
-  },
-  modeDesc: {
-    fontSize: 11,
-    color: '#555',
-    marginTop: 4,
-    textAlign: 'center',
-  },
-  wifiIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    gap: 4,
-  },
-  wifiText: {
-    fontSize: 10,
-    color: '#4CAF50',
-  },
-  targetTypesGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
     gap: 10,
   },
-  targetTypeCard: {
-    flex: 1,
+  bowTypeButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 10,
     backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#222',
-    position: 'relative',
-  },
-  targetTypeCardSelected: {
-    borderColor: '#FFD700',
-    backgroundColor: '#1a1500',
-  },
-  targetPreview: {
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  targetRing: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 100,
     borderWidth: 1,
     borderColor: '#333',
   },
-  miniRing: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 100,
-    borderWidth: 0.5,
-    borderColor: '#333',
+  bowTypeButtonSelected: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
   },
-  vegasPreviewContainer: {
-    flexDirection: 'row',
-    gap: 4,
-  },
-  nfaaPreviewContainer: {
-    flexDirection: 'column',
-    gap: 3,
-  },
-  targetTypeName: {
-    fontSize: 11,
-    fontWeight: 'bold',
+  bowTypeText: {
+    fontSize: 14,
     color: '#888',
-    textAlign: 'center',
+    fontWeight: '500',
   },
-  targetTypeNameSelected: {
-    color: '#FFD700',
+  bowTypeTextSelected: {
+    color: '#fff',
   },
-  targetCheckmark: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#FFD700',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  distanceInputContainer: {
+  distanceRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 12,
   },
   distanceInput: {
@@ -554,286 +386,116 @@ const styles = StyleSheet.create({
     color: '#fff',
     borderWidth: 1,
     borderColor: '#333',
+    textAlign: 'center',
   },
   unitToggle: {
     flexDirection: 'row',
     backgroundColor: '#111',
     borderRadius: 12,
-    padding: 4,
+    borderWidth: 1,
+    borderColor: '#333',
+    overflow: 'hidden',
+  },
+  unitButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  unitButtonActive: {
+    backgroundColor: '#8B0000',
+  },
+  unitText: {
+    fontSize: 16,
+    color: '#888',
+    fontWeight: '600',
+  },
+  unitTextActive: {
+    color: '#fff',
+  },
+  targetGrid: {
+    gap: 10,
+  },
+  targetButton: {
+    backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 16,
     borderWidth: 1,
     borderColor: '#333',
   },
-  unitButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+  targetButtonSelected: {
+    backgroundColor: 'rgba(139, 0, 0, 0.3)',
+    borderColor: '#8B0000',
   },
-  unitButtonActive: {
-    backgroundColor: '#FFD700',
-  },
-  unitButtonText: {
+  targetName: {
     fontSize: 16,
     fontWeight: '600',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  targetNameSelected: {
+    color: '#fff',
+  },
+  targetDesc: {
+    fontSize: 13,
     color: '#666',
   },
-  unitButtonTextActive: {
-    color: '#000',
+  targetDescSelected: {
+    color: '#aaa',
   },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1a1500',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#FFD700',
-    gap: 4,
-  },
-  addButtonText: {
-    color: '#FFD700',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  emptyParticipants: {
+  structureCard: {
     backgroundColor: '#111',
     borderRadius: 16,
-    padding: 32,
-    alignItems: 'center',
+    padding: 20,
+    marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#222',
-    borderStyle: 'dashed',
+    borderColor: '#333',
   },
-  emptyText: {
-    color: '#666',
-    fontSize: 16,
-    marginTop: 12,
-  },
-  emptySubtext: {
-    color: '#444',
+  structureTitle: {
     fontSize: 14,
+    fontWeight: '600',
+    color: '#888',
+    textAlign: 'center',
+    marginBottom: 16,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  structureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  structureItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  structureValue: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFD700',
+  },
+  structureLabel: {
+    fontSize: 12,
+    color: '#888',
     marginTop: 4,
   },
-  participantsList: {
-    gap: 8,
-  },
-  participantCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#222',
-  },
-  participantRank: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FFD700',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  participantRankText: {
-    color: '#000',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  participantInfo: {
-    flex: 1,
-  },
-  participantName: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  participantBow: {
-    color: '#666',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  removeButton: {
-    padding: 8,
-  },
-  footer: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#222',
+  structureDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: '#333',
   },
   startButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFD700',
-    paddingVertical: 16,
-    borderRadius: 12,
-    gap: 8,
-  },
-  startButtonDisabled: {
-    backgroundColor: '#333',
-    opacity: 0.6,
+    borderRadius: 16,
+    padding: 18,
+    gap: 10,
   },
   startButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.9)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#1a1a1a',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 24,
-    maxHeight: '80%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  modalBody: {
-    marginBottom: 24,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#888',
-    marginBottom: 8,
-  },
-  modalInput: {
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    color: '#fff',
-    borderWidth: 1,
-    borderColor: '#333',
-    marginBottom: 20,
-  },
-  noBowsMessage: {
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-  },
-  noBowsText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  addBowLink: {
-    color: '#FFD700',
-    fontSize: 14,
-    fontWeight: '600',
-    marginTop: 8,
-  },
-  bowsScroll: {
-    maxHeight: 100,
-  },
-  bowsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingVertical: 8,
-  },
-  bowOption: {
-    alignItems: 'center',
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 12,
-    minWidth: 80,
-    borderWidth: 2,
-    borderColor: '#222',
-  },
-  bowOptionSelected: {
-    borderColor: '#FFD700',
-    backgroundColor: '#1a1500',
-  },
-  bowOptionText: {
-    color: '#666',
-    fontSize: 12,
-    marginTop: 4,
-    textAlign: 'center',
-  },
-  bowOptionTextSelected: {
-    color: '#FFD700',
-  },
-  bowIconImage: {
-    width: 24,
-    height: 24,
-  },
-  bowIconImageSelected: {
-    tintColor: '#FFD700',
-  },
-  modalButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFD700',
-    paddingVertical: 16,
-    borderRadius: 12,
-    gap: 8,
-  },
-  modalButtonDisabled: {
-    backgroundColor: '#333',
-    opacity: 0.6,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  addBowCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#333',
-    borderStyle: 'dashed',
-    gap: 8,
-  },
-  addBowCardText: {
-    color: '#FFD700',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  bowsRowInline: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingVertical: 8,
-  },
-  bowOptionInline: {
-    alignItems: 'center',
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 16,
-    minWidth: 90,
-    borderWidth: 2,
-    borderColor: '#222',
-  },
-  bowOptionInlineSelected: {
-    borderColor: '#FFD700',
-    backgroundColor: '#1a1500',
-  },
-  bowOptionTextInline: {
-    color: '#666',
-    fontSize: 12,
-    marginTop: 6,
-    textAlign: 'center',
-  },
-  bowOptionTextInlineSelected: {
-    color: '#FFD700',
   },
 });
