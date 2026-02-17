@@ -127,7 +127,10 @@
     "finishSessionMessage": "Terminar esta sessão e guardar todos os turnos?",
     "end": "Terminar",
     "editScore": "Editar Pontuação",
-    "deleteArrow": "Eliminar Seta"
+    "deleteArrow": "Eliminar Seta",
+    "maxArrowsReached": "Máximo de Flechas",
+    "maxArrowsMessage": "Só pode colocar {{count}} flechas por turno no modo competição.",
+    "competitionRound": "Turno {{current}}/{{total}}"
   },
   "sessionSetup": {
     "title": "Configurar Sessão",
