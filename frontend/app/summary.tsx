@@ -796,6 +796,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#8B0000',
   },
+  finishButtonFull: {
+    backgroundColor: '#FFD700',
+    borderColor: '#FFD700',
+  },
   finishText: {
     color: '#8B0000',
     fontSize: 16,
