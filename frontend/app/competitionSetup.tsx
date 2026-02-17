@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,17 +16,10 @@ import { Icon } from '../components/Icon';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { loadSavedLanguage } from '../i18n';
-import { useAppStore, TARGET_CONFIGS, COMPETITION_BOW_TYPES } from '../store/appStore';
+import { useAppStore, TARGET_CONFIGS } from '../store/appStore';
+import { getBows, Bow } from '../utils/localStorage';
 
 type TargetType = 'wa_standard' | 'vegas_3spot' | 'nfaa_indoor';
-
-const BOW_TYPE_ICONS: { [key: string]: string } = {
-  recurve: 'bow-arrow',
-  compound: 'crosshairs',
-  barebow: 'circle-outline',
-  traditional: 'leaf-outline',
-  longbow: 'remove-outline',
-};
 
 export default function CompetitionSetupScreen() {
   const router = useRouter();
@@ -34,7 +27,9 @@ export default function CompetitionSetupScreen() {
   const { 
     setSessionType, 
     setSessionDistance, 
-    setTargetType, 
+    setTargetType,
+    setSelectedBow,
+    selectedBow,
     competitionData, 
     setCompetitionData,
     clearSessionRounds,
@@ -42,7 +37,8 @@ export default function CompetitionSetupScreen() {
   } = useAppStore();
   
   const [archerName, setArcherName] = useState(competitionData.archerName);
-  const [selectedBowType, setSelectedBowType] = useState(competitionData.bowType);
+  const [bows, setBows] = useState<Bow[]>([]);
+  const [localSelectedBow, setLocalSelectedBow] = useState<Bow | null>(selectedBow);
   const [distance, setDistance] = useState('');
   const [distanceUnit, setDistanceUnit] = useState<'m' | 'yd'>('m');
   const [selectedTargetType, setSelectedTargetType] = useState<TargetType>('wa_standard');
@@ -50,8 +46,28 @@ export default function CompetitionSetupScreen() {
   useFocusEffect(
     useCallback(() => {
       loadSavedLanguage();
+      loadBows();
     }, [])
   );
+
+  const loadBows = async () => {
+    try {
+      const bowsData = await getBows();
+      setBows(bowsData);
+      // If there's a previously selected bow, keep it
+      if (selectedBow) {
+        setLocalSelectedBow(selectedBow);
+      } else if (bowsData.length > 0) {
+        setLocalSelectedBow(bowsData[0]);
+      }
+    } catch (error) {
+      console.error('Failed to load bows:', error);
+    }
+  };
+
+  const handleSelectBow = (bow: Bow) => {
+    setLocalSelectedBow(bow);
+  };
 
   const handleStartCompetition = () => {
     // Validate archer name
@@ -59,6 +75,15 @@ export default function CompetitionSetupScreen() {
       Alert.alert(
         t('competitionSetup.archerNameRequired'),
         t('competitionSetup.enterArcherName')
+      );
+      return;
+    }
+
+    // Validate bow selection
+    if (!localSelectedBow) {
+      Alert.alert(
+        t('competitionSetup.bowRequired'),
+        t('competitionSetup.selectBow')
       );
       return;
     }
@@ -84,14 +109,17 @@ export default function CompetitionSetupScreen() {
     // Set session type to competition
     setSessionType('competition');
     
+    // Set the selected bow in the store
+    setSelectedBow(localSelectedBow);
+    
     // Clear any previous session data
     clearSessionRounds();
     setCurrentRoundNumber(1);
     
-    // Save competition data
+    // Save competition data with bow type from selected bow
     setCompetitionData({
       archerName: archerName.trim(),
-      bowType: selectedBowType,
+      bowType: localSelectedBow.bow_type,
       maxRounds: 10,
       arrowsPerRound: 3,
     });
@@ -104,8 +132,13 @@ export default function CompetitionSetupScreen() {
     router.replace('/scoring');
   };
 
+  const navigateToAddBow = () => {
+    router.push('/bows');
+  };
+
   const getBowTypeLabel = (type: string) => {
-    return t(`competitionSetup.bowTypes.${type}`);
+    const typeKey = type?.toLowerCase() || 'other';
+    return t(`competitionSetup.bowTypes.${typeKey}`, type || t('competitionSetup.bowTypes.other'));
   };
 
   return (
@@ -155,28 +188,51 @@ export default function CompetitionSetupScreen() {
             />
           </View>
 
-          {/* Bow Type Selection */}
+          {/* Bow Selection */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('competitionSetup.bowType')}</Text>
-            <View style={styles.bowTypeGrid}>
-              {COMPETITION_BOW_TYPES.map((type) => (
-                <TouchableOpacity
-                  key={type}
-                  style={[
-                    styles.bowTypeButton,
-                    selectedBowType === type && styles.bowTypeButtonSelected,
-                  ]}
-                  onPress={() => setSelectedBowType(type)}
-                >
-                  <Text style={[
-                    styles.bowTypeText,
-                    selectedBowType === type && styles.bowTypeTextSelected,
-                  ]}>
-                    {getBowTypeLabel(type)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>{t('competitionSetup.selectBow')}</Text>
+              <TouchableOpacity onPress={navigateToAddBow}>
+                <Text style={styles.addBowLink}>{t('competitionSetup.manageBows')}</Text>
+              </TouchableOpacity>
             </View>
+            
+            {bows.length === 0 ? (
+              <TouchableOpacity style={styles.noBowsCard} onPress={navigateToAddBow}>
+                <Icon name="add-circle" size={32} color="#8B0000" />
+                <Text style={styles.noBowsText}>{t('competitionSetup.noBows')}</Text>
+                <Text style={styles.noBowsSubtext}>{t('competitionSetup.tapToAddBow')}</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.bowsList}>
+                {bows.map((bow) => (
+                  <TouchableOpacity
+                    key={bow.id}
+                    style={[
+                      styles.bowCard,
+                      localSelectedBow?.id === bow.id && styles.bowCardSelected,
+                    ]}
+                    onPress={() => handleSelectBow(bow)}
+                  >
+                    <View style={[
+                      styles.bowRadio,
+                      localSelectedBow?.id === bow.id && styles.bowRadioSelected,
+                    ]}>
+                      {localSelectedBow?.id === bow.id && (
+                        <View style={styles.bowRadioInner} />
+                      )}
+                    </View>
+                    <View style={styles.bowInfo}>
+                      <Text style={styles.bowName}>{bow.name}</Text>
+                      <Text style={styles.bowDetails}>
+                        {getBowTypeLabel(bow.bow_type)}
+                        {bow.draw_weight ? ` • ${bow.draw_weight} lbs` : ''}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
 
           {/* Distance */}
@@ -261,11 +317,14 @@ export default function CompetitionSetupScreen() {
 
           {/* Start Button */}
           <TouchableOpacity
-            style={styles.startButton}
+            style={[styles.startButton, (!localSelectedBow || bows.length === 0) && styles.startButtonDisabled]}
             onPress={handleStartCompetition}
+            disabled={!localSelectedBow || bows.length === 0}
           >
-            <Icon name="flag" size={24} color="#000" />
-            <Text style={styles.startButtonText}>{t('competitionSetup.startCompetition')}</Text>
+            <Icon name="flag" size={24} color={(!localSelectedBow || bows.length === 0) ? '#666' : '#000'} />
+            <Text style={[styles.startButtonText, (!localSelectedBow || bows.length === 0) && styles.startButtonTextDisabled]}>
+              {t('competitionSetup.startCompetition')}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -333,11 +392,22 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
     marginBottom: 12,
+  },
+  addBowLink: {
+    fontSize: 14,
+    color: '#8B0000',
+    fontWeight: '600',
   },
   textInput: {
     backgroundColor: '#111',
@@ -348,30 +418,73 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
   },
-  bowTypeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  noBowsCard: {
+    backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 32,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#333',
+    borderStyle: 'dashed',
+  },
+  noBowsText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+    marginTop: 12,
+  },
+  noBowsSubtext: {
+    fontSize: 13,
+    color: '#666',
+    marginTop: 4,
+  },
+  bowsList: {
     gap: 10,
   },
-  bowTypeButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 10,
+  bowCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 16,
     borderWidth: 1,
     borderColor: '#333',
   },
-  bowTypeButtonSelected: {
-    backgroundColor: '#8B0000',
+  bowCardSelected: {
+    backgroundColor: 'rgba(139, 0, 0, 0.2)',
     borderColor: '#8B0000',
   },
-  bowTypeText: {
-    fontSize: 14,
-    color: '#888',
-    fontWeight: '500',
+  bowRadio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: '#444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
-  bowTypeTextSelected: {
+  bowRadioSelected: {
+    borderColor: '#8B0000',
+  },
+  bowRadioInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#8B0000',
+  },
+  bowInfo: {
+    flex: 1,
+  },
+  bowName: {
+    fontSize: 16,
+    fontWeight: '600',
     color: '#fff',
+  },
+  bowDetails: {
+    fontSize: 13,
+    color: '#888',
+    marginTop: 2,
   },
   distanceRow: {
     flexDirection: 'row',
@@ -493,9 +606,15 @@ const styles = StyleSheet.create({
     padding: 18,
     gap: 10,
   },
+  startButtonDisabled: {
+    backgroundColor: '#222',
+  },
   startButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
+  },
+  startButtonTextDisabled: {
+    color: '#666',
   },
 });
