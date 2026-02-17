@@ -418,6 +418,23 @@ export default function SummaryScreen() {
           </View>
         </View>
 
+        {/* Session Shot Distribution - Target visualization with all shots */}
+        {allSessionShots.length > 0 && (
+          <View style={styles.sessionTargetCard}>
+            <Text style={styles.sessionTargetTitle}>{t('summary.sessionShotMap')}</Text>
+            <View style={styles.sessionTargetContainer}>
+              <SessionTargetFace 
+                shots={allSessionShots} 
+                targetType={targetType || 'wa_standard'} 
+                size={200}
+              />
+            </View>
+            <Text style={styles.sessionTargetStats}>
+              {allSessionShots.length} {allSessionShots.length === 1 ? t('summary.arrow') : t('summary.arrows')}
+            </Text>
+          </View>
+        )}
+
         {/* Session Type Badge */}
         <View style={[styles.sessionTypeBadge, isCompetition ? styles.competitionBadge : styles.trainingBadge]}>
           <Icon 
