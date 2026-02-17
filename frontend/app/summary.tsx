@@ -459,23 +459,28 @@ export default function SummaryScreen() {
             {isCompetition ? t('summary.competition') : t('summary.training')}
           </Text>
           <Text style={styles.roundProgress}>
-            {t('summary.round')} {currentRoundNumber}
+            {isCompetition 
+              ? t('summary.roundOfTotal', { current: currentRoundNumber, total: maxRounds })
+              : `${t('summary.round')} ${currentRoundNumber}`
+            }
           </Text>
         </View>
 
         {/* Action Buttons */}
         <View style={styles.actionsContainer}>
-          {/* Add Round button - always available */}
-          <TouchableOpacity
-            style={styles.addRoundButton}
-            onPress={handleAddRound}
-          >
-            <Icon name="add-circle" size={24} color="#fff" />
-            <Text style={styles.addRoundText}>{t('summary.addAnotherRound')}</Text>
-          </TouchableOpacity>
+          {/* Add Round button - hide when competition is complete */}
+          {!isLastRound && (
+            <TouchableOpacity
+              style={styles.addRoundButton}
+              onPress={handleAddRound}
+            >
+              <Icon name="add-circle" size={24} color="#fff" />
+              <Text style={styles.addRoundText}>{t('summary.addAnotherRound')}</Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
-            style={styles.finishButton}
+            style={[styles.finishButton, isLastRound && styles.finishButtonFull]}
             onPress={handleFinishSession}
             disabled={isSaving}
           >
@@ -484,7 +489,9 @@ export default function SummaryScreen() {
             ) : (
               <>
                 <Icon name="checkmark-done" size={24} color="#8B0000" />
-                <Text style={styles.finishText}>{t('summary.finishAndSave')}</Text>
+                <Text style={styles.finishText}>
+                  {isLastRound ? t('summary.finishCompetition') : t('summary.finishAndSave')}
+                </Text>
               </>
             )}
           </TouchableOpacity>
