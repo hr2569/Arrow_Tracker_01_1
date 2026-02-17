@@ -704,14 +704,13 @@ export default function ScoringScreen() {
           <View style={styles.magnifierCrosshair}>
             <View style={styles.crosshairHorizontal} />
             <View style={styles.crosshairVertical} />
+            {/* Score indicator at center of crosshair */}
+            <View style={[styles.magnifierScoreBadgeCentered, { backgroundColor: getScoreColor(previewScore) }]}>
+              <Text style={[styles.magnifierScoreTextCentered, { color: getScoreTextColor(previewScore) }]}>
+                {getScoreDisplay(previewScore)}
+              </Text>
+            </View>
           </View>
-        </View>
-        
-        {/* Score indicator below magnifier */}
-        <View style={[styles.magnifierScoreBadge, { backgroundColor: getScoreColor(previewScore) }]}>
-          <Text style={[styles.magnifierScoreText, { color: getScoreTextColor(previewScore) }]}>
-            {getScoreDisplay(previewScore)}
-          </Text>
         </View>
       </View>
     );
