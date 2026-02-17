@@ -125,7 +125,10 @@
     "finishSessionMessage": "End this session and save all rounds?",
     "end": "End",
     "editScore": "Edit Score",
-    "deleteArrow": "Delete Arrow"
+    "deleteArrow": "Delete Arrow",
+    "maxArrowsReached": "Maximum Arrows",
+    "maxArrowsMessage": "You can only place {{count}} arrows per round in competition mode.",
+    "competitionRound": "Round {{current}}/{{total}}"
   },
   "sessionSetup": {
     "title": "Session Setup",
