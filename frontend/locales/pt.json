@@ -320,6 +320,8 @@
     "total": "Total",
     "addAnotherRound": "Adicionar Outro Turno",
     "finishAndSave": "Terminar e Guardar",
+    "finishCompetition": "Terminar Competição",
+    "roundOfTotal": "Turno {{current}}/{{total}}",
     "roundStatistics": "Estatísticas do Turno",
     "bestShot": "Melhor Tiro",
     "worstShot": "Pior Tiro",
