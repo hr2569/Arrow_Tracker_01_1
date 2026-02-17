@@ -187,12 +187,15 @@ export default function SummaryScreen() {
     selectedBow,
     sessionDistance,
     targetType,
+    competitionData,
   } = useAppStore();
   const [isSaving, setIsSaving] = useState(false);
   const [roundAdded, setRoundAdded] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const isCompetition = sessionType === 'competition';
+  const maxRounds = isCompetition ? competitionData.maxRounds : Infinity;
+  const isLastRound = isCompetition && currentRoundNumber >= maxRounds;
 
   // Reset modal state on mount to prevent stale state
   useEffect(() => {
