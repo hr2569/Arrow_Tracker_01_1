@@ -255,6 +255,11 @@ export default function SummaryScreen() {
     return sessionRounds.reduce((sum, round) => sum + (round.total || 0), 0);
   };
 
+  // All shots from the session for target visualization
+  const allSessionShots = useMemo(() => {
+    return sessionRounds.flatMap(round => round.shots || []);
+  }, [sessionRounds]);
+
   const handleSaveSession = async () => {
     setIsSaving(true);
     try {
