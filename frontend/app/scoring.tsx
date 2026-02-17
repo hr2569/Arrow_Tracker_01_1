@@ -178,7 +178,6 @@ export default function ScoringScreen() {
   const isVegas = targetType === 'vegas_3spot';
   const isNFAA = targetType === 'nfaa_indoor';
   const isMultiTarget = isVegas || isNFAA;
-  const isCompetition = sessionType === 'competition';
 
   const calculateScore = useCallback((normalizedX: number, normalizedY: number): number => {
     const dx = normalizedX - 0.5;
