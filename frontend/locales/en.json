@@ -282,6 +282,7 @@
     "scoreTable": "Score Table",
     "round": "Round",
     "arrows": "Arrows",
+    "arrow": "Arrow",
     "score": "Score",
     "total": "Total",
     "addAnotherRound": "Add Another Round",
@@ -299,7 +300,8 @@
     "competition": "Competition",
     "shots": "Shots",
     "points": "points",
-    "failedToSave": "Failed to save session"
+    "failedToSave": "Failed to save session",
+    "sessionShotMap": "Session Shot Map"
   },
   "common": {
     "loading": "Loading...",
