@@ -22,8 +22,8 @@ interface BowData {
   id: string;
   name: string;
   bow_type: string;
-  draw_weight: number | null;
-  draw_length: number | null;
+  draw_weight?: number | null;
+  draw_length?: number | null;
 }
 
 // Competition-specific data
