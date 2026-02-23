@@ -50,6 +50,8 @@ export default function ScoreKeepingScreen() {
   const [importedScores, setImportedScores] = useState<ImportedScore[]>([]);
   const [competitionSessions, setCompetitionSessions] = useState<Session[]>([]);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [importCode, setImportCode] = useState('');
 
   useFocusEffect(
     useCallback(() => {
@@ -65,6 +67,67 @@ export default function ScoreKeepingScreen() {
       setCompetitionSessions(competitions);
     } catch (error) {
       console.error('Failed to load sessions:', error);
+    }
+  };
+
+  // Parse import code from Competition PDF
+  const parseImportCode = (code: string): ImportedScore | null => {
+    try {
+      const cleanCode = code.trim();
+      const decoded = atob(cleanCode);
+      const data = JSON.parse(decoded);
+      
+      if (!data.t || data.t !== 'at_comp') {
+        return null;
+      }
+      
+      if (!data.n || data.s === undefined) {
+        return null;
+      }
+      
+      const roundScores = data.r || [];
+      const rounds = roundScores.map((scores: number[], idx: number) => ({
+        roundNumber: idx + 1,
+        scores: scores,
+        total: scores.reduce((a: number, b: number) => a + b, 0)
+      }));
+      
+      return {
+        id: `comp-import-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        archerName: data.n,
+        bowType: data.b || '',
+        distance: data.d || '',
+        rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
+        totalScore: data.s,
+        date: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error('Import code parse error:', error);
+      return null;
+    }
+  };
+
+  // Handle manual code import
+  const handleCodeImport = () => {
+    if (!importCode.trim()) {
+      Alert.alert(t('scoreKeeping.importError'), t('scoreKeeping.enterCode'));
+      return;
+    }
+    
+    const result = parseImportCode(importCode);
+    if (result) {
+      // Check for duplicates
+      const exists = importedScores.some(s => s.archerName === result.archerName && s.totalScore === result.totalScore);
+      if (exists) {
+        Alert.alert(t('scoreKeeping.importError'), t('scoreKeeping.duplicateEntry'));
+      } else {
+        setImportedScores(prev => [...prev, result]);
+        setImportCode('');
+        setShowCodeInput(false);
+        Alert.alert(t('scoreKeeping.importSuccess'), t('scoreKeeping.importedArcher', { name: result.archerName, score: result.totalScore }));
+      }
+    } else {
+      Alert.alert(t('scoreKeeping.importError'), t('scoreKeeping.invalidCode'));
     }
   };
 
