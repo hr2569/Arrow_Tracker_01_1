@@ -40,6 +40,57 @@ export default function SettingsScreen() {
     return lang ? lang.nativeName : 'English';
   };
 
+  const handleGenerateTestData = async () => {
+    Alert.alert(
+      'Generate Test Data',
+      'This will create 4 test sessions (WA Standard, Vegas 3-spot, WA Indoor) with random arrow placements for testing heatmaps. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Generate',
+          onPress: async () => {
+            setGeneratingTestData(true);
+            try {
+              const testSessions = await generateTestDataSet();
+              for (const session of testSessions) {
+                await saveSession(session);
+              }
+              Alert.alert('Success', `Created ${testSessions.length} test sessions. Check History to view them.`);
+            } catch (error) {
+              console.error('Error generating test data:', error);
+              Alert.alert('Error', 'Failed to generate test data');
+            } finally {
+              setGeneratingTestData(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleClearAllData = async () => {
+    Alert.alert(
+      'Clear All Data',
+      'This will permanently delete ALL sessions and data. This action cannot be undone!',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await clearAllSessions();
+              Alert.alert('Success', 'All data has been cleared.');
+            } catch (error) {
+              console.error('Error clearing data:', error);
+              Alert.alert('Error', 'Failed to clear data');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
