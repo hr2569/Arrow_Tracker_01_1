@@ -582,8 +582,8 @@ export default function CompetitionSummaryScreen() {
       return;
     }
     
-    if (Platform.OS === 'android') {
-      // Android - try to open directly in Google Drive, fall back to share sheet
+    if (Platform.OS === 'android' || Platform.OS === 'ios') {
+      // Use share sheet - allows user to save to Google Drive, share, etc.
       try {
         const html = generatePdfHtml(importCode);
         console.log('Generating PDF...');
@@ -591,56 +591,25 @@ export default function CompetitionSummaryScreen() {
         const { uri } = await Print.printToFileAsync({ html });
         console.log('PDF generated at:', uri);
         
-        // Copy to a file with proper name
+        // Copy to a file with proper name in document directory
         const newUri = (FileSystem.documentDirectory || '') + pdfFileName;
         try {
           await FileSystem.copyAsync({ from: uri, to: newUri });
+          console.log('PDF copied to:', newUri);
         } catch (e) {
-          console.log('Could not copy with name:', e);
+          console.log('Could not copy with name, using original:', e);
         }
         
-        // Try to get content URI and open with IntentLauncher (only works in native build)
-        try {
-          const contentUri = await getContentUriAsync(uri);
-          console.log('Content URI:', contentUri);
-          
-          // Open in default PDF viewer (no packageName to let user choose)
-          await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-            data: contentUri,
-            flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
-            type: 'application/pdf',
-          });
-        } catch (intentError) {
-          console.log('IntentLauncher failed (likely Expo Go), using share sheet...', intentError);
-          // Fall back to share sheet (works in Expo Go and native)
-          const isAvailable = await Sharing.isAvailableAsync();
-          if (isAvailable) {
-            await Sharing.shareAsync(uri, {
-              mimeType: 'application/pdf',
-              dialogTitle: 'Open Report',
-            });
-          } else {
-            Alert.alert('Error', 'Sharing not available on this device');
-          }
-        }
-      } catch (error) {
-        console.error('PDF error:', error);
-        Alert.alert('Error', 'Failed to generate PDF');
-      } finally {
-        setGenerating(false);
-      }
-    } else {
-      // iOS - use share sheet (can't force specific app on iOS)
-      try {
-        const html = generatePdfHtml(importCode);
-        const { uri } = await Print.printToFileAsync({ html });
-        
+        // Use share sheet - this allows saving to Google Drive, Files, etc.
         const isAvailable = await Sharing.isAvailableAsync();
         if (isAvailable) {
-          await Sharing.shareAsync(uri, {
+          await Sharing.shareAsync(newUri || uri, {
             mimeType: 'application/pdf',
             UTI: 'com.adobe.pdf',
+            dialogTitle: 'Save Competition Report',
           });
+        } else {
+          Alert.alert('Error', 'Sharing not available on this device');
         }
       } catch (error) {
         console.error('PDF error:', error);
