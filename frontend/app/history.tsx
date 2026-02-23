@@ -237,6 +237,10 @@ const HeatMap = ({ session, size = 140, t }: { session: Session, size?: number, 
   if (allShots.length === 0) return null;
   
   const targetType = session.target_type || 'wa_standard';
+  console.log('HeatMap targetType:', targetType, 'session.target_type:', session.target_type);
+  const isIndoor = targetType === 'vegas_3spot' || targetType === 'nfaa_indoor';
+  console.log('HeatMap isIndoor:', isIndoor);
+  
   const gridSize = 20; // Higher resolution for smoother gradient
   const cellSize = size / gridSize;
   
