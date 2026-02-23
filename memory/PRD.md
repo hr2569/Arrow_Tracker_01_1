@@ -13,8 +13,8 @@ React Native Expo archery scoring application with target visualization, arrow p
 - Score Keeping for importing and ranking competition results
 
 ## Current Version
-- App Version: 2.1.1
-- Version Code: 20
+- App Version: 2.1.2
+- Version Code: 21
 
 ---
 
@@ -30,12 +30,21 @@ React Native Expo archery scoring application with target visualization, arrow p
 ### Score Keeping
 - [x] CSV/TXT/PDF file import for external competition scores
 - [x] **PDF Import**: Reads embedded import codes from Competition PDFs for batch import
-- [x] **Manual Import Code Entry**: Modal for pasting import codes from Competition PDFs
 - [x] Parse multiple archers from a single file
 - [x] Display imported scores and competition sessions
 - [x] Rankings grouped by bow type, sorted by score
 - [x] **Generate Rankings PDF** - Direct PDF generation with medal highlighting (Gold/Silver/Bronze)
 - [x] Remove imported scores functionality
+- [x] **(v2.1.2)** Removed "Import Code" manual entry button (streamlined UI)
+
+### Report & Export
+- [x] Time period filtering: Day, Week, Month, Year, All
+- [x] Filter by bow, distance, and target type
+- [x] Session selection mode for individual exports
+- [x] **Export CSV** - Export selected sessions to CSV format (v2.1.2)
+- [x] Combined PDF report for multiple sessions
+- [x] Shot distribution scatter map
+- [x] Impact heatmap visualization
 
 ### History & Filtering
 - [x] Time period filtering: Day, Week, Month, Year, All
@@ -65,6 +74,7 @@ React Native Expo archery scoring application with target visualization, arrow p
 ### Internationalization (i18n)
 - [x] 9 languages: English, Spanish, Finnish, French, Italian, Portuguese, Russian, Swedish, Ukrainian
 - [x] Full translation coverage for Competition and Score Keeping features
+- [x] Export CSV translations added to all locales (v2.1.2)
 
 ### Developer Tools (v2.1.1)
 - [x] Test data generator for all target types (WA Standard, Vegas 3-spot, WA Indoor)
@@ -73,17 +83,18 @@ React Native Expo archery scoring application with target visualization, arrow p
 
 ---
 
-## Bug Fixes (v2.1.1)
+## Bug Fixes (v2.1.x)
 
-### TypeScript Fixes
+### v2.1.2 (Dec 2025)
+- [x] Removed orphan "Import Code" button and related state/styles from scoreKeeping.tsx
+- [x] Added Export CSV button to Report screen with full i18n support
+
+### v2.1.1
+- [x] Fixed heatmap showing wrong target face for multi-spot indoor sessions
 - [x] Fixed `normalizedDensity` undefined variable in report.tsx
 - [x] Fixed BowData interface compatibility with Bow type
 - [x] Fixed cursor style typing issues in competitionScoring.tsx and scoring.tsx
 - [x] Added `bowType` field to Participant interface
-- [x] Added `saveSession` function for test data generation
-- [x] Added `clearAllSessions` function for data reset
-
-### Backend Fixes
 - [x] Made Firebase initialization optional (prevents crash when credentials missing)
 
 ---
@@ -95,13 +106,13 @@ React Native Expo archery scoring application with target visualization, arrow p
 └── frontend/
     ├── app/
     │   ├── (tabs)/
-    │   │   └── index.tsx          # Home screen (v2.1.1)
+    │   │   └── index.tsx          # Home screen
     │   ├── competitionMenu.tsx    # Competition sub-menu
     │   ├── competitionSetup.tsx   # Competition session setup
     │   ├── competitionScoring.tsx # Competition scoring screen
     │   ├── competitionSummary.tsx # Competition summary
     │   ├── history.tsx            # History with date filtering
-    │   ├── report.tsx             # PDF report generation
+    │   ├── report.tsx             # PDF/CSV report generation
     │   ├── scoring.tsx            # Main scoring screen
     │   ├── scoreKeeping.tsx       # CSV import and rankings
     │   ├── settings.tsx           # Settings with Developer Tools
@@ -124,19 +135,26 @@ React Native Expo archery scoring application with target visualization, arrow p
 - **State Management**: Zustand for global app state
 - **File Import**: expo-document-picker for CSV selection
 - **PDF Generation**: expo-print for HTML-to-PDF conversion
+- **CSV Export**: expo-file-system + expo-sharing for CSV generation and sharing
 - **Target Configs**: TARGET_CONFIGS in appStore.ts defines ring colors and layouts
 
 ---
 
-## Future Roadmap
+## Pending Issues
 
-### P1 (Testing Required)
+### P0 (Critical)
+- [ ] PDF import not extracting text from PDFs correctly (reads binary garbage)
+  - **Root Cause**: FileSystem.readAsStringAsync cannot extract text from PDF binary
+  - **Solution**: Need proper PDF parsing library (pdf.js via webview or native module)
+
+### P1 (High Priority)  
 - [ ] Comprehensive back navigation testing on physical devices
-- [ ] Multi-spot target heatmap verification with real session data
+- [ ] PDF export share intent (currently opens standard share sheet - acceptable behavior)
 
 ### P2 (Backlog)
+- [ ] Implement robust PDF text extraction for Score Keeping imports
+- [ ] Multi-session merge for combined competition reports
 - [ ] Final icon consistency review across app
-- [ ] EAS Build automation
 
 ### P3 (Future)
 - [ ] Offline mode improvements
