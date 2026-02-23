@@ -185,7 +185,7 @@ export default function CompetitionHistory() {
 
   // Navigate to the competition summary for "compete" type
   const viewCompeteCompetition = (competition: DisplayCompetition) => {
-    router.push(`/competitionSummary?id=${competition.id}`);
+    router.replace(`/competitionSummary?id=${competition.id}`);
   };
 
   const regenerateManualPdf = async (competition: DisplayCompetition) => {

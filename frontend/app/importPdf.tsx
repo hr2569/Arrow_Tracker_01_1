@@ -263,7 +263,7 @@ export default function ImportPdf() {
 
       setShowPreview(false);
       setImportedArchers([]);
-      router.push('/competitionHistory');
+      router.replace('/competitionHistory');
 
     } catch (error) {
       console.error('Error generating PDF:', error);
