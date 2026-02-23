@@ -343,7 +343,9 @@
     "verticalAxis": "Vertical (Up/Down)",
     "legend": "Legend",
     "meanPointOfImpact": "Mean Point of Impact",
-    "cartesianDistribution": "Cartesian Distribution"
+    "cartesianDistribution": "Cartesian Distribution",
+    "rawData": "Raw Score Data (CSV Format)",
+    "csvDescription": "Copy this data to import into spreadsheet applications"
   },
   "summary": {
     "title": "Round Summary",
