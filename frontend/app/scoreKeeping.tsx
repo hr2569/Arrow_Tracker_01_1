@@ -50,8 +50,6 @@ export default function ScoreKeepingScreen() {
   const [importedScores, setImportedScores] = useState<ImportedScore[]>([]);
   const [competitionSessions, setCompetitionSessions] = useState<Session[]>([]);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-  const [showCodeInput, setShowCodeInput] = useState(false);
-  const [importCode, setImportCode] = useState('');
 
   useFocusEffect(
     useCallback(() => {
@@ -104,30 +102,6 @@ export default function ScoreKeepingScreen() {
     } catch (error) {
       console.error('Import code parse error:', error);
       return null;
-    }
-  };
-
-  // Handle manual code import
-  const handleCodeImport = () => {
-    if (!importCode.trim()) {
-      Alert.alert(t('scoreKeeping.importError'), t('scoreKeeping.enterCode'));
-      return;
-    }
-    
-    const result = parseImportCode(importCode);
-    if (result) {
-      // Check for duplicates
-      const exists = importedScores.some(s => s.archerName === result.archerName && s.totalScore === result.totalScore);
-      if (exists) {
-        Alert.alert(t('scoreKeeping.importError'), t('scoreKeeping.duplicateEntry'));
-      } else {
-        setImportedScores(prev => [...prev, result]);
-        setImportCode('');
-        setShowCodeInput(false);
-        Alert.alert(t('scoreKeeping.importSuccess'), t('scoreKeeping.importedArcher', { name: result.archerName, score: result.totalScore }));
-      }
-    } else {
-      Alert.alert(t('scoreKeeping.importError'), t('scoreKeeping.invalidCode'));
     }
   };
 
