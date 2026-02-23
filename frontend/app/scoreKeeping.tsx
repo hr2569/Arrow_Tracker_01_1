@@ -237,7 +237,7 @@ export default function ScoreKeepingScreen() {
   const handleImportFile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['text/csv', 'text/plain', 'text/comma-separated-values', '*/*'],
+        type: ['text/csv', 'text/plain', 'text/comma-separated-values', 'application/pdf', '*/*'],
         copyToCacheDirectory: true,
       });
 
@@ -247,17 +247,52 @@ export default function ScoreKeepingScreen() {
       const file = result.assets[0];
       const fileName = file.name.toLowerCase();
       
-      if (!fileName.endsWith('.csv') && !fileName.endsWith('.txt')) {
+      // Check supported formats
+      const isPDF = fileName.endsWith('.pdf');
+      const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt');
+      
+      if (!isPDF && !isCSV) {
         Alert.alert(
           t('scoreKeeping.unsupportedFormat'),
-          t('scoreKeeping.onlyCSVSupported')
+          t('scoreKeeping.supportedFormatsDetail')
         );
         setIsLoading(false);
         return;
       }
 
-      const content = await FileSystem.readAsStringAsync(file.uri);
-      const importedData = await parseMultiArcherCSV(content);
+      let importedData: ImportedScore[] = [];
+      
+      if (isPDF) {
+        // Read PDF as base64 and attempt to extract text patterns
+        try {
+          const content = await FileSystem.readAsStringAsync(file.uri, {
+            encoding: FileSystem.EncodingType.UTF8,
+          });
+          importedData = await parsePDFContent(content);
+          
+          if (importedData.length === 0) {
+            // PDF couldn't be parsed automatically
+            Alert.alert(
+              t('scoreKeeping.pdfParsingLimited'),
+              t('scoreKeeping.pdfParsingHelp')
+            );
+            setIsLoading(false);
+            return;
+          }
+        } catch (pdfError) {
+          console.error('PDF read error:', pdfError);
+          Alert.alert(
+            t('scoreKeeping.pdfParsingLimited'),
+            t('scoreKeeping.pdfParsingHelp')
+          );
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        // CSV/TXT processing
+        const content = await FileSystem.readAsStringAsync(file.uri);
+        importedData = await parseMultiArcherCSV(content);
+      }
       
       if (importedData.length > 0) {
         setImportedScores(prev => [...prev, ...importedData]);
