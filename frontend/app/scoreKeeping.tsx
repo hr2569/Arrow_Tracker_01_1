@@ -905,7 +905,9 @@ const styles = StyleSheet.create({
   exportButtonsRow: {
     flexDirection: 'row',
     gap: 12,
+    marginTop: 20,
     marginBottom: 24,
+    paddingHorizontal: 0,
   },
   generateButton: {
     flex: 1,
