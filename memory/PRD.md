@@ -29,7 +29,7 @@ React Native Expo archery scoring application with target visualization, arrow p
 
 ### Score Keeping
 - [x] CSV/TXT/PDF file import for external competition scores
-- [x] PDF text extraction with pattern matching for score data
+- [x] **PDF Import**: Reads embedded import codes from Competition PDFs for batch import
 - [x] Parse multiple archers from a single file
 - [x] Display imported scores and competition sessions
 - [x] Rankings grouped by bow type, sorted by score
