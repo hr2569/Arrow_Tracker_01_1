@@ -85,6 +85,19 @@ export const getSession = async (sessionId: string): Promise<Session | null> => 
   }
 };
 
+// Save a complete session object (for test data generation)
+export const saveSession = async (session: Session): Promise<boolean> => {
+  try {
+    const sessions = await getSessions();
+    sessions.push(session);
+    await AsyncStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+    return true;
+  } catch (error) {
+    console.error('Error saving session:', error);
+    return false;
+  }
+};
+
 export const createSession = async (data: {
   name?: string;
   bow_id?: string;
