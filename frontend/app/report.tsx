@@ -1252,20 +1252,6 @@ export default function ReportScreen() {
             </div>
           </div>
           ` : ''}
-
-          <!-- CSV Data Page -->
-          <div class="page">
-            <div class="page-header">
-              <h2>${t('report.rawData', { defaultValue: 'Raw Score Data (CSV Format)' })}</h2>
-              <p>${t('report.csvDescription', { defaultValue: 'Copy this data to import into spreadsheet applications' })}</p>
-            </div>
-            <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; font-family: monospace; font-size: 10px; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere;">
-${generateCsvContent()}
-            </div>
-            <div class="footer">
-              <p>Arrow Tracker - ${new Date().getFullYear()}</p>
-            </div>
-          </div>
         </body>
       </html>
     `;
