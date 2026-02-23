@@ -54,7 +54,7 @@ const needsBorder = (ring: number): boolean => {
 
 // Session Target Face Component - displays all shots from the current session
 interface SessionTargetFaceProps {
-  shots: Array<{ x: number; y: number; ring: number }>;
+  shots: Array<{ x: number; y: number; ring: number; targetIndex?: number }>;
   targetType: string;
   size?: number;
 }
@@ -63,22 +63,28 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   const rings = targetConfig.rings;
   const colors = targetConfig.colors;
+  const isMultiTarget = targetConfig.layout === 'triple_vertical';
   
   // Marker sizes
-  const markerSize = 16;
-  const markerFontSize = 8;
+  const markerSize = isMultiTarget ? 12 : 16;
+  const markerFontSize = isMultiTarget ? 6 : 8;
   
-  // Render target rings
-  const renderRings = () => {
+  // For multi-target layouts (Vegas 3-spot, WA Indoor)
+  const targetSpotSize = isMultiTarget ? size * 0.28 : size;
+  const spotSpacing = isMultiTarget ? size * 0.32 : 0;
+  
+  // Render a single target face
+  const renderSingleTarget = (targetSize: number, offsetX: number = 0, offsetY: number = 0, targetIdx?: number) => {
     const ringElements = [];
+    
     for (let i = 0; i < rings; i++) {
       const ringRatio = (rings - i) / rings;
-      const ringSize = size * ringRatio * 0.95;
+      const ringSize = targetSize * ringRatio * 0.95;
       const color = colors[i];
       
       ringElements.push(
         <View
-          key={`ring-${i}`}
+          key={`ring-${targetIdx}-${i}`}
           style={{
             position: 'absolute',
             width: ringSize,
@@ -87,25 +93,29 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
             backgroundColor: color?.bg || '#f5f5f0',
             borderWidth: 1,
             borderColor: color?.border || '#333',
+            left: offsetX + (targetSize - ringSize) / 2,
+            top: offsetY + (targetSize - ringSize) / 2,
           }}
         />
       );
     }
     
     // X ring (innermost)
-    const xRingSize = size * 0.05 * 0.95;
+    const xRingSize = targetSize * 0.08 * 0.95;
     const xRingColor = (targetConfig as any).xRingColor || { bg: '#fff200', border: '#b8860b' };
     ringElements.push(
       <View
-        key="xring"
+        key={`xring-${targetIdx}`}
         style={{
           position: 'absolute',
           width: xRingSize,
           height: xRingSize,
           borderRadius: xRingSize / 2,
           backgroundColor: xRingColor.bg,
-          borderWidth: 2,
+          borderWidth: 1,
           borderColor: xRingColor.border,
+          left: offsetX + (targetSize - xRingSize) / 2,
+          top: offsetY + (targetSize - xRingSize) / 2,
         }}
       />
     );
@@ -116,9 +126,19 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
   // Render shot markers
   const renderShots = () => {
     return shots.map((shot, index) => {
-      const shotColor = getRingColor(shot.ring);
-      const textColor = shot.ring >= 3 && shot.ring <= 4 ? '#fff' : 
-                       shot.ring >= 9 || (shot.ring >= 1 && shot.ring <= 2) ? '#000' : '#fff';
+      let shotX = shot.x * size;
+      let shotY = shot.y * size;
+      
+      // For multi-target layouts, shots need to be positioned relative to their target
+      if (isMultiTarget && shot.targetIndex !== undefined) {
+        // Get target position based on index (0=top, 1=middle, 2=bottom for vertical)
+        const targetOffsetY = shot.targetIndex * spotSpacing + (size - spotSpacing * 2 - targetSpotSize) / 2;
+        const targetOffsetX = (size - targetSpotSize) / 2;
+        
+        // Shot position is relative to its target
+        shotX = targetOffsetX + shot.x * targetSpotSize;
+        shotY = targetOffsetY + shot.y * targetSpotSize;
+      }
       
       return (
         <View
@@ -131,8 +151,8 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
             backgroundColor: '#8B0000',
             borderWidth: 2,
             borderColor: '#fff',
-            left: shot.x * size - markerSize / 2,
-            top: shot.y * size - markerSize / 2,
+            left: shotX - markerSize / 2,
+            top: shotY - markerSize / 2,
             alignItems: 'center',
             justifyContent: 'center',
           }}
@@ -149,6 +169,31 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
     return null;
   }
   
+  // Render multi-target layout (3 vertical targets)
+  if (isMultiTarget) {
+    const targetOffsetX = (size - targetSpotSize) / 2;
+    const startY = (size - spotSpacing * 2 - targetSpotSize) / 2;
+    
+    return (
+      <View style={{
+        width: size,
+        height: size,
+        backgroundColor: '#1a1a1a',
+        borderRadius: 12,
+        position: 'relative',
+      }}>
+        {/* Render 3 targets vertically */}
+        {renderSingleTarget(targetSpotSize, targetOffsetX, startY, 0)}
+        {renderSingleTarget(targetSpotSize, targetOffsetX, startY + spotSpacing, 1)}
+        {renderSingleTarget(targetSpotSize, targetOffsetX, startY + spotSpacing * 2, 2)}
+        
+        {/* Shot markers */}
+        {renderShots()}
+      </View>
+    );
+  }
+  
+  // Single target layout (WA Standard)
   return (
     <View style={{
       width: size,
@@ -158,7 +203,7 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
       alignItems: 'center',
       justifyContent: 'center',
     }}>
-      {renderRings()}
+      {renderSingleTarget(size)}
       
       {/* Center crosshair */}
       <View style={{ position: 'absolute', width: 12, height: 2, backgroundColor: '#000' }} />
