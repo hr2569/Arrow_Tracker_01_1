@@ -325,6 +325,8 @@
     "worstSession": "Worst Session",
     "ringDistribution": "Ring Distribution",
     "exportPDF": "Export PDF",
+    "exportCSV": "Export CSV",
+    "selectSessionsFirst": "Please select at least one session to export.",
     "share": "Share",
     "close": "Close",
     "back": "Back",
