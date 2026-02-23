@@ -248,7 +248,9 @@
     "roundDetails": "Pään Tiedot",
     "selectSession": "Valitse Sessio",
     "noSessions": "Ei sessioja saatavilla",
-    "arrows": "nuolta"
+    "arrows": "nuolta",
+    "exportCSV": "Vie CSV",
+    "selectSessionsFirst": "Valitse vähintään yksi sessio vientiä varten."
   },
   "summary": {
     "title": "Pään Yhteenveto",
