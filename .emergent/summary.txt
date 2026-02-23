@@ -1,171 +1,204 @@
-<analysis>**original_problem_statement**: The user's initial problem statement from a previous session involved fixing internationalization (i18n) bugs and a zoom jumping issue on the scoring screen.
+<analysis>**original_problem_statement**: The user initially provided a list of 5 UI/UX improvements and bug fixes. After those were implemented, the scope expanded significantly to include a multi-part Competition Mode feature (v2.1.0), version updates, and several rounds of bug fixes based on user feedback.
 
-During the current session, the user reported a cascade of new and recurring issues:
-1.  **Recurring Jump Bug**: The arrow marker on the scoring screen jumps when placed near another arrow. This has been the most persistent and critical issue.
-2.  **Recurring Rogue Modal**: A Finish Session? confirmation modal from the  screen was appearing on other screens and was being triggered incorrectly by the hardware back button.
-3.  **Recurring i18n Issues**: Hardcoded English strings remained in the app, most notably within the generated PDF performance reports.
-4.  **Incorrect Back Navigation**: After completing a session, using the back button would navigate the user through the previous steps of the session (scoring, setup) instead of returning to the home screen.
-5.  **App Crash**: The app was crashing when trying to save a round, later identified as being caused by an incorrect import.
-6.  **Magnifier Arrow Sizing**: The user provided conflicting feedback on the size of arrows in the zoom magnifier, first requesting them to be bigger, then stating they were too big.
-7.  **Version Display & Updates**: The user requested multiple version updates (up to ) and pointed out that the version number was not updating correctly on the Home and Settings screens.
+The most recent user requests include:
+1.  **Session Summary UI**: For multi-spot target types (Vegas, WA Indoor), the shot heatmap should be condensed into a single target view instead of showing the wrong layout. This issue also affects the History screen.
+2.  **Translations**: The new Competition and Report screens need to be translated into all 8 non-English languages supported by the app.
+3.  **Competition Score Keeping Feature**:
+    *   The CSV/PDF import functionality is not implemented.
+    *   The screen should not navigate to the generic Generate Report menu.
+    *   Instead, it should process the imported data and display a new, dedicated view: a list of players, organized by bow type, and sorted by their total score.
+4.  **Back Navigation**: Users have reported that the back button still navigates through screens it should skip.
+5.  **Competition Scoring Logic**:
+    *   If a competition round is finished with fewer than the required number of arrows, the missing arrows should be automatically scored as 'M' (Miss).
+    *   The generated PDF report for a session should have the raw CSV data of that session embedded within it.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The agent has implemented fixes for a wide range of issues reported by the user.
-- **Navigation**: The incorrect back-button behavior was addressed by replacing  with  in the session creation flow, preventing completed steps from being added to the navigation history.
-- **Rogue Modal**: The persistent modal issue was fixed by using the  hook to ensure the  is only active when the summary screen is visible. An app crash related to this fix (caused by an incorrect import) was also resolved.
-- **i18n**: A major refactor was performed on  to translate all hardcoded strings within the PDF generation logic. New translation keys were added to  and .
-- **Jump Bug**: A fourth attempt was made to fix this critical bug. The latest fix involves wrapping the arrow markers in a  that uses  to disable touches on existing arrows while a new one is being placed, aiming to prevent touch event conflicts.
-- **UI & Versioning**: The arrow size in the magnifier was adjusted, and the app version was updated to  (build ) across , the Home screen, and the Settings screen.
-- **EAS Build Issue**: An attempt to fix package dependency mismatches was reverted at the user's request, as the underlying Expo Go failure was a known, long-standing issue the user did not want to address.
+The application is a full-stack React Native (Expo) app for archery score tracking.
+
+The agent has implemented a large number of features and fixes in this session:
+- **UI/Data Fixes**: Correctly sorted sessions in reports, removed redundant text from PDFs, and moved the score number in the scoring magnifier.
+- **New Components**: Added a  component to the  screen to visualize all shots from a session.
+- **Competition Mode (v2.1.0)**:
+    - Enabled the Competition button on the home screen, leading to a new  with New Competition and Score Keeping sub-menus.
+    - Created a  screen with fields for Archer Name and Bow selection.
+    - Enforced competition rules: 10 rounds of 3 arrows each. The UI prevents adding more than 3 arrows in  and automatically marks unscored arrows as 'M' (Miss) when a round is saved. The Add Another Round button is hidden after the 10th round in .
+- **Navigation**: Performed a significant refactor, replacing multiple  calls with  to fix incorrect back button behavior in the session and competition flows.
+- **Reporting**: Implemented a feature to embed a session's raw CSV data as a new page within the generated PDF report.
+- **Internationalization (i18n)**: Added translations for the new Competition features across all 9 languages (en, es, fi, fr, it, pt, ru, sv, uk).
+- **Versioning**: The app version has been updated to  (build ).
 
 **Last working item**:
-- **Last item agent was working**: The agent just finished a batch of critical fixes: the navigation back-button flow, the recurring rogue modal, the PDF i18n translations, and updating the version display on the Home/Settings screens.
-- **Status**: USER VERIFICATION PENDING
-- **Agent Testing Done**: N (Agent performed code compilation checks but could not functionally test native behavior like navigation, gesture handling, or PDF generation.)
-- **Which testing method agent to use?**: Manual testing by the user via an EAS build is required to verify all recent fixes.
+- **Last item agent was working**: The agent was actively working on the user's latest bug report list. Specifically, it was in the middle of:
+    1.  Rewriting the  component in  to correctly display a condensed heatmap for multi-spot targets (like Vegas and WA Indoor).
+    2.  Refactoring the  screen to implement CSV data parsing and display a new, sorted player rankings view instead of navigating to the old report generator.
+- **Status**: IN PROGRESS
+- **Agent Testing Done**: N
+- **Which testing method agent to use?**: Frontend testing agent. The changes are significant and involve UI, data processing, and logic. The agent should be instructed to test:
+    1.  Creating a WA Indoor or Vegas session and verifying the  screen shows a single, condensed target heatmap.
+    2.  Checking the  screen to ensure the heatmap for that same session is also correctly condensed.
+    3.  Navigating to Competition -> Score Keeping, importing a sample CSV, and verifying the new ranked player list appears, sorted correctly by bow type and score.
+    4.  Testing the back button navigation throughout the entire competition and training flows to confirm no screens are incorrectly added to the history stack.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-  - **Issue 1**: The scoring screen jumps when placing an arrow near a previously placed one. (P0)
-  - **Issue 2**: The Finish Session? modal from  appears incorrectly or is triggered by the back button on the wrong screens. (P0)
-  - **Issue 3**: The app uses hardcoded English strings, especially in the generated PDF report, regardless of the selected language. (P0)
-  - **Issue 4**: The back button navigates through completed session screens instead of returning to the main app area. (P0)
-  - **Issue 5**: The size of the arrows in the magnifier may not match the user's expectation. (P1)
+  - **Issue 1**: Score Keeping feature is incomplete. (P0)
+  - **Issue 2**: Incorrect target visualization for multi-spot targets in Session Summary and History. (P0)
+  - **Issue 3**: History session filtering by date range is not implemented. (P1)
+  - **Issue 4**: Recurring back navigation bugs. (P1)
   
   **Issues Detail**:
   - **Issue 1**: 
-     - **Attempted fixes**: 1. Increased  . 2. Disabled  scrolling during touch. 3. Added negative  (reverted). 4. (Latest) Wrapped arrow markers in a  with  to prevent touch interception.
-     - **Next debug checklist**: User must test the latest fix via an EAS build. If it fails, a complete refactor of the touch logic in  to use only  may be necessary.
-     - **Why fix this issue and what will be achieved with the fix?**: This is a critical, recurring usability bug in the app's core scoring feature.
-     - **Status**: USER VERIFICATION PENDING
-     - **Is recurring issue?**: Y
+     - **Attempted fixes**: The agent started refactoring  to process CSV data and display a ranked list. The code is partially written but not complete or tested.
+     - **Next debug checklist**:
+        1.  Complete the implementation in .
+        2.  Ensure the  function correctly uses  (or a similar library) to read the CSV data.
+        3.  Store the parsed data in the component's state.
+        4.  Render a new view that lists players grouped by bow type and sorted by score.
+        5.  Remove the old navigation to the report generation screen.
+     - **Why fix this issue and what will be achieved with the fix?**: This is a key part of the Competition feature, allowing users to compile and rank results from external sources.
+     - **Status**: IN PROGRESS
+     - **Is recurring issue?**: N
      - **Should Test frontend/backend/both after fix?**: Frontend
      - **Blocked on other issue**: None
   - **Issue 2**: 
-     - **Attempted fixes**: 1. Added  listener to close the modal. 2. (Latest) Used  hook to ensure the  is only active on the summary screen.
-     - **Next debug checklist**: User must test on a device to confirm the back button behaves correctly across different screens.
-     - **Why fix this issue and what will be achieved with the fix?**: Fixes a disruptive UI bug that breaks navigation flow.
-     - **Status**: USER VERIFICATION PENDING
-     - **Is recurring issue?**: Y
-     - **Should Test frontend/backend/both after fix?**: Frontend
-     - **Blocked on other issue**: None
-  - **Issue 3**: 
-     - **Attempted fixes**: (Latest) A major refactor of  was done to inject translated strings into the PDF generation function.  and  were updated.
-     - **Next debug checklist**: User needs to generate a PDF in a non-English language and verify all text is translated.
-     - **Why fix this issue and what will be achieved with the fix?**: Fulfills the app's requirement to be fully internationalized.
-     - **Status**: USER VERIFICATION PENDING
-     - **Is recurring issue?**: Y
-     - **Should Test frontend/backend/both after fix?**: Frontend
-     - **Blocked on other issue**: None
-  - **Issue 4**: 
-     - **Attempted fixes**: (Latest) Replaced  with  for navigation between , , and  screens.
-     - **Next debug checklist**: User needs to complete a session and use the back button to confirm it doesn't go back to the scoring/summary screens.
-     - **Why fix this issue and what will be achieved with the fix?**: Ensures a logical and non-frustrating user navigation experience.
-     - **Status**: USER VERIFICATION PENDING
+     - **Attempted fixes**: The agent started rewriting the  component in  to condense multi-target layouts into a single target view. The previous implementation had duplicate code and was not functional.
+     - **Next debug checklist**:
+        1.  Finalize the refactor of the  component in .
+        2.  Identify the component used for the heatmap in .
+        3.  Apply the same condensed-view logic from  to the history heatmap component.
+     - **Why fix this issue and what will be achieved with the fix?**: Fixes a significant visual bug that misrepresents scoring data for popular target types.
+     - **Status**: IN PROGRESS
      - **Is recurring issue?**: N
      - **Should Test frontend/backend/both after fix?**: Frontend
      - **Blocked on other issue**: None
-  - **Issue 5**:
-     - **Attempted fixes**: Arrow size in the magnifier was changed multiple times, last set to .
-     - **Next debug checklist**: User needs to visually inspect the magnifier on a device.
-     - **Why fix this issue and what will be achieved with the fix?**: Improves usability of the zoom feature based on user feedback.
-     - **Status**: USER VERIFICATION PENDING
+  - **Issue 3**:
+     - **Attempted fixes**: None. This was requested in the first user message of the session but was overlooked.
+     - **Next debug checklist**:
+        1.  In , add UI elements (e.g., buttons or a dropdown) for Day/Week/Month/Year filtering.
+        2.  Implement the filtering logic on the  array before rendering the list.
+     - **Why fix this issue and what will be achieved with the fix?**: Improves usability of the history screen by allowing users to find sessions more easily.
+     - **Status**: NOT STARTED
      - **Is recurring issue?**: N
+     - **Should Test frontend/backend/both after fix?**: Frontend
+     - **Blocked on other issue**: None
+  - **Issue 4**:
+     - **Attempted fixes**: The agent replaced several  calls with  in  and .
+     - **Next debug checklist**: The entire navigation flow for both Training and Competition sessions needs to be manually tested to confirm the fix is comprehensive. Pay close attention to the  on Android.
+     - **Why fix this issue and what will be achieved with the fix?**: This is a core usability problem that creates a frustrating user experience.
+     - **Status**: TESTING PENDING
+     - **Is recurring issue?**: Y
      - **Should Test frontend/backend/both after fix?**: Frontend
      - **Blocked on other issue**: None
 
 **In progress Task List**:
-- None. All active work is pending user verification.
+  - **Task 1**: Complete the Score Keeping screen refactor.
+     - **Where to resume**: .
+     - **What will be achieved with this?**: A functional CSV import and player ranking screen for competitions.
+     - **Status**: IN PROGRESS
+     - **Should Test frontend/backend/both after fix?**: Frontend
+     - **Blocked on something**: None
+  - **Task 2**: Complete the target face visualization fix.
+     - **Where to resume**:  (and then ).
+     - **What will be achieved with this?**: Correct visual representation of scores for all target types.
+     - **Status**: IN PROGRESS
+     - **Should Test frontend/backend/both after fix?**: Frontend
+     - **Blocked on something**: None
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-    - **(P1) Enable and Finalize Competition Menu**: This was the original feature request for the next version (). It involves enabling the button on the home screen and reviewing the competition workflow.
+    - **(P1) Implement History Filtering**: Add Day/Week/Month/Year filtering to the  screen.
 - **Future Tasks**:
-    - **(P2) Final Icon Consistency Review**: A full app review to ensure all icons are replaced with SVGs from the new system implemented in a previous session.
+    - **(P2) Finalize Competition Reporting**: Implement the feature to select multiple completed competition sessions and merge them into a single, combined PDF report.
+    - **(P2) Final Icon Consistency Review**: A full app review to ensure all icons are replaced with SVGs, as per the previous fork's summary.
 
 **Completed work in this session**
-- **Fixed Back Navigation**: Changed  to  in the session flow (, ) to prevent navigating back into a completed session.
-- **Fixed Rogue Modal & App Crash**: Resolved the recurring modal bug in  using  and fixed a subsequent app crash by correcting the library import for the hook.
-- **Major i18n Refactor**: Translated all hardcoded strings in the PDF reports by refactoring  and updated  and  translation files.
-- **Attempted Jump Bug Fix**: Implemented a new strategy in  using a  wrapper with  to prevent touch conflicts.
-- **Adjusted Magnifier Arrow Size**: Set the arrow size in the zoom magnifier to  in .
-- **Updated App Version**: Updated the version to  and  to  in  and ensured it displays correctly on the Home () and Settings () screens.
+- **Competition Mode v2.1.1**: Implemented the core feature, including a new menu, setup screen (), scoring limits (3 arrows/round), auto-marking misses, and 10-round session structure.
+- **Navigation Overhaul**: Replaced  with  in key navigation paths (, ) to fix back-button issues.
+- **PDF Report Enhancement**: Embedded raw CSV session data directly into the generated PDF reports ().
+- **Full Internationalization (i18n)**: Translated all new UI text for the Competition feature into 8 additional languages.
+- **UI Improvements**:
+    - Added a target heatmap to the session summary screen ().
+    - Centered the score number inside the magnifier crosshair ().
+    - Correctly sorted sessions in the report selection screen ().
+- **Versioning**: Updated app version to  and build code to  in , , and .
 
 **Earlier issues found/mentioned but not fixed**
-   - **Expo Go Build Failure**: The agent identified package version mismatches as the cause of Expo Go failures, but the user requested to revert these fixes, stating it was a known, pre-existing issue they did not want to address at this time. This technical debt remains.
+   - **Issue 1**: The user's first request to filter sessions in the History screen by Day/Week/Month/Year was not implemented.
 
 **Known issue recurrence from previous fork**
   - **Issue recurrence in this fork**:
-    - arrow jumping bug in . (Recurrence count: 4+)
-    - Rogue modal in . (Recurrence count: 2+)
-    - Hardcoded i18n strings. (Recurrence count: 2+)
-  - **Status**: All are  after new fixes were applied.
+    - **Back Navigation**: User complained about this again, even after fixes were applied.
+    - **The Jump Bug**: Though not mentioned by the user in this session, it was the top P0 issue in the last handoff, and its fix was pending verification. It remains a potential risk.
+  - **Status**: Back Navigation is . The Jump bug is unconfirmed.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
 - **Frontend**: React Native (Expo)
-- **Gesture Handling**: A complex interaction between the React Native Responder system,  (), , and  is at the core of the main bug in .
-- **Navigation**:  (),  (), and the  API are used for navigation logic and fixing history/modal bugs.
-- **i18n**:  with JSON files for translations.
-- **PDF Generation**: Dynamically creating an HTML string with inlined SVG and styles to be converted into a PDF.
+- **Navigation**:  ( vs  is critical).
+- **State Management**: Zustand ().
+- **File Handling**:  for CSV import.
+- **i18n**:  with JSON files for 9 languages.
+- **PDF Generation**: Dynamically creating an HTML string (with embedded styles, SVG, and now raw text data) and converting it to a PDF.
 
 **All files of reference**
+-  (In Progress)
+-  (In Progress)
+-  (Upcoming Task)
 - 
 - 
 - 
 - 
-- 
-- 
+-  (all 9 language files)
 - 
 - 
 - 
 
 **Areas that need refactoring**:
-- ** Touch Logic**: The gesture and touch handling logic is extremely fragile. If the current jump bug fix fails, the entire implementation should be refactored to use a single, consistent system () for all touch interactions on the target.
-- **Package Dependencies**: The project has known package version mismatches that were intentionally not fixed per the user's request. This remains a source of technical debt and may cause issues with future EAS builds or tool compatibility.
-
-**key api endpoints**
-- N/A
+- **Navigation Logic**: The recurring back-button issues suggest that a full audit of all  and  calls across the app is needed to ensure the navigation stack is managed predictably.
+- **Shared Components**: The target heatmap logic being fixed in  is also needed in . This logic should be extracted into a reusable component to avoid code duplication and ensure consistency.
 
 **Critical Info for New Agent**
-- Your first priority is to await user verification for the latest batch of fixes. The three most critical and recurring bugs (jump issue, rogue modal, i18n) have all had new fixes applied.
-- The user tests via EAS builds, not Expo Go. Do not attempt to fix Expo Go-related issues unless the user explicitly asks. The user has previously been firm about not wanting this fixed.
-- Be prepared for the jump bug in  to persist. It is a complex interaction of multiple touch systems, and previous fixes have failed. If it fails again, you should propose a more fundamental refactor of that component's touch handling logic.
-- The user is very hands-on and provides detailed feedback, including videos. Use this information carefully to diagnose issues.
+- Your immediate priority is to finish the two in-progress tasks: fixing the target heatmap visualization and completing the Score Keeping screen's CSV import/ranking functionality.
+- The back navigation issue is a high-priority, recurring problem. After fixing the in-progress items, you must thoroughly test the navigation flow and be prepared to make further fixes.
+- Do not forget the overlooked task: implementing date-range filtering on the history screen.
+- The user provides feedback in clear, numbered lists. Address each point methodically.
 
 **documents and test reports created in this job**
-- None in this session.
+- None.
 
 **Last 10 User Messages and any pending HUMAN messages** 
-- **LATEST**: User reports i18n and back navigation issues are still present. (IN PROGRESS, fixes applied)
-- User provides details: i18n issue is recurrent and affects PDFs, specifies , and clarifies the desired back-button behavior after finishing a session. (IN PROGRESS, fixes applied)
-- User requests app version and code version update. (COMPLETED)
-- User reports the app is crashing when saving a round. (COMPLETED, fixed by correcting an import)
-- User requests app version and code version update. (COMPLETED)
-- User reports the back action triggers the Finish Session? menu incorrectly. (COMPLETED, fixed with )
-- User reports the Finish Session? menu is showing everywhere. (COMPLETED)
-- User requests app version and code version update. (COMPLETED)
-- User confirms two arrows should be placeable next to each other, leading to a tweak in the jump-fix. (COMPLETED)
-- User asks the agent to test the jump fix before they build, since it's the 4th attempt. (COMPLETED, agent explained the logic)
+- **LATEST**: User provided a list of 4 issues to fix: 1) Session Summary target face bug for multi-spot targets, 2) History heatmap has the same bug, 3) Score Keeping CSV import is broken, 4) Score Keeping should show a ranked list, not go to the report menu. (IN PROGRESS)
+- User requested two competition-related features: auto-mark unscored arrows as 'M' (Miss), and embed the session's CSV data into the PDF report. (COMPLETED)
+- User requested a version bump to  (build ) and reported that the back navigation is still not working correctly. (COMPLETED/TESTING PENDING)
+- User reported 3 new issues: 1) Session summary has the wrong target face, 2) Some screens need translation to other languages, 3) Competition menu isn't importing CSVs. (IN PROGRESS)
+- User unblocked the competition menu to finish implementation. Provided new requirements: two sub-menus (Score Keeping and New Competition), and bow type should be defined by the selected bow. (COMPLETED)
+- User requested to block the competition menu temporarily. (COMPLETED)
+- User requested to revert the app version to . (COMPLETED)
+- User confirmed the Competition Setup screen was working. (COMPLETED)
+- User reported the app was not showing on the preview. Agent found and fixed a duplicate variable declaration. (COMPLETED)
+- User provided specs for the v2.1.0 Competition Menu. (COMPLETED)
 
 **Project Health Check:**
-- **Broken**: The app's core functionalities (scoring, navigation, i18n) have been plagued by recurring bugs. Although fixes have been applied for all reported issues, the app's stability is unconfirmed until the user completes testing.
+- **Broken**: Core new features () are incomplete and there are significant visual bugs (, ) that misrepresent user data. A critical, recurring navigation bug also persists.
 
 **3rd Party Integrations**
-- None.
+- : Used for file selection (CSV import).
+- : (Assumed, for CSV parsing) Will be needed to complete the  feature.
 
 **Testing status**
   - Testing agent used after significant changes: NO
   - Troubleshoot agent used after agent stuck in loop: NO
   - Test files created: None
-  - Known regressions: The jump bug, the rogue modal bug, and i18n issues are all known regressions that have been repeatedly addressed in this session. The latest fixes are pending verification.
+  - Known regressions:
+    - **Back navigation**: Repeatedly fixed, but user reports it's still an issue.
+    - **The Jump bug**: A major recurring issue from the previous session whose fix has not been verified by the user.
 
 **Credentials to test flow:**
 - N/A
 
 **What agent forgot to execute**
-- Nothing was forgotten. The agent addressed all user requests, but the effectiveness of the fixes for highly recurring bugs is still unverified.</analysis>
+- The agent overlooked the user's initial request to add date-range filtering (Day/Week/Month/Year) to the  screen. This task from the very first user message of the session remains unimplemented.</analysis>
