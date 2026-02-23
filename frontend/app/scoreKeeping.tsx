@@ -138,6 +138,61 @@ export default function ScoreKeepingScreen() {
     }
   };
 
+  // Parse PDF content - extract text and try to find score data
+  const parsePDFContent = async (content: string): Promise<ImportedScore[]> => {
+    try {
+      // PDF files read as binary, so we'll look for patterns in raw content
+      // This is a basic extraction - complex PDFs may need server-side processing
+      
+      // Try to extract text patterns like "Name: John, Score: 285" or tabular data
+      const results: ImportedScore[] = [];
+      
+      // Common patterns in archery score sheets
+      // Pattern 1: "Name,BowType,Score" or similar CSV-like content embedded in PDF
+      const csvPattern = /([A-Za-z\s]+)[,\t]+(recurve|compound|barebow|longbow|traditional)?[,\t]*(\d{1,3})/gi;
+      let match;
+      while ((match = csvPattern.exec(content)) !== null) {
+        const name = match[1].trim();
+        const bowType = match[2] || '';
+        const score = parseInt(match[3]);
+        if (name.length > 1 && name.length < 50 && score > 0 && score <= 360) {
+          results.push({
+            id: `pdf-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
+            archerName: name,
+            bowType: bowType,
+            distance: '',
+            rounds: [{ roundNumber: 1, scores: [score], total: score }],
+            totalScore: score,
+            date: new Date().toISOString(),
+          });
+        }
+      }
+      
+      // Pattern 2: Look for "Archer: X Score: Y" patterns
+      const namedPattern = /(?:archer|name|player)[\s:]+([A-Za-z\s]+?)[\s,]+(?:score|total|points)[\s:]+(\d{1,3})/gi;
+      while ((match = namedPattern.exec(content)) !== null) {
+        const name = match[1].trim();
+        const score = parseInt(match[2]);
+        if (name.length > 1 && !results.some(r => r.archerName === name)) {
+          results.push({
+            id: `pdf-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
+            archerName: name,
+            bowType: '',
+            distance: '',
+            rounds: [{ roundNumber: 1, scores: [score], total: score }],
+            totalScore: score,
+            date: new Date().toISOString(),
+          });
+        }
+      }
+      
+      return results;
+    } catch (error) {
+      console.error('PDF parsing error:', error);
+      return [];
+    }
+  };
+
   // Parse multi-archer CSV
   const parseMultiArcherCSV = async (content: string): Promise<ImportedScore[]> => {
     try {
