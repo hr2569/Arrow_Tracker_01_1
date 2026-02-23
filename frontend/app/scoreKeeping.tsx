@@ -578,12 +578,16 @@ export default function ScoreKeepingScreen() {
         {(competitionSessions.length > 0 || importedScores.length > 0) && (
           <TouchableOpacity
             style={[styles.generateButton, totalSelected < 1 && styles.generateButtonDisabled]}
-            onPress={() => setShowRankings(true)}
-            disabled={totalSelected < 1}
+            onPress={generateRankingsPDF}
+            disabled={totalSelected < 1 || isLoading}
           >
-            <Icon name="podium" size={24} color={totalSelected < 1 ? '#666' : '#000'} />
+            {isLoading ? (
+              <ActivityIndicator color="#000" size="small" />
+            ) : (
+              <Icon name="document-text" size={24} color={totalSelected < 1 ? '#666' : '#000'} />
+            )}
             <Text style={[styles.generateButtonText, totalSelected < 1 && styles.generateButtonTextDisabled]}>
-              {t('scoreKeeping.viewRankings')} ({totalSelected})
+              {t('scoreKeeping.generateRankingsPDF')} ({totalSelected})
             </Text>
           </TouchableOpacity>
         )}
