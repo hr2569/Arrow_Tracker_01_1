@@ -248,7 +248,9 @@
     "roundDetails": "Omgångsdetaljer",
     "selectSession": "Välj Session",
     "noSessions": "Inga sessioner tillgängliga",
-    "arrows": "pilar"
+    "arrows": "pilar",
+    "exportCSV": "Exportera CSV",
+    "selectSessionsFirst": "Välj minst en session att exportera."
   },
   "summary": {
     "title": "Omgångssammanfattning",

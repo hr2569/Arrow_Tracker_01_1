@@ -248,7 +248,9 @@
     "roundDetails": "Деталі Серії",
     "selectSession": "Обрати Сесію",
     "noSessions": "Немає доступних сесій",
-    "arrows": "стріл"
+    "arrows": "стріл",
+    "exportCSV": "Експорт CSV",
+    "selectSessionsFirst": "Будь ласка, оберіть принаймні одну сесію для експорту."
   },
   "summary": {
     "title": "Підсумки Серії",

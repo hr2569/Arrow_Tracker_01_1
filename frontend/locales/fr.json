@@ -248,7 +248,9 @@
     "roundDetails": "Détails de la Volée",
     "selectSession": "Sélectionner Session",
     "noSessions": "Pas de sessions disponibles",
-    "arrows": "flèches"
+    "arrows": "flèches",
+    "exportCSV": "Exporter CSV",
+    "selectSessionsFirst": "Veuillez sélectionner au moins une session à exporter."
   },
   "summary": {
     "title": "Résumé de la Volée",

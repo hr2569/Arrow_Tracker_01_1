@@ -248,7 +248,9 @@
     "roundDetails": "Dettagli Volée",
     "selectSession": "Seleziona Sessione",
     "noSessions": "Nessuna sessione disponibile",
-    "arrows": "frecce"
+    "arrows": "frecce",
+    "exportCSV": "Esporta CSV",
+    "selectSessionsFirst": "Seleziona almeno una sessione da esportare."
   },
   "summary": {
     "title": "Riepilogo Volée",
