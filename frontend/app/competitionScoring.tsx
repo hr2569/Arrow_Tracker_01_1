@@ -343,9 +343,9 @@ export default function CompetitionScoringScreen() {
         height: size,
         backgroundColor: '#1a1a1a',
         borderRadius: size / 2,
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'crosshair',
+        alignItems: 'center' as const,
+        justifyContent: 'center' as const,
+        cursor: 'crosshair' as any,
         position: 'relative' as const,
       }
     } : {};
