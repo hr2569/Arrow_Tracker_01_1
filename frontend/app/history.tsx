@@ -385,8 +385,35 @@ const HeatMap = ({ session, size = 140, t }: { session: Session, size?: number, 
         <Icon name="flame" size={14} color="#8B0000" /> {t('history.impactHeatmap')}
       </Text>
       <View style={[scatterStyles.heatmapGrid, { width: size, height: size }]}>
-        {/* Target rings */}
-        {renderTargetRings()}
+        {/* Target rings - render based on target type */}
+        {(targetType === 'vegas_3spot' || targetType === 'nfaa_indoor') ? (
+          // Indoor target: Blue-Red-Gold (5 rings)
+          <>
+            <View style={{ position: 'absolute', width: size * 0.95, height: size * 0.95, borderRadius: size * 0.95 / 2, backgroundColor: '#00a2e8', left: (size - size * 0.95) / 2, top: (size - size * 0.95) / 2 }} />
+            <View style={{ position: 'absolute', width: size * 0.76, height: size * 0.76, borderRadius: size * 0.76 / 2, backgroundColor: '#ed1c24', left: (size - size * 0.76) / 2, top: (size - size * 0.76) / 2 }} />
+            <View style={{ position: 'absolute', width: size * 0.57, height: size * 0.57, borderRadius: size * 0.57 / 2, backgroundColor: '#ed1c24', left: (size - size * 0.57) / 2, top: (size - size * 0.57) / 2 }} />
+            <View style={{ position: 'absolute', width: size * 0.38, height: size * 0.38, borderRadius: size * 0.38 / 2, backgroundColor: '#fff200', left: (size - size * 0.38) / 2, top: (size - size * 0.38) / 2 }} />
+            <View style={{ position: 'absolute', width: size * 0.19, height: size * 0.19, borderRadius: size * 0.19 / 2, backgroundColor: '#fff200', left: (size - size * 0.19) / 2, top: (size - size * 0.19) / 2 }} />
+          </>
+        ) : (
+          // WA Standard: 10-ring target
+          <>
+            {[
+              { ratio: 1.0, bg: '#f5f5f0' },
+              { ratio: 0.9, bg: '#f5f5f0' },
+              { ratio: 0.8, bg: '#2a2a2a' },
+              { ratio: 0.7, bg: '#2a2a2a' },
+              { ratio: 0.6, bg: '#00a2e8' },
+              { ratio: 0.5, bg: '#00a2e8' },
+              { ratio: 0.4, bg: '#ed1c24' },
+              { ratio: 0.3, bg: '#ed1c24' },
+              { ratio: 0.2, bg: '#fff200' },
+              { ratio: 0.1, bg: '#fff200' },
+            ].map((ring, i) => (
+              <View key={`ring-${i}`} style={{ position: 'absolute', width: size * ring.ratio * 0.95, height: size * ring.ratio * 0.95, borderRadius: size * ring.ratio * 0.95 / 2, backgroundColor: ring.bg, left: (size - size * ring.ratio * 0.95) / 2, top: (size - size * ring.ratio * 0.95) / 2 }} />
+            ))}
+          </>
+        )}
         
         {/* Heat overlay */}
         <View style={{ position: 'absolute', top: 0, left: 0, width: size, height: size }}>
