@@ -562,12 +562,12 @@ export default function ScoringScreen() {
               height: size,
               backgroundColor: '#1a1a1a',
               borderRadius: size / 2,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'crosshair',
+              display: 'flex' as any,
+              alignItems: 'center' as const,
+              justifyContent: 'center' as const,
+              cursor: 'crosshair' as any,
               position: 'relative' as const,
-              userSelect: 'none' as const,
+              userSelect: 'none' as any,
             }}
           >
             {ringElements}
