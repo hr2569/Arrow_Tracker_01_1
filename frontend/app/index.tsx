@@ -265,7 +265,7 @@ export default function HomeScreen() {
       
       {/* Version Number - Fixed at bottom */}
       <View style={styles.versionContainer}>
-        <Text style={styles.versionText}>v2.1.1</Text>
+        <Text style={styles.versionText}>v2.1.2</Text>
       </View>
     </SafeAreaView>
   );
