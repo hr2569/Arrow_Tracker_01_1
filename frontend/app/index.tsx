@@ -142,6 +142,61 @@ export default function HomeScreen() {
           </Text>
         </View>
 
+        {/* Quick Stats Widget */}
+        {stats && (
+          <TouchableOpacity 
+            style={styles.statsWidget}
+            onPress={() => router.push('/history')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.statsHeader}>
+              <View style={styles.statsHeaderLeft}>
+                <Icon name="stats-chart" size={18} color="#8B0000" />
+                <Text style={styles.statsTitle}>{t('home.quickStats')}</Text>
+              </View>
+              {stats.trend !== 'neutral' && (
+                <View style={[
+                  styles.trendBadge,
+                  stats.trend === 'up' ? styles.trendUp : styles.trendDown
+                ]}>
+                  <Icon 
+                    name={stats.trend === 'up' ? 'trending-up' : 'trending-down'} 
+                    size={14} 
+                    color={stats.trend === 'up' ? '#4CAF50' : '#F44336'} 
+                  />
+                  <Text style={[
+                    styles.trendText,
+                    stats.trend === 'up' ? styles.trendTextUp : styles.trendTextDown
+                  ]}>
+                    {stats.trendPercent}%
+                  </Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.statsGrid}>
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>{stats.totalSessions}</Text>
+                <Text style={styles.statLabel}>{t('home.sessions')}</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>{stats.recentAvg}</Text>
+                <Text style={styles.statLabel}>{t('home.avgScore')}</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={[styles.statValue, styles.statValueGold]}>{stats.bestScore}</Text>
+                <Text style={styles.statLabel}>{t('home.bestScore')}</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>{stats.arrowsShot}</Text>
+                <Text style={styles.statLabel}>{t('home.arrows')}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+
         {/* Main Actions */}
         <View style={styles.actionsContainer}>
           {/* Two Primary Buttons Row */}
