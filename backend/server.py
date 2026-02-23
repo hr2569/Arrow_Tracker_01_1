@@ -15,18 +15,29 @@ from firebase_admin import credentials, firestore
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# Firebase initialization
-firebase_creds = os.environ.get('FIREBASE_CREDENTIALS')
-if firebase_creds:
-    cred_dict = json.loads(firebase_creds)
-    cred = credentials.Certificate(cred_dict)
-    firebase_admin.initialize_app(cred)
-else:
-    # For local development with service account file
-    cred = credentials.Certificate(ROOT_DIR / 'firebase-credentials.json')
-    firebase_admin.initialize_app(cred)
+# Firebase initialization (optional)
+firebase_enabled = False
+db = None
 
-db = firestore.client()
+firebase_creds = os.environ.get('FIREBASE_CREDENTIALS')
+firebase_creds_file = ROOT_DIR / 'firebase-credentials.json'
+
+try:
+    if firebase_creds:
+        cred_dict = json.loads(firebase_creds)
+        cred = credentials.Certificate(cred_dict)
+        firebase_admin.initialize_app(cred)
+        db = firestore.client()
+        firebase_enabled = True
+    elif firebase_creds_file.exists():
+        cred = credentials.Certificate(firebase_creds_file)
+        firebase_admin.initialize_app(cred)
+        db = firestore.client()
+        firebase_enabled = True
+    else:
+        logging.warning("Firebase credentials not found. Cloud backup features will be disabled.")
+except Exception as e:
+    logging.warning(f"Firebase initialization failed: {e}. Cloud backup features will be disabled.")
 
 # Create the main app without a prefix
 app = FastAPI()
