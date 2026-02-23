@@ -50,7 +50,6 @@ export default function ScoreKeepingScreen() {
   const [importedScores, setImportedScores] = useState<ImportedScore[]>([]);
   const [competitionSessions, setCompetitionSessions] = useState<Session[]>([]);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-  const [showRankings, setShowRankings] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
