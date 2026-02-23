@@ -43,7 +43,7 @@ export default function CompetitionMenuScreen() {
         {/* New Competition */}
         <TouchableOpacity
           style={styles.menuCard}
-          onPress={() => router.push('/competitionSetup')}
+          onPress={() => router.replace('/competitionSetup')}
           activeOpacity={0.8}
         >
           <View style={styles.menuIconContainer}>
@@ -59,7 +59,7 @@ export default function CompetitionMenuScreen() {
         {/* Score Keeping - Import */}
         <TouchableOpacity
           style={styles.menuCard}
-          onPress={() => router.push('/scoreKeeping')}
+          onPress={() => router.replace('/scoreKeeping')}
           activeOpacity={0.8}
         >
           <View style={styles.menuIconContainer}>
