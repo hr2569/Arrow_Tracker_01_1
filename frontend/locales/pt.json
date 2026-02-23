@@ -60,10 +60,15 @@
     "title": "Gestão de Pontuações",
     "importFiles": "Importar Ficheiros",
     "selectFile": "Selecionar Ficheiro para Importar",
-    "supportedFormats": "CSV, PDF, TXT",
+    "supportedFormats": "CSV, TXT",
     "fileSelected": "Ficheiro Selecionado",
     "parseNotImplemented": "A análise de ficheiros estará disponível numa futura atualização.",
     "importError": "Falha ao importar ficheiro",
+    "importSuccess": "Importação Bem Sucedida",
+    "importSuccessDesc": "Importados {{rounds}} turnos com pontuação total de {{total}} pontos.",
+    "unsupportedFormat": "Formato Não Suportado",
+    "onlyCSVSupported": "Atualmente apenas ficheiros CSV e TXT são suportados.",
+    "invalidFormat": "Não foi possível analisar o ficheiro. Verifique o formato.",
     "competitionSessions": "Sessões de Competição",
     "selected": "selecionadas",
     "noCompetitions": "Sem Sessões de Competição",
@@ -72,7 +77,7 @@
     "selectMore": "Selecionar Mais Sessões",
     "selectMoreDesc": "Por favor selecione pelo menos 2 sessões para gerar um relatório combinado.",
     "generateCombinedReport": "Gerar Relatório Combinado",
-    "infoText": "Selecione múltiplas sessões de competição para gerar um relatório de desempenho combinado. Também pode importar folhas de pontuação de outras fontes."
+    "infoText": "Selecione múltiplas sessões de competição para gerar um relatório de desempenho combinado. Também pode importar folhas de pontuação de ficheiros CSV."
   },
   "settings": {
     "title": "Definições",
