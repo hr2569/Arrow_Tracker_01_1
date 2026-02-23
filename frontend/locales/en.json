@@ -60,10 +60,15 @@
     "title": "Score Keeping",
     "importFiles": "Import Files",
     "selectFile": "Select File to Import",
-    "supportedFormats": "CSV, PDF, TXT",
+    "supportedFormats": "CSV, TXT",
     "fileSelected": "File Selected",
     "parseNotImplemented": "File parsing will be available in a future update.",
     "importError": "Failed to import file",
+    "importSuccess": "Import Successful",
+    "importSuccessDesc": "Imported {{rounds}} rounds with total score of {{total}} points.",
+    "unsupportedFormat": "Unsupported Format",
+    "onlyCSVSupported": "Currently only CSV and TXT files are supported.",
+    "invalidFormat": "Could not parse the file. Please check the format.",
     "competitionSessions": "Competition Sessions",
     "selected": "selected",
     "noCompetitions": "No Competition Sessions",
@@ -72,7 +77,7 @@
     "selectMore": "Select More Sessions",
     "selectMoreDesc": "Please select at least 2 sessions to generate a combined report.",
     "generateCombinedReport": "Generate Combined Report",
-    "infoText": "Select multiple competition sessions to generate a combined performance report. You can also import score sheets from other sources."
+    "infoText": "Select multiple competition sessions to generate a combined performance report. You can also import score sheets from CSV files."
   },
   "settings": {
     "title": "Settings",
