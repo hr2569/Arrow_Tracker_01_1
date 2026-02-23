@@ -38,7 +38,7 @@ export default function CompetitionSetupScreen() {
   
   const [archerName, setArcherName] = useState(competitionData.archerName);
   const [bows, setBows] = useState<Bow[]>([]);
-  const [localSelectedBow, setLocalSelectedBow] = useState<Bow | null>(selectedBow);
+  const [localSelectedBow, setLocalSelectedBow] = useState<Bow | null>(selectedBow as Bow | null);
   const [distance, setDistance] = useState('');
   const [distanceUnit, setDistanceUnit] = useState<'m' | 'yd'>('m');
   const [selectedTargetType, setSelectedTargetType] = useState<TargetType>('wa_standard');
@@ -56,7 +56,7 @@ export default function CompetitionSetupScreen() {
       setBows(bowsData);
       // If there's a previously selected bow, keep it
       if (selectedBow) {
-        setLocalSelectedBow(selectedBow);
+        setLocalSelectedBow(selectedBow as Bow);
       } else if (bowsData.length > 0) {
         setLocalSelectedBow(bowsData[0]);
       }
