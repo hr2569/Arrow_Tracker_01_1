@@ -144,6 +144,44 @@ export default function SettingsScreen() {
             <Text style={styles.aboutValue}>2.1.1</Text>
           </View>
         </View>
+
+        {/* Developer Section */}
+        <View style={styles.aboutSection}>
+          <Text style={styles.sectionTitle}>Developer Tools</Text>
+          
+          {/* Generate Test Data */}
+          <TouchableOpacity
+            style={[styles.settingItem, { marginTop: 12 }]}
+            onPress={handleGenerateTestData}
+            disabled={generatingTestData}
+          >
+            <View style={styles.settingIconContainer}>
+              {generatingTestData ? (
+                <ActivityIndicator size="small" color="#8B0000" />
+              ) : (
+                <Icon name="flask" size={24} color="#8B0000" />
+              )}
+            </View>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingTitle}>Generate Test Data</Text>
+              <Text style={styles.settingDescription}>Create sample sessions for all target types</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Clear All Data */}
+          <TouchableOpacity
+            style={[styles.settingItem, { marginTop: 8 }]}
+            onPress={handleClearAllData}
+          >
+            <View style={styles.settingIconContainer}>
+              <Icon name="trash" size={24} color="#ff4444" />
+            </View>
+            <View style={styles.settingInfo}>
+              <Text style={[styles.settingTitle, { color: '#ff4444' }]}>Clear All Data</Text>
+              <Text style={styles.settingDescription}>Delete all sessions and data</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
       {/* Language Selection Modal */}
