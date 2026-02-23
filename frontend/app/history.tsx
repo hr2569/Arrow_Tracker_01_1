@@ -306,6 +306,38 @@ const HeatMap = ({ session, size = 140, t }: { session: Session, size?: number, 
   
   // Render target rings based on target type
   const renderTargetRings = () => {
+    const isIndoor = targetType === 'vegas_3spot' || targetType === 'nfaa_indoor';
+    
+    if (isIndoor) {
+      // Indoor target: Blue-Red-Gold (5 rings)
+      const indoorRings = [
+        { ratio: 1.0, bg: '#00a2e8' },   // Blue (outer)
+        { ratio: 0.8, bg: '#ed1c24' },   // Red
+        { ratio: 0.6, bg: '#ed1c24' },   // Red
+        { ratio: 0.4, bg: '#fff200' },   // Gold
+        { ratio: 0.2, bg: '#fff200' },   // Gold (center)
+      ];
+      
+      return indoorRings.map((ring, i) => {
+        const ringSize = size * ring.ratio * 0.95;
+        return (
+          <View
+            key={`ring-${i}`}
+            style={{
+              position: 'absolute',
+              width: ringSize,
+              height: ringSize,
+              borderRadius: ringSize / 2,
+              backgroundColor: ring.bg,
+              left: (size - ringSize) / 2,
+              top: (size - ringSize) / 2,
+            }}
+          />
+        );
+      });
+    }
+    
+    // WA Standard: 10-ring target
     const ringColors = [
       { bg: '#f5f5f0', border: '#ddd' }, // 1-2 (white)
       { bg: '#f5f5f0', border: '#ddd' }, // 
