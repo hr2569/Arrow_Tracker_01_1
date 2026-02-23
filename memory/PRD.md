@@ -46,8 +46,9 @@ React Native Expo archery scoring application with target visualization, arrow p
 
 ### Target Visualization
 - [x] Condensed single-target view for multi-spot layouts (Vegas 3-spot, WA Indoor)
-- [x] SessionTargetFace component for summary screen
-- [x] ScatterMap and HeatMap components for history
+- [x] **SessionTargetFace** component with correct indoor target rendering (Blue-Red-Gold 5-ring)
+- [x] Proper shot position mapping from normalized coordinates
+- [x] ScatterMap and HeatMap components for history with indoor target support
 
 ### PDF Reports
 - [x] **Session PDF** (training): Clean export without raw CSV data
