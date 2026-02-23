@@ -615,6 +615,64 @@ export default function ScoreKeepingScreen() {
     }
   };
 
+  // Export rankings as CSV
+  const exportRankingsAsCSV = async () => {
+    if (rankings.length === 0) {
+      Alert.alert(t('scoreKeeping.noData'), t('scoreKeeping.noRankingsToExport'));
+      return;
+    }
+
+    try {
+      // Generate CSV content
+      const lines: string[] = [];
+      
+      // Header row
+      lines.push('Rank,Archer Name,Bow Type,Score,Source,Date');
+      
+      // Group by bow type and add data rows
+      const groupedByBow: { [key: string]: RankingEntry[] } = {};
+      rankings.forEach(entry => {
+        const bowType = entry.bowType || 'Unknown';
+        if (!groupedByBow[bowType]) {
+          groupedByBow[bowType] = [];
+        }
+        groupedByBow[bowType].push(entry);
+      });
+
+      Object.entries(groupedByBow).forEach(([bowType, entries]) => {
+        entries
+          .sort((a, b) => b.totalScore - a.totalScore)
+          .forEach((entry, idx) => {
+            lines.push(`${idx + 1},"${entry.name}","${bowType}",${entry.totalScore},${entry.source},${entry.date}`);
+          });
+      });
+      
+      const csvContent = lines.join('\n');
+      const fileName = `competition_rankings_${new Date().toISOString().split('T')[0]}.csv`;
+      const filePath = (FileSystem.documentDirectory || '') + fileName;
+      
+      // Write CSV file
+      await FileSystem.writeAsStringAsync(filePath, csvContent, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+      
+      // Share the file
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(filePath, {
+          mimeType: 'text/csv',
+          UTI: 'public.comma-separated-values-text',
+          dialogTitle: t('scoreKeeping.exportCSV'),
+        });
+      } else {
+        Alert.alert('Error', 'Sharing not available');
+      }
+    } catch (error) {
+      console.error('CSV export error:', error);
+      Alert.alert(t('common.error'), t('scoreKeeping.csvError'));
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
