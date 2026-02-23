@@ -2190,15 +2190,6 @@ export default function ReportScreen() {
               <Icon name="document-text" size={24} color="#fff" />
               <Text style={styles.generateButtonText}>{t('report.generateReport')}</Text>
             </TouchableOpacity>
-            
-            {/* Export CSV Button */}
-            <TouchableOpacity
-              style={styles.exportCSVButton}
-              onPress={exportSessionsAsCSV}
-            >
-              <Icon name="download" size={24} color="#4CAF50" />
-              <Text style={styles.exportCSVButtonText}>{t('report.exportCSV')}</Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
