@@ -137,51 +137,121 @@ export default function ScoreKeepingScreen() {
     }
   };
 
-  // Parse PDF content - extract text and try to find score data
+  // Parse PDF content - extract import codes from Competition PDFs
   const parsePDFContent = async (content: string): Promise<ImportedScore[]> => {
     try {
-      // PDF files read as binary, so we'll look for patterns in raw content
-      // This is a basic extraction - complex PDFs may need server-side processing
-      
-      // Try to extract text patterns like "Name: John, Score: 285" or tabular data
       const results: ImportedScore[] = [];
       
-      // Common patterns in archery score sheets
-      // Pattern 1: "Name,BowType,Score" or similar CSV-like content embedded in PDF
-      const csvPattern = /([A-Za-z\s]+)[,\t]+(recurve|compound|barebow|longbow|traditional)?[,\t]*(\d{1,3})/gi;
+      // Pattern 1: Look for Arrow Tracker Competition import codes
+      // Import codes are Base64 encoded JSON like: {"v":"1.0","t":"at_comp","n":"John","b":"recurve","s":285,"x":5,"r":[[10,9,10],...]}
+      // They appear in PDFs as a long alphanumeric string
+      
+      // Try to find Base64 encoded import codes (they contain at_comp marker)
+      const base64Pattern = /[A-Za-z0-9+/=]{50,500}/g;
       let match;
-      while ((match = csvPattern.exec(content)) !== null) {
-        const name = match[1].trim();
-        const bowType = match[2] || '';
-        const score = parseInt(match[3]);
-        if (name.length > 1 && name.length < 50 && score > 0 && score <= 360) {
-          results.push({
-            id: `pdf-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
-            archerName: name,
-            bowType: bowType,
-            distance: '',
-            rounds: [{ roundNumber: 1, scores: [score], total: score }],
-            totalScore: score,
-            date: new Date().toISOString(),
-          });
+      while ((match = base64Pattern.exec(content)) !== null) {
+        try {
+          const decoded = atob(match[0]);
+          if (decoded.includes('"t":"at_comp"') || decoded.includes('"t": "at_comp"')) {
+            const data = JSON.parse(decoded);
+            if (data.n && data.s !== undefined) {
+              // Calculate X count and round totals
+              const xCount = data.x || 0;
+              const roundScores = data.r || [];
+              const rounds = roundScores.map((scores: number[], idx: number) => ({
+                roundNumber: idx + 1,
+                scores: scores,
+                total: scores.reduce((a: number, b: number) => a + b, 0)
+              }));
+              
+              results.push({
+                id: `comp-import-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
+                archerName: data.n,
+                bowType: data.b || '',
+                distance: data.d || '',
+                rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
+                totalScore: data.s,
+                date: new Date().toISOString(),
+              });
+            }
+          }
+        } catch (e) {
+          // Not a valid import code, continue
         }
       }
       
-      // Pattern 2: Look for "Archer: X Score: Y" patterns
-      const namedPattern = /(?:archer|name|player)[\s:]+([A-Za-z\s]+?)[\s,]+(?:score|total|points)[\s:]+(\d{1,3})/gi;
-      while ((match = namedPattern.exec(content)) !== null) {
-        const name = match[1].trim();
-        const score = parseInt(match[2]);
-        if (name.length > 1 && !results.some(r => r.archerName === name)) {
-          results.push({
-            id: `pdf-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
-            archerName: name,
-            bowType: '',
-            distance: '',
-            rounds: [{ roundNumber: 1, scores: [score], total: score }],
-            totalScore: score,
-            date: new Date().toISOString(),
-          });
+      // Pattern 2: Look for plain text import code format in PDF
+      // These may appear as: eyJ2IjoiMS4wIiwidCI6ImF0X2NvbXAi...
+      const importCodeMarker = /Import Code[:\s]*([A-Za-z0-9+/=]{20,})/gi;
+      while ((match = importCodeMarker.exec(content)) !== null) {
+        try {
+          const decoded = atob(match[1]);
+          const data = JSON.parse(decoded);
+          if (data.n && data.s !== undefined && !results.some(r => r.archerName === data.n && r.totalScore === data.s)) {
+            const xCount = data.x || 0;
+            const roundScores = data.r || [];
+            const rounds = roundScores.map((scores: number[], idx: number) => ({
+              roundNumber: idx + 1,
+              scores: scores,
+              total: scores.reduce((a: number, b: number) => a + b, 0)
+            }));
+            
+            results.push({
+              id: `comp-import-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
+              archerName: data.n,
+              bowType: data.b || '',
+              distance: data.d || '',
+              rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
+              totalScore: data.s,
+              date: new Date().toISOString(),
+            });
+          }
+        } catch (e) {
+          // Not valid, continue
+        }
+      }
+      
+      // Pattern 3: Fallback - look for CSV-like patterns
+      // "Name,BowType,Score" format
+      if (results.length === 0) {
+        const csvPattern = /([A-Za-z][A-Za-z\s]{1,30})[,\t]+(recurve|compound|barebow|longbow|traditional)?[,\t]*(\d{1,3})/gi;
+        while ((match = csvPattern.exec(content)) !== null) {
+          const name = match[1].trim();
+          const bowType = match[2] || '';
+          const score = parseInt(match[3]);
+          if (name.length > 1 && name.length < 50 && score > 0 && score <= 360) {
+            if (!results.some(r => r.archerName === name)) {
+              results.push({
+                id: `pdf-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
+                archerName: name,
+                bowType: bowType,
+                distance: '',
+                rounds: [{ roundNumber: 1, scores: [score], total: score }],
+                totalScore: score,
+                date: new Date().toISOString(),
+              });
+            }
+          }
+        }
+      }
+      
+      // Pattern 4: Look for "Archer: X Score: Y" patterns
+      if (results.length === 0) {
+        const namedPattern = /(?:archer|name|player)[\s:]+([A-Za-z][A-Za-z\s]{1,30}?)[\s,]+(?:score|total|points)[\s:]+(\d{1,3})/gi;
+        while ((match = namedPattern.exec(content)) !== null) {
+          const name = match[1].trim();
+          const score = parseInt(match[2]);
+          if (name.length > 1 && !results.some(r => r.archerName === name)) {
+            results.push({
+              id: `pdf-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
+              archerName: name,
+              bowType: '',
+              distance: '',
+              rounds: [{ roundNumber: 1, scores: [score], total: score }],
+              totalScore: score,
+              date: new Date().toISOString(),
+            });
+          }
         }
       }
       
