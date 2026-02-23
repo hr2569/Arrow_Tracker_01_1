@@ -56,10 +56,89 @@ export default function ScoreKeepingScreen() {
     }
   };
 
+  // Parse CSV content into competition data
+  const parseCSV = async (content: string): Promise<ImportedScore | null> => {
+    try {
+      const lines = content.trim().split('\n');
+      if (lines.length < 2) {
+        throw new Error('CSV must have at least a header and one data row');
+      }
+
+      // Parse header
+      const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+      
+      // Expected format: archer_name, bow_type, distance, round, arrow1, arrow2, arrow3, total
+      // Or simple format: round, score1, score2, score3
+      
+      const data: ImportedScore = {
+        archerName: '',
+        bowType: '',
+        distance: '',
+        rounds: [],
+        totalScore: 0,
+        date: new Date().toISOString(),
+      };
+
+      // Check if it's a simple format (just scores)
+      const isSimpleFormat = header.includes('round') && !header.includes('archer_name');
+      
+      if (isSimpleFormat) {
+        // Simple format: round, score1, score2, score3, total
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim());
+          const roundNum = parseInt(values[0]) || i;
+          const scores = values.slice(1, -1).map(s => parseInt(s) || 0);
+          const roundTotal = parseInt(values[values.length - 1]) || scores.reduce((a, b) => a + b, 0);
+          
+          data.rounds.push({
+            roundNumber: roundNum,
+            scores: scores,
+            total: roundTotal,
+          });
+          data.totalScore += roundTotal;
+        }
+      } else {
+        // Full format with archer info
+        const archerNameIdx = header.indexOf('archer_name');
+        const bowTypeIdx = header.indexOf('bow_type');
+        const distanceIdx = header.indexOf('distance');
+        const roundIdx = header.indexOf('round');
+        
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim());
+          
+          if (i === 1) {
+            data.archerName = archerNameIdx >= 0 ? values[archerNameIdx] : '';
+            data.bowType = bowTypeIdx >= 0 ? values[bowTypeIdx] : '';
+            data.distance = distanceIdx >= 0 ? values[distanceIdx] : '';
+          }
+          
+          const roundNum = roundIdx >= 0 ? parseInt(values[roundIdx]) : i;
+          // Get score columns (any numeric columns after the metadata)
+          const scoreStartIdx = Math.max(roundIdx + 1, distanceIdx + 1, bowTypeIdx + 1, archerNameIdx + 1);
+          const scores = values.slice(scoreStartIdx).map(s => parseInt(s) || 0).filter(s => !isNaN(s));
+          const roundTotal = scores.reduce((a, b) => a + b, 0);
+          
+          data.rounds.push({
+            roundNumber: roundNum,
+            scores: scores,
+            total: roundTotal,
+          });
+          data.totalScore += roundTotal;
+        }
+      }
+
+      return data;
+    } catch (error) {
+      console.error('CSV parsing error:', error);
+      return null;
+    }
+  };
+
   const handleImportFile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['text/csv', 'application/pdf', 'text/plain'],
+        type: ['text/csv', 'text/plain', 'text/comma-separated-values'],
         copyToCacheDirectory: true,
       });
 
@@ -70,13 +149,44 @@ export default function ScoreKeepingScreen() {
       setIsLoading(true);
       const file = result.assets[0];
       
-      // For now, show a message that file was selected
-      // In a full implementation, you would parse CSV/PDF here
-      Alert.alert(
-        t('scoreKeeping.fileSelected'),
-        `${file.name}\n\n${t('scoreKeeping.parseNotImplemented')}`,
-        [{ text: t('common.ok') }]
-      );
+      // Check file extension
+      const fileName = file.name.toLowerCase();
+      const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt');
+      
+      if (!isCSV) {
+        Alert.alert(
+          t('scoreKeeping.unsupportedFormat'),
+          t('scoreKeeping.onlyCSVSupported'),
+          [{ text: t('common.ok') }]
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      // Read file content
+      const content = await FileSystem.readAsStringAsync(file.uri);
+      
+      // Parse CSV
+      const parsedData = await parseCSV(content);
+      
+      if (parsedData && parsedData.rounds.length > 0) {
+        setImportedFiles(prev => [...prev, parsedData]);
+        
+        Alert.alert(
+          t('scoreKeeping.importSuccess'),
+          t('scoreKeeping.importSuccessDesc', { 
+            rounds: parsedData.rounds.length, 
+            total: parsedData.totalScore 
+          }),
+          [{ text: t('common.ok') }]
+        );
+      } else {
+        Alert.alert(
+          t('scoreKeeping.importError'),
+          t('scoreKeeping.invalidFormat'),
+          [{ text: t('common.ok') }]
+        );
+      }
       
       setIsLoading(false);
     } catch (error) {
