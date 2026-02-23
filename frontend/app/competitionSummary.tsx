@@ -620,6 +620,80 @@ export default function CompetitionSummaryScreen() {
     }
   };
 
+  const [generatingCsv, setGeneratingCsv] = useState(false);
+
+  const generateCsvExport = async () => {
+    if (!competition) return;
+
+    setGeneratingCsv(true);
+    
+    try {
+      const archer = competition.participants[0];
+      const dateStr = new Date().toISOString().split('T')[0];
+      const archerNameClean = archer.name.replace(/[^a-zA-Z0-9]/g, '_');
+      
+      // Generate CSV content
+      const lines: string[] = [];
+      
+      // Header row
+      lines.push('Date,Archer,Bow Type,Distance,Target,Round,Arrow,Score,X,Y');
+      
+      // Data rows
+      const sessionDate = new Date(competition.completedAt || competition.createdAt).toLocaleDateString();
+      const targetConfig = TARGET_CONFIGS[competition.targetType as keyof typeof TARGET_CONFIGS];
+      
+      archer.rounds.forEach((round, roundIdx) => {
+        round.shots.forEach((shot, arrowIdx) => {
+          const score = shot.ring === 11 ? 'X' : (shot.ring === 0 ? 'M' : shot.ring.toString());
+          lines.push(`${sessionDate},"${archer.name}",${archer.bowType || 'recurve'},${competition.distance},"${targetConfig?.name || competition.targetType}",${roundIdx + 1},${arrowIdx + 1},${score},${shot.x.toFixed(3)},${shot.y.toFixed(3)}`);
+        });
+      });
+      
+      // Add summary row
+      lines.push('');
+      lines.push(`Total Score,${archer.totalScore}`);
+      lines.push(`Rounds,${archer.rounds.length}`);
+      lines.push(`X Count,${archer.rounds.reduce((total, r) => total + r.shots.filter(s => s.ring === 11).length, 0)}`);
+      
+      const csvContent = lines.join('\n');
+      const csvFileName = `Competition_${dateStr}_${archerNameClean}.csv`;
+      
+      if (Platform.OS === 'web') {
+        // For web, trigger download
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = csvFileName;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        // For mobile, use sharing
+        const filePath = (FileSystem.documentDirectory || '') + csvFileName;
+        
+        await FileSystem.writeAsStringAsync(filePath, csvContent, {
+          encoding: 'utf8' as any,
+        });
+        
+        const isAvailable = await Sharing.isAvailableAsync();
+        if (isAvailable) {
+          await Sharing.shareAsync(filePath, {
+            mimeType: 'text/csv',
+            UTI: 'public.comma-separated-values-text',
+            dialogTitle: 'Save Competition CSV',
+          });
+        } else {
+          Alert.alert('Error', 'Sharing not available on this device');
+        }
+      }
+    } catch (error) {
+      console.error('CSV export error:', error);
+      Alert.alert('Error', 'Failed to export CSV');
+    } finally {
+      setGeneratingCsv(false);
+    }
+  };
+
   if (loading || !competition) {
     return (
       <SafeAreaView style={styles.container}>
