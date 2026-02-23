@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -16,9 +17,12 @@ import { useTranslation } from 'react-i18next';
 import { loadSavedLanguage } from '../i18n';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as Print from 'expo-print';
 import { getSessions, Session } from '../utils/localStorage';
 
 interface ImportedScore {
+  id: string;
   archerName: string;
   bowType: string;
   distance: string;
@@ -31,13 +35,22 @@ interface ImportedScore {
   date: string;
 }
 
+interface RankingEntry {
+  name: string;
+  bowType: string;
+  totalScore: number;
+  source: 'app' | 'imported';
+  date: string;
+}
+
 export default function ScoreKeepingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
-  const [importedFiles, setImportedFiles] = useState<ImportedScore[]>([]);
+  const [importedScores, setImportedScores] = useState<ImportedScore[]>([]);
   const [competitionSessions, setCompetitionSessions] = useState<Session[]>([]);
-  const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set());
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [showRankings, setShowRankings] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -64,13 +77,10 @@ export default function ScoreKeepingScreen() {
         throw new Error('CSV must have at least a header and one data row');
       }
 
-      // Parse header
       const header = lines[0].split(',').map(h => h.trim().toLowerCase());
       
-      // Expected format: archer_name, bow_type, distance, round, arrow1, arrow2, arrow3, total
-      // Or simple format: round, score1, score2, score3
-      
       const data: ImportedScore = {
+        id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         archerName: '',
         bowType: '',
         distance: '',
@@ -79,112 +89,131 @@ export default function ScoreKeepingScreen() {
         date: new Date().toISOString(),
       };
 
-      // Check if it's a simple format (just scores)
-      const isSimpleFormat = header.includes('round') && !header.includes('archer_name');
-      
-      if (isSimpleFormat) {
-        // Simple format: round, score1, score2, score3, total
+      // Check for archer_name in header
+      const archerNameIdx = header.indexOf('archer_name') !== -1 ? header.indexOf('archer_name') : header.indexOf('name');
+      const bowTypeIdx = header.indexOf('bow_type') !== -1 ? header.indexOf('bow_type') : header.indexOf('bow');
+      const distanceIdx = header.indexOf('distance');
+      const roundIdx = header.indexOf('round');
+      const scoreIdx = header.indexOf('score') !== -1 ? header.indexOf('score') : header.indexOf('total');
+
+      // Simple format: name, bow_type, score
+      if (archerNameIdx !== -1 && (scoreIdx !== -1 || header.length >= 3)) {
         for (let i = 1; i < lines.length; i++) {
           const values = lines[i].split(',').map(v => v.trim());
-          const roundNum = parseInt(values[0]) || i;
-          const scores = values.slice(1, -1).map(s => parseInt(s) || 0);
-          const roundTotal = parseInt(values[values.length - 1]) || scores.reduce((a, b) => a + b, 0);
+          if (values.length < 2) continue;
           
-          data.rounds.push({
-            roundNumber: roundNum,
-            scores: scores,
-            total: roundTotal,
-          });
-          data.totalScore += roundTotal;
-        }
-      } else {
-        // Full format with archer info
-        const archerNameIdx = header.indexOf('archer_name');
-        const bowTypeIdx = header.indexOf('bow_type');
-        const distanceIdx = header.indexOf('distance');
-        const roundIdx = header.indexOf('round');
-        
-        for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',').map(v => v.trim());
+          const name = archerNameIdx !== -1 ? values[archerNameIdx] : values[0];
+          const bowType = bowTypeIdx !== -1 ? values[bowTypeIdx] : (values[1] || '');
+          const score = scoreIdx !== -1 ? parseInt(values[scoreIdx]) : parseInt(values[values.length - 1]) || 0;
           
-          if (i === 1) {
-            data.archerName = archerNameIdx >= 0 ? values[archerNameIdx] : '';
-            data.bowType = bowTypeIdx >= 0 ? values[bowTypeIdx] : '';
-            data.distance = distanceIdx >= 0 ? values[distanceIdx] : '';
+          // Each row is a separate archer
+          if (i === 1 || name !== data.archerName) {
+            if (data.archerName && data.totalScore > 0) {
+              // Save previous archer and start new one
+              const newEntry: ImportedScore = {
+                id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                archerName: name,
+                bowType: bowType,
+                distance: distanceIdx !== -1 ? values[distanceIdx] : '',
+                rounds: [{ roundNumber: 1, scores: [score], total: score }],
+                totalScore: score,
+                date: new Date().toISOString(),
+              };
+              return newEntry;
+            }
+            data.archerName = name;
+            data.bowType = bowType;
+            data.distance = distanceIdx !== -1 ? values[distanceIdx] : '';
           }
           
-          const roundNum = roundIdx >= 0 ? parseInt(values[roundIdx]) : i;
-          // Get score columns (any numeric columns after the metadata)
-          const scoreStartIdx = Math.max(roundIdx + 1, distanceIdx + 1, bowTypeIdx + 1, archerNameIdx + 1);
-          const scores = values.slice(scoreStartIdx).map(s => parseInt(s) || 0).filter(s => !isNaN(s));
-          const roundTotal = scores.reduce((a, b) => a + b, 0);
-          
-          data.rounds.push({
-            roundNumber: roundNum,
-            scores: scores,
-            total: roundTotal,
-          });
-          data.totalScore += roundTotal;
+          data.totalScore = score;
+          data.rounds = [{ roundNumber: 1, scores: [score], total: score }];
         }
       }
 
-      return data;
+      return data.archerName ? data : null;
     } catch (error) {
       console.error('CSV parsing error:', error);
       return null;
     }
   };
 
+  // Parse multi-archer CSV
+  const parseMultiArcherCSV = async (content: string): Promise<ImportedScore[]> => {
+    try {
+      const lines = content.trim().split('\n');
+      if (lines.length < 2) return [];
+
+      const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const results: ImportedScore[] = [];
+
+      const nameIdx = header.findIndex(h => h.includes('name') || h.includes('archer'));
+      const bowIdx = header.findIndex(h => h.includes('bow'));
+      const scoreIdx = header.findIndex(h => h.includes('score') || h.includes('total') || h.includes('points'));
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values.length < 2) continue;
+
+        const name = nameIdx !== -1 ? values[nameIdx] : values[0];
+        const bowType = bowIdx !== -1 ? values[bowIdx] : '';
+        const score = scoreIdx !== -1 ? parseInt(values[scoreIdx]) : parseInt(values[values.length - 1]) || 0;
+
+        if (name && !isNaN(score)) {
+          results.push({
+            id: `imported-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 5)}`,
+            archerName: name,
+            bowType: bowType,
+            distance: '',
+            rounds: [{ roundNumber: 1, scores: [score], total: score }],
+            totalScore: score,
+            date: new Date().toISOString(),
+          });
+        }
+      }
+
+      return results;
+    } catch (error) {
+      console.error('Multi-archer CSV parsing error:', error);
+      return [];
+    }
+  };
+
   const handleImportFile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['text/csv', 'text/plain', 'text/comma-separated-values'],
+        type: ['text/csv', 'text/plain', 'text/comma-separated-values', '*/*'],
         copyToCacheDirectory: true,
       });
 
-      if (result.canceled) {
-        return;
-      }
+      if (result.canceled) return;
 
       setIsLoading(true);
       const file = result.assets[0];
-      
-      // Check file extension
       const fileName = file.name.toLowerCase();
-      const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt');
       
-      if (!isCSV) {
+      if (!fileName.endsWith('.csv') && !fileName.endsWith('.txt')) {
         Alert.alert(
           t('scoreKeeping.unsupportedFormat'),
-          t('scoreKeeping.onlyCSVSupported'),
-          [{ text: t('common.ok') }]
+          t('scoreKeeping.onlyCSVSupported')
         );
         setIsLoading(false);
         return;
       }
 
-      // Read file content
       const content = await FileSystem.readAsStringAsync(file.uri);
+      const importedData = await parseMultiArcherCSV(content);
       
-      // Parse CSV
-      const parsedData = await parseCSV(content);
-      
-      if (parsedData && parsedData.rounds.length > 0) {
-        setImportedFiles(prev => [...prev, parsedData]);
-        
+      if (importedData.length > 0) {
+        setImportedScores(prev => [...prev, ...importedData]);
         Alert.alert(
           t('scoreKeeping.importSuccess'),
-          t('scoreKeeping.importSuccessDesc', { 
-            rounds: parsedData.rounds.length, 
-            total: parsedData.totalScore 
-          }),
-          [{ text: t('common.ok') }]
+          t('scoreKeeping.importedArchers', { count: importedData.length })
         );
       } else {
         Alert.alert(
           t('scoreKeeping.importError'),
-          t('scoreKeeping.invalidFormat'),
-          [{ text: t('common.ok') }]
+          t('scoreKeeping.invalidFormat')
         );
       }
       
@@ -196,44 +225,158 @@ export default function ScoreKeepingScreen() {
     }
   };
 
-  const toggleSessionSelection = (sessionId: string) => {
-    setSelectedSessions(prev => {
+  const toggleSelection = (id: string) => {
+    setSelectedItems(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(sessionId)) {
-        newSet.delete(sessionId);
+      if (newSet.has(id)) {
+        newSet.delete(id);
       } else {
-        newSet.add(sessionId);
+        newSet.add(id);
       }
       return newSet;
     });
   };
 
-  const handleGenerateCombinedReport = () => {
-    if (selectedSessions.size < 2) {
-      Alert.alert(
-        t('scoreKeeping.selectMore'),
-        t('scoreKeeping.selectMoreDesc')
-      );
-      return;
-    }
+  // Build rankings from selected items
+  const rankings = useMemo(() => {
+    const entries: RankingEntry[] = [];
 
-    // Navigate to report with selected sessions
-    const sessionIds = Array.from(selectedSessions).join(',');
-    router.push(`/report?sessions=${sessionIds}&type=competition`);
+    // Add selected competition sessions
+    competitionSessions.forEach(session => {
+      if (selectedItems.has(session.id)) {
+        entries.push({
+          name: session.archer_name || session.name || 'Unknown',
+          bowType: session.competition_bow_type || '',
+          totalScore: session.total_score || 0,
+          source: 'app',
+          date: session.created_at,
+        });
+      }
+    });
+
+    // Add selected imported scores
+    importedScores.forEach(score => {
+      if (selectedItems.has(score.id)) {
+        entries.push({
+          name: score.archerName,
+          bowType: score.bowType,
+          totalScore: score.totalScore,
+          source: 'imported',
+          date: score.date,
+        });
+      }
+    });
+
+    // Group by bow type, then sort by score
+    const grouped: { [key: string]: RankingEntry[] } = {};
+    entries.forEach(entry => {
+      const key = entry.bowType || 'Other';
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(entry);
+    });
+
+    // Sort each group by score (highest first)
+    Object.keys(grouped).forEach(key => {
+      grouped[key].sort((a, b) => b.totalScore - a.totalScore);
+    });
+
+    return grouped;
+  }, [selectedItems, competitionSessions, importedScores]);
+
+  const totalSelected = selectedItems.size;
+
+  const generateRankingsPDF = async () => {
+    const bowTypes = Object.keys(rankings).sort();
+    
+    let rankingsHtml = '';
+    bowTypes.forEach(bowType => {
+      const entries = rankings[bowType];
+      rankingsHtml += `
+        <div class="bow-section">
+          <h2 class="bow-type">${bowType}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>${t('scoreKeeping.rank')}</th>
+                <th>${t('scoreKeeping.archerName')}</th>
+                <th>${t('scoreKeeping.score')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${entries.map((entry, idx) => `
+                <tr class="${idx === 0 ? 'gold' : idx === 1 ? 'silver' : idx === 2 ? 'bronze' : ''}">
+                  <td class="rank">${idx + 1}</td>
+                  <td>${entry.name}</td>
+                  <td class="score">${entry.totalScore}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    });
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h1 { text-align: center; color: #8B0000; margin-bottom: 30px; }
+            .bow-section { margin-bottom: 30px; page-break-inside: avoid; }
+            .bow-type { background: #333; color: #FFD700; padding: 10px 15px; border-radius: 8px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th { background: #f5f5f5; padding: 12px; text-align: left; border-bottom: 2px solid #333; }
+            td { padding: 10px 12px; border-bottom: 1px solid #ddd; }
+            .rank { font-weight: bold; width: 50px; }
+            .score { font-weight: bold; color: #8B0000; }
+            .gold td { background: rgba(255, 215, 0, 0.2); }
+            .silver td { background: rgba(192, 192, 192, 0.2); }
+            .bronze td { background: rgba(205, 127, 50, 0.2); }
+            .footer { text-align: center; margin-top: 40px; color: #888; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <h1>${t('scoreKeeping.competitionRankings')}</h1>
+          ${rankingsHtml}
+          <div class="footer">
+            <p>Generated by Arrow Tracker - ${new Date().toLocaleDateString()}</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    try {
+      const { uri } = await Print.printToFileAsync({ html });
+      await Sharing.shareAsync(uri, {
+        mimeType: 'application/pdf',
+        dialogTitle: t('scoreKeeping.shareRankings'),
+      });
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      Alert.alert(t('common.error'), t('scoreKeeping.pdfError'));
+    }
   };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  const removeImported = (id: string) => {
+    setImportedScores(prev => prev.filter(s => s.id !== id));
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(id);
+      return newSet;
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <View style={styles.headerContent}>
@@ -243,10 +386,7 @@ export default function ScoreKeepingScreen() {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView 
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-      >
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Import Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('scoreKeeping.importFiles')}</Text>
@@ -267,45 +407,75 @@ export default function ScoreKeepingScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Competition Sessions Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{t('scoreKeeping.competitionSessions')}</Text>
-            {selectedSessions.size > 0 && (
-              <Text style={styles.selectedCount}>
-                {selectedSessions.size} {t('scoreKeeping.selected')}
-              </Text>
-            )}
-          </View>
-
-          {competitionSessions.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Icon name="trophy-outline" size={48} color="#444" />
-              <Text style={styles.emptyStateText}>{t('scoreKeeping.noCompetitions')}</Text>
-              <Text style={styles.emptyStateSubtext}>{t('scoreKeeping.noCompetitionsDesc')}</Text>
-            </View>
-          ) : (
-            <View style={styles.sessionsList}>
-              {competitionSessions.map((session) => {
-                const isSelected = selectedSessions.has(session.id);
+        {/* Imported Scores */}
+        {importedScores.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('scoreKeeping.importedScores')} ({importedScores.length})</Text>
+            <View style={styles.list}>
+              {importedScores.map(score => {
+                const isSelected = selectedItems.has(score.id);
                 return (
                   <TouchableOpacity
-                    key={session.id}
-                    style={[styles.sessionCard, isSelected && styles.sessionCardSelected]}
-                    onPress={() => toggleSessionSelection(session.id)}
+                    key={score.id}
+                    style={[styles.card, isSelected && styles.cardSelected]}
+                    onPress={() => toggleSelection(score.id)}
                   >
                     <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
                       {isSelected && <Icon name="checkmark" size={16} color="#fff" />}
                     </View>
-                    <View style={styles.sessionInfo}>
-                      <Text style={styles.sessionName}>{session.archer_name || session.name}</Text>
-                      <Text style={styles.sessionDetails}>
-                        {session.competition_bow_type} • {session.distance} • {formatDate(session.created_at)}
+                    <View style={styles.cardInfo}>
+                      <Text style={styles.cardName}>{score.archerName}</Text>
+                      <Text style={styles.cardDetails}>
+                        {score.bowType || t('scoreKeeping.noBowType')} • {t('scoreKeeping.imported')}
                       </Text>
                     </View>
-                    <View style={styles.sessionScore}>
-                      <Text style={styles.sessionScoreValue}>{session.total_score}</Text>
-                      <Text style={styles.sessionScoreLabel}>{t('scoreKeeping.pts')}</Text>
+                    <View style={styles.cardScore}>
+                      <Text style={styles.cardScoreValue}>{score.totalScore}</Text>
+                      <Text style={styles.cardScoreLabel}>{t('scoreKeeping.pts')}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => removeImported(score.id)}
+                    >
+                      <Icon name="close-circle" size={20} color="#666" />
+                    </TouchableOpacity>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
+        {/* Competition Sessions */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('scoreKeeping.competitionSessions')} ({competitionSessions.length})</Text>
+          {competitionSessions.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Icon name="trophy-outline" size={48} color="#444" />
+              <Text style={styles.emptyStateText}>{t('scoreKeeping.noCompetitions')}</Text>
+            </View>
+          ) : (
+            <View style={styles.list}>
+              {competitionSessions.map(session => {
+                const isSelected = selectedItems.has(session.id);
+                return (
+                  <TouchableOpacity
+                    key={session.id}
+                    style={[styles.card, isSelected && styles.cardSelected]}
+                    onPress={() => toggleSelection(session.id)}
+                  >
+                    <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
+                      {isSelected && <Icon name="checkmark" size={16} color="#fff" />}
+                    </View>
+                    <View style={styles.cardInfo}>
+                      <Text style={styles.cardName}>{session.archer_name || session.name}</Text>
+                      <Text style={styles.cardDetails}>
+                        {session.competition_bow_type || ''} • {session.distance} • {formatDate(session.created_at)}
+                      </Text>
+                    </View>
+                    <View style={styles.cardScore}>
+                      <Text style={styles.cardScoreValue}>{session.total_score}</Text>
+                      <Text style={styles.cardScoreLabel}>{t('scoreKeeping.pts')}</Text>
                     </View>
                   </TouchableOpacity>
                 );
@@ -314,22 +484,16 @@ export default function ScoreKeepingScreen() {
           )}
         </View>
 
-        {/* Generate Combined Report Button */}
-        {competitionSessions.length > 0 && (
+        {/* Generate Rankings Button */}
+        {(competitionSessions.length > 0 || importedScores.length > 0) && (
           <TouchableOpacity
-            style={[
-              styles.generateButton,
-              selectedSessions.size < 2 && styles.generateButtonDisabled
-            ]}
-            onPress={handleGenerateCombinedReport}
-            disabled={selectedSessions.size < 2}
+            style={[styles.generateButton, totalSelected < 1 && styles.generateButtonDisabled]}
+            onPress={() => setShowRankings(true)}
+            disabled={totalSelected < 1}
           >
-            <Icon name="document-attach" size={24} color={selectedSessions.size < 2 ? '#666' : '#000'} />
-            <Text style={[
-              styles.generateButtonText,
-              selectedSessions.size < 2 && styles.generateButtonTextDisabled
-            ]}>
-              {t('scoreKeeping.generateCombinedReport')}
+            <Icon name="podium" size={24} color={totalSelected < 1 ? '#666' : '#000'} />
+            <Text style={[styles.generateButtonText, totalSelected < 1 && styles.generateButtonTextDisabled]}>
+              {t('scoreKeeping.viewRankings')} ({totalSelected})
             </Text>
           </TouchableOpacity>
         )}
@@ -337,20 +501,53 @@ export default function ScoreKeepingScreen() {
         {/* Info Card */}
         <View style={styles.infoCard}>
           <Icon name="information-circle" size={20} color="#4CAF50" />
-          <Text style={styles.infoText}>
-            {t('scoreKeeping.infoText')}
-          </Text>
+          <Text style={styles.infoText}>{t('scoreKeeping.infoText')}</Text>
         </View>
       </ScrollView>
+
+      {/* Rankings Modal */}
+      <Modal visible={showRankings} animationType="slide" presentationStyle="pageSheet">
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowRankings(false)}>
+              <Icon name="close" size={28} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>{t('scoreKeeping.rankings')}</Text>
+            <TouchableOpacity onPress={generateRankingsPDF}>
+              <Icon name="share-outline" size={28} color="#4CAF50" />
+            </TouchableOpacity>
+          </View>
+          
+          <ScrollView style={styles.modalContent}>
+            {Object.keys(rankings).sort().map(bowType => (
+              <View key={bowType} style={styles.rankingSection}>
+                <View style={styles.bowTypeHeader}>
+                  <Icon name="trophy" size={20} color="#FFD700" />
+                  <Text style={styles.bowTypeTitle}>{bowType || t('scoreKeeping.noBowType')}</Text>
+                </View>
+                {rankings[bowType].map((entry, idx) => (
+                  <View key={`${entry.name}-${idx}`} style={[
+                    styles.rankingRow,
+                    idx === 0 && styles.rankingGold,
+                    idx === 1 && styles.rankingSilver,
+                    idx === 2 && styles.rankingBronze,
+                  ]}>
+                    <Text style={styles.rankNumber}>{idx + 1}</Text>
+                    <Text style={styles.rankName}>{entry.name}</Text>
+                    <Text style={styles.rankScore}>{entry.totalScore}</Text>
+                  </View>
+                ))}
+              </View>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
+  container: { flex: 1, backgroundColor: '#000' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -360,49 +557,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#222',
   },
-  backButton: {
-    padding: 8,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  placeholder: {
-    width: 40,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 12,
-  },
-  selectedCount: {
-    fontSize: 14,
-    color: '#4CAF50',
-    fontWeight: '600',
-  },
+  backButton: { padding: 8 },
+  headerContent: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
+  placeholder: { width: 40 },
+  scrollView: { flex: 1 },
+  scrollContent: { padding: 16, paddingBottom: 40 },
+  section: { marginBottom: 24 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 12 },
   importButton: {
     backgroundColor: '#111',
     borderRadius: 16,
@@ -412,39 +574,10 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     borderStyle: 'dashed',
   },
-  importButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-    marginTop: 12,
-  },
-  importButtonSubtext: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 4,
-  },
-  emptyState: {
-    backgroundColor: '#111',
-    borderRadius: 16,
-    padding: 40,
-    alignItems: 'center',
-  },
-  emptyStateText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 16,
-  },
-  emptyStateSubtext: {
-    fontSize: 14,
-    color: '#444',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  sessionsList: {
-    gap: 10,
-  },
-  sessionCard: {
+  importButtonText: { fontSize: 16, fontWeight: '600', color: '#fff', marginTop: 12 },
+  importButtonSubtext: { fontSize: 13, color: '#666', marginTop: 4 },
+  list: { gap: 10 },
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#111',
@@ -453,10 +586,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#222',
   },
-  sessionCardSelected: {
-    backgroundColor: 'rgba(76, 175, 80, 0.15)',
-    borderColor: '#4CAF50',
-  },
+  cardSelected: { backgroundColor: 'rgba(76, 175, 80, 0.15)', borderColor: '#4CAF50' },
   checkbox: {
     width: 24,
     height: 24,
@@ -467,35 +597,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 12,
   },
-  checkboxSelected: {
-    backgroundColor: '#4CAF50',
-    borderColor: '#4CAF50',
+  checkboxSelected: { backgroundColor: '#4CAF50', borderColor: '#4CAF50' },
+  cardInfo: { flex: 1 },
+  cardName: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  cardDetails: { fontSize: 13, color: '#888', marginTop: 2 },
+  cardScore: { alignItems: 'flex-end', marginRight: 8 },
+  cardScoreValue: { fontSize: 20, fontWeight: 'bold', color: '#FFD700' },
+  cardScoreLabel: { fontSize: 12, color: '#888' },
+  deleteButton: { padding: 4 },
+  emptyState: {
+    backgroundColor: '#111',
+    borderRadius: 16,
+    padding: 40,
+    alignItems: 'center',
   },
-  sessionInfo: {
-    flex: 1,
-  },
-  sessionName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  sessionDetails: {
-    fontSize: 13,
-    color: '#888',
-    marginTop: 2,
-  },
-  sessionScore: {
-    alignItems: 'flex-end',
-  },
-  sessionScoreValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFD700',
-  },
-  sessionScoreLabel: {
-    fontSize: 12,
-    color: '#888',
-  },
+  emptyStateText: { fontSize: 16, fontWeight: '600', color: '#666', marginTop: 16 },
   generateButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -506,17 +622,9 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 24,
   },
-  generateButtonDisabled: {
-    backgroundColor: '#222',
-  },
-  generateButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  generateButtonTextDisabled: {
-    color: '#666',
-  },
+  generateButtonDisabled: { backgroundColor: '#222' },
+  generateButtonText: { fontSize: 16, fontWeight: 'bold', color: '#000' },
+  generateButtonTextDisabled: { color: '#666' },
   infoCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -527,10 +635,44 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(76, 175, 80, 0.3)',
   },
-  infoText: {
-    flex: 1,
-    color: '#ccc',
-    fontSize: 14,
-    lineHeight: 20,
+  infoText: { flex: 1, color: '#ccc', fontSize: 14, lineHeight: 20 },
+  modalContainer: { flex: 1, backgroundColor: '#000' },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#222',
   },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
+  modalContent: { flex: 1, padding: 16 },
+  rankingSection: { marginBottom: 24 },
+  bowTypeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#222',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 8,
+    gap: 10,
+  },
+  bowTypeTitle: { fontSize: 18, fontWeight: 'bold', color: '#FFD700' },
+  rankingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#111',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  rankingGold: { backgroundColor: 'rgba(255, 215, 0, 0.15)' },
+  rankingSilver: { backgroundColor: 'rgba(192, 192, 192, 0.1)' },
+  rankingBronze: { backgroundColor: 'rgba(205, 127, 50, 0.1)' },
+  rankNumber: { fontSize: 18, fontWeight: 'bold', color: '#888', width: 40 },
+  rankName: { flex: 1, fontSize: 16, color: '#fff' },
+  rankScore: { fontSize: 18, fontWeight: 'bold', color: '#4CAF50' },
 });
