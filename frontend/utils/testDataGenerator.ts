@@ -72,16 +72,18 @@ const generateRound = (
       x,
       y,
       ring,
-      timestamp: Date.now(),
+      confirmed: true,
     });
   }
   
+  const totalScore = shots.reduce((sum, s) => sum + (s.ring > 10 ? 10 : s.ring), 0);
+  
   return {
     id: `round-${roundNumber}`,
-    number: roundNumber,
+    round_number: roundNumber,
     shots,
-    total: shots.reduce((sum, s) => sum + (s.ring > 10 ? 10 : s.ring), 0),
-    completed: true,
+    total_score: totalScore,
+    created_at: new Date().toISOString(),
   };
 };
 
@@ -114,7 +116,7 @@ export const generateTestSession = (options: {
     rounds.push(generateRound(i + 1, arrowsPerRound, targetType, skillLevel));
   }
   
-  const totalScore = rounds.reduce((sum, r) => sum + r.total, 0);
+  const totalScore = rounds.reduce((sum, r) => sum + r.total_score, 0);
   const createdAt = new Date();
   createdAt.setDate(createdAt.getDate() - daysAgo);
   
@@ -130,7 +132,6 @@ export const generateTestSession = (options: {
     distance,
     target_type: targetType,
     session_type: sessionType,
-    completed: true,
   };
 };
 
