@@ -787,16 +787,30 @@ export default function CompetitionSummaryScreen() {
       {/* Footer Actions */}
       <View style={styles.footer}>
         <TouchableOpacity
-          style={styles.reportButton}
+          style={styles.exportPdfButton}
           onPress={generateCompetitionReport}
           disabled={generating}
         >
           {generating ? (
-            <Text style={styles.reportButtonText}>Saving...</Text>
+            <Text style={styles.exportPdfButtonText}>Saving...</Text>
           ) : (
             <>
-              <Icon name="download-outline" size={20} color="#000" />
-              <Text style={styles.reportButtonText}>Save PDF</Text>
+              <Icon name="document-text" size={20} color="#fff" />
+              <Text style={styles.exportPdfButtonText}>Export PDF</Text>
+            </>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.exportCsvButton}
+          onPress={generateCsvExport}
+          disabled={generatingCsv}
+        >
+          {generatingCsv ? (
+            <Text style={styles.exportCsvButtonText}>Saving...</Text>
+          ) : (
+            <>
+              <Icon name="grid-outline" size={20} color="#4CAF50" />
+              <Text style={styles.exportCsvButtonText}>Export CSV</Text>
             </>
           )}
         </TouchableOpacity>
