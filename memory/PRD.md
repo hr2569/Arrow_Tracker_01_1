@@ -52,6 +52,7 @@ React Native Expo archery scoring application with target visualization, arrow p
 - [x] Embedded raw CSV data in generated PDFs
 - [x] Session sorting by date (newest first)
 - [x] Individual session reports from history
+- [x] Combined PDF report for multiple sessions
 
 ### Navigation
 - [x] router.replace() used in key navigation paths to prevent back-button issues
@@ -61,17 +62,25 @@ React Native Expo archery scoring application with target visualization, arrow p
 - [x] 9 languages: English, Spanish, Finnish, French, Italian, Portuguese, Russian, Swedish, Ukrainian
 - [x] Full translation coverage for Competition and Score Keeping features
 
+### Developer Tools (v2.1.1)
+- [x] Test data generator for all target types (WA Standard, Vegas 3-spot, WA Indoor)
+- [x] Clear all data option
+- [x] Settings screen with developer section
+
 ---
 
-## Known Issues
+## Bug Fixes (v2.1.1)
 
-### P1 - Testing Required
-- [ ] Back navigation flow needs comprehensive testing on physical devices
-- [ ] Multi-spot target visualization needs verification with actual session data
+### TypeScript Fixes
+- [x] Fixed `normalizedDensity` undefined variable in report.tsx
+- [x] Fixed BowData interface compatibility with Bow type
+- [x] Fixed cursor style typing issues in competitionScoring.tsx and scoring.tsx
+- [x] Added `bowType` field to Participant interface
+- [x] Added `saveSession` function for test data generation
+- [x] Added `clearAllSessions` function for data reset
 
-### P2 - Minor
-- [ ] TypeScript type compatibility warnings (cursor styles, Bow interface)
-- [ ] Some linting warnings in competitionScoring.tsx and competitionSetup.tsx
+### Backend Fixes
+- [x] Made Firebase initialization optional (prevents crash when credentials missing)
 
 ---
 
@@ -91,6 +100,7 @@ React Native Expo archery scoring application with target visualization, arrow p
     │   ├── report.tsx             # PDF report generation
     │   ├── scoring.tsx            # Main scoring screen
     │   ├── scoreKeeping.tsx       # CSV import and rankings
+    │   ├── settings.tsx           # Settings with Developer Tools
     │   └── summary.tsx            # Session summary with target face
     ├── components/
     │   └── Icon.tsx               # SVG icon system
@@ -100,7 +110,8 @@ React Native Expo archery scoring application with target visualization, arrow p
     ├── store/
     │   └── appStore.ts            # Zustand state (TARGET_CONFIGS)
     ├── utils/
-    │   └── localStorage.ts        # Session, Bow, Round, Shot interfaces
+    │   ├── localStorage.ts        # Session, Bow, Round, Shot interfaces
+    │   └── testDataGenerator.ts   # Test data generation utility
     └── app.json                   # App configuration
 ```
 
@@ -115,8 +126,11 @@ React Native Expo archery scoring application with target visualization, arrow p
 
 ## Future Roadmap
 
+### P1 (Testing Required)
+- [ ] Comprehensive back navigation testing on physical devices
+- [ ] Multi-spot target heatmap verification with real session data
+
 ### P2 (Backlog)
-- [ ] Merge multiple competition sessions into single PDF report
 - [ ] Final icon consistency review across app
 - [ ] EAS Build automation
 
