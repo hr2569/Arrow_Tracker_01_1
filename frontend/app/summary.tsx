@@ -63,20 +63,81 @@ interface SessionTargetFaceProps {
 // For multi-target layouts (Vegas 3-spot, WA Indoor), all shots are shown on one target
 const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType, size = 200 }) => {
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
-  const rings = targetConfig.rings;
-  const colors = targetConfig.colors;
+  const isIndoor = targetType === 'vegas_3spot' || targetType === 'nfaa_indoor';
   
   // Marker sizes
   const markerSize = 16;
   const markerFontSize = 8;
+  const maxRadius = size * 0.48;
+  const center = size / 2;
   
-  // Render target rings (always single target view)
-  const renderRings = () => {
+  // Render indoor target (Vegas 3-spot, WA Indoor) - 5 ring: Blue-Red-Red-Gold-Gold
+  const renderIndoorTarget = () => {
+    return (
+      <>
+        {/* Blue outer ring */}
+        <View style={{
+          position: 'absolute',
+          width: maxRadius * 2,
+          height: maxRadius * 2,
+          borderRadius: maxRadius,
+          backgroundColor: '#00a2e8',
+        }} />
+        {/* Red ring 1 */}
+        <View style={{
+          position: 'absolute',
+          width: maxRadius * 2 * 0.8,
+          height: maxRadius * 2 * 0.8,
+          borderRadius: maxRadius * 0.8,
+          backgroundColor: '#ed1c24',
+        }} />
+        {/* Red ring 2 */}
+        <View style={{
+          position: 'absolute',
+          width: maxRadius * 2 * 0.6,
+          height: maxRadius * 2 * 0.6,
+          borderRadius: maxRadius * 0.6,
+          backgroundColor: '#ed1c24',
+        }} />
+        {/* Gold ring 1 */}
+        <View style={{
+          position: 'absolute',
+          width: maxRadius * 2 * 0.4,
+          height: maxRadius * 2 * 0.4,
+          borderRadius: maxRadius * 0.4,
+          backgroundColor: '#fff200',
+        }} />
+        {/* Gold ring 2 (center) */}
+        <View style={{
+          position: 'absolute',
+          width: maxRadius * 2 * 0.2,
+          height: maxRadius * 2 * 0.2,
+          borderRadius: maxRadius * 0.2,
+          backgroundColor: '#fff200',
+        }} />
+        {/* X ring (innermost) */}
+        <View style={{
+          position: 'absolute',
+          width: maxRadius * 2 * 0.08,
+          height: maxRadius * 2 * 0.08,
+          borderRadius: maxRadius * 0.08,
+          backgroundColor: '#fff200',
+          borderWidth: 1,
+          borderColor: '#b8860b',
+        }} />
+      </>
+    );
+  };
+  
+  // Render WA Standard target (10 rings)
+  const renderWAStandardTarget = () => {
+    const rings = targetConfig.rings;
+    const colors = targetConfig.colors;
     const ringElements = [];
     
     for (let i = 0; i < rings; i++) {
       const ringRatio = (rings - i) / rings;
-      const ringSize = size * ringRatio * 0.95;
+      const ringSize = maxRadius * 2 * ringRatio;
       const color = colors[i];
       
       ringElements.push(
@@ -96,7 +157,7 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
     }
     
     // X ring (innermost)
-    const xRingSize = size * 0.08 * 0.95;
+    const xRingSize = maxRadius * 2 * 0.05;
     const xRingColor = (targetConfig as any).xRingColor || { bg: '#fff200', border: '#b8860b' };
     ringElements.push(
       <View
@@ -116,9 +177,16 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
     return ringElements;
   };
   
-  // Render shot markers
+  // Render shot markers - position based on 0-1 coordinates
   const renderShots = () => {
     return shots.map((shot, index) => {
+      // Convert from 0-1 range to actual position
+      // Shots are centered at 0.5, 0.5 with radius extending to edges
+      const normalizedX = (shot.x - 0.5) * 2; // -1 to 1
+      const normalizedY = (shot.y - 0.5) * 2; // -1 to 1
+      const x = center + (normalizedX * maxRadius) - markerSize / 2;
+      const y = center + (normalizedY * maxRadius) - markerSize / 2;
+      
       return (
         <View
           key={`shot-${index}`}
@@ -130,8 +198,8 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
             backgroundColor: '#8B0000',
             borderWidth: 2,
             borderColor: '#fff',
-            left: shot.x * size - markerSize / 2,
-            top: shot.y * size - markerSize / 2,
+            left: x,
+            top: y,
             alignItems: 'center',
             justifyContent: 'center',
           }}
@@ -157,7 +225,7 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
       alignItems: 'center',
       justifyContent: 'center',
     }}>
-      {renderRings()}
+      {isIndoor ? renderIndoorTarget() : renderWAStandardTarget()}
       
       {/* Center crosshair */}
       <View style={{ position: 'absolute', width: 12, height: 2, backgroundColor: '#000' }} />
