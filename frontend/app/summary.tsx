@@ -168,56 +168,8 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
     </View>
   );
 };
-    }
-    
-    // X ring (innermost)
-    const xRingSize = targetSize * 0.08 * 0.95;
-    const xRingColor = (targetConfig as any).xRingColor || { bg: '#fff200', border: '#b8860b' };
-    ringElements.push(
-      <View
-        key={`xring-${targetIdx}`}
-        style={{
-          position: 'absolute',
-          width: xRingSize,
-          height: xRingSize,
-          borderRadius: xRingSize / 2,
-          backgroundColor: xRingColor.bg,
-          borderWidth: 1,
-          borderColor: xRingColor.border,
-          left: offsetX + (targetSize - xRingSize) / 2,
-          top: offsetY + (targetSize - xRingSize) / 2,
-        }}
-      />
-    );
-    
-    return ringElements;
-  };
-  
-  // Render shot markers
-  const renderShots = () => {
-    return shots.map((shot, index) => {
-      let shotX = shot.x * size;
-      let shotY = shot.y * size;
-      
-      // For multi-target layouts, shots need to be positioned relative to their target
-      if (isMultiTarget && shot.targetIndex !== undefined) {
-        // Get target position based on index (0=top, 1=middle, 2=bottom for vertical)
-        const targetOffsetY = shot.targetIndex * spotSpacing + (size - spotSpacing * 2 - targetSpotSize) / 2;
-        const targetOffsetX = (size - targetSpotSize) / 2;
-        
-        // Shot position is relative to its target
-        shotX = targetOffsetX + shot.x * targetSpotSize;
-        shotY = targetOffsetY + shot.y * targetSpotSize;
-      }
-      
-      return (
-        <View
-          key={`shot-${index}`}
-          style={{
-            position: 'absolute',
-            width: markerSize,
-            height: markerSize,
-            borderRadius: markerSize / 2,
+
+export default function SummaryScreen() {
             backgroundColor: '#8B0000',
             borderWidth: 2,
             borderColor: '#fff',
