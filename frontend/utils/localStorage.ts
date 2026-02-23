@@ -374,3 +374,13 @@ export const setLastBackupDate = async () => {
 export const getLastBackupDate = async (): Promise<string | null> => {
   return await AsyncStorage.getItem(LAST_BACKUP_KEY);
 };
+
+export const clearAllSessions = async (): Promise<boolean> => {
+  try {
+    await AsyncStorage.setItem(SESSIONS_KEY, JSON.stringify([]));
+    return true;
+  } catch (error) {
+    console.error('Error clearing sessions:', error);
+    return false;
+  }
+};
