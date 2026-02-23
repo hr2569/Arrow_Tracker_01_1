@@ -345,7 +345,9 @@
     "verticalAxis": "Vertical (Cima/Baixo)",
     "legend": "Legenda",
     "meanPointOfImpact": "Ponto Médio de Impacto",
-    "cartesianDistribution": "Distribuição Cartesiana"
+    "cartesianDistribution": "Distribuição Cartesiana",
+    "rawData": "Dados Brutos de Pontuação (Formato CSV)",
+    "csvDescription": "Copie estes dados para importar em aplicações de folha de cálculo"
   },
   "summary": {
     "title": "Resumo do Turno",
