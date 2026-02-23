@@ -91,6 +91,11 @@ React Native Expo archery scoring application with target visualization, arrow p
 - [x] Added Export PDF and Export CSV buttons to Competition Summary screen
 - [x] Added Quick Stats widget to home screen showing: Sessions, Avg Score, Best Score, Arrows Shot, and week-over-week trend indicator
 - [x] Quick Stats widget translations added to all 9 locale files
+- [x] **P0 PDF Import Fix**: Improved PDF parsing logic with base64 extraction to find embedded import codes
+- [x] **P1 Back Navigation Fix**: Changed router.push to router.replace in key navigation flows:
+  - competitionHistory.tsx (viewing competition results)
+  - importPdf.tsx (after importing PDF)
+  - Verified existing fixes in summary.tsx, competitionSummary.tsx
 
 ### v2.1.1
 - [x] Fixed heatmap showing wrong target face for multi-spot indoor sessions
