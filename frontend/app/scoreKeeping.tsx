@@ -598,44 +598,6 @@ export default function ScoreKeepingScreen() {
           <Text style={styles.infoText}>{t('scoreKeeping.infoText')}</Text>
         </View>
       </ScrollView>
-
-      {/* Rankings Modal */}
-      <Modal visible={showRankings} animationType="slide" presentationStyle="pageSheet">
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setShowRankings(false)}>
-              <Icon name="close" size={28} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>{t('scoreKeeping.rankings')}</Text>
-            <TouchableOpacity onPress={generateRankingsPDF}>
-              <Icon name="share-outline" size={28} color="#4CAF50" />
-            </TouchableOpacity>
-          </View>
-          
-          <ScrollView style={styles.modalContent}>
-            {Object.keys(rankings).sort().map(bowType => (
-              <View key={bowType} style={styles.rankingSection}>
-                <View style={styles.bowTypeHeader}>
-                  <Icon name="trophy" size={20} color="#FFD700" />
-                  <Text style={styles.bowTypeTitle}>{bowType || t('scoreKeeping.noBowType')}</Text>
-                </View>
-                {rankings[bowType].map((entry, idx) => (
-                  <View key={`${entry.name}-${idx}`} style={[
-                    styles.rankingRow,
-                    idx === 0 && styles.rankingGold,
-                    idx === 1 && styles.rankingSilver,
-                    idx === 2 && styles.rankingBronze,
-                  ]}>
-                    <Text style={styles.rankNumber}>{idx + 1}</Text>
-                    <Text style={styles.rankName}>{entry.name}</Text>
-                    <Text style={styles.rankScore}>{entry.totalScore}</Text>
-                  </View>
-                ))}
-              </View>
-            ))}
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
     </SafeAreaView>
   );
 }
