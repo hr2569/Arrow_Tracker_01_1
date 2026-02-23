@@ -31,6 +31,7 @@ export interface Participant {
   name: string;
   bowId?: string;
   bowName?: string;
+  bowType?: string; // Bow type (recurve, compound, etc.)
   deviceId?: string; // For multi-device mode
   rounds: CompetitionRound[];
   totalScore: number;
