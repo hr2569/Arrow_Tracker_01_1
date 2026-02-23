@@ -13,7 +13,12 @@
     "sessionsStats": "Sessioner och Statistik",
     "bows": "Bågar",
     "equipment": "Utrustning",
-    "settings": "Inställningar"
+    "settings": "Inställningar",
+    "quickStats": "Snabbstatistik",
+    "sessions": "Sessioner",
+    "avgScore": "Medel",
+    "bestScore": "Bäst",
+    "arrows": "Pilar"
   },
   "competitionSetup": {
     "title": "Tävling",

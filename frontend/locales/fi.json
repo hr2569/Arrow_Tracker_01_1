@@ -13,7 +13,12 @@
     "sessionsStats": "Sessiot ja Tilastot",
     "bows": "Jouset",
     "equipment": "Varusteet",
-    "settings": "Asetukset"
+    "settings": "Asetukset",
+    "quickStats": "Pikatilastot",
+    "sessions": "Sessiot",
+    "avgScore": "Keskiarvo",
+    "bestScore": "Paras",
+    "arrows": "Nuolet"
   },
   "competitionSetup": {
     "title": "Kilpailu",

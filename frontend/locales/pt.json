@@ -13,7 +13,12 @@
     "sessionsStats": "Sessões e Estatísticas",
     "bows": "Arcos",
     "equipment": "Equipamento",
-    "settings": "Definições"
+    "settings": "Definições",
+    "quickStats": "Estatísticas Rápidas",
+    "sessions": "Sessões",
+    "avgScore": "Média",
+    "bestScore": "Melhor",
+    "arrows": "Flechas"
   },
   "competitionSetup": {
     "title": "Competição",

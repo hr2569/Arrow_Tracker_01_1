@@ -13,7 +13,12 @@
     "sessionsStats": "Сесії та Статистика",
     "bows": "Луки",
     "equipment": "Спорядження",
-    "settings": "Налаштування"
+    "settings": "Налаштування",
+    "quickStats": "Швидка Статистика",
+    "sessions": "Сесії",
+    "avgScore": "Середнє",
+    "bestScore": "Найкраще",
+    "arrows": "Стріли"
   },
   "competitionSetup": {
     "title": "Змагання",

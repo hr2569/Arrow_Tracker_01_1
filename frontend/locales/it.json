@@ -13,7 +13,12 @@
     "sessionsStats": "Sessioni e Statistiche",
     "bows": "Archi",
     "equipment": "Attrezzatura",
-    "settings": "Impostazioni"
+    "settings": "Impostazioni",
+    "quickStats": "Statistiche Veloci",
+    "sessions": "Sessioni",
+    "avgScore": "Media",
+    "bestScore": "Migliore",
+    "arrows": "Frecce"
   },
   "competitionSetup": {
     "title": "Competizione",
