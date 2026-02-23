@@ -369,10 +369,72 @@ export default function ScoreKeepingScreen() {
       let importedData: ImportedScore[] = [];
       
       if (isPDF) {
-        // Read PDF and attempt to extract text patterns
+        // Read PDF content - try multiple methods to extract text
         try {
-          const content = await FileSystem.readAsStringAsync(file.uri);
-          importedData = await parsePDFContent(content);
+          // Method 1: Read as base64 and decode to look for text patterns
+          const base64Content = await FileSystem.readAsStringAsync(file.uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          
+          // Decode base64 to binary string to search for text patterns
+          let textContent = '';
+          try {
+            // Attempt to extract readable text from the PDF binary
+            const binaryStr = atob(base64Content);
+            
+            // Look for text streams in PDF (between BT and ET markers, or in /Text objects)
+            // Also look for plain text strings that might be our import codes
+            
+            // Extract any ASCII text from the binary (filters non-printable chars)
+            const asciiText = binaryStr.split('').filter(char => {
+              const code = char.charCodeAt(0);
+              return (code >= 32 && code <= 126) || code === 10 || code === 13;
+            }).join('');
+            
+            textContent = asciiText;
+          } catch (decodeErr) {
+            console.log('Base64 decode failed, trying raw read');
+            // Fallback to raw string read
+            textContent = await FileSystem.readAsStringAsync(file.uri);
+          }
+          
+          // Parse the extracted text for import codes
+          importedData = await parsePDFContent(textContent);
+          
+          // If no import codes found, try to find the raw base64 import code in the PDF
+          if (importedData.length === 0) {
+            // Competition PDFs contain a base64-encoded import code
+            // Look for patterns like eyJ2 (base64 for {"v) which starts our import codes
+            const importCodePattern = /eyJ[A-Za-z0-9+/=]{40,400}/g;
+            let match;
+            while ((match = importCodePattern.exec(textContent)) !== null) {
+              try {
+                const decoded = atob(match[0]);
+                if (decoded.includes('at_comp') || decoded.includes('"n"') && decoded.includes('"s"')) {
+                  const data = JSON.parse(decoded);
+                  if (data.n && data.s !== undefined) {
+                    const rounds = (data.r || []).map((scores: number[], idx: number) => ({
+                      roundNumber: idx + 1,
+                      scores: scores,
+                      total: scores.reduce((a: number, b: number) => a + b, 0)
+                    }));
+                    
+                    importedData.push({
+                      id: `pdf-import-${Date.now()}-${importedData.length}`,
+                      archerName: data.n,
+                      bowType: data.b || '',
+                      distance: data.d || '',
+                      rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
+                      totalScore: data.s,
+                      date: new Date().toISOString(),
+                    });
+                  }
+                }
+              } catch (e) {
+                // Not a valid import code
+              }
+            }
+          }
           
           if (importedData.length === 0) {
             // PDF couldn't be parsed automatically
