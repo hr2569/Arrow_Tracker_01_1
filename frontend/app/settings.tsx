@@ -141,7 +141,7 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{t('settings.about')}</Text>
           <View style={styles.aboutItem}>
             <Text style={styles.aboutLabel}>{t('settings.version')}</Text>
-            <Text style={styles.aboutValue}>2.1.1</Text>
+            <Text style={styles.aboutValue}>2.1.2</Text>
           </View>
         </View>
 
