@@ -248,7 +248,10 @@
     "roundDetails": "Detalles de la Ronda",
     "selectSession": "Seleccionar Sesión",
     "noSessions": "No hay sesiones disponibles",
-    "arrows": "flechas"
+    "arrows": "flechas",
+    "exportCSV": "Exportar CSV",
+    "noSessions": "No hay sesiones seleccionadas",
+    "selectSessionsFirst": "Por favor, seleccione al menos una sesión para exportar."
   },
   "summary": {
     "title": "Resumen de la Ronda",
