@@ -59,32 +59,29 @@ interface SessionTargetFaceProps {
   size?: number;
 }
 
+// SessionTargetFace - Always renders a SINGLE condensed target view
+// For multi-target layouts (Vegas 3-spot, WA Indoor), all shots are shown on one target
 const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType, size = 200 }) => {
   const targetConfig = TARGET_CONFIGS[targetType as keyof typeof TARGET_CONFIGS] || TARGET_CONFIGS.wa_standard;
   const rings = targetConfig.rings;
   const colors = targetConfig.colors;
-  const isMultiTarget = targetConfig.layout === 'triple_vertical';
   
   // Marker sizes
-  const markerSize = isMultiTarget ? 12 : 16;
-  const markerFontSize = isMultiTarget ? 6 : 8;
+  const markerSize = 16;
+  const markerFontSize = 8;
   
-  // For multi-target layouts (Vegas 3-spot, WA Indoor)
-  const targetSpotSize = isMultiTarget ? size * 0.28 : size;
-  const spotSpacing = isMultiTarget ? size * 0.32 : 0;
-  
-  // Render a single target face
-  const renderSingleTarget = (targetSize: number, offsetX: number = 0, offsetY: number = 0, targetIdx?: number) => {
+  // Render target rings (always single target view)
+  const renderRings = () => {
     const ringElements = [];
     
     for (let i = 0; i < rings; i++) {
       const ringRatio = (rings - i) / rings;
-      const ringSize = targetSize * ringRatio * 0.95;
+      const ringSize = size * ringRatio * 0.95;
       const color = colors[i];
       
       ringElements.push(
         <View
-          key={`ring-${targetIdx}-${i}`}
+          key={`ring-${i}`}
           style={{
             position: 'absolute',
             width: ringSize,
@@ -93,11 +90,84 @@ const SessionTargetFace: React.FC<SessionTargetFaceProps> = ({ shots, targetType
             backgroundColor: color?.bg || '#f5f5f0',
             borderWidth: 1,
             borderColor: color?.border || '#333',
-            left: offsetX + (targetSize - ringSize) / 2,
-            top: offsetY + (targetSize - ringSize) / 2,
           }}
         />
       );
+    }
+    
+    // X ring (innermost)
+    const xRingSize = size * 0.08 * 0.95;
+    const xRingColor = (targetConfig as any).xRingColor || { bg: '#fff200', border: '#b8860b' };
+    ringElements.push(
+      <View
+        key="xring"
+        style={{
+          position: 'absolute',
+          width: xRingSize,
+          height: xRingSize,
+          borderRadius: xRingSize / 2,
+          backgroundColor: xRingColor.bg,
+          borderWidth: 1,
+          borderColor: xRingColor.border,
+        }}
+      />
+    );
+    
+    return ringElements;
+  };
+  
+  // Render shot markers
+  const renderShots = () => {
+    return shots.map((shot, index) => {
+      return (
+        <View
+          key={`shot-${index}`}
+          style={{
+            position: 'absolute',
+            width: markerSize,
+            height: markerSize,
+            borderRadius: markerSize / 2,
+            backgroundColor: '#8B0000',
+            borderWidth: 2,
+            borderColor: '#fff',
+            left: shot.x * size - markerSize / 2,
+            top: shot.y * size - markerSize / 2,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontSize: markerFontSize, fontWeight: 'bold', color: '#fff' }}>
+            {getDisplayScore(shot.ring)}
+          </Text>
+        </View>
+      );
+    });
+  };
+  
+  if (shots.length === 0) {
+    return null;
+  }
+  
+  return (
+    <View style={{
+      width: size,
+      height: size,
+      backgroundColor: '#1a1a1a',
+      borderRadius: size / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      {renderRings()}
+      
+      {/* Center crosshair */}
+      <View style={{ position: 'absolute', width: 12, height: 2, backgroundColor: '#000' }} />
+      <View style={{ position: 'absolute', width: 2, height: 12, backgroundColor: '#000' }} />
+      
+      {/* Shot markers */}
+      {renderShots()}
+    </View>
+  );
+};
     }
     
     // X ring (innermost)
