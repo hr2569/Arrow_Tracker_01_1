@@ -352,7 +352,7 @@ export default function SummaryScreen() {
     }
     clearCurrentRound();
     incrementRoundNumber();
-    router.push('/scoring');
+    router.replace('/scoring');
   };
 
   const handleFinishSession = () => {
