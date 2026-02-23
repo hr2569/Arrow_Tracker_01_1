@@ -627,51 +627,7 @@ export default function ScoreKeepingScreen() {
               </>
             )}
           </TouchableOpacity>
-          
-          {/* Enter Import Code Button */}
-          <TouchableOpacity
-            style={styles.codeImportButton}
-            onPress={() => setShowCodeInput(true)}
-          >
-            <Icon name="key" size={24} color="#FFD700" />
-            <Text style={styles.codeImportButtonText}>{t('scoreKeeping.enterCode')}</Text>
-          </TouchableOpacity>
         </View>
-
-        {/* Import Code Modal */}
-        <Modal visible={showCodeInput} transparent animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View style={styles.codeModal}>
-              <View style={styles.codeModalHeader}>
-                <Text style={styles.codeModalTitle}>{t('scoreKeeping.enterImportCode')}</Text>
-                <TouchableOpacity onPress={() => { setShowCodeInput(false); setImportCode(''); }}>
-                  <Icon name="close" size={24} color="#888" />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.codeModalDescription}>{t('scoreKeeping.codeDescription')}</Text>
-              <TextInput
-                style={styles.codeInput}
-                placeholder={t('scoreKeeping.codePlaceholder')}
-                placeholderTextColor="#666"
-                value={importCode}
-                onChangeText={setImportCode}
-                multiline
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <TouchableOpacity
-                style={[styles.codeImportSubmit, !importCode.trim() && styles.codeImportSubmitDisabled]}
-                onPress={handleCodeImport}
-                disabled={!importCode.trim()}
-              >
-                <Icon name="checkmark-circle" size={24} color={importCode.trim() ? '#000' : '#666'} />
-                <Text style={[styles.codeImportSubmitText, !importCode.trim() && styles.codeImportSubmitTextDisabled]}>
-                  {t('scoreKeeping.importCode')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
 
         {/* Imported Scores */}
         {importedScores.length > 0 && (
