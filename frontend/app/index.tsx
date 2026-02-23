@@ -519,4 +519,81 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
   },
+  // Quick Stats Widget Styles
+  statsWidget: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+  },
+  statsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  statsHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  statsTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8B0000',
+  },
+  trendBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  trendUp: {
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+  },
+  trendDown: {
+    backgroundColor: 'rgba(244, 67, 54, 0.15)',
+  },
+  trendText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  trendTextUp: {
+    color: '#4CAF50',
+  },
+  trendTextDown: {
+    color: '#F44336',
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: '#333',
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  statValueGold: {
+    color: '#FFD700',
+  },
+  statLabel: {
+    fontSize: 10,
+    color: '#888',
+    marginTop: 2,
+    textTransform: 'uppercase',
+  },
 });
