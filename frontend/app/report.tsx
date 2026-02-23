@@ -396,6 +396,34 @@ export default function ReportScreen() {
     const usedDistances = [...new Set(filteredSessions.filter(s => s.distance).map(s => s.distance))];
     const usedTargetTypes = [...new Set(filteredSessions.map(s => getTargetTypeName(s.target_type)))];
 
+    // Generate CSV content for embedding in PDF
+    const generateCsvContent = () => {
+      const lines: string[] = [];
+      
+      // Header
+      lines.push('Date,Session,Type,Bow,Distance,Target,Round,Arrow,Score,X,Y');
+      
+      // Data rows
+      filteredSessions.forEach(session => {
+        const sessionDate = new Date(session.created_at).toLocaleDateString();
+        const sessionType = session.session_type || 'training';
+        const bowName = session.bow_name || '';
+        const distance = session.distance || '';
+        const targetType = getTargetTypeName(session.target_type);
+        
+        session.rounds.forEach((round, roundIdx) => {
+          if (round.shots) {
+            round.shots.forEach((shot, arrowIdx) => {
+              const score = shot.ring >= 11 ? 'X' : (shot.ring === 0 ? 'M' : shot.ring.toString());
+              lines.push(`${sessionDate},${session.name || session.id},${sessionType},${bowName},${distance},${targetType},${roundIdx + 1},${arrowIdx + 1},${score},${shot.x.toFixed(3)},${shot.y.toFixed(3)}`);
+            });
+          }
+        });
+      });
+      
+      return lines.join('\n');
+    };
+
     // Generate heatmap SVG for PDF - full page with target type support
     const generateHeatmapSvg = (targetType: string, shots: { x: number; y: number; ring: number }[]) => {
       if (shots.length === 0) {
