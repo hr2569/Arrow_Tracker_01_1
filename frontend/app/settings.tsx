@@ -7,18 +7,23 @@ import {
   ScrollView,
   Modal,
   Pressable,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { languages, saveLanguage } from '../i18n';
+import { generateTestDataSet } from '../utils/testDataGenerator';
+import { saveSession, getSessions, clearAllSessions } from '../utils/localStorage';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
+  const [generatingTestData, setGeneratingTestData] = useState(false);
 
   useEffect(() => {
     setCurrentLanguage(i18n.language);
