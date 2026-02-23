@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,25 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useNavigation } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
+import { getSessions, Session } from '../utils/localStorage';
+
+interface QuickStats {
+  totalSessions: number;
+  recentAvg: number;
+  bestScore: number;
+  trend: 'up' | 'down' | 'neutral';
+  trendPercent: number;
+  arrowsShot: number;
+}
 
 export default function HomeScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const [stats, setStats] = useState<QuickStats | null>(null);
 
   // Set dynamic title for the navigation header
   useEffect(() => {
