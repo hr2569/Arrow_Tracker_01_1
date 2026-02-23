@@ -28,11 +28,12 @@ React Native Expo archery scoring application with target visualization, arrow p
 - [x] Session type badge (Competition vs Training)
 
 ### Score Keeping
-- [x] CSV/TXT file import for external competition scores
-- [x] Parse multiple archers from a single CSV
+- [x] CSV/TXT/PDF file import for external competition scores
+- [x] PDF text extraction with pattern matching for score data
+- [x] Parse multiple archers from a single file
 - [x] Display imported scores and competition sessions
-- [x] Rankings modal grouped by bow type, sorted by score
-- [x] PDF export of rankings with medal highlighting (Gold/Silver/Bronze)
+- [x] Rankings grouped by bow type, sorted by score
+- [x] **Generate Rankings PDF** - Direct PDF generation with medal highlighting (Gold/Silver/Bronze)
 - [x] Remove imported scores functionality
 
 ### History & Filtering
