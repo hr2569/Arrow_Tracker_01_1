@@ -395,9 +395,26 @@ export default function ScoringScreen() {
       Alert.alert(t('scoring.noArrows'), t('scoring.noArrowsMessage'));
       return;
     }
+    
+    // In competition mode, auto-fill missing arrows as misses (M = 0)
+    let finalArrows = arrows.map(a => ({ x: a.x, y: a.y, ring: a.score, targetIndex: a.targetIndex }));
+    
+    if (isCompetition && finalArrows.length < maxArrowsPerRound) {
+      const missingCount = maxArrowsPerRound - finalArrows.length;
+      // Add miss arrows at center of target (they'll show as M)
+      for (let i = 0; i < missingCount; i++) {
+        finalArrows.push({
+          x: 0.5,
+          y: 0.5,
+          ring: 0, // 0 = Miss
+          targetIndex: isMultiTarget ? 0 : undefined,
+        });
+      }
+    }
+    
     setCurrentRound({
-      shots: arrows.map(a => ({ x: a.x, y: a.y, ring: a.score })),
-      total: getTotalScore(),
+      shots: finalArrows.map(a => ({ x: a.x, y: a.y, ring: a.ring, targetIndex: a.targetIndex })),
+      total: finalArrows.reduce((sum, a) => sum + (a.ring >= 11 ? 10 : a.ring), 0),
     });
     router.replace('/summary');
   };
