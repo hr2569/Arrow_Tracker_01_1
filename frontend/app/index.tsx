@@ -29,6 +29,83 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const [stats, setStats] = useState<QuickStats | null>(null);
 
+  // Calculate quick stats from sessions
+  const calculateStats = useCallback(async () => {
+    try {
+      const sessions = await getSessions();
+      if (sessions.length === 0) {
+        setStats(null);
+        return;
+      }
+
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+      // Filter sessions by time periods
+      const recentSessions = sessions.filter(s => new Date(s.created_at) >= oneWeekAgo);
+      const previousSessions = sessions.filter(s => {
+        const date = new Date(s.created_at);
+        return date >= twoWeeksAgo && date < oneWeekAgo;
+      });
+
+      // Calculate stats
+      const totalSessions = sessions.length;
+      const bestScore = Math.max(...sessions.map(s => s.total_score || 0));
+      
+      // Count total arrows
+      let arrowsShot = 0;
+      sessions.forEach(s => {
+        s.rounds?.forEach(r => {
+          arrowsShot += r.shots?.length || 0;
+        });
+      });
+
+      // Calculate recent average (last 7 days)
+      let recentAvg = 0;
+      if (recentSessions.length > 0) {
+        const recentTotal = recentSessions.reduce((sum, s) => sum + (s.total_score || 0), 0);
+        recentAvg = Math.round(recentTotal / recentSessions.length);
+      } else if (sessions.length > 0) {
+        // Fall back to overall average if no recent sessions
+        const total = sessions.reduce((sum, s) => sum + (s.total_score || 0), 0);
+        recentAvg = Math.round(total / sessions.length);
+      }
+
+      // Calculate trend (comparing recent week to previous week)
+      let trend: 'up' | 'down' | 'neutral' = 'neutral';
+      let trendPercent = 0;
+      
+      if (recentSessions.length > 0 && previousSessions.length > 0) {
+        const recentAvgScore = recentSessions.reduce((sum, s) => sum + (s.total_score || 0), 0) / recentSessions.length;
+        const previousAvgScore = previousSessions.reduce((sum, s) => sum + (s.total_score || 0), 0) / previousSessions.length;
+        
+        if (previousAvgScore > 0) {
+          trendPercent = Math.round(((recentAvgScore - previousAvgScore) / previousAvgScore) * 100);
+          trend = trendPercent > 0 ? 'up' : trendPercent < 0 ? 'down' : 'neutral';
+        }
+      }
+
+      setStats({
+        totalSessions,
+        recentAvg,
+        bestScore,
+        trend,
+        trendPercent: Math.abs(trendPercent),
+        arrowsShot,
+      });
+    } catch (error) {
+      console.error('Failed to calculate stats:', error);
+    }
+  }, []);
+
+  // Refresh stats when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      calculateStats();
+    }, [calculateStats])
+  );
+
   // Set dynamic title for the navigation header
   useEffect(() => {
     navigation.setOptions({
