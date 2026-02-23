@@ -800,20 +800,32 @@ export default function ScoreKeepingScreen() {
 
         {/* Generate Rankings Button */}
         {(competitionSessions.length > 0 || importedScores.length > 0) && (
-          <TouchableOpacity
-            style={[styles.generateButton, totalSelected < 1 && styles.generateButtonDisabled]}
-            onPress={generateRankingsPDF}
-            disabled={totalSelected < 1 || isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#000" size="small" />
-            ) : (
-              <Icon name="document-text" size={24} color={totalSelected < 1 ? '#666' : '#000'} />
-            )}
-            <Text style={[styles.generateButtonText, totalSelected < 1 && styles.generateButtonTextDisabled]}>
-              {t('scoreKeeping.generateRankingsPDF')} ({totalSelected})
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.exportButtonsRow}>
+            <TouchableOpacity
+              style={[styles.generateButton, totalSelected < 1 && styles.generateButtonDisabled]}
+              onPress={generateRankingsPDF}
+              disabled={totalSelected < 1 || isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#000" size="small" />
+              ) : (
+                <Icon name="document-text" size={24} color={totalSelected < 1 ? '#666' : '#000'} />
+              )}
+              <Text style={[styles.generateButtonText, totalSelected < 1 && styles.generateButtonTextDisabled]}>
+                {t('scoreKeeping.exportPDF')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.exportCsvButton, rankings.length < 1 && styles.exportCsvButtonDisabled]}
+              onPress={exportRankingsAsCSV}
+              disabled={rankings.length < 1 || isLoading}
+            >
+              <Icon name="grid-outline" size={24} color={rankings.length < 1 ? '#666' : '#4CAF50'} />
+              <Text style={[styles.exportCsvButtonText, rankings.length < 1 && styles.exportCsvButtonTextDisabled]}>
+                {t('scoreKeeping.exportCSV')}
+              </Text>
+            </TouchableOpacity>
+          </View>
         )}
 
         {/* Info Card */}
