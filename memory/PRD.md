@@ -50,7 +50,8 @@ React Native Expo archery scoring application with target visualization, arrow p
 - [x] ScatterMap and HeatMap components for history
 
 ### PDF Reports
-- [x] Embedded raw CSV data in generated PDFs
+- [x] **Session PDF** (training): Clean export without raw CSV data
+- [x] **Competition PDF**: Embedded import code for Score Keeping batch import
 - [x] Session sorting by date (newest first)
 - [x] Individual session reports from history
 - [x] Combined PDF report for multiple sessions
