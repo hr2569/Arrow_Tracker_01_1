@@ -188,69 +188,6 @@ export default function ReportScreen() {
     }
   };
 
-  // Export selected sessions as CSV
-  const exportSessionsAsCSV = async () => {
-    const sessionsToExport = selectionMode === 'sessions' && selectedSessionIds.size > 0
-      ? sessions.filter(s => selectedSessionIds.has(s.id))
-      : filteredSessions;
-    
-    if (sessionsToExport.length === 0) {
-      Alert.alert(t('report.noSessions'), t('report.selectSessionsFirst'));
-      return;
-    }
-    
-    try {
-      // Generate CSV content
-      const lines: string[] = [];
-      
-      // Header row
-      lines.push('Date,Session Name,Type,Bow,Distance,Target,Round,Arrow,Score,X,Y');
-      
-      // Data rows
-      sessionsToExport.forEach(session => {
-        const sessionDate = new Date(session.created_at).toLocaleDateString();
-        const sessionType = session.session_type || 'training';
-        const bowName = session.bow_name || '';
-        const distance = session.distance || '';
-        const targetType = getTargetTypeName(session.target_type);
-        const sessionName = session.name || session.id;
-        
-        session.rounds.forEach((round, roundIdx) => {
-          if (round.shots) {
-            round.shots.forEach((shot, arrowIdx) => {
-              const score = shot.ring >= 11 ? 'X' : (shot.ring === 0 ? 'M' : shot.ring.toString());
-              lines.push(`${sessionDate},"${sessionName}",${sessionType},"${bowName}",${distance},"${targetType}",${roundIdx + 1},${arrowIdx + 1},${score},${shot.x.toFixed(3)},${shot.y.toFixed(3)}`);
-            });
-          }
-        });
-      });
-      
-      const csvContent = lines.join('\n');
-      const fileName = `arrow_tracker_export_${new Date().toISOString().split('T')[0]}.csv`;
-      const filePath = (FileSystem.documentDirectory || '') + fileName;
-      
-      // Write CSV file
-      await FileSystem.writeAsStringAsync(filePath, csvContent, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
-      
-      // Share the file
-      const isAvailable = await Sharing.isAvailableAsync();
-      if (isAvailable) {
-        await Sharing.shareAsync(filePath, {
-          mimeType: 'text/csv',
-          UTI: 'public.comma-separated-values-text',
-          dialogTitle: t('report.exportCSV'),
-        });
-      } else {
-        Alert.alert('Error', 'Sharing not available');
-      }
-    } catch (error) {
-      console.error('CSV export error:', error);
-      Alert.alert('Error', 'Failed to export CSV');
-    }
-  };
-
   // Get all shots for heatmap, grouped by target type
   const shotsByTargetType = useMemo(() => {
     const grouped: { [key: string]: { x: number; y: number; ring: number }[] } = {
