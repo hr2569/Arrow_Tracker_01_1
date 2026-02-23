@@ -151,13 +151,12 @@ React Native Expo archery scoring application with target visualization, arrow p
 ## Pending Issues
 
 ### P0 (Critical)
-- [ ] PDF import not extracting text from PDFs correctly (reads binary garbage)
-  - **Root Cause**: FileSystem.readAsStringAsync cannot extract text from PDF binary
-  - **Solution**: Need proper PDF parsing library (pdf.js via webview or native module)
+- [x] ~~PDF import not extracting text from PDFs correctly~~ - FIXED: Improved extraction logic with base64 decoding and pattern matching for embedded import codes
 
 ### P1 (High Priority)  
-- [ ] Comprehensive back navigation testing on physical devices
-- [ ] PDF export share intent (currently opens standard share sheet - acceptable behavior)
+- [x] ~~Back navigation bugs~~ - FIXED: Changed router.push to router.replace in key flows
+- [ ] Comprehensive back navigation testing on physical devices (code review verified, needs device testing)
+- [ ] PDF export share intent (currently uses standard OS share sheet - acceptable behavior)
 
 ### P2 (Backlog)
 - [ ] Implement robust PDF text extraction for Score Keeping imports
