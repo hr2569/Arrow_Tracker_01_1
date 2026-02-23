@@ -87,7 +87,8 @@ React Native Expo archery scoring application with target visualization, arrow p
 
 ### v2.1.2 (Dec 2025)
 - [x] Removed orphan "Import Code" button and related state/styles from scoreKeeping.tsx
-- [x] Added Export CSV button to Report screen with full i18n support
+- [x] Removed Export CSV button from Report screen (user requested removal)
+- [x] Added Export PDF and Export CSV buttons to Competition Summary screen
 - [x] Added Quick Stats widget to home screen showing: Sessions, Avg Score, Best Score, Arrows Shot, and week-over-week trend indicator
 - [x] Quick Stats widget translations added to all 9 locale files
 
