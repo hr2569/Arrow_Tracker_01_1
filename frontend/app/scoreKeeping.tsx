@@ -262,11 +262,9 @@ export default function ScoreKeepingScreen() {
       let importedData: ImportedScore[] = [];
       
       if (isPDF) {
-        // Read PDF as base64 and attempt to extract text patterns
+        // Read PDF and attempt to extract text patterns
         try {
-          const content = await FileSystem.readAsStringAsync(file.uri, {
-            encoding: FileSystem.EncodingType.UTF8,
-          });
+          const content = await FileSystem.readAsStringAsync(file.uri);
           importedData = await parsePDFContent(content);
           
           if (importedData.length === 0) {
