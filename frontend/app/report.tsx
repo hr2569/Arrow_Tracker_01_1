@@ -2586,22 +2586,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  exportCSVButton: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(76, 175, 80, 0.15)',
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(76, 175, 80, 0.3)',
-  },
-  exportCSVButtonText: {
-    color: '#4CAF50',
-    fontSize: 16,
-    fontWeight: '600',
-  },
   reportHeader: {
     alignItems: 'center',
     marginBottom: 24,
