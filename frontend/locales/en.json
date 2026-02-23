@@ -64,10 +64,11 @@
     "supportedFormatsDetail": "Supported formats: CSV, TXT, or PDF files with score data.",
     "fileSelected": "File Selected",
     "parseNotImplemented": "File parsing will be available in a future update.",
-    "importError": "Failed to import file",
+    "importError": "Import Error",
     "importSuccess": "Import Successful",
     "importSuccessDesc": "Imported {{rounds}} rounds with total score of {{total}} points.",
     "importedArchers": "Imported {{count}} archer(s)",
+    "importedArcher": "Imported {{name}} with score {{score}}",
     "unsupportedFormat": "Unsupported Format",
     "onlyCSVSupported": "Currently only CSV and TXT files are supported.",
     "invalidFormat": "Could not parse the file. Please check the format.",
@@ -93,7 +94,14 @@
     "score": "Score",
     "noBowType": "Unspecified",
     "imported": "Imported",
-    "infoText": "Import CSV files with archer scores or select competition sessions to generate rankings by bow type."
+    "infoText": "Import CSV files with archer scores or select competition sessions to generate rankings by bow type.",
+    "enterCode": "Enter Import Code",
+    "enterImportCode": "Enter Import Code",
+    "codeDescription": "Paste the import code from a Competition PDF to import the archer's score data.",
+    "codePlaceholder": "Paste import code here...",
+    "importCode": "Import",
+    "invalidCode": "Invalid import code. Please check and try again.",
+    "duplicateEntry": "This archer has already been imported."
   },
   "settings": {
     "title": "Settings",
