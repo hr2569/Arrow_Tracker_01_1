@@ -395,8 +395,8 @@ export default function ScoreKeepingScreen() {
           }
           
           // First, try to find our custom marker that's embedded in Arrow Tracker PDFs
-          // Format: ARROW_TRACKER_IMPORT_START:base64code:ARROW_TRACKER_IMPORT_END
-          const markerPattern = /ARROW_TRACKER_IMPORT_START[:\s]*([A-Za-z0-9+/=]+)[:\s]*ARROW_TRACKER_IMPORT_END/g;
+          // Format: ATIMPORT:base64code:ENDATIMPORT (visible text in PDF)
+          const markerPattern = /ATIMPORT[:\s]*([A-Za-z0-9+/=]+)[:\s]*ENDATIMPORT/g;
           let markerMatch;
           while ((markerMatch = markerPattern.exec(textContent)) !== null) {
             try {
