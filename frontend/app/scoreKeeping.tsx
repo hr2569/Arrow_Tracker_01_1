@@ -308,28 +308,101 @@ export default function ScoreKeepingScreen() {
       const header = lines[0].split(',').map(h => h.trim().toLowerCase());
       const results: ImportedScore[] = [];
 
-      const nameIdx = header.findIndex(h => h.includes('name') || h.includes('archer'));
-      const bowIdx = header.findIndex(h => h.includes('bow'));
-      const scoreIdx = header.findIndex(h => h.includes('score') || h.includes('total') || h.includes('points'));
+      // Check if this is the detailed format with Round,Arrow columns
+      const hasRoundArrow = header.some(h => h === 'round') && header.some(h => h === 'arrow');
+      
+      if (hasRoundArrow) {
+        // Detailed format: Date,Session,Bow,Distance,Target,Round,Arrow,Score,X,Y
+        const sessionIdx = header.findIndex(h => h === 'session' || h.includes('name'));
+        const bowIdx = header.findIndex(h => h === 'bow');
+        const roundIdx = header.findIndex(h => h === 'round');
+        const arrowIdx = header.findIndex(h => h === 'arrow');
+        const scoreIdx = header.findIndex(h => h === 'score');
+        const dateIdx = header.findIndex(h => h === 'date');
+        
+        // Group by session/archer
+        const sessionData: { [key: string]: { name: string; bowType: string; scores: { round: number; arrow: number; score: number }[]; date: string } } = {};
+        
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+          if (values.length < 3) continue;
+          
+          const sessionName = sessionIdx !== -1 ? values[sessionIdx] : values[1] || `Archer${i}`;
+          const bowType = bowIdx !== -1 ? values[bowIdx] : '';
+          const round = roundIdx !== -1 ? parseInt(values[roundIdx]) || 1 : 1;
+          const arrow = arrowIdx !== -1 ? parseInt(values[arrowIdx]) || 1 : 1;
+          let scoreVal = scoreIdx !== -1 ? values[scoreIdx] : values[7] || '0';
+          const date = dateIdx !== -1 ? values[dateIdx] : new Date().toLocaleDateString();
+          
+          // Parse score (X=10, M=0)
+          let score = 0;
+          if (scoreVal.toUpperCase() === 'X') score = 10;
+          else if (scoreVal.toUpperCase() === 'M') score = 0;
+          else score = parseInt(scoreVal) || 0;
+          
+          const key = `${sessionName}-${bowType}`;
+          if (!sessionData[key]) {
+            sessionData[key] = { name: sessionName, bowType, scores: [], date };
+          }
+          sessionData[key].scores.push({ round, arrow, score });
+        }
+        
+        // Convert to ImportedScore format
+        Object.values(sessionData).forEach(session => {
+          if (session.scores.length > 0) {
+            // Group scores by round
+            const roundsMap: { [key: number]: number[] } = {};
+            session.scores.forEach(s => {
+              if (!roundsMap[s.round]) roundsMap[s.round] = [];
+              roundsMap[s.round].push(s.score);
+            });
+            
+            const rounds = Object.entries(roundsMap)
+              .sort(([a], [b]) => parseInt(a) - parseInt(b))
+              .map(([roundNum, scores]) => ({
+                roundNumber: parseInt(roundNum),
+                scores: scores,
+                total: scores.reduce((a, b) => a + b, 0)
+              }));
+            
+            const totalScore = session.scores.reduce((sum, s) => sum + s.score, 0);
+            
+            results.push({
+              id: `imported-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
+              archerName: session.name,
+              bowType: session.bowType,
+              distance: '',
+              rounds: rounds,
+              totalScore: totalScore,
+              date: session.date,
+            });
+          }
+        });
+      } else {
+        // Simple format: Name,Bow,Score (one row per archer)
+        const nameIdx = header.findIndex(h => h.includes('name') || h.includes('archer'));
+        const bowIdx = header.findIndex(h => h.includes('bow'));
+        const scoreIdx = header.findIndex(h => h.includes('score') || h.includes('total') || h.includes('points'));
 
-      for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(v => v.trim());
-        if (values.length < 2) continue;
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+          if (values.length < 2) continue;
 
-        const name = nameIdx !== -1 ? values[nameIdx] : values[0];
-        const bowType = bowIdx !== -1 ? values[bowIdx] : '';
-        const score = scoreIdx !== -1 ? parseInt(values[scoreIdx]) : parseInt(values[values.length - 1]) || 0;
+          const name = nameIdx !== -1 ? values[nameIdx] : values[0];
+          const bowType = bowIdx !== -1 ? values[bowIdx] : '';
+          const score = scoreIdx !== -1 ? parseInt(values[scoreIdx]) : parseInt(values[values.length - 1]) || 0;
 
-        if (name && !isNaN(score)) {
-          results.push({
-            id: `imported-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 5)}`,
-            archerName: name,
-            bowType: bowType,
-            distance: '',
-            rounds: [{ roundNumber: 1, scores: [score], total: score }],
-            totalScore: score,
-            date: new Date().toISOString(),
-          });
+          if (name && !isNaN(score) && score > 0) {
+            results.push({
+              id: `imported-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 5)}`,
+              archerName: name,
+              bowType: bowType,
+              distance: '',
+              rounds: [{ roundNumber: 1, scores: [score], total: score }],
+              totalScore: score,
+              date: new Date().toISOString(),
+            });
+          }
         }
       }
 
