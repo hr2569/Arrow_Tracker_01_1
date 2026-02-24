@@ -1225,30 +1225,52 @@ export default function ReportScreen() {
           </div>
           ` : ''}
           
-          <!-- Raw Data Page -->
+          <!-- Session Summary Data Page (for Score Keeping import) -->
           <div class="page">
             <div class="page-header">
-              <h2>${t('report.rawData', { defaultValue: 'Raw Data' })}</h2>
-              <p>${t('report.sessionDetails', { defaultValue: 'Session Details' })}</p>
+              <h2>${t('report.sessionSummary', { defaultValue: 'Session Summary' })}</h2>
+              <p>${t('report.forScoreKeeping', { defaultValue: 'Import data for Score Keeping' })}</p>
             </div>
-            <div style="font-family: monospace; font-size: 10px; white-space: pre-wrap; background: #f5f5f5; padding: 15px; border-radius: 8px; overflow-x: auto;">
-<span style="font-weight: bold;">Date,Session,Bow,Distance,Target,Round,Arrow,Score,X,Y</span>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px;">
+              <thead>
+                <tr style="background: #8B0000; color: white;">
+                  <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Date</th>
+                  <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Name</th>
+                  <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Bow Type</th>
+                  <th style="padding: 10px; text-align: right; border: 1px solid #ddd;">Total Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filteredSessions.map((session, idx) => {
+                  const sessionDate = new Date(session.created_at).toLocaleDateString();
+                  const sessionName = session.name || session.id.slice(0, 8);
+                  const bowType = session.bow_name || 'Unknown';
+                  return `<tr style="background: ${idx % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
+                    <td style="padding: 8px; border: 1px solid #ddd;">${sessionDate}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${sessionName}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${bowType}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold;">${session.total_score}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+            
+            <!-- Machine-readable data for PDF import -->
+            <div style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 8px; font-family: monospace; font-size: 9px;">
+              <p style="margin: 0 0 10px 0; color: #666; font-family: sans-serif; font-size: 10px;">Import Code (for Score Keeping):</p>
+              <div style="word-break: break-all; color: #333;">
+ARROW_TRACKER_DATA_START
+Date,Name,BowType,TotalScore
 ${filteredSessions.map(session => {
   const sessionDate = new Date(session.created_at).toLocaleDateString();
-  const bowName = session.bow_name || '';
-  const distance = session.distance || '';
-  const targetType = getTargetTypeName(session.target_type);
-  const sessionName = session.name || session.id.slice(0, 8);
-  
-  return session.rounds.map((round, roundIdx) => {
-    if (!round.shots) return '';
-    return round.shots.map((shot, arrowIdx) => {
-      const score = shot.ring >= 11 ? 'X' : (shot.ring === 0 ? 'M' : shot.ring.toString());
-      return `${sessionDate},${sessionName},${bowName},${distance},${targetType},${roundIdx + 1},${arrowIdx + 1},${score},${shot.x.toFixed(3)},${shot.y.toFixed(3)}`;
-    }).join('\n');
-  }).join('\n');
+  const sessionName = (session.name || session.id.slice(0, 8)).replace(/,/g, ' ');
+  const bowType = (session.bow_name || 'Unknown').replace(/,/g, ' ');
+  return `${sessionDate},${sessionName},${bowType},${session.total_score}`;
 }).join('\n')}
+ARROW_TRACKER_DATA_END
+              </div>
             </div>
+            
             <div class="footer">
               <p>Arrow Tracker - ${new Date().getFullYear()}</p>
             </div>
