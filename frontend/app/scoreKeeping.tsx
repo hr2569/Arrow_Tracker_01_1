@@ -578,17 +578,11 @@ export default function ScoreKeepingScreen() {
               t('scoreKeeping.pdfParsingLimited'),
               t('scoreKeeping.pdfParsingHelp')
             );
-            setIsLoading(false);
-            return;
+            continue; // Try next file instead of returning
           }
         } catch (pdfError) {
           console.error('PDF read error:', pdfError);
-          Alert.alert(
-            t('scoreKeeping.pdfParsingLimited'),
-            t('scoreKeeping.pdfParsingHelp')
-          );
-          setIsLoading(false);
-          return;
+          continue; // Try next file
         }
       } else {
         // CSV/TXT processing
@@ -596,9 +590,14 @@ export default function ScoreKeepingScreen() {
         importedData = await parseMultiArcherCSV(content);
       }
       
-      if (importedData.length > 0) {
+      // Add this file's data to the total
+      allImportedData = [...allImportedData, ...importedData];
+      }
+      
+      // After processing all files
+      if (allImportedData.length > 0) {
         // Check for duplicates before adding
-        const newScores = importedData.filter(newScore => {
+        const newScores = allImportedData.filter(newScore => {
           const isDuplicate = importedScores.some(existing => 
             existing.archerName === newScore.archerName && 
             existing.totalScore === newScore.totalScore
