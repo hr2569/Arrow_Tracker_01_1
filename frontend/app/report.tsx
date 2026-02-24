@@ -1336,6 +1336,78 @@ ${filteredSessions.map(session => {
     }
   };
 
+  // Export sessions as CSV file for Score Keeping import
+  const handleExportCSV = async () => {
+    const sessionsToExport = filteredSessions;
+    
+    if (sessionsToExport.length === 0) {
+      Alert.alert(t('report.noSessions'), t('report.selectSessionsFirst'));
+      return;
+    }
+    
+    try {
+      // Generate CSV content
+      const lines: string[] = [];
+      
+      // Header row
+      lines.push('Date,Session,Bow,Distance,Target,Round,Arrow,Score,X,Y');
+      
+      // Data rows
+      sessionsToExport.forEach(session => {
+        const sessionDate = new Date(session.created_at).toLocaleDateString();
+        const bowName = session.bow_name || '';
+        const distance = session.distance || '';
+        const targetType = getTargetTypeName(session.target_type);
+        const sessionName = session.name || session.id.slice(0, 8);
+        
+        session.rounds.forEach((round, roundIdx) => {
+          if (round.shots) {
+            round.shots.forEach((shot, arrowIdx) => {
+              const score = shot.ring >= 11 ? 'X' : (shot.ring === 0 ? 'M' : shot.ring.toString());
+              lines.push(`${sessionDate},${sessionName},${bowName},${distance},${targetType},${roundIdx + 1},${arrowIdx + 1},${score},${shot.x.toFixed(3)},${shot.y.toFixed(3)}`);
+            });
+          }
+        });
+      });
+      
+      const csvContent = lines.join('\n');
+      const dateStr = new Date().toISOString().split('T')[0];
+      const fileName = `Arrow_Tracker_Export_${dateStr}.csv`;
+      
+      if (Platform.OS === 'web') {
+        // For web, trigger download
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        // For mobile, use sharing
+        const filePath = (FileSystem.cacheDirectory || '') + fileName;
+        
+        await FileSystem.writeAsStringAsync(filePath, csvContent, {
+          encoding: FileSystem.EncodingType.UTF8,
+        });
+        
+        const isAvailable = await Sharing.isAvailableAsync();
+        if (isAvailable) {
+          await Sharing.shareAsync(filePath, {
+            mimeType: 'text/csv',
+            UTI: 'public.comma-separated-values-text',
+            dialogTitle: t('report.exportCSV'),
+          });
+        } else {
+          Alert.alert('Error', 'Sharing not available');
+        }
+      }
+    } catch (error) {
+      console.error('CSV export error:', error);
+      Alert.alert('Error', 'Failed to export CSV');
+    }
+  };
+
   const handleStartDateChange = (event: any, selectedDate?: Date) => {
     setShowStartPicker(false);
     if (selectedDate) {
