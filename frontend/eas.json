@@ -11,7 +11,7 @@
         "buildType": "apk",
         "withoutCredentials": true
       },
-      "node": "22.12.0"
+      "node": "20.18.0"
     },
     "preview": {
       "distribution": "internal",
@@ -19,28 +19,28 @@
         "buildType": "apk",
         "withoutCredentials": true
       },
-      "node": "22.12.0"
+      "node": "20.18.0"
     },
     "production": {
       "android": {
         "buildType": "app-bundle",
         "credentialsSource": "local"
       },
-      "node": "22.12.0"
+      "node": "20.18.0"
     },
     "aab": {
       "android": {
         "buildType": "app-bundle",
         "withoutCredentials": true
       },
-      "node": "22.12.0"
+      "node": "20.18.0"
     },
     "playstore": {
       "android": {
         "buildType": "app-bundle",
         "credentialsSource": "local"
       },
-      "node": "22.12.0"
+      "node": "20.18.0"
     }
   },
   "submit": {
