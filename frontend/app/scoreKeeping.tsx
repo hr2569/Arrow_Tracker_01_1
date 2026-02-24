@@ -369,70 +369,116 @@ export default function ScoreKeepingScreen() {
       let importedData: ImportedScore[] = [];
       
       if (isPDF) {
-        // Read PDF content - try multiple methods to extract text
+        // Read PDF content - extract text patterns from binary
         try {
-          // Method 1: Read as base64 and decode to look for text patterns
           const base64Content = await FileSystem.readAsStringAsync(file.uri, {
             encoding: FileSystem.EncodingType.Base64,
           });
           
-          // Decode base64 to binary string to search for text patterns
+          // Decode base64 to binary string
           let textContent = '';
           try {
-            // Attempt to extract readable text from the PDF binary
             const binaryStr = atob(base64Content);
-            
-            // Extract any ASCII text from the binary (filters non-printable chars)
-            const asciiText = binaryStr.split('').filter(char => {
+            // Extract ASCII text from the binary (filters non-printable chars)
+            textContent = binaryStr.split('').filter(char => {
               const code = char.charCodeAt(0);
               return (code >= 32 && code <= 126) || code === 10 || code === 13;
             }).join('');
-            
-            textContent = asciiText;
           } catch (decodeErr) {
-            console.log('Base64 decode failed, trying raw read');
+            console.log('Base64 decode failed');
             textContent = await FileSystem.readAsStringAsync(file.uri);
           }
+
+          console.log('PDF text content length:', textContent.length);
           
-          // First, try to find our custom marker that's embedded in Arrow Tracker PDFs
-          // Format: ATIMPORT:base64code:ENDATIMPORT (visible text in PDF)
-          const markerPattern = /ATIMPORT[:\s]*([A-Za-z0-9+/=]+)[:\s]*ENDATIMPORT/g;
-          let markerMatch;
-          while ((markerMatch = markerPattern.exec(textContent)) !== null) {
-            try {
-              const decoded = atob(markerMatch[1]);
-              const data = JSON.parse(decoded);
-              if (data.n && data.s !== undefined) {
-                const rounds = (data.r || []).map((scores: number[], idx: number) => ({
-                  roundNumber: idx + 1,
-                  scores: scores,
-                  total: scores.reduce((a: number, b: number) => a + b, 0)
-                }));
-                
-                importedData.push({
-                  id: `pdf-import-${Date.now()}-${importedData.length}`,
-                  archerName: data.n,
-                  bowType: data.b || '',
-                  distance: data.d || '',
-                  rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
-                  totalScore: data.s,
-                  date: new Date().toISOString(),
+          // Method 1: Look for CSV-formatted data (Raw Data section from reports)
+          // Format: Date,Session,Bow,Distance,Target,Round,Arrow,Score,X,Y
+          const csvPattern = /(\d{1,2}\/\d{1,2}\/\d{4})[,\s]+([^,]+)[,\s]+([^,]*)[,\s]+(\d*)[,\s]+([^,]*)[,\s]+(\d+)[,\s]+(\d+)[,\s]+([0-9XxMm]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/g;
+          const sessionData: { [key: string]: { name: string; bowType: string; scores: number[]; date: string } } = {};
+          
+          let csvMatch;
+          while ((csvMatch = csvPattern.exec(textContent)) !== null) {
+            const [, date, session, bow, distance, target, round, arrow, score, x, y] = csvMatch;
+            const sessionKey = `${session}-${bow}`;
+            
+            if (!sessionData[sessionKey]) {
+              sessionData[sessionKey] = {
+                name: session.trim(),
+                bowType: bow.trim(),
+                scores: [],
+                date: date
+              };
+            }
+            
+            // Parse score (X=10, M=0)
+            let scoreNum = 0;
+            if (score.toUpperCase() === 'X') scoreNum = 10;
+            else if (score.toUpperCase() === 'M') scoreNum = 0;
+            else scoreNum = parseInt(score) || 0;
+            
+            sessionData[sessionKey].scores.push(scoreNum);
+          }
+          
+          // Convert session data to ImportedScore format
+          Object.values(sessionData).forEach(session => {
+            if (session.scores.length > 0) {
+              const totalScore = session.scores.reduce((a, b) => a + b, 0);
+              // Group scores into rounds of 3
+              const rounds = [];
+              for (let i = 0; i < session.scores.length; i += 3) {
+                const roundScores = session.scores.slice(i, i + 3);
+                rounds.push({
+                  roundNumber: rounds.length + 1,
+                  scores: roundScores,
+                  total: roundScores.reduce((a, b) => a + b, 0)
                 });
               }
-            } catch (e) {
-              console.log('Failed to parse marker import code:', e);
+              
+              importedData.push({
+                id: `pdf-csv-${Date.now()}-${importedData.length}`,
+                archerName: session.name,
+                bowType: session.bowType,
+                distance: '',
+                rounds: rounds,
+                totalScore: totalScore,
+                date: session.date || new Date().toISOString(),
+              });
+            }
+          });
+          
+          // Method 2: Look for ATIMPORT marker (Competition PDFs)
+          if (importedData.length === 0) {
+            const markerPattern = /ATIMPORT[:\s]*([A-Za-z0-9+/=]+)[:\s]*ENDATIMPORT/g;
+            let markerMatch;
+            while ((markerMatch = markerPattern.exec(textContent)) !== null) {
+              try {
+                const decoded = atob(markerMatch[1]);
+                const data = JSON.parse(decoded);
+                if (data.n && data.s !== undefined) {
+                  const rounds = (data.r || []).map((scores: number[], idx: number) => ({
+                    roundNumber: idx + 1,
+                    scores: scores,
+                    total: scores.reduce((a: number, b: number) => a + b, 0)
+                  }));
+                  
+                  importedData.push({
+                    id: `pdf-import-${Date.now()}-${importedData.length}`,
+                    archerName: data.n,
+                    bowType: data.b || '',
+                    distance: data.d || '',
+                    rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
+                    totalScore: data.s,
+                    date: new Date().toISOString(),
+                  });
+                }
+              } catch (e) {
+                console.log('Failed to parse ATIMPORT marker:', e);
+              }
             }
           }
           
-          // If no marker found, try other patterns
+          // Method 3: Look for base64 import codes (eyJ pattern)
           if (importedData.length === 0) {
-            importedData = await parsePDFContent(textContent);
-          }
-          
-          // If still no import codes found, try to find raw base64 import code patterns
-          if (importedData.length === 0) {
-            // Competition PDFs contain a base64-encoded import code
-            // Look for patterns like eyJ2 (base64 for {"v) or eyJu (base64 for {"n)
             const importCodePattern = /eyJ[A-Za-z0-9+/=]{40,400}/g;
             let match;
             while ((match = importCodePattern.exec(textContent)) !== null) {
@@ -464,8 +510,12 @@ export default function ScoreKeepingScreen() {
             }
           }
           
+          // Method 4: Try parsePDFContent for other patterns
           if (importedData.length === 0) {
-            // PDF couldn't be parsed automatically
+            importedData = await parsePDFContent(textContent);
+          }
+          
+          if (importedData.length === 0) {
             Alert.alert(
               t('scoreKeeping.pdfParsingLimited'),
               t('scoreKeeping.pdfParsingHelp')
