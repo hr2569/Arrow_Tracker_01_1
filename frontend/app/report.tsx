@@ -1368,28 +1368,19 @@ ARROW_TRACKER_DATA_END
     }
     
     try {
-      // Generate CSV content
+      // Generate CSV content with simplified format: Date, Name, Bow Type, Total Score
       const lines: string[] = [];
       
       // Header row
-      lines.push('Date,Session,Bow,Distance,Target,Round,Arrow,Score,X,Y');
+      lines.push('Date,Name,BowType,TotalScore');
       
-      // Data rows
+      // Data rows - one per session
       sessionsToExport.forEach(session => {
         const sessionDate = new Date(session.created_at).toLocaleDateString();
-        const bowName = session.bow_name || '';
-        const distance = session.distance || '';
-        const targetType = getTargetTypeName(session.target_type);
-        const sessionName = session.name || session.id.slice(0, 8);
+        const sessionName = (session.name || session.id.slice(0, 8)).replace(/,/g, ' ');
+        const bowType = (session.bow_name || 'Unknown').replace(/,/g, ' ');
         
-        session.rounds.forEach((round, roundIdx) => {
-          if (round.shots) {
-            round.shots.forEach((shot, arrowIdx) => {
-              const score = shot.ring >= 11 ? 'X' : (shot.ring === 0 ? 'M' : shot.ring.toString());
-              lines.push(`${sessionDate},${sessionName},${bowName},${distance},${targetType},${roundIdx + 1},${arrowIdx + 1},${score},${shot.x.toFixed(3)},${shot.y.toFixed(3)}`);
-            });
-          }
-        });
+        lines.push(`${sessionDate},${sessionName},${bowType},${session.total_score}`);
       });
       
       const csvContent = lines.join('\n');
