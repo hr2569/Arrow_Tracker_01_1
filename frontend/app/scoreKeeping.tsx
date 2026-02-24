@@ -418,17 +418,29 @@ export default function ScoreKeepingScreen() {
       const result = await DocumentPicker.getDocumentAsync({
         type: ['text/csv', 'text/plain', 'text/comma-separated-values', 'application/pdf', '*/*'],
         copyToCacheDirectory: true,
+        multiple: true, // Allow multiple file selection
       });
 
       if (result.canceled) return;
 
       setIsLoading(true);
-      const file = result.assets[0];
-      const fileName = file.name.toLowerCase();
       
-      // Check supported formats
-      const isPDF = fileName.endsWith('.pdf');
-      const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt');
+      let allImportedData: ImportedScore[] = [];
+      
+      // Process each selected file
+      for (const file of result.assets) {
+        const fileName = file.name.toLowerCase();
+        
+        // Check supported formats
+        const isPDF = fileName.endsWith('.pdf');
+        const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt');
+        
+        if (!isPDF && !isCSV) {
+          console.log(`Skipping unsupported file: ${fileName}`);
+          continue;
+        }
+        
+        let importedData: ImportedScore[] = [];
       
       if (!isPDF && !isCSV) {
         Alert.alert(
