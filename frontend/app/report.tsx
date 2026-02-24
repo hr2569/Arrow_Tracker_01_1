@@ -2412,6 +2412,12 @@ ${filteredSessions.map(session => {
           <Text style={styles.shareButtonText}>{t('report.savePDF')}</Text>
         </TouchableOpacity>
 
+        {/* Export CSV Button */}
+        <TouchableOpacity style={styles.exportCsvButton} onPress={handleExportCSV}>
+          <Icon name="grid-outline" size={24} color="#4CAF50" />
+          <Text style={styles.exportCsvButtonText}>{t('report.exportCSV')}</Text>
+        </TouchableOpacity>
+
         {/* Edit Range Button */}
         <TouchableOpacity 
           style={styles.editRangeButton} 
