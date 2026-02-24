@@ -382,9 +382,6 @@ export default function ScoreKeepingScreen() {
             // Attempt to extract readable text from the PDF binary
             const binaryStr = atob(base64Content);
             
-            // Look for text streams in PDF (between BT and ET markers, or in /Text objects)
-            // Also look for plain text strings that might be our import codes
-            
             // Extract any ASCII text from the binary (filters non-printable chars)
             const asciiText = binaryStr.split('').filter(char => {
               const code = char.charCodeAt(0);
@@ -394,23 +391,54 @@ export default function ScoreKeepingScreen() {
             textContent = asciiText;
           } catch (decodeErr) {
             console.log('Base64 decode failed, trying raw read');
-            // Fallback to raw string read
             textContent = await FileSystem.readAsStringAsync(file.uri);
           }
           
-          // Parse the extracted text for import codes
-          importedData = await parsePDFContent(textContent);
+          // First, try to find our custom marker that's embedded in Arrow Tracker PDFs
+          // Format: ARROW_TRACKER_IMPORT_START:base64code:ARROW_TRACKER_IMPORT_END
+          const markerPattern = /ARROW_TRACKER_IMPORT_START[:\s]*([A-Za-z0-9+/=]+)[:\s]*ARROW_TRACKER_IMPORT_END/g;
+          let markerMatch;
+          while ((markerMatch = markerPattern.exec(textContent)) !== null) {
+            try {
+              const decoded = atob(markerMatch[1]);
+              const data = JSON.parse(decoded);
+              if (data.n && data.s !== undefined) {
+                const rounds = (data.r || []).map((scores: number[], idx: number) => ({
+                  roundNumber: idx + 1,
+                  scores: scores,
+                  total: scores.reduce((a: number, b: number) => a + b, 0)
+                }));
+                
+                importedData.push({
+                  id: `pdf-import-${Date.now()}-${importedData.length}`,
+                  archerName: data.n,
+                  bowType: data.b || '',
+                  distance: data.d || '',
+                  rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
+                  totalScore: data.s,
+                  date: new Date().toISOString(),
+                });
+              }
+            } catch (e) {
+              console.log('Failed to parse marker import code:', e);
+            }
+          }
           
-          // If no import codes found, try to find the raw base64 import code in the PDF
+          // If no marker found, try other patterns
+          if (importedData.length === 0) {
+            importedData = await parsePDFContent(textContent);
+          }
+          
+          // If still no import codes found, try to find raw base64 import code patterns
           if (importedData.length === 0) {
             // Competition PDFs contain a base64-encoded import code
-            // Look for patterns like eyJ2 (base64 for {"v) which starts our import codes
+            // Look for patterns like eyJ2 (base64 for {"v) or eyJu (base64 for {"n)
             const importCodePattern = /eyJ[A-Za-z0-9+/=]{40,400}/g;
             let match;
             while ((match = importCodePattern.exec(textContent)) !== null) {
               try {
                 const decoded = atob(match[0]);
-                if (decoded.includes('at_comp') || decoded.includes('"n"') && decoded.includes('"s"')) {
+                if (decoded.includes('at_comp') || (decoded.includes('"n"') && decoded.includes('"s"'))) {
                   const data = JSON.parse(decoded);
                   if (data.n && data.s !== undefined) {
                     const rounds = (data.r || []).map((scores: number[], idx: number) => ({
