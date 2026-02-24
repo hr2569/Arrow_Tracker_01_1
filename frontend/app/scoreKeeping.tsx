@@ -442,17 +442,6 @@ export default function ScoreKeepingScreen() {
         
         let importedData: ImportedScore[] = [];
       
-      if (!isPDF && !isCSV) {
-        Alert.alert(
-          t('scoreKeeping.unsupportedFormat'),
-          t('scoreKeeping.supportedFormatsDetail')
-        );
-        setIsLoading(false);
-        return;
-      }
-
-      let importedData: ImportedScore[] = [];
-      
       if (isPDF) {
         // Read PDF content - extract text patterns from binary
         try {
