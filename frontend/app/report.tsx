@@ -1224,6 +1224,35 @@ export default function ReportScreen() {
             </div>
           </div>
           ` : ''}
+          
+          <!-- Raw Data Page -->
+          <div class="page">
+            <div class="page-header">
+              <h2>${t('report.rawData', { defaultValue: 'Raw Data' })}</h2>
+              <p>${t('report.sessionDetails', { defaultValue: 'Session Details' })}</p>
+            </div>
+            <div style="font-family: monospace; font-size: 10px; white-space: pre-wrap; background: #f5f5f5; padding: 15px; border-radius: 8px; overflow-x: auto;">
+<span style="font-weight: bold;">Date,Session,Bow,Distance,Target,Round,Arrow,Score,X,Y</span>
+${filteredSessions.map(session => {
+  const sessionDate = new Date(session.created_at).toLocaleDateString();
+  const bowName = session.bow_name || '';
+  const distance = session.distance || '';
+  const targetType = getTargetTypeName(session.target_type);
+  const sessionName = session.name || session.id.slice(0, 8);
+  
+  return session.rounds.map((round, roundIdx) => {
+    if (!round.shots) return '';
+    return round.shots.map((shot, arrowIdx) => {
+      const score = shot.ring >= 11 ? 'X' : (shot.ring === 0 ? 'M' : shot.ring.toString());
+      return `${sessionDate},${sessionName},${bowName},${distance},${targetType},${roundIdx + 1},${arrowIdx + 1},${score},${shot.x.toFixed(3)},${shot.y.toFixed(3)}`;
+    }).join('\n');
+  }).join('\n');
+}).join('\n')}
+            </div>
+            <div class="footer">
+              <p>Arrow Tracker - ${new Date().getFullYear()}</p>
+            </div>
+          </div>
         </body>
       </html>
     `;
