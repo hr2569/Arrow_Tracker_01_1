@@ -42,7 +42,6 @@
     "expo-system-ui": "~5.0.10",
     "expo-web-browser": "~14.2.0",
     "i18next": "^25.8.7",
-    "pdf-parse": "^2.4.5",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "19.1.0",
