@@ -539,11 +539,31 @@ export default function ScoreKeepingScreen() {
       }
       
       if (importedData.length > 0) {
-        setImportedScores(prev => [...prev, ...importedData]);
-        Alert.alert(
-          t('scoreKeeping.importSuccess'),
-          t('scoreKeeping.importedArchers', { count: importedData.length })
-        );
+        // Check for duplicates before adding
+        const newScores = importedData.filter(newScore => {
+          const isDuplicate = importedScores.some(existing => 
+            existing.archerName === newScore.archerName && 
+            existing.totalScore === newScore.totalScore
+          );
+          return !isDuplicate;
+        });
+        
+        if (newScores.length > 0) {
+          setImportedScores(prev => [...prev, ...newScores]);
+          const archerNames = newScores.map(s => s.archerName).join(', ');
+          Alert.alert(
+            t('scoreKeeping.importSuccess'),
+            t('scoreKeeping.importedArchersDetail', { 
+              count: newScores.length,
+              names: archerNames.length > 50 ? archerNames.substring(0, 50) + '...' : archerNames
+            })
+          );
+        } else {
+          Alert.alert(
+            t('scoreKeeping.importError'),
+            t('scoreKeeping.duplicateEntries')
+          );
+        }
       } else {
         Alert.alert(
           t('scoreKeeping.importError'),
