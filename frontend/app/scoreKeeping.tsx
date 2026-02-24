@@ -798,33 +798,21 @@ export default function ScoreKeepingScreen() {
           )}
         </View>
 
-        {/* Export Buttons - Always visible but disabled when no data */}
-        <View style={styles.exportButtonsRow}>
-          <TouchableOpacity
-            style={[styles.generateButton, (competitionSessions.length === 0 && importedScores.length === 0) && styles.generateButtonDisabled]}
-            onPress={generateRankingsPDF}
-            disabled={(competitionSessions.length === 0 && importedScores.length === 0) || isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#000" size="small" />
-            ) : (
-              <Icon name="document-text" size={24} color={(competitionSessions.length === 0 && importedScores.length === 0) ? '#666' : '#000'} />
-            )}
-            <Text style={[styles.generateButtonText, (competitionSessions.length === 0 && importedScores.length === 0) && styles.generateButtonTextDisabled]}>
-              {t('scoreKeeping.exportPDF')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.exportCsvButton, rankings.length < 1 && styles.exportCsvButtonDisabled]}
-            onPress={exportRankingsAsCSV}
-            disabled={rankings.length < 1 || isLoading}
-          >
-            <Icon name="grid-outline" size={24} color={rankings.length < 1 ? '#666' : '#4CAF50'} />
-            <Text style={[styles.exportCsvButtonText, rankings.length < 1 && styles.exportCsvButtonTextDisabled]}>
-              {t('scoreKeeping.exportCSV')}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {/* Export PDF Button */}
+        <TouchableOpacity
+          style={[styles.generateButton, (competitionSessions.length === 0 && importedScores.length === 0) && styles.generateButtonDisabled]}
+          onPress={generateRankingsPDF}
+          disabled={(competitionSessions.length === 0 && importedScores.length === 0) || isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#000" size="small" />
+          ) : (
+            <Icon name="document-text" size={24} color={(competitionSessions.length === 0 && importedScores.length === 0) ? '#666' : '#000'} />
+          )}
+          <Text style={[styles.generateButtonText, (competitionSessions.length === 0 && importedScores.length === 0) && styles.generateButtonTextDisabled]}>
+            {t('scoreKeeping.exportPDF')}
+          </Text>
+        </TouchableOpacity>
 
         {/* Info Card */}
         <View style={styles.infoCard}>
