@@ -391,20 +391,24 @@ export default function ScoreKeepingScreen() {
             let textContent = '';
             try {
               const binaryStr = atob(base64Content);
+              // Extract ALL printable ASCII from PDF binary
               textContent = binaryStr.split('').filter(char => {
                 const code = char.charCodeAt(0);
-                return (code >= 32 && code <= 126) || code === 10 || code === 13;
+                return (code >= 32 && code <= 126) || code === 10 || code === 13 || code === 9;
               }).join('');
             } catch (decodeErr) {
               textContent = await FileSystem.readAsStringAsync(file.uri);
             }
 
+            console.log('PDF extracted text length:', textContent.length);
+            console.log('PDF text sample:', textContent.substring(0, 500));
+
             // Method 1: Look for ARROW_TRACKER_DATA markers
-            const dataMarkerPattern = /ARROW_TRACKER_DATA_START[\s\S]*?Date,Name,BowType,TotalScore([\s\S]*?)ARROW_TRACKER_DATA_END/g;
+            const dataMarkerPattern = /ARROW_TRACKER_DATA_START[\s\S]*?Date,Name,BowType,TotalScore([\s\S]*?)ARROW_TRACKER_DATA_END/gi;
             let dataMatch;
             while ((dataMatch = dataMarkerPattern.exec(textContent)) !== null) {
               const csvData = dataMatch[1].trim();
-              const lines = csvData.split(/[\n\r]+/).filter(line => line.trim());
+              const lines = csvData.split(/[\n\r]+/).filter(line => line.trim() && !line.includes('Date,Name'));
               
               for (const line of lines) {
                 const parts = line.split(',').map(p => p.trim());
@@ -413,24 +417,49 @@ export default function ScoreKeepingScreen() {
                   const score = parseInt(totalScore);
                   
                   if (name && !isNaN(score) && score > 0) {
-                    const isDuplicate = importedData.some(d => d.archerName === name && d.totalScore === score);
-                    if (!isDuplicate) {
-                      importedData.push({
-                        id: `pdf-import-${Date.now()}-${importedData.length}-${Math.random().toString(36).substr(2, 5)}`,
-                        archerName: name,
-                        bowType: bowType || '',
-                        distance: '',
-                        rounds: [{ roundNumber: 1, scores: [score], total: score }],
-                        totalScore: score,
-                        date: date || new Date().toISOString(),
-                      });
-                    }
+                    importedData.push({
+                      id: `pdf-${Date.now()}-${importedData.length}-${Math.random().toString(36).substr(2, 5)}`,
+                      archerName: name,
+                      bowType: bowType || '',
+                      distance: '',
+                      rounds: [{ roundNumber: 1, scores: [score], total: score }],
+                      totalScore: score,
+                      date: date || new Date().toISOString(),
+                    });
                   }
                 }
               }
             }
             
-            // Method 2: Look for ATIMPORT marker (Competition PDFs)
+            // Method 2: Look for table-like patterns with scores (Name followed by number)
+            if (importedData.length === 0) {
+              // Look for patterns like: date name bowtype score
+              // Match: MM/DD/YYYY or DD/MM/YYYY followed by name, bowtype, and score
+              const tablePattern = /(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})[,\s]+([A-Za-z][A-Za-z0-9\s]{2,30}?)[,\s]+(Recurve|Compound|Barebow|Traditional|Longbow|Unknown)?[,\s]*(\d{2,4})/gi;
+              let tableMatch;
+              while ((tableMatch = tablePattern.exec(textContent)) !== null) {
+                const [, date, name, bowType, totalScore] = tableMatch;
+                const score = parseInt(totalScore);
+                
+                if (name && score > 10 && score < 1000) { // Reasonable score range
+                  const cleanName = name.trim();
+                  const isDuplicate = importedData.some(d => d.archerName === cleanName && d.totalScore === score);
+                  if (!isDuplicate && cleanName.length > 1) {
+                    importedData.push({
+                      id: `pdf-table-${Date.now()}-${importedData.length}`,
+                      archerName: cleanName,
+                      bowType: (bowType || '').trim(),
+                      distance: '',
+                      rounds: [{ roundNumber: 1, scores: [score], total: score }],
+                      totalScore: score,
+                      date: date,
+                    });
+                  }
+                }
+              }
+            }
+
+            // Method 3: Look for ATIMPORT marker (Competition PDFs)
             if (importedData.length === 0) {
               const markerPattern = /ATIMPORT[:\s]*([A-Za-z0-9+/=]+)[:\s]*ENDATIMPORT/g;
               let markerMatch;
@@ -445,7 +474,7 @@ export default function ScoreKeepingScreen() {
                       total: scores.reduce((a: number, b: number) => a + b, 0)
                     }));
                     importedData.push({
-                      id: `pdf-import-${Date.now()}-${importedData.length}`,
+                      id: `pdf-comp-${Date.now()}-${importedData.length}`,
                       archerName: data.n,
                       bowType: data.b || '',
                       distance: data.d || '',
@@ -460,29 +489,7 @@ export default function ScoreKeepingScreen() {
               }
             }
             
-            // Method 3: Look for simple CSV pattern
-            if (importedData.length === 0) {
-              const simplePattern = /(\d{1,2}\/\d{1,2}\/\d{2,4})\s*,\s*([^,]+)\s*,\s*([^,]*)\s*,\s*(\d+)/g;
-              let simpleMatch;
-              while ((simpleMatch = simplePattern.exec(textContent)) !== null) {
-                const [, date, name, bowType, totalScore] = simpleMatch;
-                const score = parseInt(totalScore);
-                if (name && !isNaN(score) && score > 0) {
-                  const isDuplicate = importedData.some(d => d.archerName === name.trim() && d.totalScore === score);
-                  if (!isDuplicate) {
-                    importedData.push({
-                      id: `pdf-simple-${Date.now()}-${importedData.length}`,
-                      archerName: name.trim(),
-                      bowType: bowType.trim() || '',
-                      distance: '',
-                      rounds: [{ roundNumber: 1, scores: [score], total: score }],
-                      totalScore: score,
-                      date: date,
-                    });
-                  }
-                }
-              }
-            }
+            console.log('PDF import found:', importedData.length, 'entries');
           } catch (pdfError) {
             console.error('PDF read error:', pdfError);
             continue;
