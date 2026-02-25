@@ -36,8 +36,17 @@ export default function HomeScreen() {
   const calculateStats = useCallback(async () => {
     try {
       const sessions = await getSessions();
+      
+      // Always show stats widget, with default values if no sessions
       if (sessions.length === 0) {
-        setStats(null);
+        setStats({
+          totalSessions: 0,
+          recentAvg: 0,
+          bestScore: 0,
+          trend: 'neutral',
+          trendPercent: 0,
+          arrowsShot: 0,
+        });
         return;
       }
 
@@ -99,6 +108,15 @@ export default function HomeScreen() {
       });
     } catch (error) {
       console.error('Failed to calculate stats:', error);
+      // Show default stats on error
+      setStats({
+        totalSessions: 0,
+        recentAvg: 0,
+        bestScore: 0,
+        trend: 'neutral',
+        trendPercent: 0,
+        arrowsShot: 0,
+      });
     }
   }, []);
 
