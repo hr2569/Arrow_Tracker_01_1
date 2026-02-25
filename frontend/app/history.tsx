@@ -1460,7 +1460,7 @@ export default function HistoryScreen() {
             <View style={styles.editRoundTotal}>
               <Text style={styles.editRoundTotalLabel}>Round Total:</Text>
               <Text style={styles.editRoundTotalValue}>
-                {editedShots.reduce((sum, s) => sum + s.ring, 0)}
+                {editedShots.reduce((sum, s) => sum + (s.ring >= 11 ? 10 : s.ring), 0)}
               </Text>
             </View>
 
