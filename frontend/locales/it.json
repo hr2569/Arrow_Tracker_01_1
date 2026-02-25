@@ -255,7 +255,8 @@
     "noSessions": "Nessuna sessione disponibile",
     "arrows": "frecce",
     "exportCSV": "Esporta CSV",
-    "selectSessionsFirst": "Seleziona almeno una sessione da esportare."
+    "selectSessionsFirst": "Seleziona almeno una sessione da esportare.",
+    "generateReport": "Genera Report"
   },
   "summary": {
     "title": "Riepilogo Volée",
