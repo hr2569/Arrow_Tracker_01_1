@@ -255,7 +255,8 @@
     "noSessions": "Ei sessioja saatavilla",
     "arrows": "nuolta",
     "exportCSV": "Vie CSV",
-    "selectSessionsFirst": "Valitse vähintään yksi sessio vientiä varten."
+    "selectSessionsFirst": "Valitse vähintään yksi sessio vientiä varten.",
+    "generateReport": "Luo Raportti"
   },
   "summary": {
     "title": "Pään Yhteenveto",
