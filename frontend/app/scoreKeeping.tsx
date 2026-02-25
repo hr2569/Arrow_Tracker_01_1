@@ -618,8 +618,24 @@ export default function ScoreKeepingScreen() {
           }
         } else {
           // CSV/TXT processing
-          const content = await FileSystem.readAsStringAsync(file.uri);
+          console.log('CSV Import: Starting to process', fileName);
+          
+          let content = '';
+          try {
+            // Try UTF-8 first (most common)
+            content = await FileSystem.readAsStringAsync(file.uri, {
+              encoding: FileSystem.EncodingType.UTF8,
+            });
+            console.log('CSV Import: Read', content.length, 'characters with UTF-8');
+          } catch (readError) {
+            console.log('CSV Import: UTF-8 read failed, trying without encoding spec');
+            content = await FileSystem.readAsStringAsync(file.uri);
+          }
+          
+          console.log('CSV Import: File content preview:', content.substring(0, 200));
+          
           importedData = await parseMultiArcherCSV(content);
+          console.log('CSV Import: Parsed', importedData.length, 'entries from', fileName);
         }
         
         // Add this file's data to the total
