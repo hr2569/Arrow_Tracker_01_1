@@ -97,6 +97,24 @@ React Native Expo archery scoring application with target visualization, arrow p
   - importPdf.tsx (after importing PDF)
   - Verified existing fixes in summary.tsx, competitionSummary.tsx
 
+### v2.1.21 (Feb 2026)
+- [x] Fixed 'X' scoring bug (arrows marked as X were incorrectly scored as 11 instead of 10)
+- [x] Added Competition Menu toggle feature flag in index.tsx
+- [x] Updated app version to 2.1.21
+- [x] **CSV Import Fix**: Enhanced parseMultiArcherCSV function with:
+  - Normalized line endings (handles Windows CRLF, Mac CR, Unix LF)
+  - BOM (Byte Order Mark) removal for UTF-8 files
+  - Proper CSV line parsing that handles quoted values with embedded commas
+  - Improved column header detection with priority ordering (archer > name > session)
+  - Better fallback to positional parsing when headers are unknown
+  - Extensive debug logging for troubleshooting
+- [x] **PDF Import Enhancement**: Improved with multiple extraction methods:
+  - Method 1: ARROW_TRACKER_DATA markers (from app-generated PDFs)
+  - Method 2: Date-name-bowtype-score pattern matching
+  - Method 3: ATIMPORT markers for Competition PDFs
+  - Method 4: Base64 encoded JSON data blocks
+  - Better error messages with tips for PDF import failures
+
 ### v2.1.1
 - [x] Fixed heatmap showing wrong target face for multi-spot indoor sessions
 - [x] Fixed `normalizedDensity` undefined variable in report.tsx
