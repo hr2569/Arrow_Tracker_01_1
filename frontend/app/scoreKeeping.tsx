@@ -444,30 +444,45 @@ export default function ScoreKeepingScreen() {
       
         if (isPDF) {
           try {
+            console.log('PDF Import: Starting to process', fileName);
+            
+            // Read PDF as base64 first
             const base64Content = await FileSystem.readAsStringAsync(file.uri, {
               encoding: FileSystem.EncodingType.Base64,
             });
             
+            console.log('PDF Import: Read', base64Content.length, 'base64 characters');
+            
+            // Decode base64 to binary string and extract printable characters
             let textContent = '';
             try {
               const binaryStr = atob(base64Content);
-              // Extract ALL printable ASCII from PDF binary
+              console.log('PDF Import: Binary length:', binaryStr.length);
+              
+              // Extract printable ASCII characters and common whitespace
               textContent = binaryStr.split('').filter(char => {
                 const code = char.charCodeAt(0);
                 return (code >= 32 && code <= 126) || code === 10 || code === 13 || code === 9;
               }).join('');
+              
+              console.log('PDF Import: Extracted text length:', textContent.length);
+              console.log('PDF Import: Text sample (first 1000 chars):', textContent.substring(0, 1000));
             } catch (decodeErr) {
+              console.error('PDF Import: Base64 decode error:', decodeErr);
+              // Fallback to reading as text
               textContent = await FileSystem.readAsStringAsync(file.uri);
             }
 
-            console.log('PDF extracted text length:', textContent.length);
-            console.log('PDF text sample:', textContent.substring(0, 500));
-
-            // Method 1: Look for ARROW_TRACKER_DATA markers
+            // Method 1: Look for ARROW_TRACKER_DATA markers (from our generated PDFs)
+            // The markers are embedded as visible text in the PDF HTML
+            console.log('PDF Import: Searching for ARROW_TRACKER_DATA markers...');
             const dataMarkerPattern = /ARROW_TRACKER_DATA_START[\s\S]*?Date,Name,BowType,TotalScore([\s\S]*?)ARROW_TRACKER_DATA_END/gi;
             let dataMatch;
             while ((dataMatch = dataMarkerPattern.exec(textContent)) !== null) {
+              console.log('PDF Import: Found ARROW_TRACKER_DATA marker!');
               const csvData = dataMatch[1].trim();
+              console.log('PDF Import: CSV data:', csvData.substring(0, 200));
+              
               const lines = csvData.split(/[\n\r]+/).filter(line => line.trim() && !line.includes('Date,Name'));
               
               for (const line of lines) {
@@ -477,6 +492,7 @@ export default function ScoreKeepingScreen() {
                   const score = parseInt(totalScore);
                   
                   if (name && !isNaN(score) && score > 0) {
+                    console.log('PDF Import: Found entry -', name, bowType, score);
                     importedData.push({
                       id: `pdf-${Date.now()}-${importedData.length}-${Math.random().toString(36).substr(2, 5)}`,
                       archerName: name,
@@ -491,20 +507,24 @@ export default function ScoreKeepingScreen() {
               }
             }
             
-            // Method 2: Look for table-like patterns with scores (Name followed by number)
+            // Method 2: Look for date-name-bowtype-score patterns in extracted text
             if (importedData.length === 0) {
-              // Look for patterns like: date name bowtype score
-              // Match: MM/DD/YYYY or DD/MM/YYYY followed by name, bowtype, and score
-              const tablePattern = /(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})[,\s]+([A-Za-z][A-Za-z0-9\s]{2,30}?)[,\s]+(Recurve|Compound|Barebow|Traditional|Longbow|Unknown)?[,\s]*(\d{2,4})/gi;
+              console.log('PDF Import: No markers found, trying pattern matching...');
+              
+              // Try to find patterns like: MM/DD/YYYY Name BowType Score
+              // This regex is more flexible to handle various PDF text extractions
+              const tablePattern = /(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})[,\s]+([A-Za-z][A-Za-z0-9\s]{1,30}?)[,\s]*(Recurve|Compound|Barebow|Traditional|Longbow|Unknown)?[,\s]+(\d{2,4})/gi;
               let tableMatch;
               while ((tableMatch = tablePattern.exec(textContent)) !== null) {
-                const [, date, name, bowType, totalScore] = tableMatch;
+                const [fullMatch, date, name, bowType, totalScore] = tableMatch;
                 const score = parseInt(totalScore);
                 
-                if (name && score > 10 && score < 1000) { // Reasonable score range
+                // Validate reasonable score range
+                if (name && score > 10 && score < 1000) {
                   const cleanName = name.trim();
                   const isDuplicate = importedData.some(d => d.archerName === cleanName && d.totalScore === score);
                   if (!isDuplicate && cleanName.length > 1) {
+                    console.log('PDF Import: Pattern match found -', cleanName, bowType, score);
                     importedData.push({
                       id: `pdf-table-${Date.now()}-${importedData.length}`,
                       archerName: cleanName,
@@ -519,8 +539,9 @@ export default function ScoreKeepingScreen() {
               }
             }
 
-            // Method 3: Look for ATIMPORT marker (Competition PDFs)
+            // Method 3: Look for ATIMPORT marker (Competition PDFs with encoded data)
             if (importedData.length === 0) {
+              console.log('PDF Import: Trying ATIMPORT markers...');
               const markerPattern = /ATIMPORT[:\s]*([A-Za-z0-9+/=]+)[:\s]*ENDATIMPORT/g;
               let markerMatch;
               while ((markerMatch = markerPattern.exec(textContent)) !== null) {
@@ -528,6 +549,7 @@ export default function ScoreKeepingScreen() {
                   const decoded = atob(markerMatch[1]);
                   const data = JSON.parse(decoded);
                   if (data.n && data.s !== undefined) {
+                    console.log('PDF Import: ATIMPORT found -', data.n, data.s);
                     const rounds = (data.r || []).map((scores: number[], idx: number) => ({
                       roundNumber: idx + 1,
                       scores: scores,
@@ -544,14 +566,54 @@ export default function ScoreKeepingScreen() {
                     });
                   }
                 } catch (e) {
-                  console.log('Failed to parse ATIMPORT:', e);
+                  console.log('PDF Import: Failed to parse ATIMPORT:', e);
+                }
+              }
+            }
+
+            // Method 4: If still no data, try to find any base64 encoded JSON blocks
+            if (importedData.length === 0) {
+              console.log('PDF Import: Trying to find base64 encoded data blocks...');
+              const base64Pattern = /([A-Za-z0-9+/]{40,}={0,2})/g;
+              let b64Match;
+              while ((b64Match = base64Pattern.exec(textContent)) !== null) {
+                try {
+                  const decoded = atob(b64Match[1]);
+                  if (decoded.includes('"t":"at_comp"') || decoded.includes('"n":')) {
+                    const data = JSON.parse(decoded);
+                    if (data.n && data.s !== undefined) {
+                      console.log('PDF Import: Found base64 data -', data.n, data.s);
+                      const rounds = (data.r || []).map((scores: number[], idx: number) => ({
+                        roundNumber: idx + 1,
+                        scores: scores,
+                        total: scores.reduce((a: number, b: number) => a + b, 0)
+                      }));
+                      importedData.push({
+                        id: `pdf-b64-${Date.now()}-${importedData.length}`,
+                        archerName: data.n,
+                        bowType: data.b || '',
+                        distance: data.d || '',
+                        rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
+                        totalScore: data.s,
+                        date: new Date().toISOString(),
+                      });
+                    }
+                  }
+                } catch (e) {
+                  // Not valid JSON, continue searching
                 }
               }
             }
             
-            console.log('PDF import found:', importedData.length, 'entries');
+            console.log('PDF Import: Total entries found:', importedData.length);
+            
+            // If no data found, log helpful message
+            if (importedData.length === 0) {
+              console.log('PDF Import: No data could be extracted from PDF.');
+              console.log('PDF Import: Tip - Use the CSV export for more reliable data transfer.');
+            }
           } catch (pdfError) {
-            console.error('PDF read error:', pdfError);
+            console.error('PDF Import: Error reading file:', pdfError);
             continue;
           }
         } else {
