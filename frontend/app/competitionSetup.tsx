@@ -262,6 +262,26 @@ export default function CompetitionSetupScreen() {
                 </TouchableOpacity>
               </View>
             </View>
+            {/* Quick distance buttons */}
+            <View style={styles.quickDistances}>
+              {['10', '18', '30', '50', '70'].map((d) => (
+                <TouchableOpacity
+                  key={d}
+                  style={[
+                    styles.quickDistanceButton,
+                    distance === d && styles.quickDistanceButtonActive,
+                  ]}
+                  onPress={() => setDistance(d)}
+                >
+                  <Text style={[
+                    styles.quickDistanceText,
+                    distance === d && styles.quickDistanceTextActive,
+                  ]}>
+                    {d}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
           {/* Target Type */}
