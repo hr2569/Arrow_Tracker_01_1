@@ -463,16 +463,8 @@ export default function ScoreKeepingScreen() {
         let textContent = '';
         
         try {
-          // Check if file exists
-          const fileInfo = await FileSystem.getInfoAsync(file.uri);
-          console.log('File exists:', fileInfo.exists);
-          
-          if (!fileInfo.exists) {
-            importErrors.push(`${file.name}: File not found`);
-            continue;
-          }
-          
-          // Read as base64 (universal method)
+          // Read file as base64 (universal method that works for all file types)
+          // DocumentPicker with copyToCacheDirectory ensures file is accessible
           base64Content = await FileSystem.readAsStringAsync(file.uri, {
             encoding: FileSystem.EncodingType.Base64,
           });
