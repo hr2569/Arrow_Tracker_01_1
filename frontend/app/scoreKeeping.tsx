@@ -665,7 +665,24 @@ export default function ScoreKeepingScreen() {
           Alert.alert(t('scoreKeeping.importError'), t('scoreKeeping.duplicateEntries'));
         }
       } else {
-        Alert.alert(t('scoreKeeping.importError'), t('scoreKeeping.invalidFormat'));
+        // Provide more helpful error message
+        const fileNames = result.assets.map(f => f.name).join(', ');
+        const hasPDF = result.assets.some(f => f.name.toLowerCase().endsWith('.pdf'));
+        
+        let errorMsg = t('scoreKeeping.invalidFormat');
+        if (hasPDF) {
+          errorMsg += '\n\n' + t('scoreKeeping.pdfImportTip', { 
+            defaultValue: 'Tip: PDF import works best with Arrow Tracker generated PDFs. For reliable data transfer, use CSV export instead.' 
+          });
+        }
+        
+        Alert.alert(
+          t('scoreKeeping.importError'),
+          errorMsg,
+          [
+            { text: 'OK', style: 'default' }
+          ]
+        );
       }
       
       setIsLoading(false);
