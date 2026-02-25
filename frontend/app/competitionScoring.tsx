@@ -206,11 +206,12 @@ export default function CompetitionScoringScreen() {
     }));
 
     // Store the result to show
+    // Note: X (ring 11) counts as 10 points for scoring
     const roundResult = {
       archerName: currentParticipant.name,
       roundNumber: competition.currentRound,
       shots: filledArrows.map(a => a.score),
-      total: filledArrows.reduce((sum, a) => sum + a.score, 0),
+      total: filledArrows.reduce((sum, a) => sum + (a.score >= 11 ? 10 : a.score), 0),
     };
 
     const updatedCompetition = await commitRound(
