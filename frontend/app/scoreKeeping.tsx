@@ -475,42 +475,77 @@ export default function ScoreKeepingScreen() {
               }).join('');
               
               console.log('PDF Import: Extracted text length:', textContent.length);
-              console.log('PDF Import: Text sample (first 1000 chars):', textContent.substring(0, 1000));
+              if (textContent.length > 0) {
+                console.log('PDF Import: Text sample (first 500 chars):', textContent.substring(0, 500));
+              }
             } catch (decodeErr) {
               console.error('PDF Import: Base64 decode error:', decodeErr);
               // Fallback to reading as text
               textContent = await FileSystem.readAsStringAsync(file.uri);
             }
 
+            // Method 0: Look for ARROW_TRACKER_JSON marker (embedded base64 JSON in HTML comment)
+            console.log('PDF Import: Searching for ARROW_TRACKER_JSON marker...');
+            const jsonMarkerPattern = /ARROW_TRACKER_JSON:([A-Za-z0-9+/=]+)/g;
+            let jsonMatch;
+            while ((jsonMatch = jsonMarkerPattern.exec(textContent)) !== null) {
+              try {
+                console.log('PDF Import: Found ARROW_TRACKER_JSON marker!');
+                const decoded = atob(jsonMatch[1]);
+                const data = JSON.parse(decoded);
+                console.log('PDF Import: Decoded JSON data:', data);
+                
+                if (data.type === 'arrow_tracker_export' && data.sessions) {
+                  for (const session of data.sessions) {
+                    if (session.name && session.score > 0) {
+                      console.log('PDF Import: Adding session -', session.name, session.score);
+                      importedData.push({
+                        id: `pdf-json-${Date.now()}-${importedData.length}-${Math.random().toString(36).substr(2, 5)}`,
+                        archerName: session.name,
+                        bowType: session.bowType || '',
+                        distance: '',
+                        rounds: [{ roundNumber: 1, scores: [session.score], total: session.score }],
+                        totalScore: session.score,
+                        date: session.date || new Date().toISOString(),
+                      });
+                    }
+                  }
+                }
+              } catch (e) {
+                console.log('PDF Import: Failed to parse ARROW_TRACKER_JSON:', e);
+              }
+            }
+
             // Method 1: Look for ARROW_TRACKER_DATA markers (from our generated PDFs)
-            // The markers are embedded as visible text in the PDF HTML
-            console.log('PDF Import: Searching for ARROW_TRACKER_DATA markers...');
-            const dataMarkerPattern = /ARROW_TRACKER_DATA_START[\s\S]*?Date,Name,BowType,TotalScore([\s\S]*?)ARROW_TRACKER_DATA_END/gi;
-            let dataMatch;
-            while ((dataMatch = dataMarkerPattern.exec(textContent)) !== null) {
-              console.log('PDF Import: Found ARROW_TRACKER_DATA marker!');
-              const csvData = dataMatch[1].trim();
-              console.log('PDF Import: CSV data:', csvData.substring(0, 200));
-              
-              const lines = csvData.split(/[\n\r]+/).filter(line => line.trim() && !line.includes('Date,Name'));
-              
-              for (const line of lines) {
-                const parts = line.split(',').map(p => p.trim());
-                if (parts.length >= 4) {
-                  const [date, name, bowType, totalScore] = parts;
-                  const score = parseInt(totalScore);
-                  
-                  if (name && !isNaN(score) && score > 0) {
-                    console.log('PDF Import: Found entry -', name, bowType, score);
-                    importedData.push({
-                      id: `pdf-${Date.now()}-${importedData.length}-${Math.random().toString(36).substr(2, 5)}`,
-                      archerName: name,
-                      bowType: bowType || '',
-                      distance: '',
-                      rounds: [{ roundNumber: 1, scores: [score], total: score }],
-                      totalScore: score,
-                      date: date || new Date().toISOString(),
-                    });
+            if (importedData.length === 0) {
+              console.log('PDF Import: Searching for ARROW_TRACKER_DATA markers...');
+              const dataMarkerPattern = /ARROW_TRACKER_DATA_START[\s\S]*?Date,Name,BowType,TotalScore([\s\S]*?)ARROW_TRACKER_DATA_END/gi;
+              let dataMatch;
+              while ((dataMatch = dataMarkerPattern.exec(textContent)) !== null) {
+                console.log('PDF Import: Found ARROW_TRACKER_DATA marker!');
+                const csvData = dataMatch[1].trim();
+                console.log('PDF Import: CSV data:', csvData.substring(0, 200));
+                
+                const lines = csvData.split(/[\n\r]+/).filter(line => line.trim() && !line.includes('Date,Name'));
+                
+                for (const line of lines) {
+                  const parts = line.split(',').map(p => p.trim());
+                  if (parts.length >= 4) {
+                    const [date, name, bowType, totalScore] = parts;
+                    const score = parseInt(totalScore);
+                    
+                    if (name && !isNaN(score) && score > 0) {
+                      console.log('PDF Import: Found entry -', name, bowType, score);
+                      importedData.push({
+                        id: `pdf-${Date.now()}-${importedData.length}-${Math.random().toString(36).substr(2, 5)}`,
+                        archerName: name,
+                        bowType: bowType || '',
+                        distance: '',
+                        rounds: [{ roundNumber: 1, scores: [score], total: score }],
+                        totalScore: score,
+                        date: date || new Date().toISOString(),
+                      });
+                    }
                   }
                 }
               }
