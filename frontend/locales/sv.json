@@ -255,7 +255,8 @@
     "noSessions": "Inga sessioner tillgängliga",
     "arrows": "pilar",
     "exportCSV": "Exportera CSV",
-    "selectSessionsFirst": "Välj minst en session att exportera."
+    "selectSessionsFirst": "Välj minst en session att exportera.",
+    "generateReport": "Skapa Rapport"
   },
   "summary": {
     "title": "Omgångssammanfattning",
