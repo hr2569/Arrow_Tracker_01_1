@@ -475,34 +475,14 @@ export default function ScoreKeepingScreen() {
             continue;
           }
           
-          // Decode for text processing
+          // Decode base64 to text for processing
           try {
-            // Use a safer decode for large files
-            const chunks = [];
-            const chunkSize = 1024;
-            for (let i = 0; i < base64Content.length; i += chunkSize) {
-              const chunk = base64Content.slice(i, i + chunkSize);
-              try {
-                chunks.push(atob(chunk));
-              } catch (e) {
-                // Partial chunk at end, try with padding
-                try {
-                  chunks.push(atob(chunk + '=='));
-                } catch (e2) {
-                  chunks.push(atob(chunk + '='));
-                }
-              }
-            }
-            textContent = chunks.join('');
+            textContent = atob(base64Content);
+            console.log('Decoded text length:', textContent.length);
           } catch (decodeError) {
-            console.log('Chunked decode failed, trying direct:', decodeError);
-            try {
-              textContent = atob(base64Content);
-            } catch (e) {
-              console.log('Direct decode also failed');
-            }
+            console.log('Base64 decode error (may be binary file):', decodeError);
+            // For PDF files, this is expected - the binary content will be sent to server
           }
-          console.log('Text content length:', textContent.length);
           
         } catch (readError: any) {
           console.error('File read error:', readError?.message || readError);
