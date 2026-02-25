@@ -373,6 +373,118 @@ async def delete_bow(bow_id: str):
     doc_ref.delete()
     return {"message": "Bow deleted"}
 
+# ============== PDF Text Extraction ==============
+
+class PDFExtractRequest(BaseModel):
+    pdf_base64: str
+
+class ExtractedSession(BaseModel):
+    date: str
+    name: str
+    bowType: str
+    score: int
+
+class PDFExtractResponse(BaseModel):
+    success: bool
+    text: str = ""
+    sessions: List[ExtractedSession] = []
+    error: str = ""
+
+@api_router.post("/extract-pdf", response_model=PDFExtractResponse)
+async def extract_pdf_text(request: PDFExtractRequest):
+    """Extract text from a PDF file and parse Arrow Tracker data"""
+    import base64
+    import tempfile
+    import re
+    
+    try:
+        import fitz  # PyMuPDF
+        
+        # Decode base64 PDF
+        pdf_bytes = base64.b64decode(request.pdf_base64)
+        
+        # Save to temp file
+        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_file:
+            tmp_file.write(pdf_bytes)
+            tmp_path = tmp_file.name
+        
+        # Extract text using PyMuPDF
+        text = ""
+        try:
+            doc = fitz.open(tmp_path)
+            for page in doc:
+                text += page.get_text()
+            doc.close()
+        finally:
+            # Clean up temp file
+            import os
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+        
+        logger.info(f"Extracted {len(text)} characters from PDF")
+        logger.info(f"Text preview: {text[:500]}")
+        
+        # Parse extracted text for Arrow Tracker data
+        sessions = []
+        
+        # Look for ARROW_TRACKER_DATA markers
+        data_pattern = r'ARROW_TRACKER_DATA_START\s*Date,Name,BowType,TotalScore\s*([\s\S]*?)\s*ARROW_TRACKER_DATA_END'
+        match = re.search(data_pattern, text, re.IGNORECASE)
+        
+        if match:
+            csv_data = match.group(1).strip()
+            logger.info(f"Found ARROW_TRACKER_DATA: {csv_data[:200]}")
+            
+            lines = [l.strip() for l in csv_data.split('\n') if l.strip()]
+            for line in lines:
+                parts = [p.strip() for p in line.split(',')]
+                if len(parts) >= 4:
+                    try:
+                        score = int(parts[3])
+                        if parts[1] and score > 0:
+                            sessions.append(ExtractedSession(
+                                date=parts[0],
+                                name=parts[1],
+                                bowType=parts[2],
+                                score=score
+                            ))
+                    except ValueError:
+                        continue
+        
+        # Alternative: Look for table-like patterns if no markers found
+        if not sessions:
+            # Pattern: date name bowtype score (flexible spacing)
+            table_pattern = r'(\d{1,2}/\d{1,2}/\d{2,4})\s+([A-Za-z][A-Za-z0-9\s]{1,30}?)\s+(Recurve|Compound|Barebow|Traditional|Longbow|Unknown)\s+(\d{2,4})'
+            matches = re.findall(table_pattern, text, re.IGNORECASE)
+            
+            for date, name, bow_type, score_str in matches:
+                try:
+                    score = int(score_str)
+                    if name.strip() and 10 < score < 1000:
+                        sessions.append(ExtractedSession(
+                            date=date,
+                            name=name.strip(),
+                            bowType=bow_type,
+                            score=score
+                        ))
+                except ValueError:
+                    continue
+        
+        logger.info(f"Extracted {len(sessions)} sessions from PDF")
+        
+        return PDFExtractResponse(
+            success=True,
+            text=text[:5000],  # Limit text response size
+            sessions=sessions
+        )
+        
+    except Exception as e:
+        logger.error(f"PDF extraction error: {e}")
+        return PDFExtractResponse(
+            success=False,
+            error=str(e)
+        )
+
 # Include the router in the main app
 app.include_router(api_router)
 
