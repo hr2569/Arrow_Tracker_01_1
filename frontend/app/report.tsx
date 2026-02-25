@@ -1256,6 +1256,16 @@ export default function ReportScreen() {
             </table>
             
             <!-- Machine-readable data for PDF import -->
+            <!-- ARROW_TRACKER_JSON:${Buffer.from(JSON.stringify({
+              version: 1,
+              type: 'arrow_tracker_export',
+              sessions: filteredSessions.map(session => ({
+                date: new Date(session.created_at).toLocaleDateString(),
+                name: (session.name || session.id.slice(0, 8)).replace(/,/g, ' '),
+                bowType: (session.bow_name || 'Unknown').replace(/,/g, ' '),
+                score: session.total_score
+              }))
+            })).toString('base64')} -->
             <div style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 8px; font-family: monospace; font-size: 9px;">
               <p style="margin: 0 0 10px 0; color: #666; font-family: sans-serif; font-size: 10px;">Import Code (for Score Keeping):</p>
               <div style="word-break: break-all; color: #333;">
