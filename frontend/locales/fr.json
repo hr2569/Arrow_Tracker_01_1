@@ -255,7 +255,8 @@
     "noSessions": "Pas de sessions disponibles",
     "arrows": "flèches",
     "exportCSV": "Exporter CSV",
-    "selectSessionsFirst": "Veuillez sélectionner au moins une session à exporter."
+    "selectSessionsFirst": "Veuillez sélectionner au moins une session à exporter.",
+    "generateReport": "Générer un Rapport"
   },
   "summary": {
     "title": "Résumé de la Volée",
