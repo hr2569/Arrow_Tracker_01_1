@@ -191,7 +191,8 @@ export const commitRound = async (
     const participantIndex = competition.participants.findIndex(p => p.id === participantId);
     if (participantIndex === -1) return null;
 
-    const roundTotal = shots.reduce((sum, s) => sum + s.ring, 0);
+    // Calculate round total - X (ring 11) counts as 10 points
+    const roundTotal = shots.reduce((sum, s) => sum + (s.ring >= 11 ? 10 : s.ring), 0);
     
     const newRound: CompetitionRound = {
       roundNumber,
