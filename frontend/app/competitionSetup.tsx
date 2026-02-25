@@ -546,6 +546,33 @@ const styles = StyleSheet.create({
   unitTextActive: {
     color: '#fff',
   },
+  quickDistances: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    gap: 8,
+  },
+  quickDistanceButton: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  quickDistanceButtonActive: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
+  },
+  quickDistanceText: {
+    color: '#888',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  quickDistanceTextActive: {
+    color: '#fff',
+  },
   targetGrid: {
     gap: 10,
   },
