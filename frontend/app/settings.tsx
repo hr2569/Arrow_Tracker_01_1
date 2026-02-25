@@ -42,31 +42,46 @@ export default function SettingsScreen() {
   };
 
   const handleGenerateTestData = async () => {
-    Alert.alert(
-      'Generate Test Data',
-      'This will create 4 test sessions (WA Standard, Vegas 3-spot, WA Indoor) with random arrow placements for testing heatmaps. Continue?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Generate',
-          onPress: async () => {
-            setGeneratingTestData(true);
-            try {
-              const testSessions = await generateTestDataSet();
-              for (const session of testSessions) {
-                await saveSession(session);
-              }
-              Alert.alert('Success', `Created ${testSessions.length} test sessions. Check History to view them.`);
-            } catch (error) {
-              console.error('Error generating test data:', error);
-              Alert.alert('Error', 'Failed to generate test data');
-            } finally {
-              setGeneratingTestData(false);
-            }
-          },
-        },
-      ]
-    );
+    // Use window.confirm for web, Alert.alert for native
+    const doGenerate = async () => {
+      setGeneratingTestData(true);
+      try {
+        const testSessions = await generateTestDataSet();
+        for (const session of testSessions) {
+          await saveSession(session);
+        }
+        if (Platform.OS === 'web') {
+          window.alert(`Success! Created ${testSessions.length} test sessions. Check History to view them.`);
+        } else {
+          Alert.alert('Success', `Created ${testSessions.length} test sessions. Check History to view them.`);
+        }
+      } catch (error) {
+        console.error('Error generating test data:', error);
+        if (Platform.OS === 'web') {
+          window.alert('Error: Failed to generate test data');
+        } else {
+          Alert.alert('Error', 'Failed to generate test data');
+        }
+      } finally {
+        setGeneratingTestData(false);
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('This will create 4 test sessions (WA Standard, Vegas 3-spot, WA Indoor) with random arrow placements for testing heatmaps. Continue?');
+      if (confirmed) {
+        await doGenerate();
+      }
+    } else {
+      Alert.alert(
+        'Generate Test Data',
+        'This will create 4 test sessions (WA Standard, Vegas 3-spot, WA Indoor) with random arrow placements for testing heatmaps. Continue?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Generate', onPress: doGenerate },
+        ]
+      );
+    }
   };
 
   const handleClearAllData = async () => {
