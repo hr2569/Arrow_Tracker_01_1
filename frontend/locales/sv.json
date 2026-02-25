@@ -114,7 +114,8 @@
     "importCode": "Importera",
     "invalidCode": "Ogiltig importkod. Vänligen kontrollera och försök igen.",
     "duplicateEntry": "Denna skytt har redan importerats.",
-    "supportedFormatsDetail": "Stödda format: CSV-, TXT- eller PDF-filer med poängdata."
+    "supportedFormatsDetail": "Stödda format: CSV-, TXT- eller PDF-filer med poängdata.",
+    "pdfImportTip": "PDF-textextrahering är begränsad. För tillförlitlig dataöverföring, använd CSV-export och importera CSV-filen."
   },
   "settings": {
     "title": "Inställningar",

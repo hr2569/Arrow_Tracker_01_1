@@ -114,7 +114,8 @@
     "importCode": "Importa",
     "invalidCode": "Codice di importazione non valido. Per favore verifica e riprova.",
     "duplicateEntry": "Questo arciere è già stato importato.",
-    "supportedFormatsDetail": "Formati supportati: file CSV, TXT o PDF con dati di punteggio."
+    "supportedFormatsDetail": "Formati supportati: file CSV, TXT o PDF con dati di punteggio.",
+    "pdfImportTip": "L'estrazione del testo PDF è limitata. Per un trasferimento dati affidabile, usa l'opzione di esportazione CSV e importa il file CSV."
   },
   "settings": {
     "title": "Impostazioni",

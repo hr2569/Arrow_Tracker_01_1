@@ -114,7 +114,8 @@
     "importCode": "Importar",
     "invalidCode": "Código de importación inválido. Por favor, verifica e intenta de nuevo.",
     "duplicateEntry": "Este arquero ya ha sido importado.",
-    "supportedFormatsDetail": "Formatos soportados: archivos CSV, TXT o PDF con datos de puntuación."
+    "supportedFormatsDetail": "Formatos soportados: archivos CSV, TXT o PDF con datos de puntuación.",
+    "pdfImportTip": "La extracción de texto PDF es limitada. Para una transferencia de datos confiable, use la opción de exportar CSV e importe el archivo CSV."
   },
   "settings": {
     "title": "Ajustes",

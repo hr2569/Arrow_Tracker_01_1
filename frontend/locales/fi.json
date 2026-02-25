@@ -114,7 +114,8 @@
     "importCode": "Tuo",
     "invalidCode": "Virheellinen tuontikoodi. Tarkista ja yritä uudelleen.",
     "duplicateEntry": "Tämä ampuja on jo tuotu.",
-    "supportedFormatsDetail": "Tuetut muodot: CSV-, TXT- tai PDF-tiedostot pistetiedoilla."
+    "supportedFormatsDetail": "Tuetut muodot: CSV-, TXT- tai PDF-tiedostot pistetiedoilla.",
+    "pdfImportTip": "PDF-tekstin poiminta on rajoitettua. Luotettavaa tiedonsiirtoa varten käytä CSV-vientiä ja tuo CSV-tiedosto."
   },
   "settings": {
     "title": "Asetukset",

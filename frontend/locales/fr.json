@@ -114,7 +114,8 @@
     "importCode": "Importer",
     "invalidCode": "Code d'importation invalide. Veuillez vérifier et réessayer.",
     "duplicateEntry": "Cet archer a déjà été importé.",
-    "supportedFormatsDetail": "Formats pris en charge : fichiers CSV, TXT ou PDF avec données de score."
+    "supportedFormatsDetail": "Formats pris en charge : fichiers CSV, TXT ou PDF avec données de score.",
+    "pdfImportTip": "L'extraction de texte PDF est limitée. Pour un transfert de données fiable, utilisez l'option d'export CSV et importez le fichier CSV."
   },
   "settings": {
     "title": "Paramètres",

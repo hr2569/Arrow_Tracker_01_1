@@ -113,7 +113,8 @@
     "codePlaceholder": "Importcode hier einfügen...",
     "importCode": "Importieren",
     "invalidCode": "Ungültiger Importcode. Bitte überprüfen und erneut versuchen.",
-    "duplicateEntry": "Dieser Schütze wurde bereits importiert."
+    "duplicateEntry": "Dieser Schütze wurde bereits importiert.",
+    "pdfImportTip": "PDF-Textextraktion ist eingeschränkt. Für zuverlässigen Datentransfer verwenden Sie bitte die CSV-Export-Option und importieren Sie die CSV-Datei."
   },
   "settings": {
     "title": "Einstellungen",

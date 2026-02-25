@@ -113,7 +113,8 @@
     "pdfParsingLimited": "Análise de PDF Limitada",
     "pdfParsingHelp": "Não foi possível extrair dados de pontuação deste PDF. Para melhores resultados, use o formato CSV com colunas: Nome, Tipo de Arco, Pontuação.",
     "importedArcher": "Importado {{name}} com pontuação {{score}}",
-    "importedArchersDetail": "{{count}} arqueiro(s) importado(s): {{names}}"
+    "importedArchersDetail": "{{count}} arqueiro(s) importado(s): {{names}}",
+    "pdfImportTip": "A extração de texto PDF é limitada. Para uma transferência de dados confiável, use a opção de exportar CSV e importe o arquivo CSV."
   },
   "settings": {
     "title": "Definições",
