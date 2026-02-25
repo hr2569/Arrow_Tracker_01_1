@@ -256,7 +256,8 @@
     "arrows": "flechas",
     "exportCSV": "Exportar CSV",
     "noSessions": "No hay sesiones seleccionadas",
-    "selectSessionsFirst": "Por favor, seleccione al menos una sesión para exportar."
+    "selectSessionsFirst": "Por favor, seleccione al menos una sesión para exportar.",
+    "generateReport": "Generar Informe"
   },
   "summary": {
     "title": "Resumen de la Ronda",
