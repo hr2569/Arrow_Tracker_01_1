@@ -8,6 +8,7 @@ import pt from './locales/pt.json';
 import es from './locales/es.json';
 import fr from './locales/fr.json';
 import it from './locales/it.json';
+import de from './locales/de.json';
 import fi from './locales/fi.json';
 import sv from './locales/sv.json';
 import ru from './locales/ru.json';
@@ -17,13 +18,14 @@ const LANGUAGE_KEY = '@arrow_tracker_language';
 
 export const languages = [
   { code: 'en', name: 'English', nativeName: 'English' },
-  { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch' },
   { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  { code: 'fi', name: 'Finnish', nativeName: 'Suomi' },
   { code: 'fr', name: 'French', nativeName: 'Français' },
   { code: 'it', name: 'Italian', nativeName: 'Italiano' },
-  { code: 'fi', name: 'Finnish', nativeName: 'Suomi' },
-  { code: 'sv', name: 'Swedish', nativeName: 'Svenska' },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
   { code: 'ru', name: 'Russian', nativeName: 'Русский' },
+  { code: 'sv', name: 'Swedish', nativeName: 'Svenska' },
   { code: 'uk', name: 'Ukrainian', nativeName: 'Українська' },
 ];
 
@@ -33,6 +35,7 @@ const resources = {
   es: { translation: es },
   fr: { translation: fr },
   it: { translation: it },
+  de: { translation: de },
   fi: { translation: fi },
   sv: { translation: sv },
   ru: { translation: ru },
