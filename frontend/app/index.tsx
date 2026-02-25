@@ -217,15 +217,32 @@ export default function HomeScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.competitionButton}
-              onPress={() => router.push('/competitionMenu')}
-              activeOpacity={0.8}
+              style={[
+                styles.competitionButton,
+                !COMPETITION_ENABLED && styles.competitionButtonDisabled
+              ]}
+              onPress={() => COMPETITION_ENABLED && router.push('/competitionMenu')}
+              activeOpacity={COMPETITION_ENABLED ? 0.8 : 1}
+              disabled={!COMPETITION_ENABLED}
             >
-              <View style={styles.buttonIconContainerCompetition}>
-                <Icon name="trophy" size={36} color="#FFD700" />
+              <View style={[
+                styles.buttonIconContainerCompetition,
+                !COMPETITION_ENABLED && styles.buttonIconContainerDisabled
+              ]}>
+                <Icon name="trophy" size={36} color={COMPETITION_ENABLED ? "#FFD700" : "#666"} />
               </View>
-              <Text style={styles.competitionButtonText}>{t('home.competition')}</Text>
-              <Text style={styles.competitionSubtext}>{t('home.officialScoring')}</Text>
+              <Text style={[
+                styles.competitionButtonText,
+                !COMPETITION_ENABLED && styles.competitionButtonTextDisabled
+              ]}>
+                {t('home.competition')}
+              </Text>
+              <Text style={[
+                styles.competitionSubtext,
+                !COMPETITION_ENABLED && styles.competitionSubtextDisabled
+              ]}>
+                {COMPETITION_ENABLED ? t('home.officialScoring') : t('home.comingSoon')}
+              </Text>
             </TouchableOpacity>
           </View>
 
