@@ -255,7 +255,8 @@
     "noSessions": "Нет доступных сессий",
     "arrows": "стрел",
     "exportCSV": "Экспорт CSV",
-    "selectSessionsFirst": "Пожалуйста, выберите хотя бы одну сессию для экспорта."
+    "selectSessionsFirst": "Пожалуйста, выберите хотя бы одну сессию для экспорта.",
+    "generateReport": "Создать Отчёт"
   },
   "summary": {
     "title": "Итоги Серии",
