@@ -230,7 +230,8 @@ export const updateRound = async (sessionId: string, roundId: string, shots: { x
     }
     
     sessions[sessionIndex].rounds[roundIndex].shots = newShots;
-    sessions[sessionIndex].rounds[roundIndex].total_score = newShots.reduce((sum, s) => sum + s.ring, 0);
+    // X (ring 11) counts as 10 points
+    sessions[sessionIndex].rounds[roundIndex].total_score = newShots.reduce((sum, s) => sum + (s.ring >= 11 ? 10 : s.ring), 0);
     sessions[sessionIndex].total_score = sessions[sessionIndex].rounds.reduce((sum, r) => sum + r.total_score, 0);
     sessions[sessionIndex].updated_at = new Date().toISOString();
     
