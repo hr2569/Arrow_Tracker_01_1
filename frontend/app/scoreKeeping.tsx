@@ -709,9 +709,15 @@ export default function ScoreKeepingScreen() {
         const hasPDF = result.assets.some(f => f.name.toLowerCase().endsWith('.pdf'));
         
         let errorMsg = t('scoreKeeping.invalidFormat');
+        
+        // Add specific error details if available
+        if (importErrors.length > 0) {
+          errorMsg = importErrors.join('\n');
+        }
+        
         if (hasPDF) {
           errorMsg += '\n\n' + t('scoreKeeping.pdfImportTip', { 
-            defaultValue: 'Tip: PDF import works best with Arrow Tracker generated PDFs. For reliable data transfer, use CSV export instead.' 
+            defaultValue: 'Tip: PDF text extraction is limited. For reliable import, use the CSV export option instead and import the CSV file.' 
           });
         }
         
