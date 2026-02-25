@@ -16,7 +16,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { loadSavedLanguage } from '../i18n';
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
+// Use legacy FileSystem API for compatibility with SDK 54
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import { getSessions, Session } from '../utils/localStorage';
