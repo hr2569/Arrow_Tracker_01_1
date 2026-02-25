@@ -397,33 +397,21 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   competitionButtonDisabled: {
-    flex: 1,
     backgroundColor: '#2a2a2a',
-    borderRadius: 20,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    alignItems: 'center',
+    shadowColor: 'transparent',
+    shadowOpacity: 0,
+    elevation: 0,
     borderWidth: 1,
     borderColor: '#444',
   },
-  buttonIconContainerCompetitionDisabled: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  buttonIconContainerDisabled: {
     backgroundColor: 'rgba(100,100,100,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
   },
   competitionButtonTextDisabled: {
-    fontSize: 16,
-    fontWeight: 'bold',
     color: '#666',
   },
   competitionSubtextDisabled: {
-    fontSize: 11,
     color: '#555',
-    marginTop: 2,
     fontStyle: 'italic',
   },
   buttonIconContainerCompetition: {
