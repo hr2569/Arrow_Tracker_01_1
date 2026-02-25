@@ -631,20 +631,50 @@ export default function ScoreKeepingScreen() {
           
           let content = '';
           try {
-            // Try UTF-8 first (most common)
-            content = await FileSystem.readAsStringAsync(file.uri, {
-              encoding: FileSystem.EncodingType.UTF8,
-            });
-            console.log('CSV Import: Read', content.length, 'characters with UTF-8');
-          } catch (readError) {
-            console.log('CSV Import: UTF-8 read failed, trying without encoding spec');
-            content = await FileSystem.readAsStringAsync(file.uri);
+            // Try reading the file content
+            try {
+              // Try UTF-8 first (most common)
+              content = await FileSystem.readAsStringAsync(file.uri, {
+                encoding: FileSystem.EncodingType.UTF8,
+              });
+              console.log('CSV Import: Read', content.length, 'characters with UTF-8');
+            } catch (readError) {
+              console.log('CSV Import: UTF-8 read failed, trying base64 decode');
+              // Try reading as base64 and decode
+              const base64 = await FileSystem.readAsStringAsync(file.uri, {
+                encoding: FileSystem.EncodingType.Base64,
+              });
+              content = atob(base64);
+              console.log('CSV Import: Read via base64:', content.length, 'characters');
+            }
+            
+            // Check if content is valid
+            if (!content || content.length === 0) {
+              console.log('CSV Import: Empty file content');
+              importErrors.push(`${file.name}: File is empty`);
+              continue;
+            }
+            
+            console.log('CSV Import: File content preview:', content.substring(0, 300));
+            
+            // Check if it looks like CSV data
+            if (!content.includes(',') && !content.includes('\t')) {
+              console.log('CSV Import: No delimiters found in file');
+              importErrors.push(`${file.name}: Not a valid CSV file`);
+              continue;
+            }
+            
+            importedData = await parseMultiArcherCSV(content);
+            console.log('CSV Import: Parsed', importedData.length, 'entries from', fileName);
+            
+            if (importedData.length === 0) {
+              importErrors.push(`${file.name}: No valid data rows found`);
+            }
+          } catch (fileError) {
+            console.error('CSV Import: File read error:', fileError);
+            importErrors.push(`${file.name}: Could not read file`);
+            continue;
           }
-          
-          console.log('CSV Import: File content preview:', content.substring(0, 200));
-          
-          importedData = await parseMultiArcherCSV(content);
-          console.log('CSV Import: Parsed', importedData.length, 'entries from', fileName);
         }
         
         // Add this file's data to the total
