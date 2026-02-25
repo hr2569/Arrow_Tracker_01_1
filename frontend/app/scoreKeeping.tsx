@@ -21,6 +21,9 @@ import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import { getSessions, Session } from '../utils/localStorage';
 
+// API URL for server-side PDF extraction
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://archery-tracker-4.preview.emergentagent.com';
+
 interface ImportedScore {
   id: string;
   archerName: string;
