@@ -169,7 +169,8 @@ React Native Expo archery scoring application with target visualization, arrow p
 ## Pending Issues
 
 ### P0 (Critical)
-- [x] ~~PDF import not extracting text from PDFs correctly~~ - FIXED: Improved extraction logic with base64 decoding and pattern matching for embedded import codes
+- [x] ~~PDF import not extracting text from PDFs correctly~~ - FIXED: Multiple extraction methods implemented
+- [x] ~~CSV import not parsing correctly~~ - FIXED: Enhanced parsing with line ending normalization, BOM handling, proper quoted value support
 
 ### P1 (High Priority)  
 - [x] ~~Back navigation bugs~~ - FIXED: Changed router.push to router.replace in key flows
@@ -177,7 +178,6 @@ React Native Expo archery scoring application with target visualization, arrow p
 - [ ] PDF export share intent (currently uses standard OS share sheet - acceptable behavior)
 
 ### P2 (Backlog)
-- [ ] Implement robust PDF text extraction for Score Keeping imports
 - [ ] Multi-session merge for combined competition reports
 - [ ] Final icon consistency review across app
 
@@ -185,3 +185,4 @@ React Native Expo archery scoring application with target visualization, arrow p
 - [ ] Offline mode improvements
 - [ ] Social sharing features
 - [ ] Advanced analytics and trends
+- [ ] Real-time sync (Room Code System) for multi-participant competitions
