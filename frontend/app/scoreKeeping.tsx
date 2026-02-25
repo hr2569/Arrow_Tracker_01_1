@@ -322,8 +322,14 @@ export default function ScoreKeepingScreen() {
       const results: ImportedScore[] = [];
 
       // Find column indices - support multiple header formats
+      // Priority: exact matches first, then partial matches
       const dateIdx = header.findIndex(h => h === 'date' || h.includes('date'));
-      const nameIdx = header.findIndex(h => h === 'name' || h.includes('name') || h.includes('archer') || h === 'session');
+      
+      // Name column: prioritize 'archer' matches, then 'name', then 'session'
+      let nameIdx = header.findIndex(h => h.includes('archer'));
+      if (nameIdx === -1) nameIdx = header.findIndex(h => h === 'name' || (h.includes('name') && h !== 'bowname'));
+      if (nameIdx === -1) nameIdx = header.findIndex(h => h === 'session');
+      
       const bowIdx = header.findIndex(h => h === 'bowtype' || h === 'bow type' || h.includes('bow'));
       const scoreIdx = header.findIndex(h => h === 'totalscore' || h === 'total score' || h === 'score' || h.includes('score') || h.includes('total') || h.includes('points'));
 
