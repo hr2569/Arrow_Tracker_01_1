@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,35 +6,20 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  ActivityIndicator,
-  Platform,
+  TextInput,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Icon } from '../components/Icon';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { loadSavedLanguage } from '../i18n';
-import * as DocumentPicker from 'expo-document-picker';
-// Use legacy FileSystem API for compatibility with SDK 54
-import * as FileSystem from 'expo-file-system/legacy';
-import * as Sharing from 'expo-sharing';
-import * as Print from 'expo-print';
 import { getSessions, Session } from '../utils/localStorage';
 
-// API URL for server-side PDF extraction
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://archery-tracker-4.preview.emergentagent.com';
-
-interface ImportedScore {
+interface ManualEntry {
   id: string;
   archerName: string;
   bowType: string;
-  distance: string;
-  rounds: Array<{
-    roundNumber: number;
-    scores: number[];
-    total: number;
-  }>;
   totalScore: number;
   date: string;
 }
@@ -43,913 +28,391 @@ interface RankingEntry {
   name: string;
   bowType: string;
   totalScore: number;
-  source: 'app' | 'imported';
+  source: 'app' | 'manual';
   date: string;
 }
+
+const BOW_TYPES = ['Recurve', 'Compound', 'Barebow', 'Traditional', 'Longbow'];
 
 export default function ScoreKeepingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
-  const [importedScores, setImportedScores] = useState<ImportedScore[]>([]);
+  
+  // State
   const [competitionSessions, setCompetitionSessions] = useState<Session[]>([]);
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [manualEntries, setManualEntries] = useState<ManualEntry[]>([]);
+  const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set());
+  const [selectedManualEntries, setSelectedManualEntries] = useState<Set<string>>(new Set());
+  const [showRankings, setShowRankings] = useState(false);
+  const [selectedBowFilter, setSelectedBowFilter] = useState<string | null>(null);
+  
+  // Manual entry modal state
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newArcherName, setNewArcherName] = useState('');
+  const [newBowType, setNewBowType] = useState('Recurve');
+  const [newScore, setNewScore] = useState('');
 
+  // Load competition sessions
   useFocusEffect(
     useCallback(() => {
-      loadSavedLanguage();
-      loadCompetitionSessions();
+      const loadSessions = async () => {
+        try {
+          const sessions = await getSessions();
+          const competitions = sessions.filter(s => s.session_type === 'competition');
+          setCompetitionSessions(competitions);
+        } catch (error) {
+          console.error('Error loading sessions:', error);
+        }
+      };
+      loadSessions();
     }, [])
   );
 
-  const loadCompetitionSessions = async () => {
-    try {
-      const sessions = await getSessions();
-      const competitions = sessions.filter(s => s.session_type === 'competition');
-      setCompetitionSessions(competitions);
-    } catch (error) {
-      console.error('Failed to load sessions:', error);
+  // Toggle session selection
+  const toggleSessionSelection = (sessionId: string) => {
+    const newSelected = new Set(selectedSessions);
+    if (newSelected.has(sessionId)) {
+      newSelected.delete(sessionId);
+    } else {
+      newSelected.add(sessionId);
     }
+    setSelectedSessions(newSelected);
   };
 
-  // Parse import code from Competition PDF
-  const parseImportCode = (code: string): ImportedScore | null => {
-    try {
-      const cleanCode = code.trim();
-      const decoded = atob(cleanCode);
-      const data = JSON.parse(decoded);
-      
-      if (!data.t || data.t !== 'at_comp') {
-        return null;
-      }
-      
-      if (!data.n || data.s === undefined) {
-        return null;
-      }
-      
-      const roundScores = data.r || [];
-      const rounds = roundScores.map((scores: number[], idx: number) => ({
-        roundNumber: idx + 1,
-        scores: scores,
-        total: scores.reduce((a: number, b: number) => a + b, 0)
-      }));
-      
-      return {
-        id: `comp-import-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-        archerName: data.n,
-        bowType: data.b || '',
-        distance: data.d || '',
-        rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
-        totalScore: data.s,
-        date: new Date().toISOString(),
-      };
-    } catch (error) {
-      console.error('Import code parse error:', error);
-      return null;
+  // Toggle manual entry selection
+  const toggleManualEntrySelection = (entryId: string) => {
+    const newSelected = new Set(selectedManualEntries);
+    if (newSelected.has(entryId)) {
+      newSelected.delete(entryId);
+    } else {
+      newSelected.add(entryId);
     }
+    setSelectedManualEntries(newSelected);
   };
 
-  // Parse CSV content into competition data
-  const parseCSV = async (content: string): Promise<ImportedScore | null> => {
-    try {
-      const lines = content.trim().split('\n');
-      if (lines.length < 2) {
-        throw new Error('CSV must have at least a header and one data row');
-      }
-
-      const header = lines[0].split(',').map(h => h.trim().toLowerCase());
-      
-      const data: ImportedScore = {
-        id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        archerName: '',
-        bowType: '',
-        distance: '',
-        rounds: [],
-        totalScore: 0,
-        date: new Date().toISOString(),
-      };
-
-      // Check for archer_name in header
-      const archerNameIdx = header.indexOf('archer_name') !== -1 ? header.indexOf('archer_name') : header.indexOf('name');
-      const bowTypeIdx = header.indexOf('bow_type') !== -1 ? header.indexOf('bow_type') : header.indexOf('bow');
-      const distanceIdx = header.indexOf('distance');
-      const roundIdx = header.indexOf('round');
-      const scoreIdx = header.indexOf('score') !== -1 ? header.indexOf('score') : header.indexOf('total');
-
-      // Simple format: name, bow_type, score
-      if (archerNameIdx !== -1 && (scoreIdx !== -1 || header.length >= 3)) {
-        for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',').map(v => v.trim());
-          if (values.length < 2) continue;
-          
-          const name = archerNameIdx !== -1 ? values[archerNameIdx] : values[0];
-          const bowType = bowTypeIdx !== -1 ? values[bowTypeIdx] : (values[1] || '');
-          const score = scoreIdx !== -1 ? parseInt(values[scoreIdx]) : parseInt(values[values.length - 1]) || 0;
-          
-          // Each row is a separate archer
-          if (i === 1 || name !== data.archerName) {
-            if (data.archerName && data.totalScore > 0) {
-              // Save previous archer and start new one
-              const newEntry: ImportedScore = {
-                id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                archerName: name,
-                bowType: bowType,
-                distance: distanceIdx !== -1 ? values[distanceIdx] : '',
-                rounds: [{ roundNumber: 1, scores: [score], total: score }],
-                totalScore: score,
-                date: new Date().toISOString(),
-              };
-              return newEntry;
-            }
-            data.archerName = name;
-            data.bowType = bowType;
-            data.distance = distanceIdx !== -1 ? values[distanceIdx] : '';
-          }
-          
-          data.totalScore = score;
-          data.rounds = [{ roundNumber: 1, scores: [score], total: score }];
-        }
-      }
-
-      return data.archerName ? data : null;
-    } catch (error) {
-      console.error('CSV parsing error:', error);
-      return null;
-    }
-  };
-
-  // Parse PDF content - extract import codes from Competition PDFs
-  const parsePDFContent = async (content: string): Promise<ImportedScore[]> => {
-    try {
-      const results: ImportedScore[] = [];
-      
-      // Pattern 1: Look for Arrow Tracker Competition import codes
-      // Import codes are Base64 encoded JSON like: {"v":"1.0","t":"at_comp","n":"John","b":"recurve","s":285,"x":5,"r":[[10,9,10],...]}
-      // They appear in PDFs as a long alphanumeric string
-      
-      // Try to find Base64 encoded import codes (they contain at_comp marker)
-      const base64Pattern = /[A-Za-z0-9+/=]{50,500}/g;
-      let match;
-      while ((match = base64Pattern.exec(content)) !== null) {
-        try {
-          const decoded = atob(match[0]);
-          if (decoded.includes('"t":"at_comp"') || decoded.includes('"t": "at_comp"')) {
-            const data = JSON.parse(decoded);
-            if (data.n && data.s !== undefined) {
-              // Calculate X count and round totals
-              const xCount = data.x || 0;
-              const roundScores = data.r || [];
-              const rounds = roundScores.map((scores: number[], idx: number) => ({
-                roundNumber: idx + 1,
-                scores: scores,
-                total: scores.reduce((a: number, b: number) => a + b, 0)
-              }));
-              
-              results.push({
-                id: `comp-import-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
-                archerName: data.n,
-                bowType: data.b || '',
-                distance: data.d || '',
-                rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
-                totalScore: data.s,
-                date: new Date().toISOString(),
-              });
-            }
-          }
-        } catch (e) {
-          // Not a valid import code, continue
-        }
-      }
-      
-      // Pattern 2: Look for plain text import code format in PDF
-      // These may appear as: eyJ2IjoiMS4wIiwidCI6ImF0X2NvbXAi...
-      const importCodeMarker = /Import Code[:\s]*([A-Za-z0-9+/=]{20,})/gi;
-      while ((match = importCodeMarker.exec(content)) !== null) {
-        try {
-          const decoded = atob(match[1]);
-          const data = JSON.parse(decoded);
-          if (data.n && data.s !== undefined && !results.some(r => r.archerName === data.n && r.totalScore === data.s)) {
-            const xCount = data.x || 0;
-            const roundScores = data.r || [];
-            const rounds = roundScores.map((scores: number[], idx: number) => ({
-              roundNumber: idx + 1,
-              scores: scores,
-              total: scores.reduce((a: number, b: number) => a + b, 0)
-            }));
-            
-            results.push({
-              id: `comp-import-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
-              archerName: data.n,
-              bowType: data.b || '',
-              distance: data.d || '',
-              rounds: rounds.length > 0 ? rounds : [{ roundNumber: 1, scores: [data.s], total: data.s }],
-              totalScore: data.s,
-              date: new Date().toISOString(),
-            });
-          }
-        } catch (e) {
-          // Not valid, continue
-        }
-      }
-      
-      // Pattern 3: Fallback - look for CSV-like patterns
-      // "Name,BowType,Score" format
-      if (results.length === 0) {
-        const csvPattern = /([A-Za-z][A-Za-z\s]{1,30})[,\t]+(recurve|compound|barebow|longbow|traditional)?[,\t]*(\d{1,3})/gi;
-        while ((match = csvPattern.exec(content)) !== null) {
-          const name = match[1].trim();
-          const bowType = match[2] || '';
-          const score = parseInt(match[3]);
-          if (name.length > 1 && name.length < 50 && score > 0 && score <= 360) {
-            if (!results.some(r => r.archerName === name)) {
-              results.push({
-                id: `pdf-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
-                archerName: name,
-                bowType: bowType,
-                distance: '',
-                rounds: [{ roundNumber: 1, scores: [score], total: score }],
-                totalScore: score,
-                date: new Date().toISOString(),
-              });
-            }
-          }
-        }
-      }
-      
-      // Pattern 4: Look for "Archer: X Score: Y" patterns
-      if (results.length === 0) {
-        const namedPattern = /(?:archer|name|player)[\s:]+([A-Za-z][A-Za-z\s]{1,30}?)[\s,]+(?:score|total|points)[\s:]+(\d{1,3})/gi;
-        while ((match = namedPattern.exec(content)) !== null) {
-          const name = match[1].trim();
-          const score = parseInt(match[2]);
-          if (name.length > 1 && !results.some(r => r.archerName === name)) {
-            results.push({
-              id: `pdf-${Date.now()}-${results.length}-${Math.random().toString(36).substr(2, 5)}`,
-              archerName: name,
-              bowType: '',
-              distance: '',
-              rounds: [{ roundNumber: 1, scores: [score], total: score }],
-              totalScore: score,
-              date: new Date().toISOString(),
-            });
-          }
-        }
-      }
-      
-      return results;
-    } catch (error) {
-      console.error('PDF parsing error:', error);
-      return [];
-    }
-  };
-
-  // Parse multi-archer CSV
-  const parseMultiArcherCSV = async (content: string): Promise<ImportedScore[]> => {
-    try {
-      // Normalize line endings (handle Windows CRLF, Mac CR, Unix LF)
-      const normalizedContent = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-      const lines = normalizedContent.trim().split('\n');
-      
-      console.log('CSV Import Debug:');
-      console.log('- Total lines:', lines.length);
-      console.log('- First line (header):', lines[0]);
-      if (lines.length > 1) console.log('- Second line (first data):', lines[1]);
-      
-      if (lines.length < 2) {
-        console.log('CSV has less than 2 lines, returning empty');
-        return [];
-      }
-
-      // Parse header - handle BOM and extra whitespace
-      const headerLine = lines[0].replace(/^\uFEFF/, ''); // Remove BOM if present
-      const header = headerLine.split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
-      const results: ImportedScore[] = [];
-
-      // Find column indices - support multiple header formats
-      // Priority: exact matches first, then partial matches
-      const dateIdx = header.findIndex(h => h === 'date' || h.includes('date'));
-      
-      // Name column: prioritize 'archer' matches, then 'name', then 'session'
-      let nameIdx = header.findIndex(h => h.includes('archer'));
-      if (nameIdx === -1) nameIdx = header.findIndex(h => h === 'name' || (h.includes('name') && h !== 'bowname'));
-      if (nameIdx === -1) nameIdx = header.findIndex(h => h === 'session');
-      
-      const bowIdx = header.findIndex(h => h === 'bowtype' || h === 'bow type' || h.includes('bow'));
-      const scoreIdx = header.findIndex(h => h === 'totalscore' || h === 'total score' || h === 'score' || h.includes('score') || h.includes('total') || h.includes('points'));
-
-      console.log('CSV Header parsed:', header);
-      console.log('Column indices - date:', dateIdx, 'name:', nameIdx, 'bow:', bowIdx, 'score:', scoreIdx);
-
-      // If no name column found, try positional parsing
-      const usePositional = nameIdx === -1;
-      if (usePositional) {
-        console.log('No name column found, using positional parsing');
-      }
-
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-        
-        // Parse CSV values properly (handle quoted values with commas)
-        const values = parseCSVLine(line);
-        if (values.length < 2) {
-          console.log(`Row ${i}: Skipping - less than 2 values`);
-          continue;
-        }
-
-        // Get values based on found indices or fallback to positional
-        let date: string, name: string, bowType: string, score: number;
-        
-        if (usePositional) {
-          // Positional: assume Date,Name,BowType,Score format
-          date = values[0] || new Date().toLocaleDateString();
-          name = values[1] || '';
-          bowType = values[2] || '';
-          score = parseInt(values[3] || values[values.length - 1]) || 0;
-        } else {
-          date = dateIdx !== -1 ? values[dateIdx] : values[0] || new Date().toLocaleDateString();
-          name = nameIdx !== -1 ? values[nameIdx] : values[1] || values[0];
-          bowType = bowIdx !== -1 ? values[bowIdx] : values[2] || '';
-          const scoreStr = scoreIdx !== -1 ? values[scoreIdx] : values[values.length - 1];
-          score = parseInt(scoreStr) || 0;
-        }
-
-        console.log(`Row ${i}: name="${name}", bowType="${bowType}", score=${score}`);
-
-        if (name && name.length > 0 && score > 0) {
-          results.push({
-            id: `imported-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 5)}`,
-            archerName: name,
-            bowType: bowType,
-            distance: '',
-            rounds: [{ roundNumber: 1, scores: [score], total: score }],
-            totalScore: score,
-            date: date,
-          });
-        } else {
-          console.log(`Row ${i}: Skipping - name empty or score <= 0`);
-        }
-      }
-
-      console.log('CSV Import: Parsed', results.length, 'entries');
-      return results;
-    } catch (error) {
-      console.error('Multi-archer CSV parsing error:', error);
-      return [];
-    }
-  };
-
-  // Helper function to parse a CSV line properly (handles quoted values)
-  const parseCSVLine = (line: string): string[] => {
-    const values: string[] = [];
-    let current = '';
-    let inQuotes = false;
-    
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        values.push(current.trim().replace(/^["']|["']$/g, ''));
-        current = '';
-      } else {
-        current += char;
-      }
+  // Add manual entry
+  const handleAddManualEntry = () => {
+    if (!newArcherName.trim()) {
+      Alert.alert(t('common.error'), t('competitionSetup.archerNameRequired'));
+      return;
     }
     
-    // Don't forget the last value
-    values.push(current.trim().replace(/^["']|["']$/g, ''));
-    
-    return values;
-  };
-
-  const handleImportFile = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ['text/csv', 'text/plain', 'text/comma-separated-values', 'application/pdf', '*/*'],
-        copyToCacheDirectory: true,
-        multiple: true,
-      });
-
-      if (result.canceled) return;
-
-      setIsLoading(true);
-      
-      let allImportedData: ImportedScore[] = [];
-      let importErrors: string[] = [];
-      
-      // Process each selected file
-      for (const file of result.assets) {
-        const fileName = file.name.toLowerCase();
-        console.log('=== Processing file ===');
-        console.log('Name:', fileName);
-        console.log('URI:', file.uri);
-        console.log('Size:', file.size);
-        console.log('MIME:', file.mimeType);
-        
-        const isPDF = fileName.endsWith('.pdf') || file.mimeType === 'application/pdf';
-        const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt') || 
-                      file.mimeType?.includes('csv') || file.mimeType?.includes('text');
-        
-        if (!isPDF && !isCSV) {
-          importErrors.push(`${file.name}: Unsupported format`);
-          continue;
-        }
-        
-        let importedData: ImportedScore[] = [];
-        
-        // Step 1: Read file content
-        let base64Content = '';
-        let textContent = '';
-        
-        try {
-          // Read file as base64 (universal method that works for all file types)
-          // DocumentPicker with copyToCacheDirectory ensures file is accessible
-          base64Content = await FileSystem.readAsStringAsync(file.uri, {
-            encoding: FileSystem.EncodingType.Base64,
-          });
-          console.log('Base64 length:', base64Content.length);
-          
-          if (!base64Content || base64Content.length === 0) {
-            importErrors.push(`${file.name}: File is empty`);
-            continue;
-          }
-          
-          // Decode base64 to text for processing
-          try {
-            textContent = atob(base64Content);
-            console.log('Decoded text length:', textContent.length);
-          } catch (decodeError) {
-            console.log('Base64 decode error (may be binary file):', decodeError);
-            // For PDF files, this is expected - the binary content will be sent to server
-          }
-          
-        } catch (readError: any) {
-          console.error('File read error:', readError?.message || readError);
-          importErrors.push(`${file.name}: ${readError?.message || 'Could not read file'}`);
-          continue;
-        }
-        
-        // Step 2: Process based on file type
-        if (isPDF) {
-          console.log('Processing as PDF...');
-          
-          // Try server-side extraction
-          let serverWorked = false;
-          try {
-            console.log('Trying server extraction...');
-            
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000);
-            
-            const response = await fetch(`${API_URL}/api/extract-pdf`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ pdf_base64: base64Content }),
-              signal: controller.signal,
-            });
-            
-            clearTimeout(timeoutId);
-            console.log('Server response:', response.status);
-            
-            if (response.ok) {
-              const data = await response.json();
-              console.log('Server data:', JSON.stringify(data).substring(0, 200));
-              
-              if (data.success && data.sessions?.length > 0) {
-                for (const s of data.sessions) {
-                  if (s.name && s.score > 0) {
-                    importedData.push({
-                      id: `pdf-${Date.now()}-${importedData.length}`,
-                      archerName: s.name,
-                      bowType: s.bowType || '',
-                      distance: '',
-                      rounds: [{ roundNumber: 1, scores: [s.score], total: s.score }],
-                      totalScore: s.score,
-                      date: s.date || new Date().toLocaleDateString(),
-                    });
-                  }
-                }
-                serverWorked = importedData.length > 0;
-                console.log('Server extracted:', importedData.length, 'entries');
-              }
-            }
-          } catch (serverErr: any) {
-            console.log('Server error:', serverErr?.message || serverErr);
-          }
-          
-          // Fallback: local parsing
-          if (!serverWorked && textContent) {
-            console.log('Trying local PDF parsing...');
-            
-            // Extract printable characters
-            const printable = textContent.replace(/[^\x20-\x7E\n\r\t]/g, '');
-            console.log('Printable chars:', printable.length);
-            
-            // Look for markers
-            const markerMatch = printable.match(/ARROW_TRACKER_DATA_START[\s\S]*?Date,Name,BowType,TotalScore([\s\S]*?)ARROW_TRACKER_DATA_END/i);
-            if (markerMatch) {
-              console.log('Found data markers!');
-              const csvLines = markerMatch[1].trim().split(/[\n\r]+/);
-              for (const line of csvLines) {
-                const parts = line.split(',').map(p => p.trim());
-                if (parts.length >= 4) {
-                  const score = parseInt(parts[3]);
-                  if (parts[1] && !isNaN(score) && score > 0) {
-                    importedData.push({
-                      id: `pdf-local-${Date.now()}-${importedData.length}`,
-                      archerName: parts[1],
-                      bowType: parts[2] || '',
-                      distance: '',
-                      rounds: [{ roundNumber: 1, scores: [score], total: score }],
-                      totalScore: score,
-                      date: parts[0] || new Date().toLocaleDateString(),
-                    });
-                  }
-                }
-              }
-              console.log('Local extracted:', importedData.length, 'entries');
-            }
-          }
-          
-          if (importedData.length === 0) {
-            importErrors.push(`${file.name}: No archer data found in PDF`);
-          }
-          
-        } else {
-          // CSV processing
-          console.log('Processing as CSV...');
-          
-          if (!textContent) {
-            importErrors.push(`${file.name}: Could not read CSV content`);
-            continue;
-          }
-          
-          // Normalize and parse
-          const normalized = textContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-          console.log('CSV preview:', normalized.substring(0, 200));
-          
-          if (!normalized.includes(',')) {
-            importErrors.push(`${file.name}: Not a valid CSV (no commas found)`);
-            continue;
-          }
-          
-          importedData = await parseMultiArcherCSV(normalized);
-          console.log('CSV parsed:', importedData.length, 'entries');
-          
-          if (importedData.length === 0) {
-            importErrors.push(`${file.name}: No valid data rows in CSV`);
-          }
-        }
-        
-        allImportedData = [...allImportedData, ...importedData];
-      }
-      
-      // After processing all files
-      if (allImportedData.length > 0) {
-        const newScores = allImportedData.filter(newScore => {
-          const isDuplicate = importedScores.some(existing => 
-            existing.archerName === newScore.archerName && existing.totalScore === newScore.totalScore
-          );
-          return !isDuplicate;
-        });
-        
-        if (newScores.length > 0) {
-          setImportedScores(prev => [...prev, ...newScores]);
-          const archerNames = newScores.map(s => s.archerName).join(', ');
-          Alert.alert(
-            t('scoreKeeping.importSuccess'),
-            t('scoreKeeping.importedArchersDetail', { 
-              count: newScores.length,
-              names: archerNames.length > 50 ? archerNames.substring(0, 50) + '...' : archerNames
-            })
-          );
-        } else {
-          Alert.alert(t('scoreKeeping.importError'), t('scoreKeeping.duplicateEntries'));
-        }
-      } else {
-        // Provide more helpful error message
-        const fileNames = result.assets.map(f => f.name).join(', ');
-        const hasPDF = result.assets.some(f => f.name.toLowerCase().endsWith('.pdf'));
-        
-        let errorMsg = t('scoreKeeping.invalidFormat');
-        
-        // Add specific error details if available
-        if (importErrors.length > 0) {
-          errorMsg = importErrors.join('\n');
-        }
-        
-        if (hasPDF) {
-          errorMsg += '\n\n' + t('scoreKeeping.pdfImportTip', { 
-            defaultValue: 'Tip: PDF text extraction is limited. For reliable import, use the CSV export option instead and import the CSV file.' 
-          });
-        }
-        
-        Alert.alert(
-          t('scoreKeeping.importError'),
-          errorMsg,
-          [
-            { text: 'OK', style: 'default' }
-          ]
-        );
-      }
-      
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Import error:', error);
-      setIsLoading(false);
-      Alert.alert(t('common.error'), t('scoreKeeping.importError'));
+    const score = parseInt(newScore);
+    if (isNaN(score) || score <= 0) {
+      Alert.alert(t('common.error'), 'Please enter a valid score');
+      return;
     }
+
+    const newEntry: ManualEntry = {
+      id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      archerName: newArcherName.trim(),
+      bowType: newBowType,
+      totalScore: score,
+      date: new Date().toLocaleDateString(),
+    };
+
+    setManualEntries(prev => [...prev, newEntry]);
+    setNewArcherName('');
+    setNewScore('');
+    setShowAddModal(false);
   };
 
-  const toggleSelection = (id: string) => {
-    setSelectedItems(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
+  // Delete manual entry
+  const handleDeleteManualEntry = (entryId: string) => {
+    Alert.alert(
+      t('common.delete'),
+      'Delete this entry?',
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        { 
+          text: t('common.delete'), 
+          style: 'destructive',
+          onPress: () => {
+            setManualEntries(prev => prev.filter(e => e.id !== entryId));
+            const newSelected = new Set(selectedManualEntries);
+            newSelected.delete(entryId);
+            setSelectedManualEntries(newSelected);
+          }
+        },
+      ]
+    );
   };
 
-  // Build rankings from selected items
-  const rankings = useMemo(() => {
-    const entries: RankingEntry[] = [];
+  // Generate rankings
+  const generateRankings = (): RankingEntry[] => {
+    const rankings: RankingEntry[] = [];
 
     // Add selected competition sessions
-    competitionSessions.forEach(session => {
-      if (selectedItems.has(session.id)) {
-        entries.push({
-          name: session.archer_name || session.name || 'Unknown',
-          bowType: session.competition_bow_type || '',
+    competitionSessions
+      .filter(s => selectedSessions.has(s.id))
+      .forEach(session => {
+        rankings.push({
+          name: session.name || session.id.slice(0, 8),
+          bowType: session.bow_name || 'Unknown',
           totalScore: session.total_score || 0,
           source: 'app',
-          date: session.created_at,
+          date: new Date(session.created_at).toLocaleDateString(),
         });
-      }
-    });
-
-    // Add selected imported scores
-    importedScores.forEach(score => {
-      if (selectedItems.has(score.id)) {
-        entries.push({
-          name: score.archerName,
-          bowType: score.bowType,
-          totalScore: score.totalScore,
-          source: 'imported',
-          date: score.date,
-        });
-      }
-    });
-
-    // Group by bow type, then sort by score
-    const grouped: { [key: string]: RankingEntry[] } = {};
-    entries.forEach(entry => {
-      const key = entry.bowType || 'Other';
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(entry);
-    });
-
-    // Sort each group by score (highest first)
-    Object.keys(grouped).forEach(key => {
-      grouped[key].sort((a, b) => b.totalScore - a.totalScore);
-    });
-
-    return grouped;
-  }, [selectedItems, competitionSessions, importedScores]);
-
-  const totalSelected = selectedItems.size;
-
-  const generateRankingsPDF = async () => {
-    const bowTypes = Object.keys(rankings).sort();
-    
-    let rankingsHtml = '';
-    bowTypes.forEach(bowType => {
-      const entries = rankings[bowType];
-      rankingsHtml += `
-        <div class="bow-section">
-          <h2 class="bow-type">${bowType}</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>${t('scoreKeeping.rank')}</th>
-                <th>${t('scoreKeeping.archerName')}</th>
-                <th>${t('scoreKeeping.score')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${entries.map((entry, idx) => `
-                <tr class="${idx === 0 ? 'gold' : idx === 1 ? 'silver' : idx === 2 ? 'bronze' : ''}">
-                  <td class="rank">${idx + 1}</td>
-                  <td>${entry.name}</td>
-                  <td class="score">${entry.totalScore}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-    });
-
-    const html = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            h1 { text-align: center; color: #8B0000; margin-bottom: 30px; }
-            .bow-section { margin-bottom: 30px; page-break-inside: avoid; }
-            .bow-type { background: #333; color: #FFD700; padding: 10px 15px; border-radius: 8px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            th { background: #f5f5f5; padding: 12px; text-align: left; border-bottom: 2px solid #333; }
-            td { padding: 10px 12px; border-bottom: 1px solid #ddd; }
-            .rank { font-weight: bold; width: 50px; }
-            .score { font-weight: bold; color: #8B0000; }
-            .gold td { background: rgba(255, 215, 0, 0.2); }
-            .silver td { background: rgba(192, 192, 192, 0.2); }
-            .bronze td { background: rgba(205, 127, 50, 0.2); }
-            .footer { text-align: center; margin-top: 40px; color: #888; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <h1>${t('scoreKeeping.competitionRankings')}</h1>
-          ${rankingsHtml}
-          <div class="footer">
-            <p>Generated by Arrow Tracker - ${new Date().toLocaleDateString()}</p>
-          </div>
-        </body>
-      </html>
-    `;
-
-    try {
-      const { uri } = await Print.printToFileAsync({ html });
-      await Sharing.shareAsync(uri, {
-        mimeType: 'application/pdf',
-        dialogTitle: t('scoreKeeping.shareRankings'),
       });
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      Alert.alert(t('common.error'), t('scoreKeeping.pdfError'));
+
+    // Add selected manual entries
+    manualEntries
+      .filter(e => selectedManualEntries.has(e.id))
+      .forEach(entry => {
+        rankings.push({
+          name: entry.archerName,
+          bowType: entry.bowType,
+          totalScore: entry.totalScore,
+          source: 'manual',
+          date: entry.date,
+        });
+      });
+
+    // Filter by bow type if selected
+    let filtered = rankings;
+    if (selectedBowFilter) {
+      filtered = rankings.filter(r => r.bowType === selectedBowFilter);
     }
+
+    // Sort by score descending
+    return filtered.sort((a, b) => b.totalScore - a.totalScore);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
+  const rankings = generateRankings();
+  const totalSelected = selectedSessions.size + selectedManualEntries.size;
 
-  const removeImported = (id: string) => {
-    setImportedScores(prev => prev.filter(s => s.id !== id));
-    setSelectedItems(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(id);
-      return newSet;
-    });
-  };
+  // Get unique bow types from rankings for filter
+  const availableBowTypes = [...new Set([
+    ...competitionSessions.filter(s => selectedSessions.has(s.id)).map(s => s.bow_name || 'Unknown'),
+    ...manualEntries.filter(e => selectedManualEntries.has(e.id)).map(e => e.bowType),
+  ])];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Icon name="document-text" size={28} color="#4CAF50" />
-          <Text style={styles.headerTitle}>{t('scoreKeeping.title')}</Text>
-        </View>
-        <View style={styles.placeholder} />
+        <Text style={styles.headerTitle}>{t('scoreKeeping.title')}</Text>
+        <View style={styles.headerRight} />
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {/* Import Section */}
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Manual Entry Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('scoreKeeping.importFiles')}</Text>
-          <TouchableOpacity
-            style={styles.importButton}
-            onPress={handleImportFile}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#4CAF50" />
-            ) : (
-              <>
-                <Icon name="cloud-upload" size={32} color="#4CAF50" />
-                <Text style={styles.importButtonText}>{t('scoreKeeping.selectFile')}</Text>
-                <Text style={styles.importButtonSubtext}>{t('scoreKeeping.supportedFormats')}</Text>
-              </>
-            )}
-          </TouchableOpacity>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Manual Entries ({manualEntries.length})</Text>
+            <TouchableOpacity 
+              style={styles.addButton}
+              onPress={() => setShowAddModal(true)}
+            >
+              <Icon name="add" size={20} color="#fff" />
+              <Text style={styles.addButtonText}>Add Archer</Text>
+            </TouchableOpacity>
+          </View>
+
+          {manualEntries.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Icon name="person-add" size={40} color="#666" />
+              <Text style={styles.emptyStateText}>No manual entries yet</Text>
+              <Text style={styles.emptyStateSubtext}>Tap "Add Archer" to enter scores manually</Text>
+            </View>
+          ) : (
+            manualEntries.map(entry => (
+              <TouchableOpacity
+                key={entry.id}
+                style={[
+                  styles.entryItem,
+                  selectedManualEntries.has(entry.id) && styles.entryItemSelected,
+                ]}
+                onPress={() => toggleManualEntrySelection(entry.id)}
+                onLongPress={() => handleDeleteManualEntry(entry.id)}
+              >
+                <View style={styles.entryCheckbox}>
+                  {selectedManualEntries.has(entry.id) && (
+                    <Icon name="checkmark" size={16} color="#8B0000" />
+                  )}
+                </View>
+                <View style={styles.entryInfo}>
+                  <Text style={styles.entryName}>{entry.archerName}</Text>
+                  <Text style={styles.entryDetails}>{entry.bowType} • {entry.date}</Text>
+                </View>
+                <Text style={styles.entryScore}>{entry.totalScore} pts</Text>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
 
-        {/* Imported Scores */}
-        {importedScores.length > 0 && (
+        {/* Competition Sessions Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            {t('scoreKeeping.competitionSessions')} ({competitionSessions.length})
+          </Text>
+
+          {competitionSessions.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Icon name="trophy" size={40} color="#666" />
+              <Text style={styles.emptyStateText}>{t('scoreKeeping.noCompetitions')}</Text>
+              <Text style={styles.emptyStateSubtext}>{t('scoreKeeping.noCompetitionsDesc')}</Text>
+            </View>
+          ) : (
+            competitionSessions.map(session => (
+              <TouchableOpacity
+                key={session.id}
+                style={[
+                  styles.entryItem,
+                  selectedSessions.has(session.id) && styles.entryItemSelected,
+                ]}
+                onPress={() => toggleSessionSelection(session.id)}
+              >
+                <View style={styles.entryCheckbox}>
+                  {selectedSessions.has(session.id) && (
+                    <Icon name="checkmark" size={16} color="#8B0000" />
+                  )}
+                </View>
+                <View style={styles.entryInfo}>
+                  <Text style={styles.entryName}>{session.name || session.id.slice(0, 8)}</Text>
+                  <Text style={styles.entryDetails}>
+                    {session.bow_name || 'Unknown'} • {new Date(session.created_at).toLocaleDateString()}
+                  </Text>
+                </View>
+                <Text style={styles.entryScore}>{session.total_score || 0} pts</Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+
+        {/* Rankings Section */}
+        {totalSelected > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('scoreKeeping.importedScores')} ({importedScores.length})</Text>
-            <View style={styles.list}>
-              {importedScores.map(score => {
-                const isSelected = selectedItems.has(score.id);
-                return (
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>{t('scoreKeeping.rankings')} ({totalSelected} selected)</Text>
+            </View>
+
+            {/* Bow Type Filter */}
+            {availableBowTypes.length > 1 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
+                <TouchableOpacity
+                  style={[styles.filterChip, !selectedBowFilter && styles.filterChipActive]}
+                  onPress={() => setSelectedBowFilter(null)}
+                >
+                  <Text style={[styles.filterChipText, !selectedBowFilter && styles.filterChipTextActive]}>
+                    All
+                  </Text>
+                </TouchableOpacity>
+                {availableBowTypes.map(bowType => (
                   <TouchableOpacity
-                    key={score.id}
-                    style={[styles.card, isSelected && styles.cardSelected]}
-                    onPress={() => toggleSelection(score.id)}
+                    key={bowType}
+                    style={[styles.filterChip, selectedBowFilter === bowType && styles.filterChipActive]}
+                    onPress={() => setSelectedBowFilter(bowType)}
                   >
-                    <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-                      {isSelected && <Icon name="checkmark" size={16} color="#fff" />}
-                    </View>
-                    <View style={styles.cardInfo}>
-                      <Text style={styles.cardName}>{score.archerName}</Text>
-                      <Text style={styles.cardDetails}>
-                        {score.bowType || t('scoreKeeping.noBowType')} • {t('scoreKeeping.imported')}
-                      </Text>
-                    </View>
-                    <View style={styles.cardScore}>
-                      <Text style={styles.cardScoreValue}>{score.totalScore}</Text>
-                      <Text style={styles.cardScoreLabel}>{t('scoreKeeping.pts')}</Text>
-                    </View>
-                    <TouchableOpacity
-                      style={styles.deleteButton}
-                      onPress={() => removeImported(score.id)}
-                    >
-                      <Icon name="close-circle" size={20} color="#666" />
-                    </TouchableOpacity>
+                    <Text style={[styles.filterChipText, selectedBowFilter === bowType && styles.filterChipTextActive]}>
+                      {bowType}
+                    </Text>
                   </TouchableOpacity>
-                );
-              })}
+                ))}
+              </ScrollView>
+            )}
+
+            {/* Rankings Table */}
+            <View style={styles.rankingsTable}>
+              <View style={styles.rankingsHeader}>
+                <Text style={[styles.rankingsHeaderText, styles.rankCol]}>#</Text>
+                <Text style={[styles.rankingsHeaderText, styles.nameCol]}>Archer</Text>
+                <Text style={[styles.rankingsHeaderText, styles.bowCol]}>Bow</Text>
+                <Text style={[styles.rankingsHeaderText, styles.scoreCol]}>Score</Text>
+              </View>
+              {rankings.map((entry, index) => (
+                <View key={`${entry.name}-${index}`} style={styles.rankingsRow}>
+                  <Text style={[styles.rankingsCell, styles.rankCol, index < 3 && styles.topRank]}>
+                    {index + 1}
+                  </Text>
+                  <Text style={[styles.rankingsCell, styles.nameCol]} numberOfLines={1}>
+                    {entry.name}
+                  </Text>
+                  <Text style={[styles.rankingsCell, styles.bowCol]} numberOfLines={1}>
+                    {entry.bowType}
+                  </Text>
+                  <Text style={[styles.rankingsCell, styles.scoreCol, styles.scoreText]}>
+                    {entry.totalScore}
+                  </Text>
+                </View>
+              ))}
             </View>
           </View>
         )}
 
-        {/* Competition Sessions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('scoreKeeping.competitionSessions')} ({competitionSessions.length})</Text>
-          {competitionSessions.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Icon name="trophy-outline" size={48} color="#444" />
-              <Text style={styles.emptyStateText}>{t('scoreKeeping.noCompetitions')}</Text>
-            </View>
-          ) : (
-            <View style={styles.list}>
-              {competitionSessions.map(session => {
-                const isSelected = selectedItems.has(session.id);
-                return (
-                  <TouchableOpacity
-                    key={session.id}
-                    style={[styles.card, isSelected && styles.cardSelected]}
-                    onPress={() => toggleSelection(session.id)}
-                  >
-                    <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-                      {isSelected && <Icon name="checkmark" size={16} color="#fff" />}
-                    </View>
-                    <View style={styles.cardInfo}>
-                      <Text style={styles.cardName}>{session.archer_name || session.name}</Text>
-                      <Text style={styles.cardDetails}>
-                        {session.competition_bow_type || ''} • {session.distance} • {formatDate(session.created_at)}
-                      </Text>
-                    </View>
-                    <View style={styles.cardScore}>
-                      <Text style={styles.cardScoreValue}>{session.total_score}</Text>
-                      <Text style={styles.cardScoreLabel}>{t('scoreKeeping.pts')}</Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          )}
-        </View>
-
-        {/* Export PDF Button */}
-        <TouchableOpacity
-          style={[styles.generateButton, (competitionSessions.length === 0 && importedScores.length === 0) && styles.generateButtonDisabled]}
-          onPress={generateRankingsPDF}
-          disabled={(competitionSessions.length === 0 && importedScores.length === 0) || isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#000" size="small" />
-          ) : (
-            <Icon name="document-text" size={24} color={(competitionSessions.length === 0 && importedScores.length === 0) ? '#666' : '#000'} />
-          )}
-          <Text style={[styles.generateButtonText, (competitionSessions.length === 0 && importedScores.length === 0) && styles.generateButtonTextDisabled]}>
-            {t('scoreKeeping.exportPDF')}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Info Card */}
-        <View style={styles.infoCard}>
-          <Icon name="information-circle" size={20} color="#4CAF50" />
-          <Text style={styles.infoText}>{t('scoreKeeping.infoText')}</Text>
-        </View>
+        <View style={styles.bottomPadding} />
       </ScrollView>
+
+      {/* Add Archer Modal */}
+      <Modal
+        visible={showAddModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowAddModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add Archer</Text>
+              <TouchableOpacity onPress={() => setShowAddModal(false)}>
+                <Icon name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <Text style={styles.inputLabel}>Archer Name *</Text>
+              <TextInput
+                style={styles.textInput}
+                value={newArcherName}
+                onChangeText={setNewArcherName}
+                placeholder="Enter name"
+                placeholderTextColor="#666"
+              />
+
+              <Text style={styles.inputLabel}>Bow Type</Text>
+              <View style={styles.bowTypeGrid}>
+                {BOW_TYPES.map(bow => (
+                  <TouchableOpacity
+                    key={bow}
+                    style={[styles.bowTypeButton, newBowType === bow && styles.bowTypeButtonActive]}
+                    onPress={() => setNewBowType(bow)}
+                  >
+                    <Text style={[styles.bowTypeText, newBowType === bow && styles.bowTypeTextActive]}>
+                      {bow}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.inputLabel}>Total Score *</Text>
+              <TextInput
+                style={styles.textInput}
+                value={newScore}
+                onChangeText={setNewScore}
+                placeholder="Enter score"
+                placeholderTextColor="#666"
+                keyboardType="numeric"
+              />
+
+              <TouchableOpacity style={styles.saveButton} onPress={handleAddManualEntry}>
+                <Text style={styles.saveButtonText}>Add Archer</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -959,37 +422,80 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#222',
   },
-  backButton: { padding: 8 },
-  headerContent: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
-  placeholder: { width: 40 },
-  scrollView: { flex: 1 },
-  scrollContent: { padding: 16, paddingBottom: 40 },
-  section: { marginBottom: 24 },
-  sectionTitle: { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 12 },
-  importButton: {
-    backgroundColor: '#111',
-    borderRadius: 16,
-    padding: 32,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#333',
-    borderStyle: 'dashed',
+  backButton: {
+    padding: 8,
   },
-  importButtonText: { fontSize: 16, fontWeight: '600', color: '#fff', marginTop: 12 },
-  importButtonSubtext: { fontSize: 13, color: '#666', marginTop: 4 },
-  list: { gap: 10 },
-  card: {
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  headerRight: {
+    width: 40,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  section: {
+    marginTop: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#8B0000',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 30,
+    backgroundColor: '#111',
+    borderRadius: 12,
+  },
+  emptyStateText: {
+    color: '#888',
+    fontSize: 16,
+    marginTop: 12,
+  },
+  emptyStateSubtext: {
+    color: '#666',
+    fontSize: 13,
+    marginTop: 4,
+  },
+  entryItem: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: '#222',
   },
-  cardSelected: { backgroundColor: 'rgba(76, 175, 80, 0.15)', borderColor: '#4CAF50' },
-  checkbox: {
+  entryItemSelected: {
+    borderColor: '#8B0000',
+    backgroundColor: '#1a0a0a',
+  },
+  entryCheckbox: {
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -999,83 +505,175 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 12,
   },
-  checkboxSelected: { backgroundColor: '#4CAF50', borderColor: '#4CAF50' },
-  cardInfo: { flex: 1 },
-  cardName: { fontSize: 16, fontWeight: '600', color: '#fff' },
-  cardDetails: { fontSize: 13, color: '#888', marginTop: 2 },
-  cardScore: { alignItems: 'flex-end', marginRight: 8 },
-  cardScoreValue: { fontSize: 20, fontWeight: 'bold', color: '#FFD700' },
-  cardScoreLabel: { fontSize: 12, color: '#888' },
-  deleteButton: { padding: 4 },
-  emptyState: {
+  entryInfo: {
+    flex: 1,
+  },
+  entryName: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  entryDetails: {
+    color: '#888',
+    fontSize: 13,
+    marginTop: 2,
+  },
+  entryScore: {
+    color: '#8B0000',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  filterRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: '#222',
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  filterChipActive: {
+    backgroundColor: '#8B0000',
+  },
+  filterChipText: {
+    color: '#888',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  filterChipTextActive: {
+    color: '#fff',
+  },
+  rankingsTable: {
     backgroundColor: '#111',
-    borderRadius: 16,
-    padding: 40,
-    alignItems: 'center',
+    borderRadius: 10,
+    overflow: 'hidden',
   },
-  emptyStateText: { fontSize: 16, fontWeight: '600', color: '#666', marginTop: 16 },
-  generateButton: {
+  rankingsHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#4CAF50',
-    borderRadius: 16,
-    padding: 16,
-    gap: 8,
-    marginTop: 20,
-    marginBottom: 24,
+    backgroundColor: '#1a1a1a',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
-  generateButtonDisabled: { backgroundColor: '#222' },
-  generateButtonText: { fontSize: 14, fontWeight: 'bold', color: '#000' },
-  generateButtonTextDisabled: { color: '#666' },
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-    borderRadius: 12,
-    padding: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(76, 175, 80, 0.3)',
+  rankingsHeaderText: {
+    color: '#888',
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'uppercase',
   },
-  infoText: { flex: 1, color: '#ccc', fontSize: 14, lineHeight: 20 },
-  modalContainer: { flex: 1, backgroundColor: '#000' },
-  modalHeader: {
+  rankingsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#222',
   },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
-  modalContent: { flex: 1, padding: 16 },
-  rankingSection: { marginBottom: 24 },
-  bowTypeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#222',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    marginBottom: 8,
-    gap: 10,
+  rankingsCell: {
+    color: '#fff',
+    fontSize: 14,
   },
-  bowTypeTitle: { fontSize: 18, fontWeight: 'bold', color: '#FFD700' },
-  rankingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  rankCol: {
+    width: 30,
+  },
+  nameCol: {
+    flex: 1,
+  },
+  bowCol: {
+    width: 80,
+  },
+  scoreCol: {
+    width: 50,
+    textAlign: 'right',
+  },
+  topRank: {
+    color: '#FFD700',
+    fontWeight: '700',
+  },
+  scoreText: {
+    fontWeight: '600',
+    color: '#8B0000',
+  },
+  bottomPadding: {
+    height: 40,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
     backgroundColor: '#111',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginBottom: 4,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '80%',
   },
-  rankingGold: { backgroundColor: 'rgba(255, 215, 0, 0.15)' },
-  rankingSilver: { backgroundColor: 'rgba(192, 192, 192, 0.1)' },
-  rankingBronze: { backgroundColor: 'rgba(205, 127, 50, 0.1)' },
-  rankNumber: { fontSize: 18, fontWeight: 'bold', color: '#888', width: 40 },
-  rankName: { flex: 1, fontSize: 16, color: '#fff' },
-  rankScore: { fontSize: 18, fontWeight: 'bold', color: '#4CAF50' },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#222',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  modalBody: {
+    padding: 16,
+  },
+  inputLabel: {
+    color: '#888',
+    fontSize: 13,
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  textInput: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 10,
+    padding: 14,
+    color: '#fff',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  bowTypeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  bowTypeButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  bowTypeButtonActive: {
+    backgroundColor: '#8B0000',
+    borderColor: '#8B0000',
+  },
+  bowTypeText: {
+    color: '#888',
+    fontSize: 14,
+  },
+  bowTypeTextActive: {
+    color: '#fff',
+  },
+  saveButton: {
+    backgroundColor: '#8B0000',
+    borderRadius: 10,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
