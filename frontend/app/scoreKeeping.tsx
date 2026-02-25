@@ -458,12 +458,62 @@ export default function ScoreKeepingScreen() {
           try {
             console.log('PDF Import: Starting to process', fileName);
             
-            // Read PDF as base64 first
+            // Read PDF as base64
             const base64Content = await FileSystem.readAsStringAsync(file.uri, {
               encoding: FileSystem.EncodingType.Base64,
             });
             
             console.log('PDF Import: Read', base64Content.length, 'base64 characters');
+            
+            // Try server-side extraction first (more reliable)
+            try {
+              console.log('PDF Import: Attempting server-side extraction...');
+              const response = await fetch(`${API_URL}/api/extract-pdf`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ pdf_base64: base64Content }),
+              });
+              
+              if (response.ok) {
+                const result = await response.json();
+                console.log('PDF Import: Server response:', result);
+                
+                if (result.success && result.sessions && result.sessions.length > 0) {
+                  console.log('PDF Import: Server extracted', result.sessions.length, 'sessions');
+                  
+                  for (const session of result.sessions) {
+                    if (session.name && session.score > 0) {
+                      importedData.push({
+                        id: `pdf-server-${Date.now()}-${importedData.length}-${Math.random().toString(36).substr(2, 5)}`,
+                        archerName: session.name,
+                        bowType: session.bowType || '',
+                        distance: '',
+                        rounds: [{ roundNumber: 1, scores: [session.score], total: session.score }],
+                        totalScore: session.score,
+                        date: session.date || new Date().toISOString(),
+                      });
+                    }
+                  }
+                  
+                  if (importedData.length > 0) {
+                    console.log('PDF Import: Successfully imported', importedData.length, 'entries via server');
+                    allImportedData.push(...importedData);
+                    continue; // Move to next file
+                  }
+                } else if (result.text) {
+                  // Server extracted text but no structured data - try local parsing
+                  console.log('PDF Import: Server extracted text, trying local parsing...');
+                  console.log('PDF Import: Text preview:', result.text.substring(0, 500));
+                }
+              }
+            } catch (serverError) {
+              console.log('PDF Import: Server extraction failed, falling back to local:', serverError);
+            }
+            
+            // Fallback: Local PDF text extraction (less reliable)
+            console.log('PDF Import: Attempting local extraction...');
             
             // Decode base64 to binary string and extract printable characters
             let textContent = '';
@@ -483,7 +533,6 @@ export default function ScoreKeepingScreen() {
               }
             } catch (decodeErr) {
               console.error('PDF Import: Base64 decode error:', decodeErr);
-              // Fallback to reading as text
               textContent = await FileSystem.readAsStringAsync(file.uri);
             }
 
