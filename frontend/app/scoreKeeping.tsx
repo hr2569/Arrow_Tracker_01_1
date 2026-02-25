@@ -433,16 +433,19 @@ export default function ScoreKeepingScreen() {
       setIsLoading(true);
       
       let allImportedData: ImportedScore[] = [];
+      let importErrors: string[] = [];
       
       // Process each selected file
       for (const file of result.assets) {
         const fileName = file.name.toLowerCase();
+        console.log('Processing file:', fileName, 'URI:', file.uri);
         
         const isPDF = fileName.endsWith('.pdf');
         const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt');
         
         if (!isPDF && !isCSV) {
           console.log(`Skipping unsupported file: ${fileName}`);
+          importErrors.push(`${file.name}: Unsupported format`);
           continue;
         }
         
