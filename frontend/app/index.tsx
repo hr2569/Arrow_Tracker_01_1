@@ -30,7 +30,15 @@ export default function HomeScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const { t } = useTranslation();
-  const [stats, setStats] = useState<QuickStats | null>(null);
+  // Initialize with default stats so widget always shows
+  const [stats, setStats] = useState<QuickStats>({
+    totalSessions: 0,
+    recentAvg: 0,
+    bestScore: 0,
+    trend: 'neutral',
+    trendPercent: 0,
+    arrowsShot: 0,
+  });
 
   // Calculate quick stats from sessions
   const calculateStats = useCallback(async () => {
