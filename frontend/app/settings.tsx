@@ -119,8 +119,6 @@ export default function SettingsScreen() {
       );
     }
   };
-    );
-  };
 
   return (
     <SafeAreaView style={styles.container}>
