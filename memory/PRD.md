@@ -101,6 +101,8 @@ React Native Expo archery scoring application with target visualization, arrow p
 - [x] Fixed 'X' scoring bug (arrows marked as X were incorrectly scored as 11 instead of 10)
 - [x] Added Competition Menu toggle feature flag in index.tsx
 - [x] Updated app version to 2.1.21
+- [x] **Quick Stats Widget**: Modified to always show on home screen, even with no data (displays 0 values)
+- [x] **Web Compatibility**: Updated settings.tsx to use `window.confirm` and `window.alert` for Generate Test Data and Clear All Data buttons on web platform
 - [x] **CSV Import Fix**: Enhanced parseMultiArcherCSV function with:
   - Normalized line endings (handles Windows CRLF, Mac CR, Unix LF)
   - BOM (Byte Order Mark) removal for UTF-8 files
