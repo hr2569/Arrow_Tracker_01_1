@@ -108,7 +108,12 @@
     "importCode": "Importar",
     "invalidCode": "Código de importação inválido. Por favor, verifique e tente novamente.",
     "noData": "Sem Dados",
-    "noRankingsToExport": "Sem dados de rankings para exportar. Importe pontuações ou complete sessões de competição primeiro."
+    "noRankingsToExport": "Sem dados de rankings para exportar. Importe pontuações ou complete sessões de competição primeiro.",
+    "supportedFormatsDetail": "Formatos suportados: arquivos CSV, TXT ou PDF com dados de pontuação.",
+    "pdfParsingLimited": "Análise de PDF Limitada",
+    "pdfParsingHelp": "Não foi possível extrair dados de pontuação deste PDF. Para melhores resultados, use o formato CSV com colunas: Nome, Tipo de Arco, Pontuação.",
+    "importedArcher": "Importado {{name}} com pontuação {{score}}",
+    "importedArchersDetail": "{{count}} arqueiro(s) importado(s): {{names}}"
   },
   "settings": {
     "title": "Definições",

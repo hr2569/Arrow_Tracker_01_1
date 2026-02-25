@@ -113,7 +113,8 @@
     "codePlaceholder": "Incolla il codice di importazione qui...",
     "importCode": "Importa",
     "invalidCode": "Codice di importazione non valido. Per favore verifica e riprova.",
-    "duplicateEntry": "Questo arciere è già stato importato."
+    "duplicateEntry": "Questo arciere è già stato importato.",
+    "supportedFormatsDetail": "Formati supportati: file CSV, TXT o PDF con dati di punteggio."
   },
   "settings": {
     "title": "Impostazioni",

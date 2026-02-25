@@ -113,7 +113,8 @@
     "codePlaceholder": "Liitä tuontikoodi tähän...",
     "importCode": "Tuo",
     "invalidCode": "Virheellinen tuontikoodi. Tarkista ja yritä uudelleen.",
-    "duplicateEntry": "Tämä ampuja on jo tuotu."
+    "duplicateEntry": "Tämä ampuja on jo tuotu.",
+    "supportedFormatsDetail": "Tuetut muodot: CSV-, TXT- tai PDF-tiedostot pistetiedoilla."
   },
   "settings": {
     "title": "Asetukset",

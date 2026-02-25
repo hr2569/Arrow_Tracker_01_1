@@ -113,7 +113,8 @@
     "codePlaceholder": "Collez le code d'importation ici...",
     "importCode": "Importer",
     "invalidCode": "Code d'importation invalide. Veuillez vérifier et réessayer.",
-    "duplicateEntry": "Cet archer a déjà été importé."
+    "duplicateEntry": "Cet archer a déjà été importé.",
+    "supportedFormatsDetail": "Formats pris en charge : fichiers CSV, TXT ou PDF avec données de score."
   },
   "settings": {
     "title": "Paramètres",

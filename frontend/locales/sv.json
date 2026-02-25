@@ -113,7 +113,8 @@
     "codePlaceholder": "Klistra in importkod här...",
     "importCode": "Importera",
     "invalidCode": "Ogiltig importkod. Vänligen kontrollera och försök igen.",
-    "duplicateEntry": "Denna skytt har redan importerats."
+    "duplicateEntry": "Denna skytt har redan importerats.",
+    "supportedFormatsDetail": "Stödda format: CSV-, TXT- eller PDF-filer med poängdata."
   },
   "settings": {
     "title": "Inställningar",

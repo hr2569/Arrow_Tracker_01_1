@@ -113,7 +113,8 @@
     "codePlaceholder": "Pega el código de importación aquí...",
     "importCode": "Importar",
     "invalidCode": "Código de importación inválido. Por favor, verifica e intenta de nuevo.",
-    "duplicateEntry": "Este arquero ya ha sido importado."
+    "duplicateEntry": "Este arquero ya ha sido importado.",
+    "supportedFormatsDetail": "Formatos soportados: archivos CSV, TXT o PDF con datos de puntuación."
   },
   "settings": {
     "title": "Ajustes",
