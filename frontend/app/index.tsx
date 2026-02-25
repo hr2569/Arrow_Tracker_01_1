@@ -223,7 +223,6 @@ export default function HomeScreen() {
               </View>
             </View>
           </TouchableOpacity>
-        )}
 
         {/* Main Actions */}
         <View style={styles.actionsContainer}>
