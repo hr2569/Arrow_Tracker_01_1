@@ -302,10 +302,23 @@ export default function ScoreKeepingScreen() {
   // Parse multi-archer CSV
   const parseMultiArcherCSV = async (content: string): Promise<ImportedScore[]> => {
     try {
-      const lines = content.trim().split('\n');
-      if (lines.length < 2) return [];
+      // Normalize line endings (handle Windows CRLF, Mac CR, Unix LF)
+      const normalizedContent = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      const lines = normalizedContent.trim().split('\n');
+      
+      console.log('CSV Import Debug:');
+      console.log('- Total lines:', lines.length);
+      console.log('- First line (header):', lines[0]);
+      if (lines.length > 1) console.log('- Second line (first data):', lines[1]);
+      
+      if (lines.length < 2) {
+        console.log('CSV has less than 2 lines, returning empty');
+        return [];
+      }
 
-      const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+      // Parse header - handle BOM and extra whitespace
+      const headerLine = lines[0].replace(/^\uFEFF/, ''); // Remove BOM if present
+      const header = headerLine.split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
       const results: ImportedScore[] = [];
 
       // Find column indices - support multiple header formats
@@ -314,22 +327,42 @@ export default function ScoreKeepingScreen() {
       const bowIdx = header.findIndex(h => h === 'bowtype' || h === 'bow type' || h.includes('bow'));
       const scoreIdx = header.findIndex(h => h === 'totalscore' || h === 'total score' || h === 'score' || h.includes('score') || h.includes('total') || h.includes('points'));
 
-      console.log('CSV Header:', header);
-      console.log('Indices - date:', dateIdx, 'name:', nameIdx, 'bow:', bowIdx, 'score:', scoreIdx);
+      console.log('CSV Header parsed:', header);
+      console.log('Column indices - date:', dateIdx, 'name:', nameIdx, 'bow:', bowIdx, 'score:', scoreIdx);
+
+      // If no name column found, try positional parsing
+      const usePositional = nameIdx === -1;
+      if (usePositional) {
+        console.log('No name column found, using positional parsing');
+      }
 
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
         
-        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-        if (values.length < 2) continue;
+        // Parse CSV values properly (handle quoted values with commas)
+        const values = parseCSVLine(line);
+        if (values.length < 2) {
+          console.log(`Row ${i}: Skipping - less than 2 values`);
+          continue;
+        }
 
         // Get values based on found indices or fallback to positional
-        const date = dateIdx !== -1 ? values[dateIdx] : values[0] || new Date().toLocaleDateString();
-        const name = nameIdx !== -1 ? values[nameIdx] : values[1] || values[0];
-        const bowType = bowIdx !== -1 ? values[bowIdx] : values[2] || '';
-        const scoreStr = scoreIdx !== -1 ? values[scoreIdx] : values[values.length - 1];
-        const score = parseInt(scoreStr) || 0;
+        let date: string, name: string, bowType: string, score: number;
+        
+        if (usePositional) {
+          // Positional: assume Date,Name,BowType,Score format
+          date = values[0] || new Date().toLocaleDateString();
+          name = values[1] || '';
+          bowType = values[2] || '';
+          score = parseInt(values[3] || values[values.length - 1]) || 0;
+        } else {
+          date = dateIdx !== -1 ? values[dateIdx] : values[0] || new Date().toLocaleDateString();
+          name = nameIdx !== -1 ? values[nameIdx] : values[1] || values[0];
+          bowType = bowIdx !== -1 ? values[bowIdx] : values[2] || '';
+          const scoreStr = scoreIdx !== -1 ? values[scoreIdx] : values[values.length - 1];
+          score = parseInt(scoreStr) || 0;
+        }
 
         console.log(`Row ${i}: name="${name}", bowType="${bowType}", score=${score}`);
 
@@ -343,15 +376,42 @@ export default function ScoreKeepingScreen() {
             totalScore: score,
             date: date,
           });
+        } else {
+          console.log(`Row ${i}: Skipping - name empty or score <= 0`);
         }
       }
 
-      console.log('Parsed results:', results.length);
+      console.log('CSV Import: Parsed', results.length, 'entries');
       return results;
     } catch (error) {
       console.error('Multi-archer CSV parsing error:', error);
       return [];
     }
+  };
+
+  // Helper function to parse a CSV line properly (handles quoted values)
+  const parseCSVLine = (line: string): string[] => {
+    const values: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        values.push(current.trim().replace(/^["']|["']$/g, ''));
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    
+    // Don't forget the last value
+    values.push(current.trim().replace(/^["']|["']$/g, ''));
+    
+    return values;
   };
 
   const handleImportFile = async () => {
