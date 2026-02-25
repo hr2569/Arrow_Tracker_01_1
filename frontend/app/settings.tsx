@@ -85,25 +85,40 @@ export default function SettingsScreen() {
   };
 
   const handleClearAllData = async () => {
-    Alert.alert(
-      'Clear All Data',
-      'This will permanently delete ALL sessions and data. This action cannot be undone!',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete All',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await clearAllSessions();
-              Alert.alert('Success', 'All data has been cleared.');
-            } catch (error) {
-              console.error('Error clearing data:', error);
-              Alert.alert('Error', 'Failed to clear data');
-            }
-          },
-        },
-      ]
+    const doClear = async () => {
+      try {
+        await clearAllSessions();
+        if (Platform.OS === 'web') {
+          window.alert('Success: All data has been cleared.');
+        } else {
+          Alert.alert('Success', 'All data has been cleared.');
+        }
+      } catch (error) {
+        console.error('Error clearing data:', error);
+        if (Platform.OS === 'web') {
+          window.alert('Error: Failed to clear data');
+        } else {
+          Alert.alert('Error', 'Failed to clear data');
+        }
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('This will permanently delete ALL sessions and data. This action cannot be undone!');
+      if (confirmed) {
+        await doClear();
+      }
+    } else {
+      Alert.alert(
+        'Clear All Data',
+        'This will permanently delete ALL sessions and data. This action cannot be undone!',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Delete All', style: 'destructive', onPress: doClear },
+        ]
+      );
+    }
+  };
     );
   };
 
