@@ -441,18 +441,197 @@ export default function ScoreKeepingScreen() {
       // Process each selected file
       for (const file of result.assets) {
         const fileName = file.name.toLowerCase();
-        console.log('Processing file:', fileName, 'URI:', file.uri);
+        console.log('=== Processing file ===');
+        console.log('Name:', fileName);
+        console.log('URI:', file.uri);
+        console.log('Size:', file.size);
+        console.log('MIME:', file.mimeType);
         
-        const isPDF = fileName.endsWith('.pdf');
-        const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt');
+        const isPDF = fileName.endsWith('.pdf') || file.mimeType === 'application/pdf';
+        const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt') || 
+                      file.mimeType?.includes('csv') || file.mimeType?.includes('text');
         
         if (!isPDF && !isCSV) {
-          console.log(`Skipping unsupported file: ${fileName}`);
           importErrors.push(`${file.name}: Unsupported format`);
           continue;
         }
         
         let importedData: ImportedScore[] = [];
+        
+        // Step 1: Read file content
+        let base64Content = '';
+        let textContent = '';
+        
+        try {
+          // Check if file exists
+          const fileInfo = await FileSystem.getInfoAsync(file.uri);
+          console.log('File exists:', fileInfo.exists);
+          
+          if (!fileInfo.exists) {
+            importErrors.push(`${file.name}: File not found`);
+            continue;
+          }
+          
+          // Read as base64 (universal method)
+          base64Content = await FileSystem.readAsStringAsync(file.uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          console.log('Base64 length:', base64Content.length);
+          
+          if (!base64Content || base64Content.length === 0) {
+            importErrors.push(`${file.name}: File is empty`);
+            continue;
+          }
+          
+          // Decode for text processing
+          try {
+            // Use a safer decode for large files
+            const chunks = [];
+            const chunkSize = 1024;
+            for (let i = 0; i < base64Content.length; i += chunkSize) {
+              const chunk = base64Content.slice(i, i + chunkSize);
+              try {
+                chunks.push(atob(chunk));
+              } catch (e) {
+                // Partial chunk at end, try with padding
+                try {
+                  chunks.push(atob(chunk + '=='));
+                } catch (e2) {
+                  chunks.push(atob(chunk + '='));
+                }
+              }
+            }
+            textContent = chunks.join('');
+          } catch (decodeError) {
+            console.log('Chunked decode failed, trying direct:', decodeError);
+            try {
+              textContent = atob(base64Content);
+            } catch (e) {
+              console.log('Direct decode also failed');
+            }
+          }
+          console.log('Text content length:', textContent.length);
+          
+        } catch (readError: any) {
+          console.error('File read error:', readError?.message || readError);
+          importErrors.push(`${file.name}: ${readError?.message || 'Could not read file'}`);
+          continue;
+        }
+        
+        // Step 2: Process based on file type
+        if (isPDF) {
+          console.log('Processing as PDF...');
+          
+          // Try server-side extraction
+          let serverWorked = false;
+          try {
+            console.log('Trying server extraction...');
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+            
+            const response = await fetch(`${API_URL}/api/extract-pdf`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ pdf_base64: base64Content }),
+              signal: controller.signal,
+            });
+            
+            clearTimeout(timeoutId);
+            console.log('Server response:', response.status);
+            
+            if (response.ok) {
+              const data = await response.json();
+              console.log('Server data:', JSON.stringify(data).substring(0, 200));
+              
+              if (data.success && data.sessions?.length > 0) {
+                for (const s of data.sessions) {
+                  if (s.name && s.score > 0) {
+                    importedData.push({
+                      id: `pdf-${Date.now()}-${importedData.length}`,
+                      archerName: s.name,
+                      bowType: s.bowType || '',
+                      distance: '',
+                      rounds: [{ roundNumber: 1, scores: [s.score], total: s.score }],
+                      totalScore: s.score,
+                      date: s.date || new Date().toLocaleDateString(),
+                    });
+                  }
+                }
+                serverWorked = importedData.length > 0;
+                console.log('Server extracted:', importedData.length, 'entries');
+              }
+            }
+          } catch (serverErr: any) {
+            console.log('Server error:', serverErr?.message || serverErr);
+          }
+          
+          // Fallback: local parsing
+          if (!serverWorked && textContent) {
+            console.log('Trying local PDF parsing...');
+            
+            // Extract printable characters
+            const printable = textContent.replace(/[^\x20-\x7E\n\r\t]/g, '');
+            console.log('Printable chars:', printable.length);
+            
+            // Look for markers
+            const markerMatch = printable.match(/ARROW_TRACKER_DATA_START[\s\S]*?Date,Name,BowType,TotalScore([\s\S]*?)ARROW_TRACKER_DATA_END/i);
+            if (markerMatch) {
+              console.log('Found data markers!');
+              const csvLines = markerMatch[1].trim().split(/[\n\r]+/);
+              for (const line of csvLines) {
+                const parts = line.split(',').map(p => p.trim());
+                if (parts.length >= 4) {
+                  const score = parseInt(parts[3]);
+                  if (parts[1] && !isNaN(score) && score > 0) {
+                    importedData.push({
+                      id: `pdf-local-${Date.now()}-${importedData.length}`,
+                      archerName: parts[1],
+                      bowType: parts[2] || '',
+                      distance: '',
+                      rounds: [{ roundNumber: 1, scores: [score], total: score }],
+                      totalScore: score,
+                      date: parts[0] || new Date().toLocaleDateString(),
+                    });
+                  }
+                }
+              }
+              console.log('Local extracted:', importedData.length, 'entries');
+            }
+          }
+          
+          if (importedData.length === 0) {
+            importErrors.push(`${file.name}: No archer data found in PDF`);
+          }
+          
+        } else {
+          // CSV processing
+          console.log('Processing as CSV...');
+          
+          if (!textContent) {
+            importErrors.push(`${file.name}: Could not read CSV content`);
+            continue;
+          }
+          
+          // Normalize and parse
+          const normalized = textContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+          console.log('CSV preview:', normalized.substring(0, 200));
+          
+          if (!normalized.includes(',')) {
+            importErrors.push(`${file.name}: Not a valid CSV (no commas found)`);
+            continue;
+          }
+          
+          importedData = await parseMultiArcherCSV(normalized);
+          console.log('CSV parsed:', importedData.length, 'entries');
+          
+          if (importedData.length === 0) {
+            importErrors.push(`${file.name}: No valid data rows in CSV`);
+          }
+        }
+        
+        allImportedData = [...allImportedData, ...importedData];
+      }
       
         if (isPDF) {
           try {
