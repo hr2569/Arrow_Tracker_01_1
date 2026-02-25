@@ -186,7 +186,8 @@ export const addRoundToSession = async (sessionId: string, roundData: {
       shots.push({ id: generateId(), x: 0, y: 0, ring: 0, confirmed: true });
     }
     
-    const roundTotal = shots.reduce((sum, s) => sum + s.ring, 0);
+    // X (ring 11) counts as 10 points
+    const roundTotal = shots.reduce((sum, s) => sum + (s.ring >= 11 ? 10 : s.ring), 0);
     
     const newRound: Round = {
       id: generateId(),
