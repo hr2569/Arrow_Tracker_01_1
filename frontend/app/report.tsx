@@ -326,8 +326,29 @@ export default function ReportScreen() {
   };
 
   // Generate shareable report text
-  // Generate PDF HTML content
-  const generatePdfHtml = () => {
+  // Generate PDF HTML content (async for QR code generation)
+  const generatePdfHtml = async () => {
+    // Generate QR codes for each session
+    const qrCodes: { [sessionId: string]: string } = {};
+    for (const session of filteredSessions) {
+      const qrData = JSON.stringify({
+        v: 1, // version
+        t: 'arrow_tracker',
+        n: (session.name || session.id.slice(0, 8)).substring(0, 30),
+        s: session.total_score || 0,
+        b: (session.bow_name || 'Unknown').substring(0, 20),
+        d: session.distance || '',
+        dt: new Date(session.created_at).toLocaleDateString(),
+      });
+      try {
+        const svgString = await QRCode.toString(qrData, { type: 'svg', width: 120, margin: 1 });
+        qrCodes[session.id] = svgString;
+      } catch (err) {
+        console.error('QR generation error:', err);
+        qrCodes[session.id] = '';
+      }
+    }
+
     // Translation strings for PDF
     const pdfStrings = {
       performanceReport: t('report.performanceReport'),
