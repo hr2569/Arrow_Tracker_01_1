@@ -125,12 +125,100 @@ export default function ScoreKeepingScreen() {
       bowType: newBowType,
       totalScore: score,
       date: new Date().toLocaleDateString(),
+      source: 'manual',
     };
 
     setManualEntries(prev => [...prev, newEntry]);
     setNewArcherName('');
     setNewScore('');
     setShowAddModal(false);
+  };
+
+  // Import PDFs and extract QR codes
+  const handleImportPDFs = async () => {
+    try {
+      // Pick multiple PDF files
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'application/pdf',
+        multiple: true,
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      setIsImporting(true);
+      
+      // Read all PDFs and convert to base64
+      const pdfsBase64: string[] = [];
+      for (const asset of result.assets) {
+        try {
+          const fileContent = await FileSystem.readAsStringAsync(asset.uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          pdfsBase64.push(fileContent);
+        } catch (readError) {
+          console.error('Error reading PDF:', readError);
+        }
+      }
+
+      if (pdfsBase64.length === 0) {
+        Alert.alert(t('common.error'), 'Could not read any PDF files');
+        setIsImporting(false);
+        return;
+      }
+
+      // Send to backend for QR extraction
+      const apiUrl = getApiUrl();
+      const response = await axios.post(`${apiUrl}/api/extract-qr`, {
+        pdfs_base64: pdfsBase64,
+      }, {
+        timeout: 60000, // 60 second timeout for processing
+      });
+
+      if (response.data.success && response.data.sessions.length > 0) {
+        // Convert extracted sessions to manual entries
+        const importedEntries: ManualEntry[] = response.data.sessions.map((session: any) => ({
+          id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          archerName: session.name,
+          bowType: session.bowType,
+          totalScore: session.score,
+          date: session.date,
+          distance: session.distance,
+          source: 'imported' as const,
+        }));
+
+        setManualEntries(prev => [...prev, ...importedEntries]);
+        
+        Alert.alert(
+          t('scoreKeeping.importSuccess', { defaultValue: 'Import Successful' }),
+          t('scoreKeeping.importedArchers', { 
+            defaultValue: `Imported ${importedEntries.length} archer(s) from ${response.data.total_qr_found} QR code(s)`,
+            count: importedEntries.length,
+            qrCount: response.data.total_qr_found
+          })
+        );
+      } else if (response.data.total_qr_found === 0) {
+        Alert.alert(
+          t('scoreKeeping.noQRCodes', { defaultValue: 'No QR Codes Found' }),
+          t('scoreKeeping.noQRCodesDesc', { defaultValue: 'No Arrow Tracker QR codes were found in the uploaded PDFs.' })
+        );
+      } else {
+        Alert.alert(
+          t('common.error'),
+          response.data.error || 'Failed to extract QR codes'
+        );
+      }
+    } catch (error: any) {
+      console.error('Import error:', error);
+      Alert.alert(
+        t('common.error'),
+        error.message || 'Failed to import PDFs'
+      );
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   // Delete manual entry
