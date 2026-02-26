@@ -303,24 +303,45 @@ export default function ScoreKeepingScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Import PDF Section */}
+        <View style={styles.importSection}>
+          <TouchableOpacity 
+            style={[styles.importButton, isImporting && styles.importButtonDisabled]}
+            onPress={handleImportPDFs}
+            disabled={isImporting}
+          >
+            {isImporting ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Icon name="document-attach" size={22} color="#fff" />
+            )}
+            <Text style={styles.importButtonText}>
+              {isImporting ? t('scoreKeeping.importing', { defaultValue: 'Importing...' }) : t('scoreKeeping.importPDF', { defaultValue: 'Import from PDF (QR Code)' })}
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.importHint}>
+            {t('scoreKeeping.importHint', { defaultValue: 'Select PDFs with Arrow Tracker QR codes' })}
+          </Text>
+        </View>
+
         {/* Manual Entry Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Manual Entries ({manualEntries.length})</Text>
+            <Text style={styles.sectionTitle}>{t('scoreKeeping.entries', { defaultValue: 'Entries' })} ({manualEntries.length})</Text>
             <TouchableOpacity 
               style={styles.addButton}
               onPress={() => setShowAddModal(true)}
             >
               <Icon name="add" size={20} color="#fff" />
-              <Text style={styles.addButtonText}>Add Archer</Text>
+              <Text style={styles.addButtonText}>{t('scoreKeeping.addArcher', { defaultValue: 'Add Archer' })}</Text>
             </TouchableOpacity>
           </View>
 
           {manualEntries.length === 0 ? (
             <View style={styles.emptyState}>
               <Icon name="person-add" size={40} color="#666" />
-              <Text style={styles.emptyStateText}>No manual entries yet</Text>
-              <Text style={styles.emptyStateSubtext}>Tap "Add Archer" to enter scores manually</Text>
+              <Text style={styles.emptyStateText}>{t('scoreKeeping.noEntries', { defaultValue: 'No entries yet' })}</Text>
+              <Text style={styles.emptyStateSubtext}>{t('scoreKeeping.noEntriesDesc', { defaultValue: 'Import from PDF or add archers manually' })}</Text>
             </View>
           ) : (
             manualEntries.map(entry => (
@@ -339,8 +360,18 @@ export default function ScoreKeepingScreen() {
                   )}
                 </View>
                 <View style={styles.entryInfo}>
-                  <Text style={styles.entryName}>{entry.archerName}</Text>
-                  <Text style={styles.entryDetails}>{entry.bowType} • {entry.date}</Text>
+                  <View style={styles.entryNameRow}>
+                    <Text style={styles.entryName}>{entry.archerName}</Text>
+                    {entry.source === 'imported' && (
+                      <View style={styles.importedBadge}>
+                        <Icon name="qr-code" size={10} color="#fff" />
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.entryDetails}>
+                    {entry.bowType} • {entry.date}
+                    {entry.distance ? ` • ${entry.distance}` : ''}
+                  </Text>
                 </View>
                 <Text style={styles.entryScore}>{entry.totalScore} pts</Text>
               </TouchableOpacity>
