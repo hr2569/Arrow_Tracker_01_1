@@ -1332,7 +1332,7 @@ export default function ReportScreen() {
     if (Platform.OS === 'web') {
       // For web, open in new tab directly
       try {
-        const html = generatePdfHtml();
+        const html = await generatePdfHtml();
         const blob = new Blob([html], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
@@ -1343,7 +1343,7 @@ export default function ReportScreen() {
     } else if (Platform.OS === 'android') {
       // Android - generate PDF and open with intent or share
       try {
-        const html = generatePdfHtml();
+        const html = await generatePdfHtml();
         
         // Generate PDF
         const { uri } = await Print.printToFileAsync({ 
