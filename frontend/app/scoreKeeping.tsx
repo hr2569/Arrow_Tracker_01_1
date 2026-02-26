@@ -28,15 +28,24 @@ interface ManualEntry {
   bowType: string;
   totalScore: number;
   date: string;
+  distance?: string;
+  source: 'manual' | 'imported';
 }
 
 interface RankingEntry {
   name: string;
   bowType: string;
   totalScore: number;
-  source: 'app' | 'manual';
+  source: 'app' | 'manual' | 'imported';
   date: string;
 }
+
+// Get API URL from environment
+const getApiUrl = () => {
+  return Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || 
+         process.env.EXPO_PUBLIC_BACKEND_URL || 
+         'https://7xrzp9wp-preview.emergentagent.com';
+};
 
 const BOW_TYPES = ['Recurve', 'Compound', 'Barebow', 'Traditional', 'Longbow'];
 
@@ -51,6 +60,7 @@ export default function ScoreKeepingScreen() {
   const [selectedManualEntries, setSelectedManualEntries] = useState<Set<string>>(new Set());
   const [showRankings, setShowRankings] = useState(false);
   const [selectedBowFilter, setSelectedBowFilter] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
   
   // Manual entry modal state
   const [showAddModal, setShowAddModal] = useState(false);
