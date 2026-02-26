@@ -671,10 +671,21 @@ const styles = StyleSheet.create({
   entryInfo: {
     flex: 1,
   },
+  entryNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   entryName: {
     color: '#fff',
     fontSize: 15,
     fontWeight: '600',
+  },
+  importedBadge: {
+    backgroundColor: '#1a5f1a',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
   },
   entryDetails: {
     color: '#888',
