@@ -1267,44 +1267,50 @@ export default function ReportScreen() {
                   const sessionDate = new Date(session.created_at).toLocaleDateString();
                   const sessionName = session.name || session.id.slice(0, 8);
                   const bowType = session.bow_name || 'Unknown';
-                  return `<tr style="background: ${idx % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
-                    <td style="padding: 8px; border: 1px solid #ddd;">${sessionDate}</td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">${sessionName}</td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">${bowType}</td>
-                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold;">${session.total_score}</td>
-                  </tr>`;
+                  return \`<tr style="background: \${idx % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
+                    <td style="padding: 8px; border: 1px solid #ddd;">\${sessionDate}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">\${sessionName}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">\${bowType}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold;">\${session.total_score}</td>
+                  </tr>\`;
                 }).join('')}
               </tbody>
             </table>
             
-            <!-- Machine-readable data for PDF import -->
-            <!-- ARROW_TRACKER_JSON:${btoa(JSON.stringify({
-              version: 1,
-              type: 'arrow_tracker_export',
-              sessions: filteredSessions.map(session => ({
-                date: new Date(session.created_at).toLocaleDateString(),
-                name: (session.name || session.id.slice(0, 8)).replace(/,/g, ' '),
-                bowType: (session.bow_name || 'Unknown').replace(/,/g, ' '),
-                score: session.total_score
-              }))
-            }))} -->
-            <div style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 8px; font-family: monospace; font-size: 9px;">
-              <p style="margin: 0 0 10px 0; color: #666; font-family: sans-serif; font-size: 10px;">Import Code (for Score Keeping):</p>
-              <div style="word-break: break-all; color: #333;">
-ARROW_TRACKER_DATA_START
-Date,Name,BowType,TotalScore
-${filteredSessions.map(session => {
-  const sessionDate = new Date(session.created_at).toLocaleDateString();
-  const sessionName = (session.name || session.id.slice(0, 8)).replace(/,/g, ' ');
-  const bowType = (session.bow_name || 'Unknown').replace(/,/g, ' ');
-  return `${sessionDate},${sessionName},${bowType},${session.total_score}`;
-}).join('\n')}
-ARROW_TRACKER_DATA_END
-              </div>
+            <div class="footer">
+              <p>Arrow Tracker - \${new Date().getFullYear()}</p>
+            </div>
+          </div>
+          
+          <!-- QR Code Page for Score Keeping Import -->
+          <div class="page">
+            <div class="page-header">
+              <h2>\${t('report.qrCodes', { defaultValue: 'QR Codes for Import' })}</h2>
+              <p>\${t('report.scanToImport', { defaultValue: 'Scan these QR codes to import archer data' })}</p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 20px;">
+              \${filteredSessions.map((session) => {
+                const sessionDate = new Date(session.created_at).toLocaleDateString();
+                const sessionName = session.name || session.id.slice(0, 8);
+                const bowType = session.bow_name || 'Unknown';
+                const qrSvg = qrCodes[session.id] || '';
+                return \`
+                  <div style="text-align: center; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd; width: 180px;">
+                    <div style="margin-bottom: 10px;">
+                      \${qrSvg}
+                    </div>
+                    <div style="font-weight: bold; font-size: 14px; color: #333; margin-bottom: 4px;">\${sessionName}</div>
+                    <div style="font-size: 12px; color: #666;">\${bowType}</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #8B0000; margin-top: 6px;">\${session.total_score} pts</div>
+                    <div style="font-size: 10px; color: #888; margin-top: 4px;">\${sessionDate}</div>
+                  </div>
+                \`;
+              }).join('')}
             </div>
             
-            <div class="footer">
-              <p>Arrow Tracker - ${new Date().getFullYear()}</p>
+            <div class="footer" style="margin-top: 40px;">
+              <p style="font-size: 11px; color: #666;">Each QR code contains: Name, Total Score, Bow Type, Distance, Date</p>
+              <p>Arrow Tracker - \${new Date().getFullYear()}</p>
             </div>
           </div>
         </body>
