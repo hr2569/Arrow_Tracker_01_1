@@ -8,6 +8,8 @@ import {
   Alert,
   TextInput,
   Modal,
+  ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,6 +17,10 @@ import { Icon } from '../components/Icon';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { getSessions, Session } from '../utils/localStorage';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
+import axios from 'axios';
+import Constants from 'expo-constants';
 
 interface ManualEntry {
   id: string;
