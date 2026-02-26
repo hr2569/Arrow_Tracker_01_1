@@ -572,6 +572,34 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
   },
+  importSection: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  importButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a5f1a',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 10,
+    gap: 10,
+    width: '100%',
+    justifyContent: 'center',
+  },
+  importButtonDisabled: {
+    opacity: 0.6,
+  },
+  importButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  importHint: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 8,
+  },
   section: {
     marginTop: 20,
   },
