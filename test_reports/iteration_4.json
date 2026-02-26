@@ -65,7 +65,7 @@
   "seed_data_creation": "None needed for this test",
   "retest_needed": false,
   "should_main_agent_self_test": false,
-  "context_for_next_testing_agent": "UI changes verified: Import Code button successfully removed from Score Keeping, Export CSV button successfully added to Report screen. App accessible at https://archery-tracker-4.preview.emergentagent.com. Note: App uses React Native Expo web which may have intermittent 520 errors from Metro bundler disconnection.",
+  "context_for_next_testing_agent": "UI changes verified: Import Code button successfully removed from Score Keeping, Export CSV button successfully added to Report screen. App accessible at https://score-keeper-24.preview.emergentagent.com. Note: App uses React Native Expo web which may have intermittent 520 errors from Metro bundler disconnection.",
   "rca_of_the_issue": {
     "original_request": "Remove Import Code button from Score Keeping screen and add Export CSV button to Report screen",
     "verification_method": "Code review + UI testing with Playwright",
