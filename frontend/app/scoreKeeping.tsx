@@ -154,17 +154,31 @@ export default function ScoreKeepingScreen() {
       const pdfsBase64: string[] = [];
       for (const asset of result.assets) {
         try {
-          const fileContent = await FileSystem.readAsStringAsync(asset.uri, {
+          let fileUri = asset.uri;
+          
+          // On Android, content:// URIs need to be copied to cache first
+          if (Platform.OS === 'android' && fileUri.startsWith('content://')) {
+            const fileName = asset.name || `pdf_${Date.now()}.pdf`;
+            const cacheUri = `${FileSystem.cacheDirectory}${fileName}`;
+            await FileSystem.copyAsync({
+              from: fileUri,
+              to: cacheUri,
+            });
+            fileUri = cacheUri;
+          }
+          
+          const fileContent = await FileSystem.readAsStringAsync(fileUri, {
             encoding: FileSystem.EncodingType.Base64,
           });
           pdfsBase64.push(fileContent);
-        } catch (readError) {
-          console.error('Error reading PDF:', readError);
+          console.log(`Successfully read PDF: ${asset.name}, size: ${fileContent.length}`);
+        } catch (readError: any) {
+          console.error('Error reading PDF:', asset.name, readError?.message || readError);
         }
       }
 
       if (pdfsBase64.length === 0) {
-        Alert.alert(t('common.error'), 'Could not read any PDF files');
+        Alert.alert(t('common.error'), t('scoreKeeping.couldNotReadPDF', { defaultValue: 'Could not read any PDF files. Please try again.' }));
         setIsImporting(false);
         return;
       }
