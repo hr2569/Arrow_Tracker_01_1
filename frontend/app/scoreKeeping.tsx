@@ -44,7 +44,7 @@ interface RankingEntry {
 const getApiUrl = () => {
   return Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || 
          process.env.EXPO_PUBLIC_BACKEND_URL || 
-         'https://7xrzp9wp-preview.emergentagent.com';
+         'https://score-keeper-24.preview.emergentagent.com';
 };
 
 const BOW_TYPES = ['Recurve', 'Compound', 'Barebow', 'Traditional', 'Longbow'];
