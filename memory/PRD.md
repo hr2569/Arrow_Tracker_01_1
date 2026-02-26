@@ -113,6 +113,21 @@ React Native Expo archery scoring application with target visualization, arrow p
 - [x] **CSV Import Enhancement**: Better error handling, base64 fallback, detailed error messages
 - [x] **PDF Report Update**: Added ARROW_TRACKER_JSON marker for additional data redundancy
 
+### v2.1.23 (Feb 2026)
+- [x] **QR Code Generation in PDF Reports**: Each session now includes a QR code in the exported PDF
+  - QR code contains: Name, Total Score, Bow Type, Distance, Date
+  - Added new "QR Codes for Import" page in PDF reports
+  - Each archer entry displays with their QR code and key stats
+- [x] **QR Code Import from PDF**: New "Import from PDF (QR Code)" feature in Score Keeping
+  - Upload multiple PDF files with Arrow Tracker QR codes
+  - Backend extracts QR codes from PDF pages using PyMuPDF + pyzbar
+  - Automatically parses QR code data and imports archers
+  - Imported entries marked with QR code badge
+- [x] **Backend QR Extraction Endpoint**: `/api/extract-qr` for multi-PDF QR extraction
+  - Converts PDF pages to images using PyMuPDF
+  - Detects and decodes QR codes using pyzbar + OpenCV
+  - Returns parsed archer data from Arrow Tracker QR format
+
 ### v2.1.1
 - [x] Fixed heatmap showing wrong target face for multi-spot indoor sessions
 - [x] Fixed `normalizedDensity` undefined variable in report.tsx
