@@ -152,33 +152,61 @@ export default function ScoreKeepingScreen() {
       
       // Read all PDFs and convert to base64
       const pdfsBase64: string[] = [];
+      const errors: string[] = [];
+      
       for (const asset of result.assets) {
         try {
           let fileUri = asset.uri;
+          console.log(`Processing PDF: ${asset.name}, URI: ${fileUri}`);
           
-          // On Android, content:// URIs need to be copied to cache first
-          if (Platform.OS === 'android' && fileUri.startsWith('content://')) {
-            const fileName = asset.name || `pdf_${Date.now()}.pdf`;
-            const cacheUri = `${FileSystem.cacheDirectory}${fileName}`;
-            await FileSystem.copyAsync({
-              from: fileUri,
-              to: cacheUri,
+          // Try reading directly first (works when copyToCacheDirectory is true)
+          try {
+            const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+              encoding: FileSystem.EncodingType.Base64,
             });
-            fileUri = cacheUri;
+            if (fileContent && fileContent.length > 0) {
+              pdfsBase64.push(fileContent);
+              console.log(`Successfully read PDF: ${asset.name}, size: ${fileContent.length}`);
+              continue;
+            }
+          } catch (directReadError: any) {
+            console.log(`Direct read failed for ${asset.name}: ${directReadError?.message}`);
           }
           
-          const fileContent = await FileSystem.readAsStringAsync(fileUri, {
-            encoding: FileSystem.EncodingType.Base64,
-          });
-          pdfsBase64.push(fileContent);
-          console.log(`Successfully read PDF: ${asset.name}, size: ${fileContent.length}`);
+          // Fallback: Copy to cache directory first (for content:// URIs on Android)
+          if (Platform.OS === 'android') {
+            try {
+              const fileName = asset.name || `pdf_${Date.now()}.pdf`;
+              const cacheUri = `${FileSystem.cacheDirectory}${fileName}`;
+              await FileSystem.copyAsync({
+                from: fileUri,
+                to: cacheUri,
+              });
+              const fileContent = await FileSystem.readAsStringAsync(cacheUri, {
+                encoding: FileSystem.EncodingType.Base64,
+              });
+              if (fileContent && fileContent.length > 0) {
+                pdfsBase64.push(fileContent);
+                console.log(`Read PDF after copy: ${asset.name}, size: ${fileContent.length}`);
+                continue;
+              }
+            } catch (copyReadError: any) {
+              console.log(`Copy+read failed for ${asset.name}: ${copyReadError?.message}`);
+            }
+          }
+          
+          errors.push(asset.name || 'Unknown file');
         } catch (readError: any) {
           console.error('Error reading PDF:', asset.name, readError?.message || readError);
+          errors.push(asset.name || 'Unknown file');
         }
       }
 
       if (pdfsBase64.length === 0) {
-        Alert.alert(t('common.error'), t('scoreKeeping.couldNotReadPDF', { defaultValue: 'Could not read any PDF files. Please try again.' }));
+        const errorMsg = errors.length > 0 
+          ? `Failed to read: ${errors.join(', ')}` 
+          : 'Could not read any PDF files';
+        Alert.alert(t('common.error'), errorMsg);
         setIsImporting(false);
         return;
       }
