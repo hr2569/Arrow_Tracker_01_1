@@ -536,7 +536,7 @@ async def extract_pdf_text(request: PDFExtractRequest):
             csv_data = match.group(1).strip()
             logger.info(f"Found ARROW_TRACKER_DATA: {csv_data[:200]}")
             
-            lines = [l.strip() for l in csv_data.split('\n') if l.strip()]
+            lines = [line.strip() for line in csv_data.split('\n') if line.strip()]
             for line in lines:
                 parts = [p.strip() for p in line.split(',')]
                 if len(parts) >= 4:
