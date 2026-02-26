@@ -383,12 +383,113 @@ class ExtractedSession(BaseModel):
     name: str
     bowType: str
     score: int
+    distance: str = ""
 
 class PDFExtractResponse(BaseModel):
     success: bool
     text: str = ""
     sessions: List[ExtractedSession] = []
     error: str = ""
+
+class QRExtractRequest(BaseModel):
+    pdfs_base64: List[str]
+
+class QRExtractResponse(BaseModel):
+    success: bool
+    sessions: List[ExtractedSession] = []
+    total_qr_found: int = 0
+    error: str = ""
+
+@api_router.post("/extract-qr", response_model=QRExtractResponse)
+async def extract_qr_from_pdfs(request: QRExtractRequest):
+    """Extract QR codes from multiple PDF files and return decoded archer data"""
+    import base64
+    import tempfile
+    import json
+    
+    try:
+        import fitz  # PyMuPDF
+        import cv2
+        import numpy as np
+        from pyzbar.pyzbar import decode
+        
+        all_sessions = []
+        total_qr_found = 0
+        
+        for pdf_index, pdf_base64 in enumerate(request.pdfs_base64):
+            try:
+                # Decode base64 PDF
+                pdf_bytes = base64.b64decode(pdf_base64)
+                
+                # Open PDF from bytes
+                doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+                
+                for page_num in range(len(doc)):
+                    page = doc[page_num]
+                    
+                    # Render page to image with higher resolution for better QR detection
+                    zoom = 2.0
+                    mat = fitz.Matrix(zoom, zoom)
+                    pix = page.get_pixmap(matrix=mat)
+                    
+                    # Convert to numpy array for OpenCV
+                    img_data = np.frombuffer(pix.samples, dtype=np.uint8)
+                    img_data = img_data.reshape(pix.height, pix.width, pix.n)
+                    
+                    # Convert to BGR for OpenCV if needed
+                    if pix.n == 4:  # RGBA
+                        img_cv = cv2.cvtColor(img_data, cv2.COLOR_RGBA2BGR)
+                    elif pix.n == 3:  # RGB
+                        img_cv = cv2.cvtColor(img_data, cv2.COLOR_RGB2BGR)
+                    else:
+                        img_cv = img_data
+                    
+                    # Decode QR codes
+                    qr_codes = decode(img_cv)
+                    
+                    for qr in qr_codes:
+                        try:
+                            qr_data = qr.data.decode('utf-8')
+                            total_qr_found += 1
+                            
+                            # Parse JSON data from QR code
+                            data = json.loads(qr_data)
+                            
+                            # Check if it's our Arrow Tracker QR code
+                            if data.get('t') == 'arrow_tracker':
+                                session = ExtractedSession(
+                                    date=data.get('dt', ''),
+                                    name=data.get('n', 'Unknown'),
+                                    bowType=data.get('b', 'Unknown'),
+                                    score=data.get('s', 0),
+                                    distance=data.get('d', '')
+                                )
+                                all_sessions.append(session)
+                                logger.info(f"Extracted QR: {session.name} - {session.score} pts")
+                        except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                            logger.warning(f"QR decode error: {e}")
+                            continue
+                
+                doc.close()
+                
+            except Exception as pdf_error:
+                logger.error(f"Error processing PDF {pdf_index}: {pdf_error}")
+                continue
+        
+        logger.info(f"Total QR codes found: {total_qr_found}, Sessions extracted: {len(all_sessions)}")
+        
+        return QRExtractResponse(
+            success=True,
+            sessions=all_sessions,
+            total_qr_found=total_qr_found
+        )
+        
+    except Exception as e:
+        logger.error(f"QR extraction error: {e}")
+        return QRExtractResponse(
+            success=False,
+            error=str(e)
+        )
 
 @api_router.post("/extract-pdf", response_model=PDFExtractResponse)
 async def extract_pdf_text(request: PDFExtractRequest):
