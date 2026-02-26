@@ -1380,7 +1380,7 @@ export default function ReportScreen() {
     } else {
       // iOS - use share sheet
       try {
-        const html = generatePdfHtml();
+        const html = await generatePdfHtml();
         const { uri } = await Print.printToFileAsync({ html });
         const newUri = FileSystem.cacheDirectory + pdfFileName;
         await FileSystem.copyAsync({ from: uri, to: newUri });
