@@ -255,14 +255,40 @@ export default function ScoreKeepingScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Hidden WebView for offline PDF QR extraction */}
-      {pdfToProcess && (
-        <PDFQRExtractor
-          pdfBase64={pdfToProcess}
-          onComplete={handleQRExtractComplete}
-          onError={handleQRExtractError}
-        />
-      )}
+      {/* QR Scanner Modal */}
+      <Modal
+        visible={showScanner}
+        animationType="slide"
+        onRequestClose={() => setShowScanner(false)}
+      >
+        <SafeAreaView style={styles.scannerContainer}>
+          <View style={styles.scannerHeader}>
+            <TouchableOpacity onPress={() => setShowScanner(false)} style={styles.closeButton}>
+              <Icon name="close" size={28} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.scannerTitle}>{t('scoreKeeping.scanQR', { defaultValue: 'Scan QR Code' })}</Text>
+            <View style={{ width: 40 }} />
+          </View>
+          
+          <CameraView
+            style={styles.camera}
+            facing="back"
+            barcodeScannerSettings={{
+              barcodeTypes: ['qr'],
+            }}
+            onBarcodeScanned={handleBarCodeScanned}
+          />
+          
+          <View style={styles.scannerFooter}>
+            <Text style={styles.scannerHint}>
+              {t('scoreKeeping.scanHint', { defaultValue: 'Point camera at Arrow Tracker QR code' })}
+            </Text>
+            <Text style={styles.scannedCount}>
+              {t('scoreKeeping.scannedCount', { defaultValue: `Scanned: ${scannedCodes.size}`, count: scannedCodes.size })}
+            </Text>
+          </View>
+        </SafeAreaView>
+      </Modal>
       
       {/* Header */}
       <View style={styles.header}>
