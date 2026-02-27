@@ -577,6 +577,29 @@ export default function ScoreKeepingScreen() {
           </Text>
         </View>
 
+        {/* Generate Results PDF Button */}
+        {manualEntries.length > 0 && (
+          <View style={styles.generateSection}>
+            <TouchableOpacity 
+              style={[styles.generateButton, isGeneratingPDF && styles.generateButtonDisabled]}
+              onPress={handleGenerateResultsPDF}
+              disabled={isGeneratingPDF}
+            >
+              {isGeneratingPDF ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Icon name="trophy" size={22} color="#fff" />
+              )}
+              <Text style={styles.generateButtonText}>
+                {isGeneratingPDF ? t('scoreKeeping.generating', { defaultValue: 'Generating...' }) : t('scoreKeeping.generateResults', { defaultValue: 'Generate Results PDF' })}
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.generateHint}>
+              {t('scoreKeeping.generateHint', { defaultValue: 'Creates PDF with rankings by distance & bow type' })}
+            </Text>
+          </View>
+        )}
+
         {/* Manual Entry Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
