@@ -634,6 +634,40 @@ export default function ScoreKeepingScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Import/Export Section */}
+        <View style={styles.importExportSection}>
+          <TouchableOpacity 
+            style={[styles.importButton, isImporting && styles.buttonDisabled]}
+            onPress={handleImportFiles}
+            disabled={isImporting}
+          >
+            {isImporting ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Icon name="cloud-upload" size={20} color="#fff" />
+            )}
+            <Text style={styles.importButtonText}>
+              {isImporting ? t('scoreKeeping.importing', { defaultValue: 'Importing...' }) : t('scoreKeeping.importFiles', { defaultValue: 'Import Files' })}
+            </Text>
+          </TouchableOpacity>
+          
+          {manualEntries.length > 0 && (
+            <TouchableOpacity 
+              style={styles.exportButton}
+              onPress={handleExportData}
+            >
+              <Icon name="share" size={20} color="#fff" />
+              <Text style={styles.exportButtonText}>
+                {t('scoreKeeping.exportData', { defaultValue: 'Export' })}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        
+        <Text style={styles.importHint}>
+          {t('scoreKeeping.importHintFiles', { defaultValue: 'Import JSON or CSV files with archer data' })}
+        </Text>
+
         {/* Generate Results PDF Button */}
         {manualEntries.length > 0 && (
           <View style={styles.generateSection}>
