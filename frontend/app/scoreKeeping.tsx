@@ -382,19 +382,24 @@ export default function ScoreKeepingScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Scan QR Code Section */}
+        {/* Import QR Code Section */}
         <View style={styles.importSection}>
           <TouchableOpacity 
-            style={styles.importButton}
-            onPress={handleOpenScanner}
+            style={[styles.importButton, isImporting && styles.importButtonDisabled]}
+            onPress={handleImport}
+            disabled={isImporting}
           >
-            <Icon name="qr-code" size={22} color="#fff" />
+            {isImporting ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Icon name="qr-code" size={22} color="#fff" />
+            )}
             <Text style={styles.importButtonText}>
-              {t('scoreKeeping.scanQRCode', { defaultValue: 'Scan QR Code' })}
+              {isImporting ? t('scoreKeeping.importing', { defaultValue: 'Importing...' }) : t('scoreKeeping.importQR', { defaultValue: 'Import QR Code' })}
             </Text>
           </TouchableOpacity>
           <Text style={styles.importHint}>
-            {t('scoreKeeping.scanHintShort', { defaultValue: 'Scan QR codes from printed PDF reports' })}
+            {t('scoreKeeping.importHintNew', { defaultValue: 'Select photo or PDF with QR code' })}
           </Text>
         </View>
 
