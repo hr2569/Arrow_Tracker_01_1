@@ -1129,4 +1129,32 @@ const styles = StyleSheet.create({
   importButtonDisabled: {
     opacity: 0.6,
   },
+  generateSection: {
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  generateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#8B0000',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 10,
+    gap: 10,
+    width: '100%',
+    justifyContent: 'center',
+  },
+  generateButtonDisabled: {
+    opacity: 0.6,
+  },
+  generateButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  generateHint: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 8,
+  },
 });
