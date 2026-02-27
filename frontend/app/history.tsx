@@ -1246,7 +1246,7 @@ export default function HistoryScreen() {
                                       ]}
                                     >
                                       <Text style={[styles.shotBadgeText, { color: textColor }]}>
-                                        {ringScore === 0 ? 'M' : ringScore}
+                                        {ringScore === 0 ? 'M' : ringScore === 11 ? 'X' : ringScore}
                                       </Text>
                                     </View>
                                   );
