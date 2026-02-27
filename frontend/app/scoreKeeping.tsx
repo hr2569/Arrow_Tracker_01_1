@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { getSessions, Session } from '../utils/localStorage';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system/legacy';
 
 interface ManualEntry {
   id: string;
