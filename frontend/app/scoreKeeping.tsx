@@ -51,7 +51,6 @@ export default function ScoreKeepingScreen() {
   const [selectedManualEntries, setSelectedManualEntries] = useState<Set<string>>(new Set());
   const [showRankings, setShowRankings] = useState(false);
   const [selectedBowFilter, setSelectedBowFilter] = useState<string | null>(null);
-  const [isImporting, setIsImporting] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   
   // Manual entry modal state
