@@ -127,59 +127,177 @@ export default function ScoreKeepingScreen() {
     setShowAddModal(false);
   };
 
-  // Handle QR code scan from camera
-  const handleBarCodeScanned = useCallback(({ data }: { data: string }) => {
-    // Prevent duplicate scans
-    if (scannedCodes.has(data)) return;
-    
+  // Decode QR code from image data
+  const decodeQRFromImageData = (imageData: ImageData): string | null => {
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
+    return code ? code.data : null;
+  };
+
+  // Process QR code data and add entry
+  const processQRData = (qrData: string): boolean => {
     try {
-      const qrData = JSON.parse(data);
-      
-      // Check if it's an Arrow Tracker QR code
-      if (qrData.t === 'arrow_tracker') {
-        setScannedCodes(prev => new Set([...prev, data]));
-        
+      const data = JSON.parse(qrData);
+      if (data.t === 'arrow_tracker') {
         const newEntry: ManualEntry = {
           id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-          archerName: qrData.n || 'Unknown',
-          bowType: qrData.b || 'Unknown',
-          totalScore: qrData.s || 0,
-          date: qrData.dt || new Date().toLocaleDateString(),
-          distance: qrData.d || '',
+          archerName: data.n || 'Unknown',
+          bowType: data.b || 'Unknown',
+          totalScore: data.s || 0,
+          date: data.dt || new Date().toLocaleDateString(),
+          distance: data.d || '',
           source: 'imported',
         };
-        
         setManualEntries(prev => [...prev, newEntry]);
-        
-        // Vibrate feedback would go here if we had haptics
-        Alert.alert(
-          t('scoreKeeping.qrScanned', { defaultValue: 'QR Code Scanned' }),
-          `${newEntry.archerName}: ${newEntry.totalScore} pts`,
-          [
-            { text: t('scoreKeeping.scanMore', { defaultValue: 'Scan More' }) },
-            { text: t('common.done'), onPress: () => setShowScanner(false) }
-          ]
-        );
+        return true;
       }
     } catch (e) {
-      // Not a valid JSON QR code, ignore
+      // Not valid Arrow Tracker QR
     }
-  }, [scannedCodes, t]);
+    return false;
+  };
 
-  // Open QR scanner
-  const handleOpenScanner = async () => {
-    if (!permission?.granted) {
-      const result = await requestPermission();
-      if (!result.granted) {
-        Alert.alert(
-          t('scoreKeeping.cameraPermission', { defaultValue: 'Camera Permission Required' }),
-          t('scoreKeeping.cameraPermissionDesc', { defaultValue: 'Please grant camera permission to scan QR codes.' })
-        );
+  // Import from image (photo/screenshot)
+  const handleImportFromImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true,
+        quality: 1,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
         return;
       }
+
+      setIsImporting(true);
+      let importedCount = 0;
+
+      for (const asset of result.assets) {
+        try {
+          // Load image and decode QR
+          const response = await fetch(asset.uri);
+          const blob = await response.blob();
+          
+          // Create image bitmap and get pixel data
+          const imageBitmap = await createImageBitmap(blob);
+          const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(imageBitmap, 0, 0);
+            const imageData = ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
+            const qrData = decodeQRFromImageData(imageData);
+            if (qrData && processQRData(qrData)) {
+              importedCount++;
+            }
+          }
+        } catch (err) {
+          console.error('Error processing image:', err);
+        }
+      }
+
+      if (importedCount > 0) {
+        Alert.alert(
+          t('scoreKeeping.importSuccess', { defaultValue: 'Import Successful' }),
+          t('scoreKeeping.importedCount', { defaultValue: `Imported ${importedCount} archer(s)`, count: importedCount })
+        );
+      } else {
+        Alert.alert(
+          t('scoreKeeping.noQRCodes', { defaultValue: 'No QR Codes Found' }),
+          t('scoreKeeping.noQRCodesInImages', { defaultValue: 'No Arrow Tracker QR codes found in selected images.' })
+        );
+      }
+    } catch (error: any) {
+      Alert.alert(t('common.error'), error.message || 'Failed to import images');
+    } finally {
+      setIsImporting(false);
     }
-    setScannedCodes(new Set());
-    setShowScanner(true);
+  };
+
+  // Import from PDF - sends to backend for processing
+  const handleImportFromPDF = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'application/pdf',
+        multiple: true,
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      setIsImporting(true);
+      const pdfsBase64: string[] = [];
+
+      for (const asset of result.assets) {
+        try {
+          const fileContent = await FileSystem.readAsStringAsync(asset.uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          if (fileContent && fileContent.length > 0) {
+            pdfsBase64.push(fileContent);
+          }
+        } catch (err) {
+          console.error('Error reading PDF:', err);
+        }
+      }
+
+      if (pdfsBase64.length === 0) {
+        Alert.alert(t('common.error'), t('scoreKeeping.couldNotReadPDF', { defaultValue: 'Could not read PDF files.' }));
+        setIsImporting(false);
+        return;
+      }
+
+      // Send to backend for QR extraction
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL || 'https://score-keeper-24.preview.emergentagent.com'}/api/extract-qr`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pdfs_base64: pdfsBase64 }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.sessions && data.sessions.length > 0) {
+        const importedEntries: ManualEntry[] = data.sessions.map((session: any) => ({
+          id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          archerName: session.name,
+          bowType: session.bowType,
+          totalScore: session.score,
+          date: session.date,
+          distance: session.distance || '',
+          source: 'imported' as const,
+        }));
+
+        setManualEntries(prev => [...prev, ...importedEntries]);
+
+        Alert.alert(
+          t('scoreKeeping.importSuccess', { defaultValue: 'Import Successful' }),
+          t('scoreKeeping.importedCount', { defaultValue: `Imported ${importedEntries.length} archer(s)`, count: importedEntries.length })
+        );
+      } else {
+        Alert.alert(
+          t('scoreKeeping.noQRCodes', { defaultValue: 'No QR Codes Found' }),
+          t('scoreKeeping.noQRCodesInPDF', { defaultValue: 'No Arrow Tracker QR codes found in the PDF files.' })
+        );
+      }
+    } catch (error: any) {
+      Alert.alert(t('common.error'), error.message || 'Failed to import PDF');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  // Show import options
+  const handleImport = () => {
+    Alert.alert(
+      t('scoreKeeping.importFrom', { defaultValue: 'Import From' }),
+      t('scoreKeeping.selectImportSource', { defaultValue: 'Select the source for QR code import' }),
+      [
+        { text: t('scoreKeeping.photoGallery', { defaultValue: 'Photo / Screenshot' }), onPress: handleImportFromImage },
+        { text: t('scoreKeeping.pdfFile', { defaultValue: 'PDF File' }), onPress: handleImportFromPDF },
+        { text: t('common.cancel'), style: 'cancel' },
+      ]
+    );
   };
 
   // Delete manual entry
