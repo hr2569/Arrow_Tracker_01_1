@@ -128,6 +128,179 @@ export default function ScoreKeepingScreen() {
     setShowAddModal(false);
   };
 
+  // Import archer data from JSON files (batch import, works offline)
+  const handleImportFiles = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/json', 'text/plain', 'text/csv'],
+        multiple: true,
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      setIsImporting(true);
+      const importedEntries: ManualEntry[] = [];
+      let filesProcessed = 0;
+      let errors: string[] = [];
+
+      for (const asset of result.assets) {
+        try {
+          // Read file content
+          const content = await FileSystem.readAsStringAsync(asset.uri, {
+            encoding: FileSystem.EncodingType.UTF8,
+          });
+
+          filesProcessed++;
+
+          // Try to parse as JSON first
+          try {
+            const data = JSON.parse(content);
+            
+            // Handle Arrow Tracker export format
+            if (data.type === 'arrow_tracker_export' && Array.isArray(data.archers)) {
+              for (const archer of data.archers) {
+                importedEntries.push({
+                  id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                  archerName: archer.name || 'Unknown',
+                  bowType: archer.bowType || 'Unknown',
+                  totalScore: archer.score || 0,
+                  date: archer.date || new Date().toLocaleDateString(),
+                  distance: archer.distance || '',
+                  source: 'imported',
+                });
+              }
+            }
+            // Handle single archer format
+            else if (data.name && data.score !== undefined) {
+              importedEntries.push({
+                id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                archerName: data.name,
+                bowType: data.bowType || 'Unknown',
+                totalScore: data.score,
+                date: data.date || new Date().toLocaleDateString(),
+                distance: data.distance || '',
+                source: 'imported',
+              });
+            }
+            // Handle array of archers
+            else if (Array.isArray(data)) {
+              for (const archer of data) {
+                if (archer.name && archer.score !== undefined) {
+                  importedEntries.push({
+                    id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                    archerName: archer.name,
+                    bowType: archer.bowType || 'Unknown',
+                    totalScore: archer.score,
+                    date: archer.date || new Date().toLocaleDateString(),
+                    distance: archer.distance || '',
+                    source: 'imported',
+                  });
+                }
+              }
+            }
+          } catch (jsonError) {
+            // Try CSV format: name,bowType,score,distance,date
+            const lines = content.trim().split('\n');
+            for (const line of lines) {
+              const parts = line.split(',').map(p => p.trim());
+              if (parts.length >= 3 && parts[0] && !isNaN(parseInt(parts[2]))) {
+                // Skip header row
+                if (parts[0].toLowerCase() === 'name') continue;
+                
+                importedEntries.push({
+                  id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                  archerName: parts[0],
+                  bowType: parts[1] || 'Unknown',
+                  totalScore: parseInt(parts[2]) || 0,
+                  date: parts[4] || new Date().toLocaleDateString(),
+                  distance: parts[3] || '',
+                  source: 'imported',
+                });
+              }
+            }
+          }
+        } catch (err: any) {
+          errors.push(asset.name || 'Unknown file');
+          console.error('Error reading file:', err);
+        }
+      }
+
+      if (importedEntries.length > 0) {
+        setManualEntries(prev => [...prev, ...importedEntries]);
+        Alert.alert(
+          t('scoreKeeping.importSuccess', { defaultValue: 'Import Successful' }),
+          t('scoreKeeping.importedFromFiles', { 
+            defaultValue: `Imported ${importedEntries.length} archer(s) from ${filesProcessed} file(s)`,
+            count: importedEntries.length,
+            files: filesProcessed
+          })
+        );
+      } else {
+        Alert.alert(
+          t('scoreKeeping.importFailed', { defaultValue: 'Import Failed' }),
+          t('scoreKeeping.noValidData', { 
+            defaultValue: 'No valid archer data found in the selected files. Please use JSON or CSV format.' 
+          })
+        );
+      }
+    } catch (error: any) {
+      Alert.alert(t('common.error'), error.message || 'Failed to import files');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  // Export current entries as JSON file for sharing
+  const handleExportData = async () => {
+    if (manualEntries.length === 0) {
+      Alert.alert(
+        t('scoreKeeping.noEntries', { defaultValue: 'No Entries' }),
+        t('scoreKeeping.noEntriesToExport', { defaultValue: 'Add archers before exporting.' })
+      );
+      return;
+    }
+
+    try {
+      const exportData = {
+        type: 'arrow_tracker_export',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        archers: manualEntries.map(entry => ({
+          name: entry.archerName,
+          bowType: entry.bowType,
+          score: entry.totalScore,
+          distance: entry.distance || '',
+          date: entry.date,
+        })),
+      };
+
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const fileName = `ArrowTracker_Export_${new Date().toISOString().split('T')[0]}.json`;
+      const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
+
+      await FileSystem.writeAsStringAsync(fileUri, jsonString, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri, {
+          mimeType: 'application/json',
+          dialogTitle: t('scoreKeeping.exportData', { defaultValue: 'Export Archer Data' }),
+        });
+      } else {
+        Alert.alert(
+          t('scoreKeeping.exportSuccess', { defaultValue: 'Export Ready' }),
+          t('scoreKeeping.fileSaved', { defaultValue: `File saved: ${fileName}` })
+        );
+      }
+    } catch (error: any) {
+      Alert.alert(t('common.error'), error.message || 'Failed to export data');
+    }
+  };
+
   // Generate Competition Results PDF
   const handleGenerateResultsPDF = async () => {
     if (manualEntries.length === 0) {
