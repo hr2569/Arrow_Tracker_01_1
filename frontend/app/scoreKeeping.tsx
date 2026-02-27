@@ -355,6 +355,15 @@ export default function ScoreKeepingScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Hidden WebView for offline PDF QR extraction */}
+      {pdfToProcess && (
+        <PDFQRExtractor
+          pdfBase64={pdfToProcess}
+          onComplete={handleQRExtractComplete}
+          onError={handleQRExtractError}
+        />
+      )}
+      
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
