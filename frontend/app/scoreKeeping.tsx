@@ -929,45 +929,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  // Scanner styles
-  scannerContainer: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  scannerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#111',
-  },
-  closeButton: {
-    padding: 8,
-  },
-  scannerTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  camera: {
-    flex: 1,
-  },
-  scannerFooter: {
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    backgroundColor: '#111',
-    alignItems: 'center',
-  },
-  scannerHint: {
-    color: '#888',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  scannedCount: {
-    color: '#1a5f1a',
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 8,
+  importButtonDisabled: {
+    opacity: 0.6,
   },
 });
