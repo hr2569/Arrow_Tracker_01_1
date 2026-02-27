@@ -1259,38 +1259,6 @@ export default function ReportScreen() {
               <p>Arrow Tracker - ${new Date().getFullYear()}</p>
             </div>
           </div>
-          
-          <!-- QR Code Page for Score Keeping Import -->
-          <div class="page">
-            <div class="page-header">
-              <h2>${t('report.qrCodes', { defaultValue: 'QR Codes for Import' })}</h2>
-              <p>${t('report.scanToImport', { defaultValue: 'Scan these QR codes to import archer data' })}</p>
-            </div>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 20px;">
-              ${filteredSessions.map((session) => {
-                const sessionDate = new Date(session.created_at).toLocaleDateString();
-                const sessionName = session.name || session.id.slice(0, 8);
-                const bowType = session.bow_name || 'Unknown';
-                const qrSvg = qrCodes[session.id] || '';
-                return `
-                  <div style="text-align: center; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd; width: 180px;">
-                    <div style="margin-bottom: 10px;">
-                      ${qrSvg}
-                    </div>
-                    <div style="font-weight: bold; font-size: 14px; color: #333; margin-bottom: 4px;">${sessionName}</div>
-                    <div style="font-size: 12px; color: #666;">${bowType}</div>
-                    <div style="font-size: 18px; font-weight: bold; color: #8B0000; margin-top: 6px;">${session.total_score} pts</div>
-                    <div style="font-size: 10px; color: #888; margin-top: 4px;">${sessionDate}</div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-            
-            <div class="footer" style="margin-top: 40px;">
-              <p style="font-size: 11px; color: #666;">Each QR code contains: Name, Total Score, Bow Type, Distance, Date</p>
-              <p>Arrow Tracker - ${new Date().getFullYear()}</p>
-            </div>
-          </div>
         </body>
       </html>
     `;
