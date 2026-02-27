@@ -2187,6 +2187,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#8B0000',
     borderColor: '#8B0000',
   },
+  scoreOptionX: {
+    backgroundColor: '#FFD700',
+    borderColor: '#c0a000',
+  },
   scoreOptionText: {
     color: '#888888',
     fontSize: 12,
