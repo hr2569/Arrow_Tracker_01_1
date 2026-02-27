@@ -19,8 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { getSessions, Session } from '../utils/localStorage';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
-import axios from 'axios';
-import Constants from 'expo-constants';
+import { PDFQRExtractor } from '../components/PDFQRExtractor';
 
 interface ManualEntry {
   id: string;
