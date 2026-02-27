@@ -39,13 +39,6 @@ interface RankingEntry {
   date: string;
 }
 
-// Get API URL from environment
-const getApiUrl = () => {
-  return Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || 
-         process.env.EXPO_PUBLIC_BACKEND_URL || 
-         'https://score-keeper-24.preview.emergentagent.com';
-};
-
 const BOW_TYPES = ['Recurve', 'Compound', 'Barebow', 'Traditional', 'Longbow'];
 
 export default function ScoreKeepingScreen() {
@@ -60,6 +53,11 @@ export default function ScoreKeepingScreen() {
   const [showRankings, setShowRankings] = useState(false);
   const [selectedBowFilter, setSelectedBowFilter] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  
+  // PDF processing state
+  const [pdfToProcess, setPdfToProcess] = useState<string | null>(null);
+  const [pendingPdfs, setPendingPdfs] = useState<string[]>([]);
+  const [extractedResults, setExtractedResults] = useState<any[]>([]);
   
   // Manual entry modal state
   const [showAddModal, setShowAddModal] = useState(false);
