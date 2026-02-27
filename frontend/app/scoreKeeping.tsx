@@ -54,6 +54,7 @@ export default function ScoreKeepingScreen() {
   const [showRankings, setShowRankings] = useState(false);
   const [selectedBowFilter, setSelectedBowFilter] = useState<string | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   
   // Manual entry modal state
   const [showAddModal, setShowAddModal] = useState(false);
