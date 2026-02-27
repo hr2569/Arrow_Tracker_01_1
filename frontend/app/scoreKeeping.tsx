@@ -42,6 +42,7 @@ const BOW_TYPES = ['Recurve', 'Compound', 'Barebow', 'Traditional', 'Longbow'];
 export default function ScoreKeepingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const [permission, requestPermission] = useCameraPermissions();
   
   // State
   const [competitionSessions, setCompetitionSessions] = useState<Session[]>([]);
@@ -50,12 +51,10 @@ export default function ScoreKeepingScreen() {
   const [selectedManualEntries, setSelectedManualEntries] = useState<Set<string>>(new Set());
   const [showRankings, setShowRankings] = useState(false);
   const [selectedBowFilter, setSelectedBowFilter] = useState<string | null>(null);
-  const [isImporting, setIsImporting] = useState(false);
   
-  // PDF processing state
-  const [pdfToProcess, setPdfToProcess] = useState<string | null>(null);
-  const [pendingPdfs, setPendingPdfs] = useState<string[]>([]);
-  const [extractedResults, setExtractedResults] = useState<any[]>([]);
+  // QR Scanner state
+  const [showScanner, setShowScanner] = useState(false);
+  const [scannedCodes, setScannedCodes] = useState<Set<string>>(new Set());
   
   // Manual entry modal state
   const [showAddModal, setShowAddModal] = useState(false);
