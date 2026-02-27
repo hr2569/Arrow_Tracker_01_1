@@ -128,157 +128,60 @@ export default function ScoreKeepingScreen() {
     setShowAddModal(false);
   };
 
-  // Import PDFs and extract QR codes - OFFLINE using WebView
-  const handleImportPDFs = async () => {
+  // Handle QR code scan from camera
+  const handleBarCodeScanned = useCallback(({ data }: { data: string }) => {
+    // Prevent duplicate scans
+    if (scannedCodes.has(data)) return;
+    
     try {
-      // Pick multiple PDF files
-      const result = await DocumentPicker.getDocumentAsync({
-        type: 'application/pdf',
-        multiple: true,
-        copyToCacheDirectory: true,
-      });
-
-      if (result.canceled || !result.assets || result.assets.length === 0) {
-        return;
+      const qrData = JSON.parse(data);
+      
+      // Check if it's an Arrow Tracker QR code
+      if (qrData.t === 'arrow_tracker') {
+        setScannedCodes(prev => new Set([...prev, data]));
+        
+        const newEntry: ManualEntry = {
+          id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          archerName: qrData.n || 'Unknown',
+          bowType: qrData.b || 'Unknown',
+          totalScore: qrData.s || 0,
+          date: qrData.dt || new Date().toLocaleDateString(),
+          distance: qrData.d || '',
+          source: 'imported',
+        };
+        
+        setManualEntries(prev => [...prev, newEntry]);
+        
+        // Vibrate feedback would go here if we had haptics
+        Alert.alert(
+          t('scoreKeeping.qrScanned', { defaultValue: 'QR Code Scanned' }),
+          `${newEntry.archerName}: ${newEntry.totalScore} pts`,
+          [
+            { text: t('scoreKeeping.scanMore', { defaultValue: 'Scan More' }) },
+            { text: t('common.done'), onPress: () => setShowScanner(false) }
+          ]
+        );
       }
-
-      setIsImporting(true);
-      setExtractedResults([]);
-      
-      // Read all PDFs and convert to base64
-      const pdfsBase64: string[] = [];
-      const errors: string[] = [];
-      
-      for (const asset of result.assets) {
-        try {
-          let fileUri = asset.uri;
-          console.log(`Processing PDF: ${asset.name}, URI: ${fileUri}`);
-          
-          // Try reading directly first (works when copyToCacheDirectory is true)
-          try {
-            const fileContent = await FileSystem.readAsStringAsync(fileUri, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
-            if (fileContent && fileContent.length > 0) {
-              pdfsBase64.push(fileContent);
-              console.log(`Successfully read PDF: ${asset.name}, size: ${fileContent.length}`);
-              continue;
-            }
-          } catch (directReadError: any) {
-            console.log(`Direct read failed for ${asset.name}: ${directReadError?.message}`);
-          }
-          
-          // Fallback: Copy to cache directory first (for content:// URIs on Android)
-          if (Platform.OS === 'android') {
-            try {
-              const fileName = asset.name || `pdf_${Date.now()}.pdf`;
-              const cacheUri = `${FileSystem.cacheDirectory}${fileName}`;
-              await FileSystem.copyAsync({
-                from: fileUri,
-                to: cacheUri,
-              });
-              const fileContent = await FileSystem.readAsStringAsync(cacheUri, {
-                encoding: FileSystem.EncodingType.Base64,
-              });
-              if (fileContent && fileContent.length > 0) {
-                pdfsBase64.push(fileContent);
-                console.log(`Read PDF after copy: ${asset.name}, size: ${fileContent.length}`);
-                continue;
-              }
-            } catch (copyReadError: any) {
-              console.log(`Copy+read failed for ${asset.name}: ${copyReadError?.message}`);
-            }
-          }
-          
-          errors.push(asset.name || 'Unknown file');
-        } catch (readError: any) {
-          console.error('Error reading PDF:', asset.name, readError?.message || readError);
-          errors.push(asset.name || 'Unknown file');
-        }
-      }
-
-      if (pdfsBase64.length === 0) {
-        const errorMsg = errors.length > 0 
-          ? `Failed to read: ${errors.join(', ')}` 
-          : 'Could not read any PDF files';
-        Alert.alert(t('common.error'), errorMsg);
-        setIsImporting(false);
-        return;
-      }
-      
-      // Process PDFs one by one using offline WebView extractor
-      setPendingPdfs(pdfsBase64.slice(1));
-      setPdfToProcess(pdfsBase64[0]);
-      
-    } catch (error: any) {
-      console.error('Import error:', error);
-      Alert.alert(t('common.error'), error.message || 'Failed to import PDFs');
-      setIsImporting(false);
+    } catch (e) {
+      // Not a valid JSON QR code, ignore
     }
+  }, [scannedCodes, t]);
+
+  // Open QR scanner
+  const handleOpenScanner = async () => {
+    if (!permission?.granted) {
+      const result = await requestPermission();
+      if (!result.granted) {
+        Alert.alert(
+          t('scoreKeeping.cameraPermission', { defaultValue: 'Camera Permission Required' }),
+          t('scoreKeeping.cameraPermissionDesc', { defaultValue: 'Please grant camera permission to scan QR codes.' })
+        );
+        return;
+      }
+    }
+    setScannedCodes(new Set());
+    setShowScanner(true);
   };
-
-  // Handle QR extraction results from WebView
-  const handleQRExtractComplete = useCallback((results: any[]) => {
-    console.log('QR extraction complete:', results.length, 'results');
-    setExtractedResults(prev => [...prev, ...results]);
-    
-    // Process next PDF if any
-    if (pendingPdfs.length > 0) {
-      const nextPdf = pendingPdfs[0];
-      setPendingPdfs(prev => prev.slice(1));
-      setPdfToProcess(nextPdf);
-    } else {
-      // All PDFs processed
-      finishImport();
-    }
-  }, [pendingPdfs]);
-
-  const handleQRExtractError = useCallback((error: string) => {
-    console.error('QR extraction error:', error);
-    
-    // Continue with next PDF even if one fails
-    if (pendingPdfs.length > 0) {
-      const nextPdf = pendingPdfs[0];
-      setPendingPdfs(prev => prev.slice(1));
-      setPdfToProcess(nextPdf);
-    } else {
-      finishImport();
-    }
-  }, [pendingPdfs]);
-
-  const finishImport = useCallback(() => {
-    setPdfToProcess(null);
-    setIsImporting(false);
-    
-    if (extractedResults.length > 0) {
-      // Convert extracted results to manual entries
-      const importedEntries: ManualEntry[] = extractedResults.map((result: any) => ({
-        id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-        archerName: result.name,
-        bowType: result.bowType,
-        totalScore: result.score,
-        date: result.date,
-        distance: result.distance,
-        source: 'imported' as const,
-      }));
-
-      setManualEntries(prev => [...prev, ...importedEntries]);
-      setExtractedResults([]);
-      
-      Alert.alert(
-        t('scoreKeeping.importSuccess', { defaultValue: 'Import Successful' }),
-        t('scoreKeeping.importedArchers', { 
-          defaultValue: `Imported ${importedEntries.length} archer(s)`,
-          count: importedEntries.length,
-        })
-      );
-    } else {
-      Alert.alert(
-        t('scoreKeeping.noQRCodes', { defaultValue: 'No QR Codes Found' }),
-        t('scoreKeeping.noQRCodesDesc', { defaultValue: 'No Arrow Tracker QR codes were found in the uploaded PDFs.' })
-      );
-    }
-  }, [extractedResults, t]);
 
   // Delete manual entry
   const handleDeleteManualEntry = (entryId: string) => {
