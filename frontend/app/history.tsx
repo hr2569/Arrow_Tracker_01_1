@@ -1420,12 +1420,13 @@ export default function HistoryScreen() {
                 <View key={index} style={styles.editShotRow}>
                   <Text style={styles.editShotLabel}>Shot {index + 1}</Text>
                   <View style={styles.scoreSelector}>
-                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
+                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((score) => (
                       <TouchableOpacity
                         key={score}
                         style={[
                           styles.scoreOption,
                           shot.ring === score && styles.scoreOptionSelected,
+                          score === 11 && styles.scoreOptionX,
                         ]}
                         onPress={() => updateShotScore(index, score)}
                       >
@@ -1435,7 +1436,7 @@ export default function HistoryScreen() {
                             shot.ring === score && styles.scoreOptionTextSelected,
                           ]}
                         >
-                          {score === 0 ? 'M' : score}
+                          {score === 0 ? 'M' : score === 11 ? 'X' : score}
                         </Text>
                       </TouchableOpacity>
                     ))}
