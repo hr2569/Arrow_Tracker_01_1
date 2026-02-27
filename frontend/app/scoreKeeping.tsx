@@ -223,6 +223,257 @@ export default function ScoreKeepingScreen() {
     }
   };
 
+  // Generate Competition Results PDF
+  const handleGenerateResultsPDF = async () => {
+    if (manualEntries.length === 0) {
+      Alert.alert(
+        t('scoreKeeping.noEntries', { defaultValue: 'No Entries' }),
+        t('scoreKeeping.noEntriesToExport', { defaultValue: 'Add or import archers before generating results.' })
+      );
+      return;
+    }
+
+    setIsGeneratingPDF(true);
+
+    try {
+      // Group entries by Distance and Bow Type
+      const grouped: { [key: string]: ManualEntry[] } = {};
+      
+      manualEntries.forEach(entry => {
+        const distance = entry.distance || 'No Distance';
+        const bowType = entry.bowType || 'Unknown';
+        const key = `${distance}|||${bowType}`;
+        
+        if (!grouped[key]) {
+          grouped[key] = [];
+        }
+        grouped[key].push(entry);
+      });
+
+      // Sort each group by score (descending)
+      Object.keys(grouped).forEach(key => {
+        grouped[key].sort((a, b) => b.totalScore - a.totalScore);
+      });
+
+      // Sort groups by distance then bow type
+      const sortedKeys = Object.keys(grouped).sort((a, b) => {
+        const [distA, bowA] = a.split('|||');
+        const [distB, bowB] = b.split('|||');
+        if (distA !== distB) return distA.localeCompare(distB);
+        return bowA.localeCompare(bowB);
+      });
+
+      // Generate HTML for PDF
+      const getMedalEmoji = (rank: number): string => {
+        if (rank === 1) return '🥇';
+        if (rank === 2) return '🥈';
+        if (rank === 3) return '🥉';
+        return `${rank}.`;
+      };
+
+      const getMedalColor = (rank: number): string => {
+        if (rank === 1) return '#FFD700';
+        if (rank === 2) return '#C0C0C0';
+        if (rank === 3) return '#CD7F32';
+        return '#666';
+      };
+
+      let sectionsHtml = '';
+      sortedKeys.forEach(key => {
+        const [distance, bowType] = key.split('|||');
+        const entries = grouped[key];
+
+        sectionsHtml += `
+          <div class="section">
+            <div class="section-header">
+              <h2>${bowType}</h2>
+              <span class="distance-badge">${distance}</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 60px;">Rank</th>
+                  <th>Archer</th>
+                  <th style="width: 100px; text-align: right;">Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${entries.map((entry, index) => {
+                  const rank = index + 1;
+                  const isTop3 = rank <= 3;
+                  return `
+                    <tr class="${isTop3 ? 'top-three' : ''}">
+                      <td class="rank" style="color: ${getMedalColor(rank)}; font-size: ${isTop3 ? '24px' : '14px'};">
+                        ${getMedalEmoji(rank)}
+                      </td>
+                      <td class="archer-name ${isTop3 ? 'highlight' : ''}">${entry.archerName}</td>
+                      <td class="score ${isTop3 ? 'highlight' : ''}">${entry.totalScore}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      });
+
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Competition Results</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              background: #fff;
+              color: #333;
+              padding: 20px;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              padding-bottom: 20px;
+              border-bottom: 3px solid #8B0000;
+            }
+            .header h1 {
+              color: #8B0000;
+              font-size: 28px;
+              margin-bottom: 8px;
+            }
+            .header .date {
+              color: #666;
+              font-size: 14px;
+            }
+            .header .total {
+              color: #333;
+              font-size: 16px;
+              margin-top: 8px;
+            }
+            .section {
+              margin-bottom: 30px;
+              page-break-inside: avoid;
+            }
+            .section-header {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              background: #8B0000;
+              color: white;
+              padding: 12px 16px;
+              border-radius: 8px 8px 0 0;
+            }
+            .section-header h2 {
+              font-size: 18px;
+              font-weight: 600;
+            }
+            .distance-badge {
+              background: rgba(255,255,255,0.2);
+              padding: 4px 12px;
+              border-radius: 20px;
+              font-size: 14px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              background: #fff;
+              border: 1px solid #ddd;
+              border-top: none;
+            }
+            th {
+              background: #f5f5f5;
+              padding: 12px;
+              text-align: left;
+              font-weight: 600;
+              font-size: 12px;
+              text-transform: uppercase;
+              color: #666;
+              border-bottom: 2px solid #ddd;
+            }
+            td {
+              padding: 12px;
+              border-bottom: 1px solid #eee;
+            }
+            .rank {
+              font-weight: bold;
+              text-align: center;
+            }
+            .archer-name {
+              font-size: 15px;
+            }
+            .score {
+              text-align: right;
+              font-weight: 600;
+              font-size: 16px;
+            }
+            .top-three td {
+              background: #fffbf0;
+            }
+            .highlight {
+              font-weight: 700;
+            }
+            tr:last-child td {
+              border-bottom: none;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 1px solid #ddd;
+              color: #888;
+              font-size: 12px;
+            }
+            @media print {
+              body { padding: 0; }
+              .section { page-break-inside: avoid; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>${t('scoreKeeping.competitionResults', { defaultValue: 'Competition Results' })}</h1>
+            <div class="date">${new Date().toLocaleDateString()}</div>
+            <div class="total">${t('scoreKeeping.totalParticipants', { defaultValue: `Total Participants: ${manualEntries.length}`, count: manualEntries.length })}</div>
+          </div>
+          
+          ${sectionsHtml}
+          
+          <div class="footer">
+            <p>Generated by Arrow Tracker</p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      // Generate and share PDF
+      const { uri } = await Print.printToFileAsync({ html });
+      
+      if (Platform.OS === 'web') {
+        // Web: open in new tab
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } else if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'application/pdf',
+          dialogTitle: t('scoreKeeping.shareResults', { defaultValue: 'Share Competition Results' }),
+          UTI: 'com.adobe.pdf',
+        });
+      } else {
+        Alert.alert(
+          t('scoreKeeping.pdfGenerated', { defaultValue: 'PDF Generated' }),
+          t('scoreKeeping.pdfSaved', { defaultValue: 'Results PDF has been saved.' })
+        );
+      }
+    } catch (error: any) {
+      console.error('PDF generation error:', error);
+      Alert.alert(t('common.error'), error.message || 'Failed to generate PDF');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   // Delete manual entry
   const handleDeleteManualEntry = (entryId: string) => {
     Alert.alert(
