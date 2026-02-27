@@ -459,27 +459,6 @@ export default function ScoreKeepingScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Import QR Code Section */}
-        <View style={styles.importSection}>
-          <TouchableOpacity 
-            style={[styles.importButton, isImporting && styles.importButtonDisabled]}
-            onPress={handleImportFromPhotos}
-            disabled={isImporting}
-          >
-            {isImporting ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Icon name="images" size={22} color="#fff" />
-            )}
-            <Text style={styles.importButtonText}>
-              {isImporting ? t('scoreKeeping.importing', { defaultValue: 'Importing...' }) : t('scoreKeeping.importFromPhotos', { defaultValue: 'Import from Photos' })}
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.importHint}>
-            {t('scoreKeeping.importHintPhotos', { defaultValue: 'Select screenshots of QR codes (batch supported)' })}
-          </Text>
-        </View>
-
         {/* Generate Results PDF Button */}
         {manualEntries.length > 0 && (
           <View style={styles.generateSection}>
