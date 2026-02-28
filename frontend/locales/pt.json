@@ -454,7 +454,8 @@
     "pts": "pts",
     "yes": "Sim",
     "no": "Não",
-    "ok": "OK"
+    "ok": "OK",
+    "all": "Todos"
   },
   "targets": {
     "waStandard": "WA Padrão",

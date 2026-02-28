@@ -455,7 +455,8 @@
     "pts": "pkt",
     "yes": "Ja",
     "no": "Nej",
-    "ok": "OK"
+    "ok": "OK",
+    "all": "Alla"
   },
   "targets": {
     "waStandard": "WA Standard",

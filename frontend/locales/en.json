@@ -452,7 +452,8 @@
     "pts": "pts",
     "yes": "Yes",
     "no": "No",
-    "ok": "OK"
+    "ok": "OK",
+    "all": "All"
   },
   "competition": {
     "deleteCompetition": "Delete Competition",

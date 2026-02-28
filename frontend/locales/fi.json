@@ -455,7 +455,8 @@
     "pts": "pst",
     "yes": "Kyllä",
     "no": "Ei",
-    "ok": "OK"
+    "ok": "OK",
+    "all": "Kaikki"
   },
   "targets": {
     "waStandard": "WA Standard",

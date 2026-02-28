@@ -452,7 +452,8 @@
     "pts": "Pkt",
     "yes": "Ja",
     "no": "Nein",
-    "ok": "OK"
+    "ok": "OK",
+    "all": "Alle"
   },
   "competition": {
     "deleteCompetition": "Wettkampf löschen",

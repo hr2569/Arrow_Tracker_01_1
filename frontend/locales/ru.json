@@ -455,7 +455,8 @@
     "pts": "очк",
     "yes": "Да",
     "no": "Нет",
-    "ok": "OK"
+    "ok": "OK",
+    "all": "Все"
   },
   "targets": {
     "waStandard": "WA Стандарт",
