@@ -858,23 +858,23 @@ export default function ScoreKeepingScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add Archer</Text>
+              <Text style={styles.modalTitle}>{t('scoreKeeping.addArcher')}</Text>
               <TouchableOpacity onPress={() => setShowAddModal(false)}>
                 <Icon name="close" size={24} color="#fff" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.modalBody}>
-              <Text style={styles.inputLabel}>Archer Name *</Text>
+              <Text style={styles.inputLabel}>{t('scoreKeeping.archerNameLabel', { defaultValue: 'Archer Name' })} *</Text>
               <TextInput
                 style={styles.textInput}
                 value={newArcherName}
                 onChangeText={setNewArcherName}
-                placeholder="Enter name"
+                placeholder={t('scoreKeeping.enterName', { defaultValue: 'Enter name' })}
                 placeholderTextColor="#666"
               />
 
-              <Text style={styles.inputLabel}>Bow Type</Text>
+              <Text style={styles.inputLabel}>{t('bows.bowType', { defaultValue: 'Bow Type' })}</Text>
               <View style={styles.bowTypeGrid}>
                 {BOW_TYPES.map(bow => (
                   <TouchableOpacity
@@ -883,24 +883,24 @@ export default function ScoreKeepingScreen() {
                     onPress={() => setNewBowType(bow)}
                   >
                     <Text style={[styles.bowTypeText, newBowType === bow && styles.bowTypeTextActive]}>
-                      {bow}
+                      {t(`bows.types.${bow.toLowerCase()}`, { defaultValue: bow })}
                     </Text>
                   </TouchableOpacity>
                 ))}
               </View>
 
-              <Text style={styles.inputLabel}>Total Score *</Text>
+              <Text style={styles.inputLabel}>{t('scoreKeeping.totalScore', { defaultValue: 'Total Score' })} *</Text>
               <TextInput
                 style={styles.textInput}
                 value={newScore}
                 onChangeText={setNewScore}
-                placeholder="Enter score"
+                placeholder={t('scoreKeeping.enterScore', { defaultValue: 'Enter score' })}
                 placeholderTextColor="#666"
                 keyboardType="numeric"
               />
 
               <TouchableOpacity style={styles.saveButton} onPress={handleAddManualEntry}>
-                <Text style={styles.saveButtonText}>Add Archer</Text>
+                <Text style={styles.saveButtonText}>{t('scoreKeeping.addArcher')}</Text>
               </TouchableOpacity>
             </View>
           </View>
