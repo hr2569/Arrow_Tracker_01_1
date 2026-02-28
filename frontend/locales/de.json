@@ -136,7 +136,11 @@
     "pdfGenerated": "PDF erstellt",
     "pdfSaved": "Ergebnis-PDF wurde gespeichert.",
     "noEntries": "Keine Einträge",
-    "deleteEntryConfirm": "Diesen Eintrag löschen?"
+    "deleteEntryConfirm": "Diesen Eintrag löschen?",
+    "archerNameLabel": "Name des Bogenschützen",
+    "enterName": "Name eingeben",
+    "totalScore": "Gesamtpunktzahl",
+    "enterScore": "Punktzahl eingeben"
   },
   "settings": {
     "title": "Einstellungen",
@@ -293,7 +297,14 @@
     "enterBowName": "Bitte gib einen Bogennamen ein",
     "failedToSave": "Bogen konnte nicht gespeichert werden",
     "failedToDelete": "Bogen konnte nicht gelöscht werden",
-    "loadingBows": "Bögen werden geladen..."
+    "loadingBows": "Bögen werden geladen...",
+    "types": {
+      "recurve": "Recurve",
+      "compound": "Compound",
+      "barebow": "Blankbogen",
+      "traditional": "Traditionell",
+      "longbow": "Langbogen"
+    }
   },
   "backup": {
     "title": "Sichern & Wiederherstellen",

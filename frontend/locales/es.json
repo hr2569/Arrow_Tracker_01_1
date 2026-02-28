@@ -137,7 +137,11 @@
     "pdfGenerated": "PDF generado",
     "pdfSaved": "El PDF de resultados se ha guardado.",
     "noEntries": "Sin entradas",
-    "deleteEntryConfirm": "¿Eliminar esta entrada?"
+    "deleteEntryConfirm": "¿Eliminar esta entrada?",
+    "archerNameLabel": "Nombre del arquero",
+    "enterName": "Ingrese nombre",
+    "totalScore": "Puntuación total",
+    "enterScore": "Ingrese puntuación"
   },
   "settings": {
     "title": "Ajustes",
@@ -296,7 +300,14 @@
     "enterBowName": "Por favor, introduce el nombre del arco",
     "failedToSave": "Error al guardar el arco",
     "failedToDelete": "Error al eliminar el arco",
-    "loadingBows": "Cargando arcos..."
+    "loadingBows": "Cargando arcos...",
+    "types": {
+      "recurve": "Recurvo",
+      "compound": "Compuesto",
+      "barebow": "Arco desnudo",
+      "traditional": "Tradicional",
+      "longbow": "Arco largo"
+    }
   },
   "backup": {
     "title": "Copia de Seguridad",

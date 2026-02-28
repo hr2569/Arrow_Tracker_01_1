@@ -137,7 +137,11 @@
     "pdfGenerated": "PDF généré",
     "pdfSaved": "Le PDF des résultats a été enregistré.",
     "noEntries": "Aucune entrée",
-    "deleteEntryConfirm": "Supprimer cette entrée?"
+    "deleteEntryConfirm": "Supprimer cette entrée?",
+    "archerNameLabel": "Nom de l'archer",
+    "enterName": "Entrez le nom",
+    "totalScore": "Score total",
+    "enterScore": "Entrez le score"
   },
   "settings": {
     "title": "Paramètres",
@@ -296,7 +300,14 @@
     "enterBowName": "Veuillez entrer le nom de l'arc",
     "failedToSave": "Échec de l'enregistrement de l'arc",
     "failedToDelete": "Échec de la suppression de l'arc",
-    "loadingBows": "Chargement des arcs..."
+    "loadingBows": "Chargement des arcs...",
+    "types": {
+      "recurve": "Recurve",
+      "compound": "Compound",
+      "barebow": "Arc nu",
+      "traditional": "Traditionnel",
+      "longbow": "Arc long"
+    }
   },
   "backup": {
     "title": "Sauvegarde",

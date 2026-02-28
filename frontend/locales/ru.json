@@ -137,7 +137,11 @@
     "pdfGenerated": "PDF создан",
     "pdfSaved": "PDF результатов сохранён.",
     "noEntries": "Нет записей",
-    "deleteEntryConfirm": "Удалить эту запись?"
+    "deleteEntryConfirm": "Удалить эту запись?",
+    "archerNameLabel": "Имя лучника",
+    "enterName": "Введите имя",
+    "totalScore": "Общий счёт",
+    "enterScore": "Введите счёт"
   },
   "settings": {
     "title": "Настройки",
@@ -296,7 +300,14 @@
     "enterBowName": "Пожалуйста, введите название лука",
     "failedToSave": "Не удалось сохранить лук",
     "failedToDelete": "Не удалось удалить лук",
-    "loadingBows": "Загрузка луков..."
+    "loadingBows": "Загрузка луков...",
+    "types": {
+      "recurve": "Рекурсивный",
+      "compound": "Блочный",
+      "barebow": "Голый лук",
+      "traditional": "Традиционный",
+      "longbow": "Длинный лук"
+    }
   },
   "backup": {
     "title": "Резервное Копирование",

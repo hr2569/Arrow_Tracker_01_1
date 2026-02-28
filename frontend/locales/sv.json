@@ -137,7 +137,11 @@
     "pdfGenerated": "PDF genererad",
     "pdfSaved": "Resultat-PDF har sparats.",
     "noEntries": "Inga poster",
-    "deleteEntryConfirm": "Ta bort denna post?"
+    "deleteEntryConfirm": "Ta bort denna post?",
+    "archerNameLabel": "Skyttens namn",
+    "enterName": "Ange namn",
+    "totalScore": "Total poäng",
+    "enterScore": "Ange poäng"
   },
   "settings": {
     "title": "Inställningar",
@@ -296,7 +300,14 @@
     "enterBowName": "Ange bågens namn",
     "failedToSave": "Misslyckades att spara bågen",
     "failedToDelete": "Misslyckades att radera bågen",
-    "loadingBows": "Laddar bågar..."
+    "loadingBows": "Laddar bågar...",
+    "types": {
+      "recurve": "Recurve",
+      "compound": "Compound",
+      "barebow": "Barebow",
+      "traditional": "Traditionell",
+      "longbow": "Långbåge"
+    }
   },
   "backup": {
     "title": "Säkerhetskopiering",

@@ -136,7 +136,11 @@
     "invalidCode": "Invalid import code. Please check and try again.",
     "duplicateEntry": "This archer has already been imported.",
     "pdfImportTip": "PDF text extraction is limited. For reliable data transfer, please use the CSV export option and import the CSV file instead.",
-    "deleteEntryConfirm": "Delete this entry?"
+    "deleteEntryConfirm": "Delete this entry?",
+    "archerNameLabel": "Archer Name",
+    "enterName": "Enter name",
+    "totalScore": "Total Score",
+    "enterScore": "Enter score"
   },
   "settings": {
     "title": "Settings",
@@ -293,7 +297,14 @@
     "enterBowName": "Please enter a bow name",
     "failedToSave": "Failed to save bow",
     "failedToDelete": "Failed to delete bow",
-    "loadingBows": "Loading bows..."
+    "loadingBows": "Loading bows...",
+    "types": {
+      "recurve": "Recurve",
+      "compound": "Compound",
+      "barebow": "Barebow",
+      "traditional": "Traditional",
+      "longbow": "Longbow"
+    }
   },
   "backup": {
     "title": "Backup & Restore",

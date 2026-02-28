@@ -137,7 +137,11 @@
     "pdfGenerated": "PDF створено",
     "pdfSaved": "PDF результатів збережено.",
     "noEntries": "Немає записів",
-    "deleteEntryConfirm": "Видалити цей запис?"
+    "deleteEntryConfirm": "Видалити цей запис?",
+    "archerNameLabel": "Ім'я лучника",
+    "enterName": "Введіть ім'я",
+    "totalScore": "Загальний рахунок",
+    "enterScore": "Введіть рахунок"
   },
   "settings": {
     "title": "Налаштування",
@@ -296,7 +300,14 @@
     "enterBowName": "Будь ласка, введіть назву лука",
     "failedToSave": "Не вдалося зберегти лук",
     "failedToDelete": "Не вдалося видалити лук",
-    "loadingBows": "Завантаження луків..."
+    "loadingBows": "Завантаження луків...",
+    "types": {
+      "recurve": "Рекурсивний",
+      "compound": "Блочний",
+      "barebow": "Голий лук",
+      "traditional": "Традиційний",
+      "longbow": "Довгий лук"
+    }
   },
   "backup": {
     "title": "Резервне Копіювання",

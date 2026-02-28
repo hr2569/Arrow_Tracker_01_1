@@ -137,7 +137,11 @@
     "pdfGenerated": "PDF luotu",
     "pdfSaved": "Tulokset PDF on tallennettu.",
     "noEntries": "Ei merkintöjä",
-    "deleteEntryConfirm": "Poista tämä merkintä?"
+    "deleteEntryConfirm": "Poista tämä merkintä?",
+    "archerNameLabel": "Jousiampujan nimi",
+    "enterName": "Syötä nimi",
+    "totalScore": "Kokonaispistemäärä",
+    "enterScore": "Syötä pistemäärä"
   },
   "settings": {
     "title": "Asetukset",
@@ -296,7 +300,14 @@
     "enterBowName": "Syötä jousen nimi",
     "failedToSave": "Jousen tallentaminen epäonnistui",
     "failedToDelete": "Jousen poistaminen epäonnistui",
-    "loadingBows": "Ladataan jousia..."
+    "loadingBows": "Ladataan jousia...",
+    "types": {
+      "recurve": "Recurve",
+      "compound": "Compound",
+      "barebow": "Barebow",
+      "traditional": "Perinteinen",
+      "longbow": "Pitkäjousi"
+    }
   },
   "backup": {
     "title": "Varmuuskopio",
