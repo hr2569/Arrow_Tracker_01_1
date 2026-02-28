@@ -556,7 +556,7 @@ export default function ScoreKeepingScreen() {
   const handleDeleteManualEntry = (entryId: string) => {
     Alert.alert(
       t('common.delete'),
-      'Delete this entry?',
+      t('scoreKeeping.deleteEntryConfirm', { defaultValue: 'Delete this entry?' }),
       [
         { text: t('common.cancel'), style: 'cancel' },
         { 
