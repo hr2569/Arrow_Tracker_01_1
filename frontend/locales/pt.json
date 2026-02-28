@@ -134,7 +134,8 @@
     "totalParticipants": "Total de participantes: {{count}}",
     "shareResults": "Compartilhar resultados",
     "pdfGenerated": "PDF gerado",
-    "pdfSaved": "O PDF de resultados foi salvo."
+    "pdfSaved": "O PDF de resultados foi salvo.",
+    "noEntries": "Sem entradas"
   },
   "settings": {
     "title": "Definições",

@@ -135,7 +135,8 @@
     "totalParticipants": "Participants totaux: {{count}}",
     "shareResults": "Partager les résultats",
     "pdfGenerated": "PDF généré",
-    "pdfSaved": "Le PDF des résultats a été enregistré."
+    "pdfSaved": "Le PDF des résultats a été enregistré.",
+    "noEntries": "Aucune entrée"
   },
   "settings": {
     "title": "Paramètres",

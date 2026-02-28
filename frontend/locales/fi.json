@@ -135,7 +135,8 @@
     "totalParticipants": "Osallistujia yhteensä: {{count}}",
     "shareResults": "Jaa kilpailutulokset",
     "pdfGenerated": "PDF luotu",
-    "pdfSaved": "Tulokset PDF on tallennettu."
+    "pdfSaved": "Tulokset PDF on tallennettu.",
+    "noEntries": "Ei merkintöjä"
   },
   "settings": {
     "title": "Asetukset",

@@ -135,7 +135,8 @@
     "totalParticipants": "Всего участников: {{count}}",
     "shareResults": "Поделиться результатами",
     "pdfGenerated": "PDF создан",
-    "pdfSaved": "PDF результатов сохранён."
+    "pdfSaved": "PDF результатов сохранён.",
+    "noEntries": "Нет записей"
   },
   "settings": {
     "title": "Настройки",

@@ -134,7 +134,8 @@
     "totalParticipants": "Teilnehmer insgesamt: {{count}}",
     "shareResults": "Wettbewerbsergebnisse teilen",
     "pdfGenerated": "PDF erstellt",
-    "pdfSaved": "Ergebnis-PDF wurde gespeichert."
+    "pdfSaved": "Ergebnis-PDF wurde gespeichert.",
+    "noEntries": "Keine Einträge"
   },
   "settings": {
     "title": "Einstellungen",

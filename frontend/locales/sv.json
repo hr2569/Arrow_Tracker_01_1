@@ -135,7 +135,8 @@
     "totalParticipants": "Totalt antal deltagare: {{count}}",
     "shareResults": "Dela tävlingsresultat",
     "pdfGenerated": "PDF genererad",
-    "pdfSaved": "Resultat-PDF har sparats."
+    "pdfSaved": "Resultat-PDF har sparats.",
+    "noEntries": "Inga poster"
   },
   "settings": {
     "title": "Inställningar",

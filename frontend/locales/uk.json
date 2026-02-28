@@ -135,7 +135,8 @@
     "totalParticipants": "Всього учасників: {{count}}",
     "shareResults": "Поділитися результатами",
     "pdfGenerated": "PDF створено",
-    "pdfSaved": "PDF результатів збережено."
+    "pdfSaved": "PDF результатів збережено.",
+    "noEntries": "Немає записів"
   },
   "settings": {
     "title": "Налаштування",
