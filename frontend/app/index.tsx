@@ -14,8 +14,8 @@ import { Icon } from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { getSessions, Session } from '../utils/localStorage';
 
-// Feature flag - set to true to enable Competition menu
-const COMPETITION_ENABLED = true;
+// Feature flag - set to false to disable Competition menu (Coming Soon)
+const COMPETITION_ENABLED = false;
 
 interface QuickStats {
   totalSessions: number;
