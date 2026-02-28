@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Stack, useRouter, useNavigation } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { TouchableOpacity, Platform, View, ActivityIndicator } from 'react-native';
-import { Icon } from '../components/Icon';
+import { View, ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '../i18n'; // Initialize i18n
 import { loadSavedLanguage } from '../i18n';
 
-// HeaderBackButton is now defined inline with proper navigation context
 export default function RootLayout() {
   const [isLanguageLoaded, setIsLanguageLoaded] = useState(false);
 
