@@ -800,7 +800,7 @@ export default function ScoreKeepingScreen() {
                   onPress={() => setSelectedBowFilter(null)}
                 >
                   <Text style={[styles.filterChipText, !selectedBowFilter && styles.filterChipTextActive]}>
-                    All
+                    {t('common.all', { defaultValue: 'All' })}
                   </Text>
                 </TouchableOpacity>
                 {availableBowTypes.map(bowType => (
