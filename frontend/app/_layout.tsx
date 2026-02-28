@@ -18,146 +18,56 @@ export default function RootLayout() {
     initLanguage();
   }, []);
 
-  // Show a loading screen until the language is loaded
-  if (!isLanguageLoaded) {
-    return (
-      <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#121212' }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }}>
-          <ActivityIndicator size="large" color="#8B0000" />
-        </View>
-      </GestureHandlerRootView>
-    );
-  }
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#1a1a2e',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-          contentStyle: {
-            backgroundColor: '#16213e',
-          },
-          headerBackVisible: true,
-        }}
-      >
-        <Stack.Screen 
-          name="index" 
-          options={{ 
-            title: 'Arrow Tracker',
-            headerShown: true,
-            headerLeft: () => null, // No back button on home
-          }} 
-        />
-        <Stack.Screen 
-          name="scoring" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="summary" 
-          options={{ 
-            headerBackVisible: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="history" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="stats" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="bows" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="sessionSetup" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="report" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="backup" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="competitionSetup" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="competitionScoring" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="competitionSummary" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="competitionMenu" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="scoreKeeping" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="manualScoring" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="importPdf" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="competitionHistory" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-        <Stack.Screen 
-          name="settings" 
-          options={{ 
-            headerShown: false,
-          }} 
-        />
-      </Stack>
+      {!isLanguageLoaded ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }}>
+          <ActivityIndicator size="large" color="#8B0000" />
+        </View>
+      ) : (
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: '#1a1a2e',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+            contentStyle: {
+              backgroundColor: '#16213e',
+            },
+            headerBackVisible: true,
+          }}
+        >
+          <Stack.Screen 
+            name="index" 
+            options={{ 
+              title: 'Arrow Tracker',
+              headerShown: true,
+              headerLeft: () => null,
+            }} 
+          />
+          <Stack.Screen name="scoring" options={{ headerShown: false }} />
+          <Stack.Screen name="summary" options={{ headerBackVisible: false }} />
+          <Stack.Screen name="history" options={{ headerShown: false }} />
+          <Stack.Screen name="stats" options={{ headerShown: false }} />
+          <Stack.Screen name="bows" options={{ headerShown: false }} />
+          <Stack.Screen name="sessionSetup" options={{ headerShown: false }} />
+          <Stack.Screen name="report" options={{ headerShown: false }} />
+          <Stack.Screen name="backup" options={{ headerShown: false }} />
+          <Stack.Screen name="competitionSetup" options={{ headerShown: false }} />
+          <Stack.Screen name="competitionScoring" options={{ headerShown: false }} />
+          <Stack.Screen name="competitionSummary" options={{ headerShown: false }} />
+          <Stack.Screen name="competitionMenu" options={{ headerShown: false }} />
+          <Stack.Screen name="scoreKeeping" options={{ headerShown: false }} />
+          <Stack.Screen name="manualScoring" options={{ headerShown: false }} />
+          <Stack.Screen name="importPdf" options={{ headerShown: false }} />
+          <Stack.Screen name="competitionHistory" options={{ headerShown: false }} />
+          <Stack.Screen name="settings" options={{ headerShown: false }} />
+        </Stack>
+      )}
     </GestureHandlerRootView>
   );
 }
