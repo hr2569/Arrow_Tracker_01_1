@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity, Platform, View, ActivityIndicator } from 'react-native';
 import { Icon } from '../components/Icon';
@@ -7,26 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '../i18n'; // Initialize i18n
 import { loadSavedLanguage } from '../i18n';
 
-function HeaderBackButton() {
-  const router = useRouter();
-  
-  const handleBack = () => {
-    // Simple back: always go to home screen
-    router.replace('/');
-  };
-  
-  return (
-    <TouchableOpacity 
-      onPress={handleBack} 
-      style={{ marginLeft: 10, padding: 8, minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' }}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      activeOpacity={0.7}
-    >
-      <Icon name="arrow-back" size={24} color="#fff" />
-    </TouchableOpacity>
-  );
-}
-
+// HeaderBackButton is now defined inline with proper navigation context
 export default function RootLayout() {
   const [isLanguageLoaded, setIsLanguageLoaded] = useState(false);
 
