@@ -821,9 +821,9 @@ export default function ScoreKeepingScreen() {
             <View style={styles.rankingsTable}>
               <View style={styles.rankingsHeader}>
                 <Text style={[styles.rankingsHeaderText, styles.rankCol]}>#</Text>
-                <Text style={[styles.rankingsHeaderText, styles.nameCol]}>Archer</Text>
-                <Text style={[styles.rankingsHeaderText, styles.bowCol]}>Bow</Text>
-                <Text style={[styles.rankingsHeaderText, styles.scoreCol]}>Score</Text>
+                <Text style={[styles.rankingsHeaderText, styles.nameCol]}>{t('scoreKeeping.archerName')}</Text>
+                <Text style={[styles.rankingsHeaderText, styles.bowCol]}>{t('bows.bow')}</Text>
+                <Text style={[styles.rankingsHeaderText, styles.scoreCol]}>{t('scoreKeeping.score')}</Text>
               </View>
               {rankings.map((entry, index) => (
                 <View key={`${entry.name}-${index}`} style={styles.rankingsRow}>
