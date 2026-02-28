@@ -76,8 +76,7 @@ export default function RootLayout() {
         <Stack.Screen 
           name="stats" 
           options={{ 
-            headerBackVisible: false,
-            headerLeft: () => <HeaderBackButton />,
+            headerShown: false,
           }} 
         />
         <Stack.Screen 
