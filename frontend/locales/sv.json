@@ -136,7 +136,8 @@
     "shareResults": "Dela tävlingsresultat",
     "pdfGenerated": "PDF genererad",
     "pdfSaved": "Resultat-PDF har sparats.",
-    "noEntries": "Inga poster"
+    "noEntries": "Inga poster",
+    "deleteEntryConfirm": "Ta bort denna post?"
   },
   "settings": {
     "title": "Inställningar",

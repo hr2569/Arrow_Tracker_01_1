@@ -136,7 +136,8 @@
     "shareResults": "Поделиться результатами",
     "pdfGenerated": "PDF создан",
     "pdfSaved": "PDF результатов сохранён.",
-    "noEntries": "Нет записей"
+    "noEntries": "Нет записей",
+    "deleteEntryConfirm": "Удалить эту запись?"
   },
   "settings": {
     "title": "Настройки",

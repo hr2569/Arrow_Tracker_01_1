@@ -135,7 +135,8 @@
     "shareResults": "Compartilhar resultados",
     "pdfGenerated": "PDF gerado",
     "pdfSaved": "O PDF de resultados foi salvo.",
-    "noEntries": "Sem entradas"
+    "noEntries": "Sem entradas",
+    "deleteEntryConfirm": "Excluir esta entrada?"
   },
   "settings": {
     "title": "Definições",

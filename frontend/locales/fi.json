@@ -136,7 +136,8 @@
     "shareResults": "Jaa kilpailutulokset",
     "pdfGenerated": "PDF luotu",
     "pdfSaved": "Tulokset PDF on tallennettu.",
-    "noEntries": "Ei merkintöjä"
+    "noEntries": "Ei merkintöjä",
+    "deleteEntryConfirm": "Poista tämä merkintä?"
   },
   "settings": {
     "title": "Asetukset",

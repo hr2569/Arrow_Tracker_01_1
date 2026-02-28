@@ -136,7 +136,8 @@
     "shareResults": "Поділитися результатами",
     "pdfGenerated": "PDF створено",
     "pdfSaved": "PDF результатів збережено.",
-    "noEntries": "Немає записів"
+    "noEntries": "Немає записів",
+    "deleteEntryConfirm": "Видалити цей запис?"
   },
   "settings": {
     "title": "Налаштування",

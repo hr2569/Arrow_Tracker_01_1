@@ -135,7 +135,8 @@
     "importCode": "Import",
     "invalidCode": "Invalid import code. Please check and try again.",
     "duplicateEntry": "This archer has already been imported.",
-    "pdfImportTip": "PDF text extraction is limited. For reliable data transfer, please use the CSV export option and import the CSV file instead."
+    "pdfImportTip": "PDF text extraction is limited. For reliable data transfer, please use the CSV export option and import the CSV file instead.",
+    "deleteEntryConfirm": "Delete this entry?"
   },
   "settings": {
     "title": "Settings",

@@ -136,7 +136,8 @@
     "shareResults": "Compartir resultados de competición",
     "pdfGenerated": "PDF generado",
     "pdfSaved": "El PDF de resultados se ha guardado.",
-    "noEntries": "Sin entradas"
+    "noEntries": "Sin entradas",
+    "deleteEntryConfirm": "¿Eliminar esta entrada?"
   },
   "settings": {
     "title": "Ajustes",

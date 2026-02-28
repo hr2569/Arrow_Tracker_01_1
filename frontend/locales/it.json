@@ -136,7 +136,8 @@
     "shareResults": "Condividi risultati",
     "pdfGenerated": "PDF generato",
     "pdfSaved": "Il PDF dei risultati è stato salvato.",
-    "noEntries": "Nessuna voce"
+    "noEntries": "Nessuna voce",
+    "deleteEntryConfirm": "Eliminare questa voce?"
   },
   "settings": {
     "title": "Impostazioni",

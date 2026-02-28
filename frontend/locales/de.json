@@ -135,7 +135,8 @@
     "shareResults": "Wettbewerbsergebnisse teilen",
     "pdfGenerated": "PDF erstellt",
     "pdfSaved": "Ergebnis-PDF wurde gespeichert.",
-    "noEntries": "Keine Einträge"
+    "noEntries": "Keine Einträge",
+    "deleteEntryConfirm": "Diesen Eintrag löschen?"
   },
   "settings": {
     "title": "Einstellungen",
